@@ -49,7 +49,7 @@ Task("BuildLinux")
 
     // Copy artifact
     CreateDirectory(artifactsDir);
-    CopyFile($"build/lib/joltc.so", $"{artifactsDir}/libjoltc.so");
+    CopyFile($"build/lib/libjoltc.so", $"{artifactsDir}/libjoltc.so");
 });
 
 Task("Package")
