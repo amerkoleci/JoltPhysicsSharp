@@ -15,11 +15,11 @@ Task("BuildWindows")
     var buildDir = "build";
     CreateDirectory(buildDir);
     StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-G \"Visual Studio 17 2022\" -A x64 ../" });
-    StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Release" });
+    StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Distribution" });
 
     // Copy artifact
     CreateDirectory(artifactsDir);
-    CopyFile("build/bin/Release/joltc.dll", $"{artifactsDir}/joltc.dll");
+    CopyFile("build/bin/Distribution/joltc.dll", $"{artifactsDir}/joltc.dll");
 });
 
 Task("BuildMacOS")
@@ -29,7 +29,7 @@ Task("BuildMacOS")
     // Build
     var buildDir = "build";
     CreateDirectory(buildDir);
-    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Release" });
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution" });
     StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
 
     // Copy artifact
@@ -44,7 +44,7 @@ Task("BuildLinux")
     // Build
     var buildDir = "build";
     CreateDirectory(buildDir);
-    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Release" });
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution" });
     StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
 
     // Copy artifact

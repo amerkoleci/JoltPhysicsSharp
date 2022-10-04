@@ -1,26 +1,200 @@
-# CMake version
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-	message(FATAL_ERROR "In-source builds are not supported. Please choose a different binary directory.")
-	return()
-endif()
+project(JoltC CXX)
 
 # Use solution folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Configure CMake global variables
-set (CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_STANDARD_REQUIRED ON)
-set (CMAKE_CXX_EXTENSIONS OFF)
-
-# Project declaration
-project (JoltC LANGUAGES C CXX)
-
-# Configure CMake global variables
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# When turning this option on, the library will be compiled in such a way to attempt to keep the simulation deterministic across platforms
+option(CROSS_PLATFORM_DETERMINISTIC "Cross platform deterministic" OFF)
+
+# When turning this option on, the library will be compiled for ARM (aarch64-linux-gnu), requires compiling with clang
+option(CROSS_COMPILE_ARM "Cross compile to aarch64-linux-gnu" OFF)
+
+# Select X86 processor features to use (if everything is off it will be SSE2 compatible)
+option(USE_SSE4_1 "Enable SSE4.1" ON)
+option(USE_SSE4_2 "Enable SSE4.2" ON)
+option(USE_AVX "Enable AVX" ON)
+option(USE_AVX2 "Enable AVX2" ON)
+option(USE_AVX512 "Enable AVX512" OFF)
+option(USE_LZCNT "Enable LZCNT" ON)
+option(USE_TZCNT "Enable TZCNT" ON)
+option(USE_F16C "Enable F16C" ON)
+option(USE_FMADD "Enable FMADD" ON)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	set(CMAKE_CONFIGURATION_TYPES "Debug;Release;Distribution")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+	set(CMAKE_CONFIGURATION_TYPES "Debug;Release;ReleaseASAN;ReleaseUBSAN;ReleaseCoverage;Distribution")
+endif()
+
+if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "WindowsStore") AND NOT MINGW)
+	# Fill in the path to the asan libraries
+	set(CLANG_LIB_PATH "\"$(VSInstallDir)\\VC\\Tools\\Llvm\\x64\\lib\\clang\\${CMAKE_CXX_COMPILER_VERSION}\\lib\\windows\"")
+	
+	# 64 bit architecture
+	set(CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE "x64")
+
+	# Set runtime library
+	if ("${CMAKE_SYSTEM_NAME}" STREQUAL "WindowsStore")
+		# Windows store only supports multithreaded DLL
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+	else()
+		# Otherwise use static library
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	endif()
+
+	# Set general compiler flags
+	set(CMAKE_CXX_FLAGS "/std:c++17 /Zc:__cplusplus /GR- /Gm- /W3 /WX /EHsc /MP /nologo /diagnostics:classic /FC /fp:except- /Zc:inline /Zi /DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE")
+
+	# Set compiler flags for various configurations
+	set(CMAKE_CXX_FLAGS_DEBUG "/GS /Od /Ob0 /RTC1")
+	set(CMAKE_CXX_FLAGS_RELEASE "/GS- /GL /Gy /O2 /Oi /Ot")
+	set(CMAKE_CXX_FLAGS_DISTRIBUTION "/GS- /GL /Gy /O2 /Oi /Ot")
+	set(CMAKE_CXX_FLAGS_RELEASEASAN "-fsanitize=address /Od")
+	set(CMAKE_CXX_FLAGS_RELEASEUBSAN "-fsanitize=undefined,implicit-conversion,float-divide-by-zero,local-bounds -fno-sanitize-recover=all")
+	set(CMAKE_CXX_FLAGS_RELEASECOVERAGE "-fprofile-instr-generate -fcoverage-mapping")
+
+	# Set linker flags
+	set(CMAKE_EXE_LINKER_FLAGS "/SUBSYSTEM:WINDOWS /ignore:4221 /DEBUG:FASTLINK")
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+		if (CROSS_PLATFORM_DETERMINISTIC)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:precise")
+		else()
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast") # Clang doesn't use fast math because it cannot be turned off inside a single compilation unit
+		endif()
+		if (USE_AVX512)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX512")
+		elseif (USE_AVX2)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
+		elseif (USE_AVX)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX")
+		endif()	
+		if (USE_SSE4_1)
+			add_compile_definitions(JPH_USE_SSE4_1)
+		endif()
+		if (USE_SSE4_2)
+			add_compile_definitions(JPH_USE_SSE4_2)
+		endif()
+		if (USE_LZCNT)
+			add_compile_definitions(JPH_USE_LZCNT)
+		endif()
+		if (USE_TZCNT)
+			add_compile_definitions(JPH_USE_TZCNT)
+		endif()
+		if (USE_F16C)
+			add_compile_definitions(JPH_USE_F16C)
+		endif()
+		if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
+			add_compile_definitions(JPH_USE_FMADD)
+		endif()
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED") # Clang turns Float2 into a vector sometimes causing floating point exceptions
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED")
+		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/INCREMENTAL:NO /LTCG:incremental /OPT:ICF /OPT:REF")
+		set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "/LTCG")
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /showFilenames")
+		if (USE_AVX512)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f -mavx512vl -mavx512dq -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
+		elseif (USE_AVX2)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
+		elseif (USE_AVX)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -mpopcnt")
+		elseif (USE_SSE4_2)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -mpopcnt")
+		elseif (USE_SSE4_1)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+		else()
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+		endif()
+		if (USE_LZCNT)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mlzcnt")
+		endif()
+		if (USE_TZCNT)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi")
+		endif()
+		if (USE_F16C)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mf16c")
+		endif()
+		if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
+		endif()
+		set(CMAKE_EXE_LINKER_FLAGS_RELEASEASAN "/SUBSYSTEM:CONSOLE /LIBPATH:${CLANG_LIB_PATH} clang_rt.asan-x86_64.lib -wholearchive:clang_rt.asan-x86_64.lib clang_rt.asan_cxx-x86_64.lib -wholearchive:clang_rt.asan_cxx-x86_64.lib")
+		set(CMAKE_EXE_LINKER_FLAGS_RELEASEUBSAN "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LIBPATH:${CLANG_LIB_PATH}")
+		set(CMAKE_EXE_LINKER_FLAGS_RELEASECOVERAGE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LIBPATH:${CLANG_LIB_PATH}")
+	endif()
+elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR MINGW OR EMSCRIPTEN)
+	# Set general compiler flags
+	set(CMAKE_CXX_FLAGS "-g -std=c++17 -I. -Wall -Werror")
+
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		# Somehow -Wcomment doesn't want to be turned off from code and we need this because Doxygen MathJax uses it
+		# Also turn off automatic fused multiply add contractions, there doesn't seem to be a way to do this selectively through the macro JPH_PRECISE_MATH_OFF
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-comment -ffp-contract=off")
+	else()
+		# Do not use -ffast-math or -ffp-contract=on since it cannot be turned off in a single compilation unit under clang, see Core.h
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffp-model=precise -ffp-contract=off")
+	endif()
+
+	# Platform specific compiler flags
+	if (CROSS_COMPILE_ARM)
+		set(CMAKE_CXX_FLAGS "--target=aarch64-linux-gnu ${CMAKE_CXX_FLAGS}")
+	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
+		# X64
+		if (USE_AVX512)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f -mavx512vl -mavx512dq -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
+		elseif (USE_AVX2)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
+		elseif (USE_AVX)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -mpopcnt")
+		elseif (USE_SSE4_2)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -mpopcnt")
+		elseif (USE_SSE4_1)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+		else()
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+		endif()
+		if (USE_LZCNT)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mlzcnt")
+		endif()
+		if (USE_TZCNT)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi")
+		endif()
+		if (USE_F16C)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mf16c")
+		endif()
+		if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
+		endif()
+	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+		# ARM64
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	endif()
+
+	# Set compiler flags for various configurations
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+	set(CMAKE_CXX_FLAGS_DISTRIBUTION "-O3")
+	set(CMAKE_CXX_FLAGS_RELEASEASAN "-fsanitize=address")
+	set(CMAKE_CXX_FLAGS_RELEASEUBSAN "-fsanitize=undefined,implicit-conversion,float-divide-by-zero,local-bounds -fno-sanitize-recover=all")
+	set(CMAKE_CXX_FLAGS_RELEASECOVERAGE "-fprofile-instr-generate -fcoverage-mapping")
+
+	# Set linker flags
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+endif()
+
+# Setting to attempt cross platform determinism
+if (CROSS_PLATFORM_DETERMINISTIC)
+	add_compile_definitions(JPH_CROSS_PLATFORM_DETERMINISTIC)
+endif()
+
+# Set linker flags
+set(CMAKE_SHARED_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+set(CMAKE_EXE_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
 # Options
 if (IOS OR EMSCRIPTEN)
