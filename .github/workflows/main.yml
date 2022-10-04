@@ -64,17 +64,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: Native-windows-latest
-          path: src/Vortice.Textures/runtimes/win-x64/native
+          path: src/JoltPhysicsSharp/runtimes/win-x64/native
       - name: Download artifacts for macOS
         uses: actions/download-artifact@v3
         with:
           name: Native-macos-latest
-          path: src/Vortice.Textures/runtimes/osx/native
+          path: src/JoltPhysicsSharp/runtimes/osx/native
       - name: Download artifacts for Linux x64
         uses: actions/download-artifact@v3
         with:
           name: Native-ubuntu-20.04
-          path: src/Vortice.Textures/runtimes/linux-x64/native
+          path: src/JoltPhysicsSharp/runtimes/linux-x64/native
       - name: Restore dotnet tools
         run: dotnet tool restore
       - name: Run CAKE
