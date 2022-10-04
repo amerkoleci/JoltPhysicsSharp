@@ -15,7 +15,7 @@ Task("BuildWindows")
     var buildDir = "build";
     CreateDirectory(buildDir);
     StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-G \"Visual Studio 17 2022\" -A x64 ../" });
-    StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "Native.sln /p:Configuration=Release" });
+    StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Release" });
 
     // Copy artifact
     CreateDirectory(artifactsDir);
