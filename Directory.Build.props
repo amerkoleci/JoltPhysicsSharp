@@ -1,0 +1,45 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>CS1591;CS1701</NoWarn>
+
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RepositoryUrl>https://github.com/amerkoleci/JoltPhysicsSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <ProjectUrl>https://github.com/amerkoleci/JoltPhysicsSharp</ProjectUrl>
+    <Authors>Amer Koleci</Authors>
+    <Owners>Amer Koleci</Owners>
+    <Company>Amer Koleci</Company>
+    <Copyright>Copyright © Amer Koleci and Contributors</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageTags>game-engine game-development physics physics-engine physics-simulation</PackageTags>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts/</PackageOutputPath>
+  </PropertyGroup>
+
+  <!-- https://github.com/dotnet/sourcelink -->
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>false</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

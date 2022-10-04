@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!--<ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\JoltPhysicsSharp\runtimes\win-x64\native\joltc.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <ProjectReference Include="..\JoltPhysicsSharp\JoltPhysicsSharp.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <ProjectReference Include="..\JoltPhysicsSharp\JoltPhysicsSharp.csproj" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    
+    <PackageReference Include="xunit" Version="2.4.2" />
+  </ItemGroup>
+
+</Project>

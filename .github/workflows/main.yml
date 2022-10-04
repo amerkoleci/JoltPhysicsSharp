@@ -1,0 +1,87 @@
+
+name: Build
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - '*.md'
+      - 'LICENSE'
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - 'LICENSE'
+
+jobs:
+  build:
+    name: build-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-20.04]
+    steps:
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v1.1
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt-get install make cmake autoconf automake pkg-config 
+        shell: bash
+      - name: Clone repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+      - name: Run CAKE
+        run: dotnet cake
+      - name: Package artifacts
+        uses: actions/upload-artifact@main
+        with:
+          name: Native-${{ matrix.os }}
+          path: |
+            artifacts/*
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    needs: [ build ]
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+      - name: Clone repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Download artifacts for Windows x64
+        uses: actions/download-artifact@v3
+        with:
+          name: Native-windows-latest
+          path: src/Vortice.Textures/runtimes/win-x64/native
+      - name: Download artifacts for macOS
+        uses: actions/download-artifact@v3
+        with:
+          name: Native-macos-latest
+          path: src/Vortice.Textures/runtimes/osx/native
+      - name: Download artifacts for Linux x64
+        uses: actions/download-artifact@v3
+        with:
+          name: Native-ubuntu-20.04
+          path: src/Vortice.Textures/runtimes/linux-x64/native
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+      - name: Run CAKE
+        run: dotnet cake --target Package
+      - uses: actions/upload-artifact@v2
+        with:
+          name: nuget_release
+          path: |
+            ./artifacts/*
+          if-no-files-found: error

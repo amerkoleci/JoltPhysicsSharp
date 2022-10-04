@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <!-- Settings that are only set for executables -->
+  <PropertyGroup Condition="'$(OutputType)' != 'Library' AND '$(UseWindowsForms)' != 'true'">
+    <PublishTrimmed>true</PublishTrimmed>
+  </PropertyGroup>
+
+  <!-- Settings that are only set for libraries -->
+  <PropertyGroup Condition="'$(OutputType)' == 'Library'">
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,1 @@
+Native library for the corresponding platform have to be copied here.

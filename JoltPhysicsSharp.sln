@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoltPhysicsSharp", "src\JoltPhysicsSharp\JoltPhysicsSharp.csproj", "{E95D00A1-3120-4871-B1EF-21A9B90D0240}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{0FC63B64-13F8-4238-9D1F-82E65F4E5D6C}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoltPhysicsSharp.Tests", "src\tests\JoltPhysicsSharp.Tests.csproj", "{66EB1AB5-040B-4F68-BFC3-B320B95557A2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6757E0F8-8F96-4CE9-BA2E-4B2C6C2E3E50}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E95D00A1-3120-4871-B1EF-21A9B90D0240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E95D00A1-3120-4871-B1EF-21A9B90D0240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E95D00A1-3120-4871-B1EF-21A9B90D0240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E95D00A1-3120-4871-B1EF-21A9B90D0240}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66EB1AB5-040B-4F68-BFC3-B320B95557A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66EB1AB5-040B-4F68-BFC3-B320B95557A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66EB1AB5-040B-4F68-BFC3-B320B95557A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66EB1AB5-040B-4F68-BFC3-B320B95557A2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{66EB1AB5-040B-4F68-BFC3-B320B95557A2} = {6757E0F8-8F96-4CE9-BA2E-4B2C6C2E3E50}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7315E8D4-D93C-4516-A973-02FEF89B408A}
+	EndGlobalSection
+EndGlobal
