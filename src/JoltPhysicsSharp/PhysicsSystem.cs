@@ -7,6 +7,8 @@ namespace JoltPhysicsSharp;
 
 public sealed class PhysicsSystem : NativeObject
 {
+    public BodyInterface BodyInterface => new BodyInterface(JPH_PhysicsSystem_GetBodyInterface(Handle));
+
     public PhysicsSystem()
         : base(JPH_PhysicsSystem_Create())
     {
@@ -33,5 +35,11 @@ public sealed class PhysicsSystem : NativeObject
     public void OptimizeBroadPhase()
     {
         JPH_PhysicsSystem_OptimizeBroadPhase(Handle);
+    }
+
+    public void Update(float deltaTime, int collisionSteps, int integrationSubSteps,
+        in TempAllocator tempAlocator, in JobSystemThreadPool jobSystem)
+    {
+        JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, integrationSubSteps, tempAlocator.Handle, jobSystem.Handle);
     }
 }

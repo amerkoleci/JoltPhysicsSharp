@@ -5,25 +5,23 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-
-public sealed class BroadPhaseLayer : NativeObject
+public abstract class ShapeSettings : NativeObject
 {
-    public BroadPhaseLayer()
-        : base(JPH_BroadPhaseLayer_Create())
+    protected ShapeSettings(IntPtr handle)
+        : base(handle)
     {
     }
 
     /// <summary>
-    /// Finalizes an instance of the <see cref="BroadPhaseLayer" /> class.
+    /// Finalizes an instance of the <see cref="ShapeSettings" /> class.
     /// </summary>
-    ~BroadPhaseLayer() => Dispose(isDisposing: false);
+    ~ShapeSettings() => Dispose(isDisposing: false);
 
     protected override void Dispose(bool isDisposing)
     {
         if (isDisposing)
         {
-            JPH_BroadPhaseLayer_Destroy(Handle);
+            JPH_ShapeSettings_Destroy(Handle);
         }
     }
 }
-

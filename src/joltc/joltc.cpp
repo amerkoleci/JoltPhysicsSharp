@@ -139,6 +139,23 @@ static bool MyObjectCanCollide(ObjectLayer inObject1, ObjectLayer inObject2)
     }
 };
 
+static JPH::Vec3 ToVec3(const JPH_Vec3* vec)
+{
+    return JPH::Vec3(vec->x, vec->y, vec->z);
+}
+
+static void FromVec3(const JPH::Vec3& vec, JPH_Vec3* result)
+{
+    result->x = vec.GetX();
+    result->y = vec.GetY();
+    result->z = vec.GetZ();
+}
+
+static JPH::Quat ToQuat(const JPH_Quat* quat)
+{
+    return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
+}
+
 bool JPH_Init(void)
 {
     JPH::RegisterDefaultAllocator();
@@ -205,6 +222,61 @@ void JPH_BroadPhaseLayer_Destroy(JPH_BroadPhaseLayer* layer)
     }
 }
 
+/* ShapeSettings */
+void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
+{
+    if (settings)
+    {
+        delete reinterpret_cast<JPH::ShapeSettings*>(settings);
+    }
+}
+
+JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius)
+{
+    auto settings = new JPH::BoxShapeSettings(ToVec3(halfExtent), convexRadius);
+    return reinterpret_cast<JPH_BoxShapeSettings*>(settings);
+}
+
+JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius)
+{
+    auto settings = new JPH::SphereShapeSettings(radius);
+    return reinterpret_cast<JPH_SphereShapeSettings*>(settings);
+}
+
+/* JPH_BodyCreationSettings */
+JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create()
+{
+    auto bodyCreationSettings = new JPH::BodyCreationSettings();
+    return reinterpret_cast<JPH_BodyCreationSettings*>(bodyCreationSettings);
+}
+
+JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(
+    JPH_ShapeSettings* shapeSettings,
+    const JPH_Vec3* position,
+    const JPH_Quat* rotation,
+    JPH_MotionType motionType,
+    uint16_t objectLayer)
+{
+    JPH::ShapeSettings* joltShapeSettings = reinterpret_cast<JPH::ShapeSettings*>(shapeSettings);
+    auto bodyCreationSettings = new JPH::BodyCreationSettings(
+        joltShapeSettings,
+        ToVec3(position),
+        ToQuat(rotation),
+        (JPH::EMotionType)motionType,
+        objectLayer
+    );
+    return reinterpret_cast<JPH_BodyCreationSettings*>(bodyCreationSettings);
+}
+
+void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* settings)
+{
+    if (settings)
+    {
+        delete reinterpret_cast<JPH::BodyCreationSettings*>(settings);
+    }
+}
+
+/* JPH_PhysicsSystem */
 JPH_PhysicsSystem* JPH_PhysicsSystem_Create(void)
 {
     auto system = new JPH::PhysicsSystem();
@@ -237,4 +309,118 @@ void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system)
     JPH_ASSERT(system);
 
     reinterpret_cast<JPH::PhysicsSystem*>(system)->OptimizeBroadPhase();
+}
+
+void JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
+    JPH_TempAllocator* tempAlocator,
+    JPH_JobSystemThreadPool* jobSystem)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    auto joltTempAlocator = reinterpret_cast<JPH::TempAllocator*>(tempAlocator);
+    auto joltJobSystem = reinterpret_cast<JPH::JobSystemThreadPool*>(jobSystem);
+    joltSystem->Update(deltaTime, collisionSteps, integrationSubSteps, joltTempAlocator, joltJobSystem);
+}
+
+JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    return reinterpret_cast<JPH_BodyInterface*>(&joltSystem->GetBodyInterface());
+}
+
+JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    auto body = joltBodyInterface->CreateBody(
+        *reinterpret_cast<const JPH::BodyCreationSettings*>(settings)
+    );
+
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_BodyID JPH_BodyInterface_CreateAndAddBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings, JPH_ActivationMode activation)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    JPH::BodyID bodyID = joltBodyInterface->CreateAndAddBody(
+        *reinterpret_cast<const JPH::BodyCreationSettings*>(settings),
+        (JPH::EActivation)activation
+    );
+
+    return bodyID.GetIndexAndSequenceNumber();
+}
+
+void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    joltBodyInterface->DestroyBody(JPH::BodyID(bodyID));
+}
+
+void JPH_BodyInterface_AddBody(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_ActivationMode activation)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    joltBodyInterface->AddBody(JPH::BodyID(bodyID), (JPH::EActivation)activation);
+}
+
+void JPH_BodyInterface_RemoveBody(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    joltBodyInterface->RemoveBody(JPH::BodyID(bodyID));
+}
+
+bool JPH_BodyInterface_IsActive(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    return joltBodyInterface->IsActive(JPH::BodyID(bodyID));
+}
+
+bool JPH_BodyInterface_IsAdded(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    return joltBodyInterface->IsAdded(JPH::BodyID(bodyID));
+}
+
+void JPH_BodyInterface_SetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_Vec3* velocity)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    joltBodyInterface->SetLinearVelocity(JPH::BodyID(bodyID), ToVec3(velocity));
+}
+
+void JPH_BodyInterface_GetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Vec3* velocity)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto joltVector = joltBodyInterface->GetLinearVelocity(JPH::BodyID(bodyID));
+    FromVec3(joltVector, velocity);
+}
+
+void JPH_BodyInterface_GetCenterOfMassPosition(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Vec3* position)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto joltVector = joltBodyInterface->GetCenterOfMassPosition(JPH::BodyID(bodyID));
+    FromVec3(joltVector, position);
+}
+
+JPH_BodyID JPH_Body_GetID(JPH_Body* body)
+{
+    auto joltBody = reinterpret_cast<JPH::Body*>(body);
+    return joltBody->GetID().GetIndexAndSequenceNumber();
 }

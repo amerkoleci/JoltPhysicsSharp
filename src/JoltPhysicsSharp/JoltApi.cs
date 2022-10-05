@@ -2,6 +2,7 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -113,6 +114,27 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BroadPhaseLayer_Destroy(IntPtr handle);
 
+    /* ShapeSettings */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ShapeSettings_Destroy(IntPtr shape);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BoxShapeSettings_Create(Vector3* halfExtent, float convexRadius);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_SphereShapeSettings_Create(float radius);
+
+    /* BodyCreationSettings */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyCreationSettings_Create();
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyCreationSettings_Create2(IntPtr shapeSettings, Vector3* position, Quaternion* rotation, MotionType motionType, ushort objectLayer);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyCreationSettings_Destroy(IntPtr settings);
+
+
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PhysicsSystem_Create();
 
@@ -126,4 +148,44 @@ internal static unsafe class JoltApi
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_OptimizeBroadPhase(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_Update(IntPtr handle,
+        float deltaTime, int collisionSteps, int integrationSubSteps,
+        IntPtr tempAlocator, IntPtr jobSystem);
+
+    /* BodyInterface */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_PhysicsSystem_GetBodyInterface(IntPtr system);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyInterface_CreateBody(IntPtr handle, IntPtr settings);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_BodyInterface_CreateAndAddBody(IntPtr handle, IntPtr bodyID, ActivationMode activation);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_DestroyBody(IntPtr handle, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_AddBody(IntPtr handle, uint bodyID, ActivationMode activation);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_RemoveBody(IntPtr handle, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetLinearVelocity(IntPtr handle, uint bodyID, Vector3* velocity);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_GetLinearVelocity(IntPtr handle, uint bodyID, Vector3* velocity);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_GetCenterOfMassPosition(IntPtr handle, uint bodyID, Vector3* velocity);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_Body_GetID(IntPtr body);
 }
