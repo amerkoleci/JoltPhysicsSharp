@@ -7,7 +7,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public readonly partial struct BodyInterface : IEquatable<BodyInterface>
+public readonly struct BodyInterface : IEquatable<BodyInterface>
 {
     public BodyInterface(IntPtr handle) { Handle = handle; }
     public IntPtr Handle { get; }
@@ -19,8 +19,10 @@ public readonly partial struct BodyInterface : IEquatable<BodyInterface>
     public static bool operator ==(BodyInterface left, IntPtr right) => left.Handle == right;
     public static bool operator !=(BodyInterface left, IntPtr right) => left.Handle != right;
     public bool Equals(BodyInterface other) => Handle == other.Handle;
+
     /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is BodyInterface handle && Equals(handle);
+
     /// <inheritdoc/>
     public override int GetHashCode() => Handle.GetHashCode();
 
@@ -32,27 +34,22 @@ public readonly partial struct BodyInterface : IEquatable<BodyInterface>
 
     public BodyID CreateAndAddBody(BodyCreationSettings settings, ActivationMode activationMode)
     {
-        uint bodyID = JPH_BodyInterface_CreateAndAddBody(Handle, settings.Handle, activationMode);
-        return bodyID;
+        return new(JPH_BodyInterface_CreateAndAddBody(Handle, settings.Handle, activationMode));
     }
-
-    public void DestroyBody(in Body body) => DestroyBody(body.ID);
 
     public void DestroyBody(in BodyID bodyID)
     {
         JPH_BodyInterface_DestroyBody(Handle, bodyID);
     }
 
-    public void AddBody(in Body body, ActivationMode activationMode) => AddBody(body.ID, activationMode);
-
     public void AddBody(in BodyID bodyID, ActivationMode activationMode)
     {
         JPH_BodyInterface_AddBody(Handle, bodyID, activationMode);
     }
 
-    public void RemoveBody(in Body body)
+    public void AddBody(in Body body, ActivationMode activationMode)
     {
-        JPH_BodyInterface_RemoveBody(Handle, body.ID);
+        JPH_BodyInterface_AddBody(Handle, body.ID, activationMode);
     }
 
     public void RemoveBody(in BodyID bodyID)
@@ -94,10 +91,16 @@ public readonly partial struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, velocity);
     }
 
-    public bool IsActive(in Body body) => IsActive(body.ID);
-
-    public bool IsActive(in BodyID bodyID)
+    public MotionType GetMotionType(in BodyID bodyID)
     {
-        return JPH_BodyInterface_IsActive(Handle, bodyID);
+        return JPH_BodyInterface_GetMotionType(Handle, bodyID);
     }
+
+    public void SetMotionType(in BodyID bodyID, MotionType motionType, ActivationMode activationMode)
+    {
+        JPH_BodyInterface_SetMotionType(Handle, bodyID, motionType, activationMode);
+    }
+
+    public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID);
+    public bool IsAdded(in BodyID bodyID) => JPH_BodyInterface_IsAdded(Handle, bodyID);
 }

@@ -419,8 +419,64 @@ void JPH_BodyInterface_GetCenterOfMassPosition(JPH_BodyInterface* interface, JPH
     FromVec3(joltVector, position);
 }
 
+JPH_MotionType JPH_BodyInterface_GetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    return static_cast<JPH_MotionType>(joltBodyInterface->GetMotionType(JPH::BodyID(bodyID)));
+}
+
+void JPH_BodyInterface_SetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_MotionType motionType, JPH_ActivationMode activationMode)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    joltBodyInterface->SetMotionType(
+        JPH::BodyID(bodyID),
+        static_cast<JPH::EMotionType>(motionType),
+        static_cast<JPH::EActivation>(activationMode)
+    );
+}
+
+/* Body */
 JPH_BodyID JPH_Body_GetID(JPH_Body* body)
 {
     auto joltBody = reinterpret_cast<JPH::Body*>(body);
     return joltBody->GetID().GetIndexAndSequenceNumber();
+}
+
+bool JPH_Body_IsActive(JPH_Body* body)
+{
+    return reinterpret_cast<JPH::Body*>(body)->IsActive();
+}
+
+bool JPH_Body_IsStatic(JPH_Body* body)
+{
+    return reinterpret_cast<JPH::Body*>(body)->IsStatic();
+}
+
+bool JPH_Body_IsKinematic(JPH_Body* body)
+{
+    return reinterpret_cast<JPH::Body*>(body)->IsKinematic();
+}
+
+bool JPH_Body_IsDynamic(JPH_Body* body)
+{
+    return reinterpret_cast<JPH::Body*>(body)->IsDynamic();
+}
+
+bool JPH_Body_IsSensor(JPH_Body* body)
+{
+    return reinterpret_cast<JPH::Body*>(body)->IsSensor();
+}
+
+JPH_MotionType JPH_Body_GetMotionType(JPH_Body* body)
+{
+    return static_cast<JPH_MotionType>(reinterpret_cast<JPH::Body*>(body)->GetMotionType());
+}
+
+void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType)
+{
+    reinterpret_cast<JPH::Body*>(body)->SetMotionType(static_cast<JPH::EMotionType>(motionType));
 }

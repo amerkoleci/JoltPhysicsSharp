@@ -187,5 +187,42 @@ internal static unsafe class JoltApi
     public static extern bool JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_BodyInterface_IsAdded(IntPtr handle, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern MotionType JPH_BodyInterface_GetMotionType(IntPtr handle, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetMotionType(IntPtr handle, uint bodyID, MotionType motionType, ActivationMode activationMode);
+
+    /* Body */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_Body_GetID(IntPtr body);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_Body_IsActive(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_Body_IsStatic(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_Body_IsKinematic(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_Body_IsDynamic(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_Body_IsSensor(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern MotionType JPH_Body_GetMotionType(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_SetMotionType(IntPtr handle, MotionType motionType);
 }

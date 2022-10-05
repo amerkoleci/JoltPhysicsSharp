@@ -124,6 +124,8 @@ JPH_CAPI void JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTim
     JPH_JobSystemThreadPool* jobSystem);
 
 JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system);
+
+/* BodyInterface */
 JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 JPH_CAPI JPH_BodyID JPH_BodyInterface_CreateAndAddBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings, JPH_ActivationMode activation);
 JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings);
@@ -137,6 +139,18 @@ JPH_CAPI void JPH_BodyInterface_SetLinearVelocity(JPH_BodyInterface* interface, 
 JPH_CAPI void JPH_BodyInterface_GetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Vec3* velocity);
 JPH_CAPI void JPH_BodyInterface_GetCenterOfMassPosition(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Vec3* position);
 
-JPH_CAPI JPH_BodyID JPH_Body_GetID(JPH_Body* in_body);
+JPH_CAPI JPH_MotionType JPH_BodyInterface_GetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_BodyInterface_SetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_MotionType motionType, JPH_ActivationMode activationMode);
+
+/* Body */
+JPH_CAPI JPH_BodyID JPH_Body_GetID(JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsActive(JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsStatic(JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsKinematic(JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsDynamic(JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsSensor(JPH_Body* body);
+
+JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(JPH_Body* body);
+JPH_CAPI void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType);
 
 #endif /* _JOLT_C_H */

@@ -48,7 +48,7 @@ public static class Program
             // Add it to the world
             bodyInterface.AddBody(floor, ActivationMode.DontActivate);
 
-            BodyCreationSettings spherSettings = new (new SphereShapeSettings(0.5f), new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
+            BodyCreationSettings spherSettings = new(new SphereShapeSettings(0.5f), new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
             BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, ActivationMode.Activate);
 
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.
@@ -91,8 +91,8 @@ public static class Program
             bodyInterface.DestroyBody(sphereID);
 
             // Remove and destroy the floor
-            bodyInterface.RemoveBody(floor);
-            bodyInterface.DestroyBody(floor);
+            bodyInterface.RemoveBody(floor.ID);
+            bodyInterface.DestroyBody(floor.ID);
         }
 
         Foundation.Shutdown();
