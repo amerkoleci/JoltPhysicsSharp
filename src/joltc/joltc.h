@@ -126,10 +126,6 @@ JPH_CAPI void JPH_TempAllocator_Destroy(JPH_TempAllocator* allocator);
 JPH_CAPI JPH_JobSystemThreadPool* JPH_JobSystemThreadPool_Create(uint32_t maxJobs, uint32_t maxBarriers, int inNumThreads);
 JPH_CAPI void JPH_JobSystemThreadPool_Destroy(JPH_JobSystemThreadPool* system);
 
-/* JPH_BroadPhaseLayer */
-JPH_CAPI JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayer_Create();
-JPH_CAPI void JPH_BroadPhaseLayer_Destroy(JPH_BroadPhaseLayerInterface* layer);
-
 /* JPH_ShapeSettings */
 JPH_CAPI void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings);
 JPH_CAPI JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius);
@@ -188,6 +184,19 @@ JPH_CAPI bool JPH_Body_IsSensor(JPH_Body* body);
 
 JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(JPH_Body* body);
 JPH_CAPI void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType);
+
+
+/* JPH_BroadPhaseLayer */
+typedef struct JPH_BroadPhaseLayerInterface_Procs {
+    uint32_t(JPH_API_CALL* GetNumBroadPhaseLayers)(const JPH_BroadPhaseLayerInterface* interface);
+    JPH_BroadPhaseLayer(JPH_API_CALL* GetBroadPhaseLayer)(const JPH_BroadPhaseLayerInterface* interface, JPH_ObjectLayer layer);
+
+    const char* (*GetBroadPhaseLayerName)(const JPH_BroadPhaseLayerInterface* interface, JPH_BroadPhaseLayer layer);
+} JPH_BroadPhaseLayerInterface_Procs;
+
+JPH_CAPI void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);
+JPH_CAPI JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterface_Create();
+JPH_CAPI void JPH_BroadPhaseLayerInterface_Destroy(JPH_BroadPhaseLayerInterface* layer);
 
 /* Contact listener */
 typedef struct JPH_ContactListener_Procs {

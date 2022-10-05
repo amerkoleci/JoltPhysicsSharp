@@ -55,61 +55,6 @@ static bool AssertFailedImpl(const char* inExpression, const char* inMessage, co
 
 #endif // JPH_ENABLE_ASSERTS
 
-namespace Layers
-{
-    static constexpr uint8 NON_MOVING = 0;
-    static constexpr uint8 MOVING = 1;
-    static constexpr uint8 NUM_LAYERS = 2;
-};
-
-namespace BroadPhaseLayers
-{
-    static constexpr BroadPhaseLayer NON_MOVING(0);
-    static constexpr BroadPhaseLayer MOVING(1);
-    static constexpr uint NUM_LAYERS(2);
-};
-
-namespace JPH
-{
-    class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
-    {
-    public:
-        BPLayerInterfaceImpl()
-        {
-            // Create a mapping table from object to broad phase layer
-            mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
-            mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
-        }
-
-        uint GetNumBroadPhaseLayers() const override
-        {
-            return BroadPhaseLayers::NUM_LAYERS;
-        }
-
-        BroadPhaseLayer	GetBroadPhaseLayer(ObjectLayer inLayer) const override
-        {
-            JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
-            return mObjectToBroadPhase[inLayer];
-        }
-
-#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
-        const char* GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const override
-        {
-            switch ((BroadPhaseLayer::Type)inLayer)
-            {
-            case (BroadPhaseLayer::Type)BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
-            case (BroadPhaseLayer::Type)BroadPhaseLayers::MOVING:		return "MOVING";
-            default:													JPH_ASSERT(false); return "INVALID";
-            }
-        }
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
-
-    private:
-        BroadPhaseLayer	mObjectToBroadPhase[Layers::NUM_LAYERS];
-    };
-}
-
-
 static JPH::Vec3 ToVec3(const JPH_Vec3* vec)
 {
     return JPH::Vec3(vec->x, vec->y, vec->z);
@@ -179,17 +124,57 @@ JPH_CAPI void JPH_JobSystemThreadPool_Destroy(JPH_JobSystemThreadPool* system)
     }
 }
 
-JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayer_Create()
+/* JPH_BroadPhaseLayerInterface */
+static JPH_BroadPhaseLayerInterface_Procs g_BroadPhaseLayerInterface_Procs;
+
+class ManagedBroadPhaseLayerInterface final : public JPH::BroadPhaseLayerInterface
 {
-    auto system = new JPH::BPLayerInterfaceImpl();
+public:
+    uint GetNumBroadPhaseLayers() const override
+    {
+        return g_BroadPhaseLayerInterface_Procs.GetNumBroadPhaseLayers(
+            reinterpret_cast<const JPH_BroadPhaseLayerInterface*>(this)
+        );
+    }
+
+    BroadPhaseLayer	GetBroadPhaseLayer(ObjectLayer inLayer) const override
+    {
+        return (BroadPhaseLayer)g_BroadPhaseLayerInterface_Procs.GetBroadPhaseLayer(
+            reinterpret_cast<const JPH_BroadPhaseLayerInterface*>(this),
+            static_cast<JPH_ObjectLayer>(inLayer)
+        );
+    }
+
+#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
+    const char* GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const override
+    {
+        if (g_BroadPhaseLayerInterface_Procs.GetBroadPhaseLayerName == nullptr)
+            return nullptr;
+
+        return g_BroadPhaseLayerInterface_Procs.GetBroadPhaseLayerName(
+            reinterpret_cast<const JPH_BroadPhaseLayerInterface*>(this),
+            static_cast<JPH_BroadPhaseLayer>(inLayer)
+        );
+    }
+#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
+};
+
+void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs)
+{
+    g_BroadPhaseLayerInterface_Procs = procs;
+}
+
+JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterface_Create()
+{
+    auto system = new ManagedBroadPhaseLayerInterface();
     return reinterpret_cast<JPH_BroadPhaseLayerInterface*>(system);
 }
 
-void JPH_BroadPhaseLayer_Destroy(JPH_BroadPhaseLayerInterface* layer)
+void JPH_BroadPhaseLayerInterface_Destroy(JPH_BroadPhaseLayerInterface* layer)
 {
     if (layer)
     {
-        delete reinterpret_cast<JPH::BPLayerInterfaceImpl*>(layer);
+        delete reinterpret_cast<ManagedBroadPhaseLayerInterface*>(layer);
     }
 }
 
@@ -272,7 +257,7 @@ void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
 
     reinterpret_cast<JPH::PhysicsSystem*>(system)->Init(
         maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
-        *reinterpret_cast<const JPH::BPLayerInterfaceImpl*>(layer),
+        *reinterpret_cast<const JPH::BroadPhaseLayerInterface*>(layer),
         reinterpret_cast<JPH::ObjectVsBroadPhaseLayerFilter>(objectVsBroadPhaseLayerFilter),
         reinterpret_cast<JPH::ObjectLayerPairFilter>(objectLayerPairFilter)
     );

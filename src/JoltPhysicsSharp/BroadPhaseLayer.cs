@@ -1,29 +1,31 @@
 // Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using static JoltPhysicsSharp.JoltApi;
-
 namespace JoltPhysicsSharp;
 
-
-public sealed class BroadPhaseLayer : NativeObject
+public readonly struct BroadPhaseLayer : IEquatable<BroadPhaseLayer>
 {
-    public BroadPhaseLayer()
-        : base(JPH_BroadPhaseLayer_Create())
+    public BroadPhaseLayer(byte value)
     {
+        Value = value;
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BroadPhaseLayer" /> class.
-    /// </summary>
-    ~BroadPhaseLayer() => Dispose(isDisposing: false);
+    public byte Value { get; }
+    
+    public static implicit operator BroadPhaseLayer(byte id) => new(id);
+    public static implicit operator byte(in BroadPhaseLayer id) => id.Value;
 
-    protected override void Dispose(bool isDisposing)
-    {
-        if (isDisposing)
-        {
-            JPH_BroadPhaseLayer_Destroy(Handle);
-        }
-    }
+    public static bool operator ==(BroadPhaseLayer left, BroadPhaseLayer right) => left.Value == right.Value;
+    public static bool operator !=(BroadPhaseLayer left, BroadPhaseLayer right) => left.Value != right.Value;
+    public static bool operator ==(BroadPhaseLayer left, byte right) => left.Value == right;
+    public static bool operator !=(BroadPhaseLayer left, byte right) => left.Value != right;
+    public bool Equals(BroadPhaseLayer other) => Value == other.Value;
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => obj is BroadPhaseLayer handle && Equals(handle);
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => Value.GetHashCode();
+
+    public override string ToString() => Value.ToString();
 }
-

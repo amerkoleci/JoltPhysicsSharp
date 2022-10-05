@@ -10,11 +10,11 @@ namespace JoltPhysicsSharp;
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 [return: MarshalAs(UnmanagedType.Bool)]
-public delegate bool ObjectVsBroadPhaseLayerFilter(ushort layer1, byte layer2);
+public delegate bool ObjectVsBroadPhaseLayerFilter(ObjectLayer layer1, BroadPhaseLayer layer2);
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 [return: MarshalAs(UnmanagedType.Bool)]
-public delegate bool ObjectLayerPairFilter(ushort layer1, ushort layer2);
+public delegate bool ObjectLayerPairFilter(ObjectLayer layer1, ObjectLayer layer2);
 
 internal static unsafe class JoltApi
 {
@@ -67,7 +67,7 @@ internal static unsafe class JoltApi
         {
             dllName = "libjoltc.so";
         }
-        else if(OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
+        else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
         {
             dllName = "libjoltc.dylib";
         }
@@ -115,11 +115,22 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_JobSystemThreadPool_Destroy(IntPtr handle);
 
-    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BroadPhaseLayer_Create();
+    //  BroadPhaseLayerInterface
+    public struct JPH_BroadPhaseLayerInterface_Procs
+    {
+        public delegate* unmanaged[Cdecl]<IntPtr, uint> GetNumBroadPhaseLayers;
+        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer> GetBroadPhaseLayer;
+        public delegate* unmanaged[Cdecl]<IntPtr, BroadPhaseLayer, IntPtr> GetBroadPhaseLayerName;
+    }
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BroadPhaseLayer_Destroy(IntPtr handle);
+    public static extern void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BroadPhaseLayerInterface_Create();
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BroadPhaseLayerInterface_Destroy(IntPtr handle);
 
     /* ShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]

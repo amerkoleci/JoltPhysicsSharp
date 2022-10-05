@@ -25,12 +25,35 @@ public static class Program
 
     static class BroadPhaseLayers
     {
-        public const byte NonMoving = 0;
-        public const byte Moving = 1;
+        public static readonly BroadPhaseLayer NonMoving = 0;
+        public static readonly BroadPhaseLayer Moving = 1;
         public const int NumLayers = 2;
     };
 
-    private static bool BroadPhaseCanCollide(ushort layer1, byte layer2)
+    class BPLayerInterfaceImpl : BroadPhaseLayerInterface
+    {
+        private readonly BroadPhaseLayer[] _objectToBroadPhase = new BroadPhaseLayer[Layers.NumLayers];
+
+        public BPLayerInterfaceImpl()
+        {
+            // Create a mapping table from object to broad phase layer
+            _objectToBroadPhase[Layers.NonMoving] = BroadPhaseLayers.NonMoving;
+            _objectToBroadPhase[Layers.Moving] = BroadPhaseLayers.Moving;
+        }
+
+        protected override int GetNumBroadPhaseLayers()
+        {
+            return BroadPhaseLayers.NumLayers;
+        }
+
+        protected override BroadPhaseLayer GetBroadPhaseLayer(ObjectLayer layer)
+        {
+            Debug.Assert(layer < Layers.NumLayers);
+            return _objectToBroadPhase[layer];
+        }
+    }
+
+    private static bool BroadPhaseCanCollide(ObjectLayer layer1, BroadPhaseLayer layer2)
     {
         switch (layer1)
         {
@@ -44,7 +67,7 @@ public static class Program
         }
     }
 
-    private static bool ObjectCanCollide(ushort layer1, ushort layer2)
+    private static bool ObjectCanCollide(ObjectLayer layer1, ObjectLayer layer2)
     {
         switch (layer1)
         {
@@ -66,7 +89,7 @@ public static class Program
         {
             using TempAllocator tempAllocator = new(10 * 1024 * 1024);
             using JobSystemThreadPool jobSystem = new(Foundation.MaxPhysicsJobs, Foundation.MaxPhysicsBarriers);
-            using BroadPhaseLayer broadPhaseLayer = new();
+            using BPLayerInterfaceImpl broadPhaseLayer = new();
             using PhysicsSystem physicsSystem = new();
             physicsSystem.Init(MaxBodies, NumBodyMutexes, MaxBodyPairs, MaxContactConstraints,
                 broadPhaseLayer,

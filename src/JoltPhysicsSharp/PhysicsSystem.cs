@@ -16,6 +16,7 @@ public sealed class PhysicsSystem : NativeObject
 {
     private static readonly Dictionary<IntPtr, PhysicsSystem> s_listeners = new();
     private static readonly JPH_ContactListener_Procs s_contactListener_Procs;
+
     private readonly IntPtr contactListenerHandle;
 
     static unsafe PhysicsSystem()
@@ -49,6 +50,7 @@ public sealed class PhysicsSystem : NativeObject
         if (isDisposing)
         {
             s_listeners.Remove(contactListenerHandle);
+
             JPH_ContactListener_Destroy(contactListenerHandle);
             JPH_PhysicsSystem_Destroy(Handle);
         }
@@ -101,7 +103,7 @@ public sealed class PhysicsSystem : NativeObject
         uint maxBodies, uint numBodyMutexes,
         uint maxBodyPairs,
         uint maxContactConstraints,
-        BroadPhaseLayer layer,
+        BroadPhaseLayerInterface layer,
         ObjectVsBroadPhaseLayerFilter objectVsBroadPhaseLayerFilter,
         ObjectLayerPairFilter objectLayerPairFilter)
     {
