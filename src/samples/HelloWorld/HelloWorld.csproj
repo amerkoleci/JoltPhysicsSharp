@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <Title>Cross platform .NET bindings for Jolt Physics engine</Title>
+    <OutputType>WinExe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\JoltPhysicsSharp\JoltPhysicsSharp.csproj" />
+  </ItemGroup>
+
+</Project>

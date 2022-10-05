@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JoltPhysicsSharp.Tests", "s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6757E0F8-8F96-4CE9-BA2E-4B2C6C2E3E50}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{97BE8BBF-3CFA-4EE5-9530-862ED4AAA1B7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloWorld", "src\samples\HelloWorld\HelloWorld.csproj", "{F1E62F60-D46E-49F8-BFC8-AD0E9E353F50}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,12 +33,17 @@ Global
 		{66EB1AB5-040B-4F68-BFC3-B320B95557A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66EB1AB5-040B-4F68-BFC3-B320B95557A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66EB1AB5-040B-4F68-BFC3-B320B95557A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1E62F60-D46E-49F8-BFC8-AD0E9E353F50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1E62F60-D46E-49F8-BFC8-AD0E9E353F50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1E62F60-D46E-49F8-BFC8-AD0E9E353F50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1E62F60-D46E-49F8-BFC8-AD0E9E353F50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{66EB1AB5-040B-4F68-BFC3-B320B95557A2} = {6757E0F8-8F96-4CE9-BA2E-4B2C6C2E3E50}
+		{F1E62F60-D46E-49F8-BFC8-AD0E9E353F50} = {97BE8BBF-3CFA-4EE5-9530-862ED4AAA1B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7315E8D4-D93C-4516-A973-02FEF89B408A}
