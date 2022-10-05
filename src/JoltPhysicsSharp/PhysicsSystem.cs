@@ -1,6 +1,7 @@
 // Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
@@ -27,9 +28,19 @@ public sealed class PhysicsSystem : NativeObject
         }
     }
 
-    public void Init(uint maxBodies, uint numBodyMutexes, uint maxBodyPairs, uint maxContactConstraints, BroadPhaseLayer layer)
+    public void Init(
+        uint maxBodies, uint numBodyMutexes,
+        uint maxBodyPairs,
+        uint maxContactConstraints,
+        BroadPhaseLayer layer,
+        ObjectVsBroadPhaseLayerFilter objectVsBroadPhaseLayerFilter,
+        ObjectLayerPairFilter objectLayerPairFilter)
     {
-        JPH_PhysicsSystem_Init(Handle, maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints, layer.Handle);
+        JPH_PhysicsSystem_Init(Handle,
+            maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
+            layer.Handle,
+            objectVsBroadPhaseLayerFilter,
+            objectLayerPairFilter);
     }
 
     public void OptimizeBroadPhase()

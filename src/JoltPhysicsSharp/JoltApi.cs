@@ -5,9 +5,16 @@ using System;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 
 namespace JoltPhysicsSharp;
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+[return: MarshalAs(UnmanagedType.Bool)]
+public delegate bool ObjectVsBroadPhaseLayerFilter(ushort layer1, byte layer2);
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+[return: MarshalAs(UnmanagedType.Bool)]
+public delegate bool ObjectLayerPairFilter(ushort layer1, ushort layer2);
 
 internal static unsafe class JoltApi
 {
@@ -144,7 +151,9 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_Init(IntPtr handle,
         uint inMaxBodies, uint numBodyMutexes, uint maxBodyPairs, uint maxContactConstraints,
-        IntPtr layer);
+        IntPtr layer,
+        ObjectVsBroadPhaseLayerFilter inObjectVsBroadPhaseLayerFilter,
+        ObjectLayerPairFilter inObjectLayerPairFilter);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_OptimizeBroadPhase(IntPtr handle);

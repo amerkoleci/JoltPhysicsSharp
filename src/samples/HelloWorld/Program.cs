@@ -1,6 +1,7 @@
 ﻿// Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Diagnostics;
 using System.Numerics;
 using JoltPhysicsSharp;
 
@@ -16,10 +17,45 @@ public static class Program
 
     static class Layers
     {
-        public static readonly byte NonMoving = 0;
-        public static readonly byte Moving = 1;
-        public static readonly byte NumLayers = 2;
+        public const byte NonMoving = 0;
+        public const byte Moving = 1;
+        public const int NumLayers = 2;
     };
+
+    static class BroadPhaseLayers
+    {
+        public const byte NonMoving = 0;
+        public const byte Moving = 1;
+        public const int NumLayers = 2;
+    };
+
+    private static bool BroadPhaseCanCollide(ushort layer1, byte layer2)
+    {
+        switch (layer1)
+        {
+            case Layers.NonMoving:
+                return layer2 == BroadPhaseLayers.Moving;
+            case Layers.Moving:
+                return true;
+            default:
+                Debug.Assert(false);
+                return false;
+        }
+    }
+
+    private static bool ObjectCanCollide(ushort layer1, ushort layer2)
+    {
+        switch (layer1)
+        {
+            case Layers.NonMoving:
+                return layer2 == Layers.Moving;
+            case Layers.Moving:
+                return true;
+            default:
+                Debug.Assert(false);
+                return false;
+        }
+    }
 
     public static unsafe void Main()
     {
@@ -31,7 +67,10 @@ public static class Program
             using JobSystemThreadPool jobSystem = new(Foundation.MaxPhysicsJobs, Foundation.MaxPhysicsBarriers);
             using BroadPhaseLayer broadPhaseLayer = new();
             using PhysicsSystem physicsSystem = new();
-            physicsSystem.Init(MaxBodies, NumBodyMutexes, MaxBodyPairs, MaxContactConstraints, broadPhaseLayer);
+            physicsSystem.Init(MaxBodies, NumBodyMutexes, MaxBodyPairs, MaxContactConstraints,
+                broadPhaseLayer,
+                BroadPhaseCanCollide,
+                ObjectCanCollide);
 
             BodyInterface bodyInterface = physicsSystem.BodyInterface;
 

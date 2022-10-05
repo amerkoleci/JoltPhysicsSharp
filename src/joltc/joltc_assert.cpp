@@ -21,7 +21,8 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
-static_assert(sizeof(JPH::ObjectLayer) == sizeof(uint16_t));
+static_assert(sizeof(JPH::ObjectLayer) == sizeof(JPH_ObjectLayer));
+static_assert(sizeof(JPH::BroadPhaseLayer) == sizeof(JPH_BroadPhaseLayer));
 
 static_assert(JPH_MOTION_TYPE_STATIC == (int)JPH::EMotionType::Static);
 static_assert(JPH_MOTION_TYPE_KINEMATIC == (int)JPH::EMotionType::Kinematic);

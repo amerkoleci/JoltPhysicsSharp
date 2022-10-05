@@ -109,35 +109,6 @@ namespace JPH
     };
 }
 
-// Function that determines if two broadphase layers can collide
-static bool MyBroadPhaseCanCollide(ObjectLayer inLayer1, BroadPhaseLayer inLayer2)
-{
-    switch (inLayer1)
-    {
-    case Layers::NON_MOVING:
-        return inLayer2 == BroadPhaseLayers::MOVING;
-    case Layers::MOVING:
-        return true;
-    default:
-        JPH_ASSERT(false);
-        return false;
-    }
-}
-
-// Function that determines if two object layers can collide
-static bool MyObjectCanCollide(ObjectLayer inObject1, ObjectLayer inObject2)
-{
-    switch (inObject1)
-    {
-    case Layers::NON_MOVING:
-        return inObject2 == Layers::MOVING; // Non moving only collides with moving
-    case Layers::MOVING:
-        return true; // Moving collides with everything
-    default:
-        JPH_ASSERT(false);
-        return false;
-    }
-};
 
 static JPH::Vec3 ToVec3(const JPH_Vec3* vec)
 {
@@ -208,13 +179,13 @@ JPH_CAPI void JPH_JobSystemThreadPool_Destroy(JPH_JobSystemThreadPool* system)
     }
 }
 
-JPH_BroadPhaseLayer* JPH_BroadPhaseLayer_Create()
+JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayer_Create()
 {
     auto system = new JPH::BPLayerInterfaceImpl();
-    return reinterpret_cast<JPH_BroadPhaseLayer*>(system);
+    return reinterpret_cast<JPH_BroadPhaseLayerInterface*>(system);
 }
 
-void JPH_BroadPhaseLayer_Destroy(JPH_BroadPhaseLayer* layer)
+void JPH_BroadPhaseLayer_Destroy(JPH_BroadPhaseLayerInterface* layer)
 {
     if (layer)
     {
@@ -255,7 +226,7 @@ JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(
     const JPH_Vec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
-    uint16_t objectLayer)
+    JPH_ObjectLayer objectLayer)
 {
     JPH::ShapeSettings* joltShapeSettings = reinterpret_cast<JPH::ShapeSettings*>(shapeSettings);
     auto bodyCreationSettings = new JPH::BodyCreationSettings(
@@ -293,15 +264,18 @@ void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system)
 
 void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
     uint32_t maxBodies, uint32_t numBodyMutexes, uint32_t maxBodyPairs, uint32_t maxContactConstraints,
-    JPH_BroadPhaseLayer* layer)
+    JPH_BroadPhaseLayer* layer,
+    JPH_ObjectVsBroadPhaseLayerFilter objectVsBroadPhaseLayerFilter,
+    JPH_ObjectLayerPairFilter objectLayerPairFilter)
 {
     JPH_ASSERT(system);
 
     reinterpret_cast<JPH::PhysicsSystem*>(system)->Init(
         maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
         *reinterpret_cast<const JPH::BPLayerInterfaceImpl*>(layer),
-        MyBroadPhaseCanCollide,
-        MyObjectCanCollide);
+        reinterpret_cast<JPH::ObjectVsBroadPhaseLayerFilter>(objectVsBroadPhaseLayerFilter),
+        reinterpret_cast<JPH::ObjectLayerPairFilter>(objectLayerPairFilter)
+    );
 }
 
 void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system)
