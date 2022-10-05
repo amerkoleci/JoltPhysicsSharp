@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Numerics;
+using System.Security.AccessControl;
 using JoltPhysicsSharp;
 
 namespace HelloWorld;
@@ -72,6 +73,11 @@ public static class Program
                 BroadPhaseCanCollide,
                 ObjectCanCollide);
 
+            physicsSystem.OnContactValidate += OnContactValidate;
+            physicsSystem.OnContactAdded += OnContactAdded;
+            physicsSystem.OnContactPersisted += OnContactPersisted;
+            physicsSystem.OnContactRemoved += OnContactRemoved;
+
             BodyInterface bodyInterface = physicsSystem.BodyInterface;
 
             // Next we can create a rigid body to serve as the floor, we make a large box
@@ -135,5 +141,28 @@ public static class Program
         }
 
         Foundation.Shutdown();
+    }
+
+    private static ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, IntPtr collisionResult)
+    {
+        Console.WriteLine("Contact validate callback");
+
+        // Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
+        return ValidateResult.AcceptAllContactsForThisBodyPair;
+    }
+
+    private static void OnContactAdded(PhysicsSystem system, in Body body1, in Body body2)
+    {
+        Console.WriteLine("A contact was added");
+    }
+
+    private static void OnContactPersisted(PhysicsSystem system, in Body body1, in Body body2)
+    {
+        Console.WriteLine("A contact was persisted");
+    }
+
+    private static void OnContactRemoved(PhysicsSystem system, ref SubShapeIDPair subShapePair)
+    {
+        Console.WriteLine("A contact was removed");
     }
 }

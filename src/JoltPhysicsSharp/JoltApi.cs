@@ -163,6 +163,9 @@ internal static unsafe class JoltApi
         float deltaTime, int collisionSteps, int integrationSubSteps,
         IntPtr tempAlocator, IntPtr jobSystem);
 
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_SetContactListener(IntPtr system, IntPtr listener);
+
     /* BodyInterface */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PhysicsSystem_GetBodyInterface(IntPtr system);
@@ -234,4 +237,22 @@ internal static unsafe class JoltApi
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_SetMotionType(IntPtr handle, MotionType motionType);
+
+    // ContactListener
+    public struct JPH_ContactListener_Procs
+    {
+        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, IntPtr, ValidateResult> OnContactValidate;
+        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactAdded;
+        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactPersisted;
+        public delegate* unmanaged[Cdecl]<IntPtr, SubShapeIDPair*, void> OnContactRemoved;
+    }
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_ContactListener_Create();
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ContactListener_Destroy(IntPtr handle);
 }

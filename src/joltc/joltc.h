@@ -43,6 +43,7 @@
 #include <stdint.h>
 
 typedef uint32_t JPH_BodyID;
+typedef uint32_t JPH_SubShapeID;
 typedef uint16_t JPH_ObjectLayer;
 typedef uint8_t  JPH_BroadPhaseLayer;
 
@@ -67,7 +68,15 @@ typedef enum JPH_ActivationMode
     _JPH_ACTIVATION_MODE_FORCEU32 = 0x7fffffff
 } JPH_ActivationMode;
 
+typedef enum JPH_ValidateResult {
+    JPH_VALIDATE_RESULT_ACCEPT_ALL_CONTACTS = 0,
+    JPH_VALIDATE_RESULT_ACCEPT_CONTACT = 1,
+    JPH_VALIDATE_RESULT_REJECT_CONTACT = 2,
+    JPH_VALIDATE_RESULT_REJECT_ALL_CONTACTS = 3,
 
+    _JPH_VALIDATE_RESULT_NUM,
+    _JPH_VALIDATE_RESULT_FORCEU32 = 0x7fffffff
+} JPH_ValidateResult;
 
 typedef struct JPH_Vec3 {
     float x;
@@ -82,6 +91,14 @@ typedef struct JPH_Quat {
     float w;
 } JPH_Quat;
 
+typedef struct JPH_SubShapeIDPair
+{
+    JPH_BodyID     Body1ID;
+    JPH_SubShapeID subShapeID1;
+    JPH_BodyID     Body2ID;
+    JPH_SubShapeID subShapeID2;
+} JPH_SubShapeIDPair;
+
 typedef struct JPH_TempAllocator JPH_TempAllocator;
 typedef struct JPH_JobSystemThreadPool JPH_JobSystemThreadPool;
 typedef struct JPH_BroadPhaseLayerInterface JPH_BroadPhaseLayerInterface;
@@ -94,6 +111,9 @@ typedef struct JPH_SphereShapeSettings JPH_SphereShapeSettings;
 typedef struct JPH_BodyCreationSettings JPH_BodyCreationSettings;
 typedef struct JPH_BodyInterface JPH_BodyInterface;
 typedef struct JPH_Body JPH_Body;
+
+typedef struct JPH_CollideShapeResult   JPH_CollideShapeResult;
+typedef struct JPH_ContactListener      JPH_ContactListener;
 
 JPH_CAPI bool JPH_Init(void);
 JPH_CAPI void JPH_Shutdown(void);
@@ -139,6 +159,7 @@ JPH_CAPI void JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTim
     JPH_JobSystemThreadPool* jobSystem);
 
 JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system);
+JPH_CAPI void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JPH_ContactListener* listener);
 
 /* BodyInterface */
 JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
@@ -167,5 +188,29 @@ JPH_CAPI bool JPH_Body_IsSensor(JPH_Body* body);
 
 JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(JPH_Body* body);
 JPH_CAPI void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType);
+
+/* Contact listener */
+typedef struct JPH_ContactListener_Procs {
+    JPH_ValidateResult (JPH_API_CALL *OnContactValidate)(JPH_ContactListener* listener,
+        const JPH_Body* body1,
+        const JPH_Body* body2,
+        const JPH_CollideShapeResult* collisionResult);
+
+    void(JPH_API_CALL* OnContactAdded)(JPH_ContactListener* listener,
+        const JPH_Body* body1,
+        const JPH_Body* body2);
+
+    void(JPH_API_CALL* OnContactPersisted)(JPH_ContactListener* listener,
+        const JPH_Body* body1,
+        const JPH_Body* body2);
+
+    void(JPH_API_CALL* OnContactRemoved)(JPH_ContactListener* listener,
+        const JPH_SubShapeIDPair* subShapePair
+        );
+} JPH_ContactListener_Procs;
+
+JPH_CAPI void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs);
+JPH_CAPI JPH_ContactListener* JPH_ContactListener_Create();
+JPH_CAPI void JPH_ContactListener_Destroy(JPH_ContactListener* listener);
 
 #endif /* _JOLT_C_H */

@@ -23,15 +23,26 @@
 
 static_assert(sizeof(JPH::ObjectLayer) == sizeof(JPH_ObjectLayer));
 static_assert(sizeof(JPH::BroadPhaseLayer) == sizeof(JPH_BroadPhaseLayer));
+static_assert(sizeof(JPH::BodyID) == sizeof(JPH_BodyID));
+static_assert(sizeof(JPH::SubShapeID) == sizeof(JPH_SubShapeID));
 
+// EMotionType
 static_assert(JPH_MOTION_TYPE_STATIC == (int)JPH::EMotionType::Static);
 static_assert(JPH_MOTION_TYPE_KINEMATIC == (int)JPH::EMotionType::Kinematic);
 static_assert(JPH_MOTION_TYPE_DYNAMIC == (int)JPH::EMotionType::Dynamic);
 
+// EActivation
 static_assert(sizeof(JPH::EActivation) == sizeof(JPH_ActivationMode));
-
 static_assert(JPH_ACTIVATION_MODE_ACTIVATE == (int)JPH::EActivation::Activate);
 static_assert(JPH_ACTIVATION_MODE_DONT_ACTIVATE == (int)JPH::EActivation::DontActivate);
 
-static_assert(sizeof(JPH::BodyID) == sizeof(JPH_BodyID));
 
+// EActivation
+static_assert(sizeof(JPH::ValidateResult) == sizeof(JPH_ValidateResult));
+static_assert(JPH_VALIDATE_RESULT_ACCEPT_ALL_CONTACTS == (int)JPH::ValidateResult::AcceptAllContactsForThisBodyPair);
+static_assert(JPH_VALIDATE_RESULT_ACCEPT_CONTACT == (int)JPH::ValidateResult::AcceptContact);
+static_assert(JPH_VALIDATE_RESULT_REJECT_CONTACT == (int)JPH::ValidateResult::RejectContact);
+static_assert(JPH_VALIDATE_RESULT_REJECT_ALL_CONTACTS == (int)JPH::ValidateResult::RejectAllContactsForThisBodyPair);
+
+static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
+static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));

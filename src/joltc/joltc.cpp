@@ -305,6 +305,15 @@ JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system)
     return reinterpret_cast<JPH_BodyInterface*>(&joltSystem->GetBodyInterface());
 }
 
+void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JPH_ContactListener* listener)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    auto joltListener = reinterpret_cast<JPH::ContactListener*>(listener);
+    joltSystem->SetContactListener(joltListener);
+}
+
 JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
 {
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
@@ -453,4 +462,68 @@ JPH_MotionType JPH_Body_GetMotionType(JPH_Body* body)
 void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType)
 {
     reinterpret_cast<JPH::Body*>(body)->SetMotionType(static_cast<JPH::EMotionType>(motionType));
+}
+
+/* Contact Listener */
+static JPH_ContactListener_Procs g_ContactListener_Procs;
+
+class ManagedContactListener final : public JPH::ContactListener
+{
+public:
+    ValidateResult OnContactValidate(const Body& inBody1, const Body& inBody2, const CollideShapeResult& inCollisionResult) override
+    {
+        JPH_ValidateResult result = g_ContactListener_Procs.OnContactValidate(
+            reinterpret_cast<JPH_ContactListener*>(this),
+            reinterpret_cast<const JPH_Body*>(&inBody1),
+            reinterpret_cast<const JPH_Body*>(&inBody2),
+            nullptr
+        );
+
+        return (JPH::ValidateResult)result;
+    }
+
+    void OnContactAdded(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
+    {
+        g_ContactListener_Procs.OnContactAdded(
+            reinterpret_cast<JPH_ContactListener*>(this),
+            reinterpret_cast<const JPH_Body*>(&inBody1),
+            reinterpret_cast<const JPH_Body*>(&inBody2)
+        );
+    }
+
+    void OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
+    {
+        g_ContactListener_Procs.OnContactPersisted(
+            reinterpret_cast<JPH_ContactListener*>(this),
+            reinterpret_cast<const JPH_Body*>(&inBody1),
+            reinterpret_cast<const JPH_Body*>(&inBody2)
+        );
+    }
+
+    void OnContactRemoved(const SubShapeIDPair& inSubShapePair) override
+    {
+        g_ContactListener_Procs.OnContactRemoved(
+            reinterpret_cast<JPH_ContactListener*>(this),
+            reinterpret_cast<const JPH_SubShapeIDPair*>(&inSubShapePair)
+        );
+    }
+};
+
+void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs)
+{
+    g_ContactListener_Procs = procs;
+}
+
+JPH_ContactListener* JPH_ContactListener_Create()
+{
+    auto impl = new ManagedContactListener();
+    return reinterpret_cast<JPH_ContactListener*>(impl);
+}
+
+void JPH_ContactListener_Destroy(JPH_ContactListener* listener)
+{
+    if (listener)
+    {
+        delete reinterpret_cast<ManagedContactListener*>(listener);
+    }
 }
