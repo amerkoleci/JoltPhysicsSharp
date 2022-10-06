@@ -1,23 +1,28 @@
 // Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public delegate ValidateResult OnContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, IntPtr collisionResult);
-public delegate void OnContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2);
-public delegate void OnContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2);
-public delegate void OnContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
+public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, IntPtr collisionResult);
+public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2);
+public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2);
+public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
+public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData);
 
 public sealed class PhysicsSystem : NativeObject
 {
-    private static readonly Dictionary<IntPtr, PhysicsSystem> s_listeners = new();
+    private static readonly Dictionary<IntPtr, PhysicsSystem> s_contactListeners = new();
+    private static readonly Dictionary<IntPtr, PhysicsSystem> s_bodyActivationListenerListeners = new();
     private static readonly JPH_ContactListener_Procs s_contactListener_Procs;
+    private static readonly JPH_BodyActivationListener_Procs s_BodyActivationListener_Procs;
 
     private readonly IntPtr contactListenerHandle;
+    private readonly IntPtr bodyActivationListenerHandle;
 
     static unsafe PhysicsSystem()
     {
@@ -29,15 +34,26 @@ public sealed class PhysicsSystem : NativeObject
             OnContactRemoved = &OnContactRemovedCallback
         };
         JPH_ContactListener_SetProcs(s_contactListener_Procs);
+
+        s_BodyActivationListener_Procs = new JPH_BodyActivationListener_Procs
+        {
+            OnBodyActivated = &OnBodyActivatedCallback,
+            OnBodyDeactivated = &OnBodyDeactivatedCallback
+        };
+        JPH_BodyActivationListener_SetProcs(s_BodyActivationListener_Procs);
     }
 
     public PhysicsSystem()
         : base(JPH_PhysicsSystem_Create())
     {
         contactListenerHandle = JPH_ContactListener_Create();
-        s_listeners.Add(contactListenerHandle, this);
+        s_contactListeners.Add(contactListenerHandle, this);
+
+        bodyActivationListenerHandle = JPH_BodyActivationListener_Create();
+        s_bodyActivationListenerListeners.Add(bodyActivationListenerHandle, this);
 
         JPH_PhysicsSystem_SetContactListener(Handle, contactListenerHandle);
+        JPH_PhysicsSystem_SetBodyActivationListener(Handle, bodyActivationListenerHandle);
     }
 
     /// <summary>
@@ -49,9 +65,12 @@ public sealed class PhysicsSystem : NativeObject
     {
         if (isDisposing)
         {
-            s_listeners.Remove(contactListenerHandle);
-
+            s_contactListeners.Remove(contactListenerHandle);
             JPH_ContactListener_Destroy(contactListenerHandle);
+
+            s_bodyActivationListenerListeners.Remove(bodyActivationListenerHandle);
+            JPH_BodyActivationListener_Destroy(bodyActivationListenerHandle);
+
             JPH_PhysicsSystem_Destroy(Handle);
         }
     }
@@ -67,7 +86,7 @@ public sealed class PhysicsSystem : NativeObject
 	/// Note that this callback is called when all bodies are locked, so don't use any locking functions!
 	/// The order of body 1 and 2 is undefined, but when one of the two bodies is dynamic it will be body 1
     /// </summary>
-    public event OnContactValidateHandler? OnContactValidate;
+    public event ContactValidateHandler? OnContactValidate;
 
     /// <summary>
     /// Called whenever a new contact point is detected.
@@ -79,14 +98,14 @@ public sealed class PhysicsSystem : NativeObject
 	/// The velocities of inBody1 and inBody2 are the velocities before the contact has been resolved, so you can use this to
 	/// estimate the collision impulse to e.g. determine the volume of the impact sound to play.
     /// </summary>
-    public event OnContactAddedHandler? OnContactAdded;
+    public event ContactAddedHandler? OnContactAdded;
 
     /// <summary>
     /// Called whenever a contact is detected that was also detected last update.
 	/// Note that this callback is called when all bodies are locked, so don't use any locking functions!
 	/// Body 1 and 2 will be sorted such that body 1 ID less than body 2 ID, so body 1 may not be dynamic.
     /// </summary>
-    public event OnContactPersistedHandler? OnContactPersisted;
+    public event ContactPersistedHandler? OnContactPersisted;
 
     /// <summary>
     /// Called whenever a contact was detected last update but is not detected anymore.
@@ -94,7 +113,19 @@ public sealed class PhysicsSystem : NativeObject
     /// Note that we're using BodyID's since the bodies may have been removed at the time of callback.
     /// Body 1 and 2 will be sorted such that body 1 ID less than body 2 ID, so body 1 may not be dynamic.
     /// </summary>
-    public event OnContactRemovedHandler? OnContactRemoved;
+    public event ContactRemovedHandler? OnContactRemoved;
+
+    /// <summary>
+    /// Called whenever a body activates, note this can be called from any thread so make sure your code is thread safe.
+	/// At the time of the callback the body inBodyID will be locked and no bodies can be activated/deactivated from the callback.
+    /// </summary>
+    public event BodyActivationHandler? OnBodyActivated;
+
+    /// <summary>
+    /// Called whenever a body deactivates, note this can be called from any thread so make sure your code is thread safe.
+	/// At the time of the callback the body inBodyID will be locked and no bodies can be activated/deactivated from the callback.
+    /// </summary>
+    public event BodyActivationHandler? OnBodyDeactivated;
     #endregion Events
 
     public BodyInterface BodyInterface => new(JPH_PhysicsSystem_GetBodyInterface(Handle));
@@ -129,7 +160,7 @@ public sealed class PhysicsSystem : NativeObject
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static ValidateResult OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, IntPtr collisionResult)
     {
-        PhysicsSystem listener = s_listeners[listenerPtr];
+        PhysicsSystem listener = s_contactListeners[listenerPtr];
 
         if (listener.OnContactValidate != null)
             return listener.OnContactValidate(listener, new Body(body1), new Body(body2), collisionResult);
@@ -140,22 +171,38 @@ public sealed class PhysicsSystem : NativeObject
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static void OnContactAddedCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2)
     {
-        PhysicsSystem listener = s_listeners[listenerPtr];
+        PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactAdded?.Invoke(listener, new Body(body1), new Body(body2));
     }
 
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static void OnContactPersistedCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2)
     {
-        PhysicsSystem listener = s_listeners[listenerPtr];
+        PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactPersisted?.Invoke(listener, new Body(body1), new Body(body2));
     }
 
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private unsafe static void OnContactRemovedCallback(IntPtr listenerPtr, SubShapeIDPair* subShapePair)
     {
-        PhysicsSystem listener = s_listeners[listenerPtr];
+        PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactRemoved?.Invoke(listener, ref Unsafe.AsRef<SubShapeIDPair>(subShapePair));
     }
-    #endregion
+    #endregion ContactListener
+
+    #region BodyActivationListener
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    private static void OnBodyActivatedCallback(IntPtr listenerPtr, uint bodyID, ulong bodyUserData)
+    {
+        PhysicsSystem listener = s_bodyActivationListenerListeners[listenerPtr];
+        listener.OnBodyActivated?.Invoke(listener, bodyID, bodyUserData);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    private static void OnBodyDeactivatedCallback(IntPtr listenerPtr, uint bodyID, ulong bodyUserData)
+    {
+        PhysicsSystem listener = s_bodyActivationListenerListeners[listenerPtr];
+        listener.OnBodyDeactivated?.Invoke(listener, bodyID, bodyUserData);
+    }
+    #endregion BodyActivationListener
 }

@@ -299,6 +299,15 @@ void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JPH_Contact
     joltSystem->SetContactListener(joltListener);
 }
 
+void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_BodyActivationListener* listener)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    auto joltListener = reinterpret_cast<JPH::BodyActivationListener*>(listener);
+    joltSystem->SetBodyActivationListener(joltListener);
+}
+
 JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
 {
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
@@ -510,5 +519,49 @@ void JPH_ContactListener_Destroy(JPH_ContactListener* listener)
     if (listener)
     {
         delete reinterpret_cast<ManagedContactListener*>(listener);
+    }
+}
+
+/* BodyActivationListener */
+static JPH_BodyActivationListener_Procs g_BodyActivationListener_Procs;
+
+class ManagedBodyActivationListener final : public JPH::BodyActivationListener
+{
+public:
+    void OnBodyActivated(const BodyID& inBodyID, uint64 inBodyUserData) override
+    {
+        g_BodyActivationListener_Procs.OnBodyActivated(
+            reinterpret_cast<JPH_BodyActivationListener*>(this),
+            inBodyID.GetIndexAndSequenceNumber(),
+            inBodyUserData
+        );
+    }
+
+    void OnBodyDeactivated(const BodyID& inBodyID, uint64 inBodyUserData) override
+    {
+        g_BodyActivationListener_Procs.OnBodyDeactivated(
+            reinterpret_cast<JPH_BodyActivationListener*>(this),
+            inBodyID.GetIndexAndSequenceNumber(),
+            inBodyUserData
+        );
+    }
+};
+
+void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs)
+{
+    g_BodyActivationListener_Procs = procs;
+}
+
+JPH_BodyActivationListener* JPH_BodyActivationListener_Create()
+{
+    auto impl = new ManagedBodyActivationListener();
+    return reinterpret_cast<JPH_BodyActivationListener*>(impl);
+}
+
+void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener)
+{
+    if (listener)
+    {
+        delete reinterpret_cast<ManagedBodyActivationListener*>(listener);
     }
 }

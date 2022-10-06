@@ -96,10 +96,14 @@ public static class Program
                 BroadPhaseCanCollide,
                 ObjectCanCollide);
 
+            // ContactListener
             physicsSystem.OnContactValidate += OnContactValidate;
             physicsSystem.OnContactAdded += OnContactAdded;
             physicsSystem.OnContactPersisted += OnContactPersisted;
             physicsSystem.OnContactRemoved += OnContactRemoved;
+            // BodyActivationListener
+            physicsSystem.OnBodyActivated += OnBodyActivated;
+            physicsSystem.OnBodyDeactivated += OnBodyDeactivated;
 
             BodyInterface bodyInterface = physicsSystem.BodyInterface;
 
@@ -166,6 +170,7 @@ public static class Program
         Foundation.Shutdown();
     }
 
+
     private static ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, IntPtr collisionResult)
     {
         Console.WriteLine("Contact validate callback");
@@ -187,5 +192,15 @@ public static class Program
     private static void OnContactRemoved(PhysicsSystem system, ref SubShapeIDPair subShapePair)
     {
         Console.WriteLine("A contact was removed");
+    }
+
+    private static void OnBodyActivated(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData)
+    {
+        Console.WriteLine("A body got activated");
+    }
+
+    private static void OnBodyDeactivated(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData)
+    {
+        Console.WriteLine("A body went to sleep");
     }
 }

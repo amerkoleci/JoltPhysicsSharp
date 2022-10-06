@@ -177,6 +177,9 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_SetContactListener(IntPtr system, IntPtr listener);
 
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_SetBodyActivationListener(IntPtr system, IntPtr listener);
+
     /* BodyInterface */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PhysicsSystem_GetBodyInterface(IntPtr system);
@@ -266,4 +269,20 @@ internal static unsafe class JoltApi
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ContactListener_Destroy(IntPtr handle);
+
+    // BodyActivationListener
+    public struct JPH_BodyActivationListener_Procs
+    {
+        public delegate* unmanaged[Cdecl]<IntPtr, uint, ulong, void> OnBodyActivated;
+        public delegate* unmanaged[Cdecl]<IntPtr, uint, ulong, void> OnBodyDeactivated;
+    }
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyActivationListener_Create();
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyActivationListener_Destroy(IntPtr handle);
 }
