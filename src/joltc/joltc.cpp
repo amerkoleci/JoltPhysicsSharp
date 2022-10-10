@@ -193,6 +193,12 @@ JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, fl
     return reinterpret_cast<JPH_BoxShapeSettings*>(settings);
 }
 
+JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius)
+{
+    auto shape = new JPH::BoxShape(ToVec3(halfExtent), convexRadius);
+    return reinterpret_cast<JPH_BoxShape*>(shape);
+}
+
 /* SphereShapeSettings */
 JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius)
 {
@@ -212,16 +218,6 @@ void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float 
     reinterpret_cast<JPH::SphereShapeSettings*>(settings)->mRadius = radius;
 }
 
-/* Shape */
-void JPH_Shape_Destroy(JPH_Shape* shape)
-{
-    if (shape)
-    {
-        delete reinterpret_cast<JPH::Shape*>(shape);
-    }
-}
-
-/* SphereShape */
 JPH_SphereShape* JPH_SphereShape_Create(float radius)
 {
     auto shape = new JPH::SphereShape(radius);
@@ -232,6 +228,36 @@ float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape)
 {
     JPH_ASSERT(shape);
     return reinterpret_cast<const JPH::SphereShape*>(shape)->GetRadius();
+}
+
+/* TriangleShapeSettings */
+JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, const JPH_Vec3* v2, const JPH_Vec3* v3, float convexRadius)
+{
+    auto settings = new JPH::TriangleShapeSettings(ToVec3(v1), ToVec3(v2), ToVec3(v3), convexRadius);
+    return reinterpret_cast<JPH_TriangleShapeSettings*>(settings);
+}
+
+/* CapsuleShapeSettings */
+JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius)
+{
+    auto settings = new JPH::CapsuleShapeSettings(halfHeightOfCylinder, radius);
+    return reinterpret_cast<JPH_CapsuleShapeSettings*>(settings);
+}
+
+/* CylinderShapeSettings */
+JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius)
+{
+    auto settings = new JPH::CylinderShapeSettings(halfHeight, radius, convexRadius);
+    return reinterpret_cast<JPH_CylinderShapeSettings*>(settings);
+}
+
+/* Shape */
+void JPH_Shape_Destroy(JPH_Shape* shape)
+{
+    if (shape)
+    {
+        delete reinterpret_cast<JPH::Shape*>(shape);
+    }
 }
 
 /* JPH_BodyCreationSettings */
@@ -360,11 +386,47 @@ void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_
     joltSystem->SetBodyActivationListener(joltListener);
 }
 
+uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
+    return joltSystem->GetNumBodies();
+}
+
+uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
+    return joltSystem->GetNumActiveBodies();
+}
+
+uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
+    return joltSystem->GetMaxBodies();
+}
+
 JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
 {
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
     auto body = joltBodyInterface->CreateBody(
+        *reinterpret_cast<const JPH::BodyCreationSettings*>(settings)
+    );
+
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_BodyCreationSettings* settings)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    auto body = joltBodyInterface->CreateBodyWithID(
+        JPH::BodyID(bodyID),
         *reinterpret_cast<const JPH::BodyCreationSettings*>(settings)
     );
 

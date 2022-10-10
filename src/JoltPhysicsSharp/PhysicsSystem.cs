@@ -75,6 +75,10 @@ public sealed class PhysicsSystem : NativeObject
         }
     }
 
+    public uint BodiesCount => JPH_PhysicsSystem_GetNumBodies(Handle);
+    public uint ActiveBodiesCount => JPH_PhysicsSystem_GetNumActiveBodies(Handle);
+    public uint MaxBodies => JPH_PhysicsSystem_GetMaxBodies(Handle);
+
     #region Events
     /// <summary>
     /// Called after detecting a collision between a body pair, but before calling OnContactAdded and before adding the contact constraint.

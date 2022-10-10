@@ -18,3 +18,16 @@ public sealed class BoxShapeSettings : ConvexShapeSettings
     /// </summary>
     ~BoxShapeSettings() => Dispose(isDisposing: false);
 }
+
+public sealed class BoxShape : ConvexShape
+{
+    public unsafe BoxShape(Vector3 halfExent, float convexRadius = Foundation.DefaultConvexRadius)
+        : base(JPH_BoxShape_Create(&halfExent, convexRadius))
+    {
+    }
+
+    /// <summary>
+    /// Finalizes an instance of the <see cref="BoxShape" /> class.
+    /// </summary>
+    ~BoxShape() => Dispose(isDisposing: false);
+}

@@ -1,7 +1,6 @@
 // Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using System.Diagnostics;
 using System.Numerics;
 using static JoltPhysicsSharp.JoltApi;
 
@@ -35,6 +34,12 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
     public BodyID CreateAndAddBody(BodyCreationSettings settings, ActivationMode activationMode)
     {
         return new(JPH_BodyInterface_CreateAndAddBody(Handle, settings.Handle, activationMode));
+    }
+
+    public Body CreateBodyWithID(in BodyID bodyID, BodyCreationSettings settings)
+    {
+        IntPtr bodyHandle = JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle);
+        return new Body(bodyHandle);
     }
 
     public void DestroyBody(in BodyID bodyID)

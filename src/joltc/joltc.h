@@ -108,6 +108,9 @@ typedef struct JPH_ShapeSettings            JPH_ShapeSettings;
 typedef struct JPH_ConvexShapeSettings      JPH_ConvexShapeSettings;
 typedef struct JPH_BoxShapeSettings         JPH_BoxShapeSettings;
 typedef struct JPH_SphereShapeSettings      JPH_SphereShapeSettings;
+typedef struct JPH_TriangleShapeSettings    JPH_TriangleShapeSettings;
+typedef struct JPH_CapsuleShapeSettings     JPH_CapsuleShapeSettings;
+typedef struct JPH_CylinderShapeSettings    JPH_CylinderShapeSettings;
 
 typedef struct JPH_Shape                    JPH_Shape;
 typedef struct JPH_ConvexShape              JPH_ConvexShape;
@@ -137,18 +140,26 @@ JPH_CAPI void JPH_JobSystemThreadPool_Destroy(JPH_JobSystemThreadPool* system);
 /* JPH_ShapeSettings */
 JPH_CAPI void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings);
 JPH_CAPI JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius);
+JPH_CAPI JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius);
 
 /* SphereShapeSettings */
 JPH_CAPI JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius);
 JPH_CAPI float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings);
 JPH_CAPI void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float radius);
+JPH_CAPI JPH_SphereShape* JPH_SphereShape_Create(float radius);
+JPH_CAPI float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape);
+
+/* TriangleShapeSettings */
+JPH_CAPI JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, const JPH_Vec3* v2, const JPH_Vec3* v3, float convexRadius);
+
+/* CapsuleShapeSettings */
+JPH_CAPI JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius);
+
+/* CylinderShapeSettings */
+JPH_CAPI JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
-
-/* SphereShape */
-JPH_CAPI JPH_SphereShape* JPH_SphereShape_Create(float radius);
-JPH_CAPI float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape);
 
 /* JPH_BodyCreationSettings */
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create();
@@ -182,10 +193,15 @@ JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem
 JPH_CAPI void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JPH_ContactListener* listener);
 JPH_CAPI void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_BodyActivationListener* listener);
 
+JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system);
+JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system);
+JPH_CAPI uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system);
+
 /* BodyInterface */
 JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 JPH_CAPI JPH_BodyID JPH_BodyInterface_CreateAndAddBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings, JPH_ActivationMode activation);
 JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings);
+JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_BodyCreationSettings* settings);
 
 JPH_CAPI void JPH_BodyInterface_AddBody(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_ActivationMode activation);
 JPH_CAPI void JPH_BodyInterface_RemoveBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);

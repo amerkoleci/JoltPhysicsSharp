@@ -5,6 +5,14 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
+public abstract class ConvexShapeSettings : ShapeSettings
+{
+    internal ConvexShapeSettings(IntPtr handle)
+        : base(handle)
+    {
+    }
+}
+
 public abstract class ConvexShape : Shape
 {
     internal ConvexShape(IntPtr handle)

@@ -136,9 +136,14 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ShapeSettings_Destroy(IntPtr shape);
 
+    /* BoxShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BoxShapeSettings_Create(Vector3* halfExtent, float convexRadius);
 
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BoxShape_Create(Vector3* halfExtent, float convexRadius);
+
+    /* SphereShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_SphereShapeSettings_Create(float radius);
 
@@ -147,6 +152,18 @@ internal static unsafe class JoltApi
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_SphereShapeSettings_SetRadius(IntPtr shape, float radius);
+
+    /* TriangleShapeSettings */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_TriangleShapeSettings_Create(Vector3* v1, Vector3* v2, Vector3* v3, float convexRadius);
+
+    /* CapsuleShapeSettings */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius);
+
+    /* CylinderShapeSettings */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
 
     /* Shape */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
@@ -200,6 +217,15 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_SetBodyActivationListener(IntPtr system, IntPtr listener);
 
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_PhysicsSystem_GetNumBodies(IntPtr system);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_PhysicsSystem_GetNumActiveBodies(IntPtr system);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_PhysicsSystem_GetMaxBodies(IntPtr system);
+
     /* BodyInterface */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PhysicsSystem_GetBodyInterface(IntPtr system);
@@ -209,6 +235,9 @@ internal static unsafe class JoltApi
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_BodyInterface_CreateAndAddBody(IntPtr handle, IntPtr bodyID, ActivationMode activation);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyInterface_CreateBodyWithID(IntPtr handle, uint bodyID, IntPtr settings);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_DestroyBody(IntPtr handle, uint bodyID);

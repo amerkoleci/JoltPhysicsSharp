@@ -5,6 +5,28 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
+public abstract class ShapeSettings : NativeObject
+{
+    protected ShapeSettings(IntPtr handle)
+        : base(handle)
+    {
+    }
+
+    /// <summary>
+    /// Finalizes an instance of the <see cref="ShapeSettings" /> class.
+    /// </summary>
+    ~ShapeSettings() => Dispose(isDisposing: false);
+
+    protected override void Dispose(bool isDisposing)
+    {
+        if (isDisposing)
+        {
+            JPH_ShapeSettings_Destroy(Handle);
+        }
+    }
+}
+
+
 public abstract class Shape : NativeObject
 {
     protected Shape(IntPtr handle)
