@@ -25,8 +25,8 @@ public static class Program
 
     static class BroadPhaseLayers
     {
-        public static readonly BroadPhaseLayer NonMoving = 0;
-        public static readonly BroadPhaseLayer Moving = 1;
+        public const byte NonMoving = 0;
+        public const byte Moving = 1;
         public const int NumLayers = 2;
     };
 
@@ -50,6 +50,18 @@ public static class Program
         {
             Debug.Assert(layer < Layers.NumLayers);
             return _objectToBroadPhase[layer];
+        }
+
+        protected override string GetBroadPhaseLayerName(BroadPhaseLayer layer)
+        {
+            switch ((byte)layer)
+            {
+                case BroadPhaseLayers.NonMoving: return "NON_MOVING";
+                case BroadPhaseLayers.Moving: return "MOVING";
+                default:
+                    Debug.Assert(false);
+                    return "INVALID";
+            }
         }
     }
 
@@ -120,7 +132,7 @@ public static class Program
             // Add it to the world
             bodyInterface.AddBody(floor, ActivationMode.DontActivate);
 
-            BodyCreationSettings spherSettings = new(new SphereShapeSettings(0.5f), new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
+            BodyCreationSettings spherSettings = new(new SphereShape(0.5f), new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
             BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, ActivationMode.Activate);
 
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.

@@ -17,7 +17,8 @@ public abstract class BroadPhaseLayerInterface : NativeObject
         s_broadPhaseLayerInterface_Procs = new JPH_BroadPhaseLayerInterface_Procs
         {
             GetNumBroadPhaseLayers = &GetNumBroadPhaseLayersCallback,
-            GetBroadPhaseLayer = &GetBroadPhaseLayerCallback
+            GetBroadPhaseLayer = &GetBroadPhaseLayerCallback,
+            GetBroadPhaseLayerName= &GetBroadPhaseLayerNameCallback
         };
         JPH_BroadPhaseLayerInterface_SetProcs(s_broadPhaseLayerInterface_Procs);
     }
@@ -45,6 +46,7 @@ public abstract class BroadPhaseLayerInterface : NativeObject
 
     protected abstract int GetNumBroadPhaseLayers();
     protected abstract BroadPhaseLayer GetBroadPhaseLayer(ObjectLayer layer);
+    protected abstract string GetBroadPhaseLayerName(BroadPhaseLayer layer);
 
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static uint GetNumBroadPhaseLayersCallback(IntPtr listenerPtr)
@@ -58,5 +60,13 @@ public abstract class BroadPhaseLayerInterface : NativeObject
     {
         BroadPhaseLayerInterface listener = s_listeners[listenerPtr];
         return listener.GetBroadPhaseLayer(layer);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+    private static unsafe IntPtr GetBroadPhaseLayerNameCallback(IntPtr listenerPtr, BroadPhaseLayer layer)
+    {
+        BroadPhaseLayerInterface listener = s_listeners[listenerPtr];
+        string layerName = listener.GetBroadPhaseLayerName(layer);
+        return Marshal.StringToHGlobalAnsi(layerName);
     }
 }

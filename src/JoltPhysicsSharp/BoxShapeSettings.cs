@@ -6,7 +6,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public sealed class BoxShapeSettings : ShapeSettings
+public sealed class BoxShapeSettings : ConvexShapeSettings
 {
     public unsafe BoxShapeSettings(Vector3 halfExent, float convexRadius = Foundation.DefaultConvexRadius)
         : base(JPH_BoxShapeSettings_Create(&halfExent, convexRadius))

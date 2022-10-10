@@ -193,10 +193,45 @@ JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, fl
     return reinterpret_cast<JPH_BoxShapeSettings*>(settings);
 }
 
+/* SphereShapeSettings */
 JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius)
 {
     auto settings = new JPH::SphereShapeSettings(radius);
     return reinterpret_cast<JPH_SphereShapeSettings*>(settings);
+}
+
+float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings)
+{
+    JPH_ASSERT(settings);
+    return reinterpret_cast<const JPH::SphereShapeSettings*>(settings)->mRadius;
+}
+
+void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float radius)
+{
+    JPH_ASSERT(settings);
+    reinterpret_cast<JPH::SphereShapeSettings*>(settings)->mRadius = radius;
+}
+
+/* Shape */
+void JPH_Shape_Destroy(JPH_Shape* shape)
+{
+    if (shape)
+    {
+        delete reinterpret_cast<JPH::Shape*>(shape);
+    }
+}
+
+/* SphereShape */
+JPH_SphereShape* JPH_SphereShape_Create(float radius)
+{
+    auto shape = new JPH::SphereShape(radius);
+    return reinterpret_cast<JPH_SphereShape*>(shape);
+}
+
+float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape)
+{
+    JPH_ASSERT(shape);
+    return reinterpret_cast<const JPH::SphereShape*>(shape)->GetRadius();
 }
 
 /* JPH_BodyCreationSettings */
@@ -224,6 +259,23 @@ JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(
     return reinterpret_cast<JPH_BodyCreationSettings*>(bodyCreationSettings);
 }
 
+JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(
+    JPH_Shape* shape,
+    const JPH_Vec3* position,
+    const JPH_Quat* rotation,
+    JPH_MotionType motionType,
+    JPH_ObjectLayer objectLayer)
+{
+    JPH::Shape* joltShape = reinterpret_cast<JPH::Shape*>(shape);
+    auto bodyCreationSettings = new JPH::BodyCreationSettings(
+        joltShape,
+        ToVec3(position),
+        ToQuat(rotation),
+        (JPH::EMotionType)motionType,
+        objectLayer
+    );
+    return reinterpret_cast<JPH_BodyCreationSettings*>(bodyCreationSettings);
+}
 void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* settings)
 {
     if (settings)

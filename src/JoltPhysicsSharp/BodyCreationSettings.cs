@@ -13,8 +13,13 @@ public sealed class BodyCreationSettings : NativeObject
     {
     }
 
-    public unsafe BodyCreationSettings(ShapeSettings shapeSettings, Vector3 position, Quaternion rotation, MotionType motionType, ushort objectLayer)
+    public unsafe BodyCreationSettings(ShapeSettings shapeSettings, Vector3 position, Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
        : base(JPH_BodyCreationSettings_Create2(shapeSettings.Handle, &position, &rotation, motionType, objectLayer))
+    {
+    }
+
+    public unsafe BodyCreationSettings(Shape shape, Vector3 position, Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+       : base(JPH_BodyCreationSettings_Create3(shape.Handle, &position, &rotation, motionType, objectLayer))
     {
     }
 

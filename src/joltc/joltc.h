@@ -105,8 +105,14 @@ typedef struct JPH_BroadPhaseLayerInterface JPH_BroadPhaseLayerInterface;
 typedef struct JPH_PhysicsSystem            JPH_PhysicsSystem;
 
 typedef struct JPH_ShapeSettings            JPH_ShapeSettings;
+typedef struct JPH_ConvexShapeSettings      JPH_ConvexShapeSettings;
 typedef struct JPH_BoxShapeSettings         JPH_BoxShapeSettings;
 typedef struct JPH_SphereShapeSettings      JPH_SphereShapeSettings;
+
+typedef struct JPH_Shape                    JPH_Shape;
+typedef struct JPH_ConvexShape              JPH_ConvexShape;
+typedef struct JPH_BoxShape                 JPH_BoxShape;
+typedef struct JPH_SphereShape              JPH_SphereShape;
 
 typedef struct JPH_BodyCreationSettings     JPH_BodyCreationSettings;
 typedef struct JPH_BodyInterface            JPH_BodyInterface;
@@ -131,11 +137,27 @@ JPH_CAPI void JPH_JobSystemThreadPool_Destroy(JPH_JobSystemThreadPool* system);
 /* JPH_ShapeSettings */
 JPH_CAPI void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings);
 JPH_CAPI JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius);
+
+/* SphereShapeSettings */
 JPH_CAPI JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius);
+JPH_CAPI float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings);
+JPH_CAPI void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float radius);
+
+/* Shape */
+JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
+
+/* SphereShape */
+JPH_CAPI JPH_SphereShape* JPH_SphereShape_Create(float radius);
+JPH_CAPI float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape);
 
 /* JPH_BodyCreationSettings */
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create();
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(JPH_ShapeSettings* settings,
+    const JPH_Vec3* position,
+    const JPH_Quat* rotation,
+    JPH_MotionType motionType,
+    JPH_ObjectLayer objectLayer);
+JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(JPH_Shape* shape,
     const JPH_Vec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
