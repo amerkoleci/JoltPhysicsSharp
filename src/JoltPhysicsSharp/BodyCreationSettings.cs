@@ -13,13 +13,13 @@ public sealed class BodyCreationSettings : NativeObject
     {
     }
 
-    public unsafe BodyCreationSettings(ShapeSettings shapeSettings, Vector3 position, Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
-       : base(JPH_BodyCreationSettings_Create2(shapeSettings.Handle, &position, &rotation, motionType, objectLayer))
+    public BodyCreationSettings(ShapeSettings shapeSettings, in Vector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+       : base(JPH_BodyCreationSettings_Create2(shapeSettings.Handle, position, rotation, motionType, objectLayer))
     {
     }
 
-    public unsafe BodyCreationSettings(Shape shape, Vector3 position, Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
-       : base(JPH_BodyCreationSettings_Create3(shape.Handle, &position, &rotation, motionType, objectLayer))
+    public BodyCreationSettings(Shape shape, in Vector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+       : base(JPH_BodyCreationSettings_Create3(shape.Handle, position, rotation, motionType, objectLayer))
     {
     }
 
@@ -32,7 +32,7 @@ public sealed class BodyCreationSettings : NativeObject
     {
         if (isDisposing)
         {
-            JPH_BodyCreationSettings_Destroy(Handle); 
+            JPH_BodyCreationSettings_Destroy(Handle);
         }
     }
 }

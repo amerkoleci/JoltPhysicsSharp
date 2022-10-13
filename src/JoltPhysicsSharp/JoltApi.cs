@@ -138,10 +138,10 @@ internal static unsafe class JoltApi
 
     /* BoxShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BoxShapeSettings_Create(Vector3* halfExtent, float convexRadius);
+    public static extern IntPtr JPH_BoxShapeSettings_Create(in Vector3 halfExtent, float convexRadius);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BoxShape_Create(Vector3* halfExtent, float convexRadius);
+    public static extern IntPtr JPH_BoxShape_Create(in Vector3 halfExtent, float convexRadius);
 
     /* SphereShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
@@ -155,7 +155,7 @@ internal static unsafe class JoltApi
 
     /* TriangleShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_TriangleShapeSettings_Create(Vector3* v1, Vector3* v2, Vector3* v3, float convexRadius);
+    public static extern IntPtr JPH_TriangleShapeSettings_Create(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius);
 
     /* CapsuleShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
@@ -181,10 +181,10 @@ internal static unsafe class JoltApi
     public static extern IntPtr JPH_BodyCreationSettings_Create();
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create2(IntPtr shapeSettings, Vector3* position, Quaternion* rotation, MotionType motionType, ushort objectLayer);
+    public static extern IntPtr JPH_BodyCreationSettings_Create2(IntPtr shapeSettings, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create3(IntPtr shape, Vector3* position, Quaternion* rotation, MotionType motionType, ushort objectLayer);
+    public static extern IntPtr JPH_BodyCreationSettings_Create3(IntPtr shape, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyCreationSettings_Destroy(IntPtr settings);
@@ -249,13 +249,13 @@ internal static unsafe class JoltApi
     public static extern void JPH_BodyInterface_RemoveBody(IntPtr handle, uint bodyID);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetLinearVelocity(IntPtr handle, uint bodyID, Vector3* velocity);
+    public static extern void JPH_BodyInterface_SetLinearVelocity(IntPtr handle, uint bodyID, in Vector3 velocity);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_GetLinearVelocity(IntPtr handle, uint bodyID, Vector3* velocity);
+    public static extern void JPH_BodyInterface_GetLinearVelocity(IntPtr handle, uint bodyID, out Vector3 velocity);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_GetCenterOfMassPosition(IntPtr handle, uint bodyID, Vector3* velocity);
+    public static extern void JPH_BodyInterface_GetCenterOfMassPosition(IntPtr handle, uint bodyID, out Vector3 velocity);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     [return: MarshalAs(UnmanagedType.Bool)]

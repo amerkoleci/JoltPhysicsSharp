@@ -8,8 +8,8 @@ namespace JoltPhysicsSharp;
 
 public sealed class TriangleShapeSettings : ConvexShapeSettings
 {
-    public unsafe TriangleShapeSettings(Vector3 v1, Vector3 v2, Vector3 v3, float convexRadius = 0.0f)
-        : base(JPH_TriangleShapeSettings_Create(&v1, &v2, &v3, convexRadius))
+    public TriangleShapeSettings(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius = 0.0f)
+        : base(JPH_TriangleShapeSettings_Create(v1, v2, v3, convexRadius))
     {
     }
 

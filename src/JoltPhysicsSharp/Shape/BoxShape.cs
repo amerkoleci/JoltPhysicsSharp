@@ -8,8 +8,8 @@ namespace JoltPhysicsSharp;
 
 public sealed class BoxShapeSettings : ConvexShapeSettings
 {
-    public unsafe BoxShapeSettings(Vector3 halfExent, float convexRadius = Foundation.DefaultConvexRadius)
-        : base(JPH_BoxShapeSettings_Create(&halfExent, convexRadius))
+    public BoxShapeSettings(in Vector3 halfExent, float convexRadius = Foundation.DefaultConvexRadius)
+        : base(JPH_BoxShapeSettings_Create(halfExent, convexRadius))
     {
     }
 
@@ -21,8 +21,8 @@ public sealed class BoxShapeSettings : ConvexShapeSettings
 
 public sealed class BoxShape : ConvexShape
 {
-    public unsafe BoxShape(Vector3 halfExent, float convexRadius = Foundation.DefaultConvexRadius)
-        : base(JPH_BoxShape_Create(&halfExent, convexRadius))
+    public BoxShape(in Vector3 halfExent, float convexRadius = Foundation.DefaultConvexRadius)
+        : base(JPH_BoxShape_Create(halfExent, convexRadius))
     {
     }
 

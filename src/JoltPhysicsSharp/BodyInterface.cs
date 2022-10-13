@@ -62,38 +62,36 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_RemoveBody(Handle, bodyID);
     }
 
-    public unsafe void SetLinearVelocity(in Body body, Vector3 velocity)
+    public void SetLinearVelocity(in Body body, in Vector3 velocity)
     {
-        JPH_BodyInterface_SetLinearVelocity(Handle, body.ID, &velocity);
+        JPH_BodyInterface_SetLinearVelocity(Handle, body.ID, velocity);
     }
 
-    public unsafe void SetLinearVelocity(in BodyID bodyID, Vector3 velocity)
+    public void SetLinearVelocity(in BodyID bodyID, in Vector3 velocity)
     {
-        JPH_BodyInterface_SetLinearVelocity(Handle, bodyID, &velocity);
+        JPH_BodyInterface_SetLinearVelocity(Handle, bodyID, velocity);
     }
 
-    public unsafe Vector3 GetLinearVelocity(in BodyID bodyID)
+    public Vector3 GetLinearVelocity(in BodyID bodyID)
     {
-        Vector3 velocity;
-        JPH_BodyInterface_GetLinearVelocity(Handle, bodyID, &velocity);
+        JPH_BodyInterface_GetLinearVelocity(Handle, bodyID, out Vector3 velocity);
         return velocity;
     }
 
-    public unsafe void GetLinearVelocity(in BodyID bodyID, Vector3* velocity)
+    public void GetLinearVelocity(in BodyID bodyID, out Vector3 velocity)
     {
-        JPH_BodyInterface_GetLinearVelocity(Handle, bodyID, velocity);
+        JPH_BodyInterface_GetLinearVelocity(Handle, bodyID, out velocity);
     }
 
-    public unsafe Vector3 GetCenterOfMassPosition(in BodyID bodyID)
+    public Vector3 GetCenterOfMassPosition(in BodyID bodyID)
     {
-        Vector3 velocity;
-        JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, &velocity);
+        JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, out Vector3 velocity);
         return velocity;
     }
 
-    public unsafe void GetCenterOfMassPosition(in BodyID bodyID, Vector3* velocity)
+    public void GetCenterOfMassPosition(in BodyID bodyID, out Vector3 velocity)
     {
-        JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, velocity);
+        JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, out velocity);
     }
 
     public MotionType GetMotionType(in BodyID bodyID)
