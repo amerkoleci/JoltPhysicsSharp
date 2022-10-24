@@ -95,7 +95,7 @@
 			#error Undefined compiler
 		#endif
 	#endif
-#elif defined(__aarch64__) || defined(_M_ARM64)
+#elif defined(__aarch64__) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC)
 	// ARM64 CPU architecture
 	#define JPH_CPU_ARM64
 	#define JPH_USE_NEON
@@ -253,7 +253,11 @@ JPH_SUPPRESS_WARNINGS_STD_END
 #if defined(JPH_USE_SSE)
 	#include <immintrin.h>
 #elif defined(JPH_USE_NEON)
-	#include <arm_neon.h>
+    #if defined(_MSC_VER) && !defined(__clang__) && (defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC))
+        #include <arm64_neon.h>
+    #else   
+	    #include <arm_neon.h>
+    #endif
 #endif
 
 JPH_NAMESPACE_BEGIN
