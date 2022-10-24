@@ -199,6 +199,25 @@ JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius
     return reinterpret_cast<JPH_BoxShape*>(shape);
 }
 
+void JPH_BoxShape_GetHalfExtent(const JPH_BoxShape* shape, JPH_Vec3* halfExtent)
+{
+    auto joltShape = reinterpret_cast<const JPH::BoxShape*>(shape);
+    auto joltVector = joltShape->GetHalfExtent();
+    FromVec3(joltVector, halfExtent);
+}
+
+float JPH_BoxShape_GetVolume(const JPH_BoxShape* shape)
+{
+    auto joltShape = reinterpret_cast<const JPH::BoxShape*>(shape);
+    return joltShape->GetVolume();
+}
+
+float JPH_BoxShape_GetConvexRadius(const JPH_BoxShape* shape)
+{
+    auto joltShape = reinterpret_cast<const JPH::BoxShape*>(shape);
+    return joltShape->GetConvexRadius();
+}
+
 /* SphereShapeSettings */
 JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius)
 {
@@ -430,6 +449,47 @@ JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* interface, JPH_B
         *reinterpret_cast<const JPH::BodyCreationSettings*>(settings)
     );
 
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_Body* JPH_BodyInterface_CreateBodyWithoutID(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto body = joltBodyInterface->CreateBodyWithoutID(
+        *reinterpret_cast<const JPH::BodyCreationSettings*>(settings)
+    );
+
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+void JPH_BodyInterface_DestroyBodyWithoutID(JPH_BodyInterface* interface, JPH_Body* body)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto joltBody = reinterpret_cast<JPH::Body*>(body);
+
+    joltBodyInterface->DestroyBodyWithoutID(joltBody);
+}
+
+bool JPH_BodyInterface_AssignBodyID(JPH_BodyInterface* interface, JPH_Body* body)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto joltBody = reinterpret_cast<JPH::Body*>(body);
+
+    return joltBodyInterface->AssignBodyID(joltBody);
+}
+
+bool JPH_BodyInterface_AssignBodyID2(JPH_BodyInterface* interface, JPH_Body* body, JPH_BodyID bodyID)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto joltBody = reinterpret_cast<JPH::Body*>(body);
+
+    return joltBodyInterface->AssignBodyID(joltBody, JPH::BodyID(bodyID));
+}
+
+JPH_Body* JPH_BodyInterface_UnassignBodyID(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto body = joltBodyInterface->UnassignBodyID(JPH::BodyID(bodyID));
     return reinterpret_cast<JPH_Body*>(body);
 }
 

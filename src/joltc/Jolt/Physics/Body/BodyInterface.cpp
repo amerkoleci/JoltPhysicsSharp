@@ -17,12 +17,56 @@ JPH_NAMESPACE_BEGIN
 
 Body *BodyInterface::CreateBody(const BodyCreationSettings &inSettings)
 {
-	return mBodyManager->CreateBody(inSettings);
+	Body *body = mBodyManager->AllocateBody(inSettings);
+	if (!mBodyManager->AddBody(body))
+	{
+		mBodyManager->FreeBody(body);
+		return nullptr;
+	}
+	return body;
 }
 
 Body *BodyInterface::CreateBodyWithID(const BodyID &inBodyID, const BodyCreationSettings &inSettings)
 {
-	return mBodyManager->CreateBodyWithID(inBodyID, inSettings);
+	Body *body = mBodyManager->AllocateBody(inSettings);
+	if (!mBodyManager->AddBodyWithCustomID(body, inBodyID))
+	{
+		mBodyManager->FreeBody(body);
+		return nullptr;
+	}
+	return body;
+}
+
+Body *BodyInterface::CreateBodyWithoutID(const BodyCreationSettings &inSettings) const
+{
+	return mBodyManager->AllocateBody(inSettings);
+}
+
+void BodyInterface::DestroyBodyWithoutID(Body *inBody) const
+{
+	mBodyManager->FreeBody(inBody);
+}
+
+bool BodyInterface::AssignBodyID(Body *ioBody)
+{
+	return mBodyManager->AddBody(ioBody);
+}
+
+bool BodyInterface::AssignBodyID(Body *ioBody, const BodyID &inBodyID)
+{
+	return mBodyManager->AddBodyWithCustomID(ioBody, inBodyID);
+}
+
+Body *BodyInterface::UnassignBodyID(const BodyID &inBodyID)
+{
+	Body *body = nullptr;
+	mBodyManager->RemoveBodies(&inBodyID, 1, &body);
+	return body;
+}
+
+void BodyInterface::UnassignBodyIDs(const BodyID *inBodyIDs, int inNumber, Body **outBodies)
+{
+	mBodyManager->RemoveBodies(inBodyIDs, inNumber, outBodies);
 }
 
 void BodyInterface::DestroyBody(const BodyID &inBodyID)

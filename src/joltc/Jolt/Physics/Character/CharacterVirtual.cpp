@@ -8,7 +8,10 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
 #include <Jolt/Physics/Collision/CollideShape.h>
+#include <Jolt/Physics/Collision/Shape/RotatedTranslatedShape.h>
 #include <Jolt/Core/QuickSort.h>
+#include <Jolt/Geometry/ConvexSupport.h>
+#include <Jolt/Geometry/GJKClosestPoint.h>
 #ifdef JPH_DEBUG_RENDERER
 	#include <Jolt/Renderer/DebugRenderer.h>
 #endif // JPH_DEBUG_RENDERER
@@ -175,10 +178,37 @@ bool CharacterVirtual::ValidateContact(const Contact &inContact) const
 	return mListener->OnContactValidate(this, inContact.mBodyB, inContact.mSubShapeIDB);
 }
 
+template <class T>
+inline static bool sCorrectFractionForCharacterPadding(const Shape *inShape, Mat44Arg inStart, Vec3Arg inDisplacement, const T &inPolygon, float &ioFraction)
+{
+	if (inShape->GetType() == EShapeType::Convex)
+	{
+		// Get the support function for the shape we're casting
+		const ConvexShape *convex_shape = static_cast<const ConvexShape *>(inShape);
+		ConvexShape::SupportBuffer buffer;
+		const ConvexShape::Support *support = convex_shape->GetSupportFunction(ConvexShape::ESupportMode::IncludeConvexRadius, buffer, Vec3::sReplicate(1.0f));
+
+		// Cast the shape against the polygon
+		GJKClosestPoint gjk;
+		return gjk.CastShape(inStart, inDisplacement, cDefaultCollisionTolerance, *support, inPolygon, ioFraction);
+	}
+	else if (inShape->GetSubType() == EShapeSubType::RotatedTranslated)
+	{
+		const RotatedTranslatedShape *rt_shape = static_cast<const RotatedTranslatedShape *>(inShape);
+		return sCorrectFractionForCharacterPadding(rt_shape->GetInnerShape(), inStart * Mat44::sRotation(rt_shape->GetRotation()), inDisplacement, inPolygon, ioFraction);
+	}
+	else
+	{
+		JPH_ASSERT(false, "Not supported yet!");
+		return false;
+	}
+}
+
 bool CharacterVirtual::GetFirstContactForSweep(Vec3Arg inPosition, Vec3Arg inDisplacement, Contact &outContact, const IgnoredContactList &inIgnoredContacts, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, TempAllocator &inAllocator) const
 {
 	// Too small distance -> skip checking
-	if (inDisplacement.LengthSq() < 1.0e-8f)
+	float displacement_len_sq = inDisplacement.LengthSq();
+	if (displacement_len_sq < 1.0e-8f)
 		return false;
 
 	// Calculate start transform
@@ -217,15 +247,28 @@ bool CharacterVirtual::GetFirstContactForSweep(Vec3Arg inPosition, Vec3Arg inDis
 	if (!valid_contact)
 		return false;
 
-	// Correct fraction for the padding that we want to keep from geometry
-	// We want to maintain distance of mCharacterPadding (p) along plane normal outContact.mContactNormal (n) to the capsule by moving back along inDisplacement (d) by amount d'
-	// cos(angle between d and -n) = -n dot d / |d| = p / d'
-	// <=> d' = -p |d| / n dot d
-	// The new fraction of collision is then:
-	// f' = f - d' / |d| = f + p / n dot d
-	float dot = outContact.mContactNormal.Dot(inDisplacement);
-	if (dot < 0.0f) // We should not divide by zero and we should only update the fraction if normal is pointing towards displacement
-		outContact.mFraction = max(0.0f, outContact.mFraction + mCharacterPadding / dot);
+	// Fetch the face we're colliding with
+	TransformedShape ts = mSystem->GetBodyInterface().GetTransformedShape(outContact.mBodyB);
+	Shape::SupportingFace face;
+	ts.GetSupportingFace(outContact.mSubShapeIDB, -outContact.mContactNormal, face);
+
+	bool corrected = false;
+	if (face.size() >= 2)
+	{
+		// Inflate the colliding face by the character padding
+		PolygonConvexSupport polygon(face);
+		AddConvexRadius add_cvx(polygon, mCharacterPadding);
+
+		// Correct fraction to hit this inflated face instead of the inner shape
+		corrected = sCorrectFractionForCharacterPadding(mShape, start, inDisplacement, add_cvx, outContact.mFraction);
+	}
+	if (!corrected)
+	{
+		// When there's only a single contact point or when we were unable to correct the fraction,
+		// we can just move the fraction back so that the character and its padding don't hit the contact point anymore
+		outContact.mFraction = max(0.0f, outContact.mFraction - mCharacterPadding / sqrt(displacement_len_sq));
+	}
+
 	return true;
 }
 
@@ -584,6 +627,9 @@ void CharacterVirtual::UpdateSupportingContact(bool inSkipContactVelocityCheck, 
 			c.mHadCollision |= c.mDistance < mCollisionTolerance
 								&& (inSkipContactVelocityCheck || c.mSurfaceNormal.Dot(mLinearVelocity - c.mLinearVelocity) <= 0.0f);
 
+	// Calculate transform that takes us to character local space
+	Mat44 inv_transform = Mat44::sInverseRotationTranslation(mRotation, mPosition);
+
 	// Determine if we're supported or not
 	int num_supported = 0;
 	int num_sliding = 0;
@@ -592,13 +638,26 @@ void CharacterVirtual::UpdateSupportingContact(bool inSkipContactVelocityCheck, 
 	Vec3 avg_velocity = Vec3::sZero();
 	const Contact *supporting_contact = nullptr;
 	float max_cos_angle = -FLT_MAX;
+	const Contact *deepest_contact = nullptr;
+	float smallest_distance = FLT_MAX;
 	for (const Contact &c : mActiveContacts)
 		if (c.mHadCollision)
 		{
 			// Calculate the angle between the plane normal and the up direction
 			float cos_angle = c.mSurfaceNormal.Dot(mUp);
 
-			// Find the contact with the normal that is pointing most upwards and store it in mSupportingContact
+			// Find the deepest contact
+			if (c.mDistance < smallest_distance)
+			{
+				deepest_contact = &c;
+				smallest_distance = c.mDistance;
+			}
+
+			// If this contact is in front of our plane, we cannot be supported by it
+			if (mSupportingVolume.SignedDistance(inv_transform * c.mPosition) > 0.0f)
+				continue;
+
+			// Find the contact with the normal that is pointing most upwards and store it
 			if (max_cos_angle < cos_angle)
 			{
 				supporting_contact = &c;
@@ -667,11 +726,19 @@ void CharacterVirtual::UpdateSupportingContact(bool inSkipContactVelocityCheck, 
 			}
 		}
 
+	// Take either the most supporting contact or the deepest contact
+	const Contact *best_contact = supporting_contact != nullptr? supporting_contact : deepest_contact;
+
 	// Calculate average normal and velocity
 	if (num_avg_normal >= 1)
 	{
 		mGroundNormal = avg_normal.Normalized();
 		mGroundVelocity = avg_velocity / float(num_avg_normal);
+	}
+	else if (best_contact != nullptr)
+	{
+		mGroundNormal = best_contact->mSurfaceNormal;
+		mGroundVelocity = best_contact->mLinearVelocity;
 	}
 	else
 	{
@@ -679,14 +746,14 @@ void CharacterVirtual::UpdateSupportingContact(bool inSkipContactVelocityCheck, 
 		mGroundVelocity = Vec3::sZero();
 	}
 
-	// Copy supporting contact properties
-	if (supporting_contact != nullptr)
+	// Copy contact properties
+	if (best_contact != nullptr)
 	{
-		mGroundBodyID = supporting_contact->mBodyB;
-		mGroundBodySubShapeID = supporting_contact->mSubShapeIDB;
-		mGroundPosition = supporting_contact->mPosition;
-		mGroundMaterial = supporting_contact->mMaterial;
-		mGroundUserData = supporting_contact->mUserData;
+		mGroundBodyID = best_contact->mBodyB;
+		mGroundBodySubShapeID = best_contact->mSubShapeIDB;
+		mGroundPosition = best_contact->mPosition;
+		mGroundMaterial = best_contact->mMaterial;
+		mGroundUserData = best_contact->mUserData;
 	}
 	else
 	{
@@ -729,8 +796,8 @@ void CharacterVirtual::UpdateSupportingContact(bool inSkipContactVelocityCheck, 
 	}
 	else
 	{
-		// Not in contact with anything
-		mGroundState = EGroundState::InAir;
+		// Not supported by anything
+		mGroundState = best_contact != nullptr? EGroundState::NotSupported : EGroundState::InAir;
 	}
 }
 
@@ -818,6 +885,32 @@ void CharacterVirtual::MoveShape(Vec3 &ioPosition, Vec3Arg inVelocity, float inD
 	}
 }
 
+Vec3 CharacterVirtual::CancelVelocityTowardsSteepSlopes(Vec3Arg inDesiredVelocity) const
+{
+	// If we're not pushing against a steep slope, return the desired velocity
+	// Note: This is important as WalkStairs overrides the ground state to OnGround when its first check fails but the second succeeds
+	if (mGroundState == CharacterVirtual::EGroundState::OnGround
+		|| mGroundState == CharacterVirtual::EGroundState::InAir)
+		return inDesiredVelocity;
+		
+	Vec3 desired_velocity = inDesiredVelocity;
+	for (const Contact &c : mActiveContacts)
+		if (c.mHadCollision
+			&& IsSlopeTooSteep(c.mSurfaceNormal))
+		{
+			Vec3 normal = c.mSurfaceNormal;
+
+			// Remove normal vertical component
+			normal -= normal.Dot(mUp) * mUp;
+
+			// Cancel horizontal movement in opposite direction
+			float dot = normal.Dot(desired_velocity);
+			if (dot < 0.0f)
+				desired_velocity -= (dot * normal) / normal.LengthSq();
+		}
+	return desired_velocity;
+}
+
 void CharacterVirtual::Update(float inDeltaTime, Vec3Arg inGravity, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, TempAllocator &inAllocator)
 {
 	// If there's no delta time, we don't need to do anything
@@ -871,7 +964,7 @@ void CharacterVirtual::MoveToContact(Vec3Arg inPosition, const Contact &inContac
 	GetContactsAtPosition(mPosition, mLinearVelocity.NormalizedOr(Vec3::sZero()), mShape, contacts, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter);
 
 	// Ensure that we mark inContact as colliding
-	JPH_IF_ENABLE_ASSERTS(bool found_contact = false;)
+	bool found_contact = false;
 	for (Contact &c : contacts)
 		if (c.mBodyB == inContact.mBodyB
 			&& c.mSubShapeIDB == inContact.mSubShapeIDB)
@@ -879,7 +972,13 @@ void CharacterVirtual::MoveToContact(Vec3Arg inPosition, const Contact &inContac
 			c.mHadCollision = true;
 			JPH_IF_ENABLE_ASSERTS(found_contact = true;)
 		}
-	JPH_ASSERT(found_contact);
+	if (!found_contact)
+	{
+		contacts.push_back(inContact);
+
+		Contact &copy = contacts.back();
+		copy.mHadCollision = true;
+	}
 
 	StoreActiveContacts(contacts, inAllocator);
 	JPH_ASSERT(mGroundState != EGroundState::InAir);
@@ -920,6 +1019,10 @@ bool CharacterVirtual::SetShape(const Shape *inShape, float inMaxPenetrationDept
 
 bool CharacterVirtual::CanWalkStairs(Vec3Arg inLinearVelocity) const
 {
+	// We can only walk stairs if we're supported
+	if (!IsSupported())
+		return false;
+
 	// Check if there's enough horizontal velocity to trigger a stair walk
 	Vec3 horizontal_velocity = inLinearVelocity - inLinearVelocity.Dot(mUp) * mUp;
 	if (horizontal_velocity.IsNearZero(1.0e-6f))
@@ -960,7 +1063,8 @@ bool CharacterVirtual::WalkStairs(float inDeltaTime, Vec3Arg inStepUp, Vec3Arg i
 	// Horizontal movement
 	Vec3 new_position = up_position;
 	MoveShape(new_position, inStepForward / inDeltaTime, inDeltaTime, nullptr, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator);
-	if (new_position.IsClose(up_position, 1.0e-8f))
+	float horizontal_movement_sq = (new_position - up_position).LengthSq();
+	if (horizontal_movement_sq < 1.0e-8f)
 		return false; // No movement, cancel
 
 #ifdef JPH_DEBUG_RENDERER
@@ -997,28 +1101,28 @@ bool CharacterVirtual::WalkStairs(float inDeltaTime, Vec3Arg inStepUp, Vec3Arg i
 		// Delta time may be very small, so it may be that we hit the edge of a step and the normal is too horizontal.
 		// In order to judge if the floor is flat further along the sweep, we test again for a floor at inStepForwardTest
 		// and check if the normal is valid there.
-		Vec3 test_position = up_position + inStepForwardTest;
-
-		// First sweep forward to the test position
-		Contact test_contact;
-		if (!GetFirstContactForSweep(up_position, inStepForwardTest, test_contact, dummy_ignored_contacts, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator))
-		{
-			// Then sweep down
-			if (!GetFirstContactForSweep(test_position, down, test_contact, dummy_ignored_contacts, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator))
-				return false;
-		}
-		else
-		{
-			// If we didn't move down, set the 'down' fraction to zero
-			test_contact.mFraction = 0.0f;
-		}
+		Vec3 test_position = up_position;
+		MoveShape(test_position, inStepForwardTest / inDeltaTime, inDeltaTime, nullptr, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator);
+		float test_horizontal_movement_sq = (test_position - up_position).LengthSq();
+		if (test_horizontal_movement_sq <= horizontal_movement_sq + 1.0e-8f)
+			return false; // We didn't move any further than in the previous test
 
 	#ifdef JPH_DEBUG_RENDERER
-		// Draw 2nd sweep forward and down
+		// Draw 2nd sweep horizontal
+		if (sDrawWalkStairs)
+			DebugRenderer::sInstance->DrawArrow(up_position, test_position, Color::sCyan, 0.01f);
+	#endif // JPH_DEBUG_RENDERER
+
+		// Then sweep down
+		Contact test_contact;
+		if (!GetFirstContactForSweep(test_position, down, test_contact, dummy_ignored_contacts, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator))
+			return false;
+
+	#ifdef JPH_DEBUG_RENDERER
+		// Draw 2nd sweep down
 		if (sDrawWalkStairs)
 		{
 			Vec3 debug_pos = test_position + test_contact.mFraction * down; 
-			DebugRenderer::sInstance->DrawArrow(up_position, test_position, Color::sCyan, 0.01f);
 			DebugRenderer::sInstance->DrawArrow(test_position, debug_pos, Color::sCyan, 0.01f);
 			DebugRenderer::sInstance->DrawArrow(test_contact.mPosition, test_contact.mPosition + test_contact.mSurfaceNormal, Color::sCyan, 0.01f);
 			mShape->Draw(DebugRenderer::sInstance, GetCenterOfMassTransform(debug_pos, mRotation, mShape), Vec3::sReplicate(1.0f), Color::sCyan, false, true);
@@ -1035,13 +1139,15 @@ bool CharacterVirtual::WalkStairs(float inDeltaTime, Vec3Arg inStepUp, Vec3Arg i
 
 	// Move the character to the new location
 	MoveToContact(new_position, contact, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator);
+
+	// Override ground state to 'on ground', it is possible that the contact normal is too steep, but in this case the inStepForwardTest has found a contact normal that is not too steep
+	mGroundState = EGroundState::OnGround;
+
 	return true;
 }
 
 bool CharacterVirtual::StickToFloor(Vec3Arg inStepDown, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, TempAllocator &inAllocator)
 {
-	JPH_ASSERT(GetGroundState() == EGroundState::InAir, "Makes no sense to call this if we're not in air");
-
 	// Try to find the floor
 	Contact contact;
 	IgnoredContactList dummy_ignored_contacts(inAllocator);
@@ -1063,6 +1169,84 @@ bool CharacterVirtual::StickToFloor(Vec3Arg inStepDown, const BroadPhaseLayerFil
 	// Move the character to the new location
 	MoveToContact(new_position, contact, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator);
 	return true;
+}
+
+void CharacterVirtual::ExtendedUpdate(float inDeltaTime, Vec3Arg inGravity, const ExtendedUpdateSettings &inSettings, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, TempAllocator &inAllocator)
+{
+	// Update the velocity
+	Vec3 desired_velocity = mLinearVelocity;
+	mLinearVelocity = CancelVelocityTowardsSteepSlopes(desired_velocity);
+	
+	// Remember old position
+	Vec3 old_position = mPosition;
+
+	// Track if on ground before the update
+	bool ground_to_air = IsSupported();
+
+	// Update the character position (instant, do not have to wait for physics update)
+	Update(inDeltaTime, inGravity, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator);
+
+	// ... and that we got into air after
+	if (IsSupported())
+		ground_to_air = false;
+
+	// If stick to floor enabled and we're going from supported to not supported
+	if (ground_to_air && !inSettings.mStickToFloorStepDown.IsNearZero())
+	{
+		// If we're not moving up, stick to the floor
+		float velocity = (mPosition - old_position).Dot(mUp) / inDeltaTime;
+		if (velocity <= 1.0e-6f)
+			StickToFloor(inSettings.mStickToFloorStepDown, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator);
+	}
+
+	// If walk stairs enabled
+	if (!inSettings.mWalkStairsStepUp.IsNearZero())
+	{
+		// Calculate how much we wanted to move horizontally
+		Vec3 desired_horizontal_step = desired_velocity * inDeltaTime;
+		desired_horizontal_step -= desired_horizontal_step.Dot(mUp) * mUp;
+		float desired_horizontal_step_len = desired_horizontal_step.Length();
+		if (desired_horizontal_step_len > 0.0f)
+		{
+			// Calculate how much we moved horizontally
+			Vec3 achieved_horizontal_step = mPosition - old_position;
+			achieved_horizontal_step -= achieved_horizontal_step.Dot(mUp) * mUp;
+
+			// Only count movement in the direction of the desired movement
+			// (otherwise we find it ok if we're sliding downhill while we're trying to climb uphill)
+			Vec3 step_forward_normalized = desired_horizontal_step / desired_horizontal_step_len;
+			achieved_horizontal_step = max(0.0f, achieved_horizontal_step.Dot(step_forward_normalized)) * step_forward_normalized;
+			float achieved_horizontal_step_len = achieved_horizontal_step.Length();
+
+			// If we didn't move as far as we wanted and we're against a slope that's too steep
+			if (achieved_horizontal_step_len + 1.0e-4f < desired_horizontal_step_len
+				&& CanWalkStairs(desired_velocity))
+			{
+				// Calculate how much we should step forward
+				// Note that we clamp the step forward to a minimum distance. This is done because at very high frame rates the delta time
+				// may be very small, causing a very small step forward. If the step becomes small enough, we may not move far enough
+				// horizontally to actually end up at the top of the step.
+				Vec3 step_forward = step_forward_normalized * max(inSettings.mWalkStairsMinStepForward, desired_horizontal_step_len - achieved_horizontal_step_len);
+
+				// Calculate how far to scan ahead for a floor. This is only used in case the floor normal at step_forward is too steep.
+				// In that case an additional check will be performed at this distance to check if that normal is not too steep.
+				// Start with the ground normal in the horizontal plane and normalizing it
+				Vec3 step_forward_test = -mGroundNormal;
+				step_forward_test -= step_forward_test.Dot(mUp) * mUp;
+				step_forward_test = step_forward_test.NormalizedOr(step_forward_normalized);
+
+				// If this normalized vector and the character forward vector is bigger than a preset angle, we use the character forward vector instead of the ground normal
+				// to do our forward test
+				if (step_forward_test.Dot(step_forward_normalized) < inSettings.mWalkStairsCosAngleForwardContact)
+					step_forward_test = step_forward_normalized;
+
+				// Calculate the correct magnitude for the test vector
+				step_forward_test *= inSettings.mWalkStairsStepForwardTest;
+
+				WalkStairs(inDeltaTime, inSettings.mWalkStairsStepUp, step_forward, step_forward_test, inSettings.mWalkStairsStepDownExtra, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inAllocator);
+			}
+		}
+	}
 }
 
 void CharacterVirtual::SaveState(StateRecorder &inStream) const
