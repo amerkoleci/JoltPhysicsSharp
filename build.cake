@@ -29,7 +29,7 @@ Task("BuildMacOS")
     // Build
     var buildDir = "build";
     CreateDirectory(buildDir);
-    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_OSX_ARCHITECTURES=arm64;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_BUILD_TYPE=Distribution" });
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_OSX_ARCHITECTURES=arm64;x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DUSE_AVX2=OFF -DUSE_AVX512=OFF -DUSE_LZCNT=OFF -DUSE_TZCNT=OFF -DUSE_FMADD=OFF -DCMAKE_BUILD_TYPE=Distribution" });
     StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
 
     // Copy artifact
