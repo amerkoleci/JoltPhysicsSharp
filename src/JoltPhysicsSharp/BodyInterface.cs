@@ -27,8 +27,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
 
     public Body CreateBody(BodyCreationSettings settings)
     {
-        IntPtr bodyHandle = JPH_BodyInterface_CreateBody(Handle, settings.Handle);
-        return new Body(bodyHandle);
+        return JPH_BodyInterface_CreateBody(Handle, settings.Handle);
     }
 
     public BodyID CreateAndAddBody(BodyCreationSettings settings, ActivationMode activationMode)
@@ -38,13 +37,22 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
 
     public Body CreateBodyWithID(in BodyID bodyID, BodyCreationSettings settings)
     {
-        IntPtr bodyHandle = JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle);
-        return new Body(bodyHandle);
+        return JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle);
+    }
+
+    public Body CreateBodyWithoutID(BodyCreationSettings settings)
+    {
+        return JPH_BodyInterface_CreateBodyWithoutID(Handle, settings.Handle);
     }
 
     public void DestroyBody(in BodyID bodyID)
     {
         JPH_BodyInterface_DestroyBody(Handle, bodyID);
+    }
+
+    public void DestroyBody(in Body body)
+    {
+        JPH_BodyInterface_DestroyBodyWithoutID(Handle, body.Handle);
     }
 
     public void AddBody(in BodyID bodyID, ActivationMode activationMode)
@@ -60,6 +68,21 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
     public void RemoveBody(in BodyID bodyID)
     {
         JPH_BodyInterface_RemoveBody(Handle, bodyID);
+    }
+
+    public bool AssignBodyID(in Body body)
+    {
+        return JPH_BodyInterface_AssignBodyID(Handle, body.Handle);
+    }
+
+    public bool AssignBodyID(in Body body, in BodyID bodyID)
+    {
+        return JPH_BodyInterface_AssignBodyID2(Handle, body.Handle, bodyID);
+    }
+
+    public Body UnassignBodyID(in BodyID bodyID)
+    {
+        return JPH_BodyInterface_UnassignBodyID(Handle, bodyID);
     }
 
     public void SetLinearVelocity(in Body body, in Vector3 velocity)

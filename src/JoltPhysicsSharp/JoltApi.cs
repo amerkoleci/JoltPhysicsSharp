@@ -143,6 +143,15 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BoxShape_Create(in Vector3 halfExtent, float convexRadius);
 
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BoxShape_GetHalfExtent(IntPtr handle, out Vector3 halfExtent);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_BoxShape_GetVolume(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_BoxShape_GetConvexRadius(IntPtr handle);
+
     /* SphereShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_SphereShapeSettings_Create(float radius);
@@ -240,7 +249,25 @@ internal static unsafe class JoltApi
     public static extern IntPtr JPH_BodyInterface_CreateBodyWithID(IntPtr handle, uint bodyID, IntPtr settings);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyInterface_CreateBodyWithoutID(IntPtr handle, IntPtr settings);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_DestroyBody(IntPtr handle, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_DestroyBodyWithoutID(IntPtr handle, IntPtr body);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_BodyInterface_AssignBodyID(IntPtr handle, IntPtr body);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_BodyInterface_AssignBodyID2(IntPtr handle, IntPtr body, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern IntPtr JPH_BodyInterface_UnassignBodyID(IntPtr handle, uint bodyID);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_AddBody(IntPtr handle, uint bodyID, ActivationMode activation);

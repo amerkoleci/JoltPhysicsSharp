@@ -30,4 +30,21 @@ public sealed class BoxShape : ConvexShape
     /// Finalizes an instance of the <see cref="BoxShape" /> class.
     /// </summary>
     ~BoxShape() => Dispose(isDisposing: false);
+
+    public Vector3 HalfExtent
+    {
+        get
+        {
+            JPH_BoxShape_GetHalfExtent(Handle, out Vector3 value);
+            return value;
+        }
+    }
+
+    public void GetHalfExtent(out Vector3 halfExtent)
+    {
+        JPH_BoxShape_GetHalfExtent(Handle, out halfExtent);
+    }
+
+    public float Volume => JPH_BoxShape_GetVolume(Handle);
+    public float ConvexRadius => JPH_BoxShape_GetConvexRadius(Handle);
 }
