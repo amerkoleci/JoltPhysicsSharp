@@ -50,7 +50,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_DestroyBody(Handle, bodyID);
     }
 
-    public void DestroyBody(in Body body)
+    public void DestroyBodyWithoutID(in Body body)
     {
         JPH_BodyInterface_DestroyBodyWithoutID(Handle, body.Handle);
     }
