@@ -91,6 +91,26 @@ typedef struct JPH_Quat {
     float w;
 } JPH_Quat;
 
+typedef struct JPH_Triangle {
+    JPH_Vec3 v1;
+    JPH_Vec3 v2;
+    JPH_Vec3 v3;
+    uint32_t materialIndex;
+} JPH_Triangle;
+
+typedef struct JPH_IndexedTriangleNoMaterial {
+    uint32_t i1;
+    uint32_t i2;
+    uint32_t i3;
+} JPH_IndexedTriangleNoMaterial;
+
+typedef struct JPH_IndexedTriangle {
+    uint32_t i1;
+    uint32_t i2;
+    uint32_t i3;
+    uint32_t materialIndex;
+} JPH_IndexedTriangle;
+
 typedef struct JPH_SubShapeIDPair
 {
     JPH_BodyID     Body1ID;
@@ -111,6 +131,8 @@ typedef struct JPH_SphereShapeSettings      JPH_SphereShapeSettings;
 typedef struct JPH_TriangleShapeSettings    JPH_TriangleShapeSettings;
 typedef struct JPH_CapsuleShapeSettings     JPH_CapsuleShapeSettings;
 typedef struct JPH_CylinderShapeSettings    JPH_CylinderShapeSettings;
+typedef struct JPH_MeshShapeSettings        JPH_MeshShapeSettings;
+typedef struct JPH_HeightFieldShapeSettings JPH_HeightFieldShapeSettings;
 
 typedef struct JPH_Shape                    JPH_Shape;
 typedef struct JPH_ConvexShape              JPH_ConvexShape;
@@ -162,6 +184,15 @@ JPH_CAPI JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHei
 
 /* CylinderShapeSettings */
 JPH_CAPI JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
+
+/* MeshShapeSettings */
+JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangle, uint32_t triangleCount);
+JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, uint32_t verticesCount, const JPH_IndexedTriangle* triangles, uint32_t triangleCount);
+JPH_CAPI void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings);
+
+/* HeightFieldShapeSettings */
+JPH_CAPI JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount);
+JPH_CAPI uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(JPH_HeightFieldShapeSettings* settings, float maxError);
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);

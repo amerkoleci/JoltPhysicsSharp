@@ -18,6 +18,8 @@
 #include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
 #include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
+#include <Jolt/Physics/Collision/Shape/HeightFieldShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
@@ -60,6 +62,11 @@ static JPH::Vec3 ToVec3(const JPH_Vec3* vec)
     return JPH::Vec3(vec->x, vec->y, vec->z);
 }
 
+static JPH::Float3 ToFloat3(const JPH_Vec3& vec)
+{
+    return JPH::Float3(vec.x, vec.y, vec.z);
+}
+
 static void FromVec3(const JPH::Vec3& vec, JPH_Vec3* result)
 {
     result->x = vec.GetX();
@@ -70,6 +77,11 @@ static void FromVec3(const JPH::Vec3& vec, JPH_Vec3* result)
 static JPH::Quat ToQuat(const JPH_Quat* quat)
 {
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
+}
+
+static JPH::IndexedTriangle ToIndexedTriangle(const JPH_IndexedTriangle& triangle)
+{
+    return JPH::IndexedTriangle(triangle.i1, triangle.i2, triangle.i3, triangle.materialIndex);
 }
 
 bool JPH_Init(void)
@@ -268,6 +280,66 @@ JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, fl
 {
     auto settings = new JPH::CylinderShapeSettings(halfHeight, radius, convexRadius);
     return reinterpret_cast<JPH_CylinderShapeSettings*>(settings);
+}
+
+/* MeshShapeSettings */
+JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangle, uint32_t triangleCount)
+{
+    TriangleList triangles;
+    triangles.resize(triangleCount);
+    for (uint32_t i = 0; i < triangleCount; ++i)
+    {
+        triangles[i].mV[0] = ToFloat3(triangle[i].v1);
+        triangles[i].mV[1] = ToFloat3(triangle[i].v2);
+        triangles[i].mV[2] = ToFloat3(triangle[i].v3);
+        triangles[i].mMaterialIndex = triangle[i].materialIndex;
+    }
+
+    auto settings = new JPH::MeshShapeSettings(triangles);
+    return reinterpret_cast<JPH_MeshShapeSettings*>(settings);
+}
+
+JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, uint32_t verticesCount, const JPH_IndexedTriangle* triangles, uint32_t triangleCount)
+{
+    VertexList joltVertices;
+    IndexedTriangleList joltTriangles;
+
+    joltVertices.resize(verticesCount);
+    joltTriangles.resize(triangleCount);
+
+    for (uint32_t i = 0; i < verticesCount; ++i)
+    {
+        joltVertices[i] = ToFloat3(vertices[i]);
+    }
+
+    for (uint32_t i = 0; i < triangleCount; ++i)
+    {
+        joltTriangles[i] = ToIndexedTriangle(triangles[i]);
+    }
+
+    auto settings = new JPH::MeshShapeSettings(joltVertices, joltTriangles);
+    return reinterpret_cast<JPH_MeshShapeSettings*>(settings);
+}
+
+void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings)
+{
+    JPH_ASSERT(system);
+
+    reinterpret_cast<JPH::MeshShapeSettings*>(settings)->Sanitize();
+}
+
+/* MeshShapeSettings */
+JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount)
+{
+    auto settings = new JPH::HeightFieldShapeSettings(samples, ToVec3(offset), ToVec3(scale), sampleCount);
+    return reinterpret_cast<JPH_HeightFieldShapeSettings*>(settings);
+}
+
+uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(JPH_HeightFieldShapeSettings* settings, float maxError)
+{
+    JPH_ASSERT(system);
+
+    return reinterpret_cast<JPH::HeightFieldShapeSettings*>(settings)->CalculateBitsPerSampleForError(maxError);
 }
 
 /* Shape */
