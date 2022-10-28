@@ -119,34 +119,35 @@ typedef struct JPH_SubShapeIDPair
     JPH_SubShapeID subShapeID2;
 } JPH_SubShapeIDPair;
 
-typedef struct JPH_TempAllocator            JPH_TempAllocator;
-typedef struct JPH_JobSystemThreadPool      JPH_JobSystemThreadPool;
-typedef struct JPH_BroadPhaseLayerInterface JPH_BroadPhaseLayerInterface;
-typedef struct JPH_PhysicsSystem            JPH_PhysicsSystem;
+typedef struct JPH_TempAllocator                JPH_TempAllocator;
+typedef struct JPH_JobSystemThreadPool          JPH_JobSystemThreadPool;
+typedef struct JPH_BroadPhaseLayerInterface     JPH_BroadPhaseLayerInterface;
+typedef struct JPH_PhysicsSystem                JPH_PhysicsSystem;
 
-typedef struct JPH_ShapeSettings            JPH_ShapeSettings;
-typedef struct JPH_ConvexShapeSettings      JPH_ConvexShapeSettings;
-typedef struct JPH_BoxShapeSettings         JPH_BoxShapeSettings;
-typedef struct JPH_SphereShapeSettings      JPH_SphereShapeSettings;
-typedef struct JPH_TriangleShapeSettings    JPH_TriangleShapeSettings;
-typedef struct JPH_CapsuleShapeSettings     JPH_CapsuleShapeSettings;
-typedef struct JPH_CylinderShapeSettings    JPH_CylinderShapeSettings;
-typedef struct JPH_MeshShapeSettings        JPH_MeshShapeSettings;
-typedef struct JPH_HeightFieldShapeSettings JPH_HeightFieldShapeSettings;
+typedef struct JPH_ShapeSettings                JPH_ShapeSettings;
+typedef struct JPH_BoxShapeSettings             JPH_BoxShapeSettings;
+typedef struct JPH_SphereShapeSettings          JPH_SphereShapeSettings;
+typedef struct JPH_TriangleShapeSettings        JPH_TriangleShapeSettings;
+typedef struct JPH_CapsuleShapeSettings         JPH_CapsuleShapeSettings;
+typedef struct JPH_CylinderShapeSettings        JPH_CylinderShapeSettings;
+typedef struct JPH_ConvexHullShapeSettings      JPH_ConvexHullShapeSettings;
+typedef struct JPH_MeshShapeSettings            JPH_MeshShapeSettings;
+typedef struct JPH_HeightFieldShapeSettings     JPH_HeightFieldShapeSettings;
+typedef struct JPH_TaperedCapsuleShapeSettings  JPH_TaperedCapsuleShapeSettings;
 
-typedef struct JPH_Shape                    JPH_Shape;
-typedef struct JPH_ConvexShape              JPH_ConvexShape;
-typedef struct JPH_BoxShape                 JPH_BoxShape;
-typedef struct JPH_SphereShape              JPH_SphereShape;
+typedef struct JPH_Shape                        JPH_Shape;
+typedef struct JPH_ConvexShape                  JPH_ConvexShape;
+typedef struct JPH_BoxShape                     JPH_BoxShape;
+typedef struct JPH_SphereShape                  JPH_SphereShape;
 
-typedef struct JPH_BodyCreationSettings     JPH_BodyCreationSettings;
-typedef struct JPH_BodyInterface            JPH_BodyInterface;
-typedef struct JPH_Body                     JPH_Body;
+typedef struct JPH_BodyCreationSettings         JPH_BodyCreationSettings;
+typedef struct JPH_BodyInterface                JPH_BodyInterface;
+typedef struct JPH_Body                         JPH_Body;
 
-typedef struct JPH_CollideShapeResult       JPH_CollideShapeResult;
-typedef struct JPH_ContactListener          JPH_ContactListener;
+typedef struct JPH_CollideShapeResult           JPH_CollideShapeResult;
+typedef struct JPH_ContactListener              JPH_ContactListener;
 
-typedef struct JPH_BodyActivationListener   JPH_BodyActivationListener;
+typedef struct JPH_BodyActivationListener       JPH_BodyActivationListener;
 
 JPH_CAPI bool JPH_Init(void);
 JPH_CAPI void JPH_Shutdown(void);
@@ -177,24 +178,30 @@ JPH_CAPI void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* setting
 JPH_CAPI JPH_SphereShape* JPH_SphereShape_Create(float radius);
 JPH_CAPI float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape);
 
-/* TriangleShapeSettings */
+/* TriangleShape */
 JPH_CAPI JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, const JPH_Vec3* v2, const JPH_Vec3* v3, float convexRadius);
 
-/* CapsuleShapeSettings */
+/* CapsuleShape */
 JPH_CAPI JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius);
 
-/* CylinderShapeSettings */
+/* CylinderShape */
 JPH_CAPI JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
 
-/* MeshShapeSettings */
+/* ConvexHullShape */
+JPH_CAPI JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* points, uint32_t pointsCount, float maxConvexRadius);
+
+/* MeshShape */
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount);
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, uint32_t verticesCount, const JPH_IndexedTriangle* triangles, uint32_t triangleCount);
 JPH_CAPI void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings);
 
-/* HeightFieldShapeSettings */
+/* HeightFieldShape */
 JPH_CAPI JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount);
 JPH_CAPI void JPH_MeshShapeSettings_DetermineMinAndMaxSample(const JPH_HeightFieldShapeSettings* settings, float* pOutMinValue, float* pOutMaxValue, float* pOutQuantizationScale);
 JPH_CAPI uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFieldShapeSettings* settings, float maxError);
+
+/* TaperedCapsuleShape */
+JPH_CAPI JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius);
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
@@ -258,16 +265,25 @@ JPH_CAPI void JPH_BodyInterface_GetCenterOfMassPosition(JPH_BodyInterface* inter
 JPH_CAPI JPH_MotionType JPH_BodyInterface_GetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 JPH_CAPI void JPH_BodyInterface_SetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_MotionType motionType, JPH_ActivationMode activationMode);
 
-/* Body */
-JPH_CAPI JPH_BodyID JPH_Body_GetID(JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsActive(JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsStatic(JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsKinematic(JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsDynamic(JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsSensor(JPH_Body* body);
+JPH_CAPI float JPH_BodyInterface_GetRestitution(const JPH_BodyInterface* interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_BodyInterface_SetRestitution(JPH_BodyInterface* interface, JPH_BodyID bodyID, float restitution);
 
-JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(JPH_Body* body);
+JPH_CAPI float JPH_BodyInterface_GetFriction(const JPH_BodyInterface* interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_BodyInterface_SetFriction(JPH_BodyInterface* interface, JPH_BodyID bodyID, float friction);
+
+/* Body */
+JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsActive(const JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsStatic(const JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsKinematic(const JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsDynamic(const JPH_Body* body);
+JPH_CAPI bool JPH_Body_IsSensor(const JPH_Body* body);
+JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType);
+JPH_CAPI float JPH_Body_GetFriction(const JPH_Body* body);
+JPH_CAPI void JPH_Body_SetFriction(JPH_Body* body, float friction);
+JPH_CAPI float JPH_Body_GetRestitution(const JPH_Body* body);
+JPH_CAPI void JPH_Body_SetRestitution(JPH_Body* body, float restitution);
 
 /* JPH_BroadPhaseLayer */
 typedef struct JPH_BroadPhaseLayerInterface_Procs {

@@ -129,4 +129,24 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
 
     public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID);
     public bool IsAdded(in BodyID bodyID) => JPH_BodyInterface_IsAdded(Handle, bodyID);
+
+    public float GetRestitution(in BodyID bodyID)
+    {
+        return JPH_BodyInterface_GetRestitution(Handle, bodyID);
+    }
+
+    public void SetRestitution(in BodyID bodyID, float restitution)
+    {
+        JPH_BodyInterface_SetRestitution(Handle, bodyID, restitution);
+    }
+
+    public float GetFriction(in BodyID bodyID)
+    {
+        return JPH_BodyInterface_GetFriction(Handle, bodyID);
+    }
+
+    public void SetFriction(in BodyID bodyID, float friction)
+    {
+        JPH_BodyInterface_SetFriction(Handle, bodyID, friction);
+    }
 }

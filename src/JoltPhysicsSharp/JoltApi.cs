@@ -177,7 +177,11 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
 
-    /* MeshShapeSettings  */
+    /* ConvexHullShape */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_ConvexHullShapeSettings_Create(Vector3* points, int pointsCount, float maxConvexRadius);
+
+    /* MeshShape  */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_MeshShapeSettings_Create(Triangle* triangle, int triangleCount);
 
@@ -187,7 +191,7 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_MeshShapeSettings_Sanitize(IntPtr shape);
 
-    /* HeightFieldShapeSettings  */
+    /* HeightFieldShape  */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_HeightFieldShapeSettings_Create(float* samples, in Vector3 offset, in Vector3 scale, int sampleCount);
 
@@ -196,6 +200,10 @@ internal static unsafe class JoltApi
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_MeshShapeSettings_CalculateBitsPerSampleForError(IntPtr settings, float maxError);
+
+    /* TaperedCapsuleShapeSettings */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius);
 
     /* Shape */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
@@ -321,6 +329,18 @@ internal static unsafe class JoltApi
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetMotionType(IntPtr handle, uint bodyID, MotionType motionType, ActivationMode activationMode);
 
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_BodyInterface_GetRestitution(IntPtr handle, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetRestitution(IntPtr handle, uint bodyID, float value);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_BodyInterface_GetFriction(IntPtr handle, uint bodyID);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetFriction(IntPtr handle, uint bodyID, float value);
+
     /* Body */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_Body_GetID(IntPtr body);
@@ -350,6 +370,18 @@ internal static unsafe class JoltApi
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_SetMotionType(IntPtr handle, MotionType motionType);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_Body_GetFriction(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_SetFriction(IntPtr handle, float value);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_Body_GetRestitution(IntPtr handle);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_SetRestitution(IntPtr handle, float value);
 
     // ContactListener
     public struct JPH_ContactListener_Procs

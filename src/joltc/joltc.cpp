@@ -62,6 +62,11 @@ static JPH::Vec3 ToVec3(const JPH_Vec3* vec)
     return JPH::Vec3(vec->x, vec->y, vec->z);
 }
 
+static JPH::Vec3 ToVec3(const JPH_Vec3& vec)
+{
+    return JPH::Vec3(vec.x, vec.y, vec.z);
+}
+
 static JPH::Float3 ToFloat3(const JPH_Vec3& vec)
 {
     return JPH::Float3(vec.x, vec.y, vec.z);
@@ -210,6 +215,7 @@ void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
     }
 }
 
+/* BoxShape */
 JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius)
 {
     auto settings = new JPH::BoxShapeSettings(ToVec3(halfExtent), convexRadius);
@@ -293,6 +299,21 @@ JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, fl
     return reinterpret_cast<JPH_CylinderShapeSettings*>(settings);
 }
 
+/* ConvexHullShape */
+JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* points, uint32_t pointsCount, float maxConvexRadius)
+{
+    Array<Vec3> joltPoints;
+    joltPoints.resize(pointsCount);
+
+    for (uint32_t i = 0; i < pointsCount; ++i)
+    {
+        joltPoints[i] = ToVec3(points[i]);
+    }
+
+    auto settings = new JPH::ConvexHullShapeSettings(joltPoints, maxConvexRadius);
+    return reinterpret_cast<JPH_ConvexHullShapeSettings*>(settings);
+}
+
 /* MeshShapeSettings */
 JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount)
 {
@@ -361,6 +382,13 @@ uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFi
     JPH_ASSERT(system);
 
     return reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings)->CalculateBitsPerSampleForError(maxError);
+}
+
+/* TaperedCapsuleShapeSettings */
+JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius)
+{
+    auto settings = new JPH::TaperedCapsuleShapeSettings(halfHeightOfTaperedCylinder, topRadius, bottomRadius);
+    return reinterpret_cast<JPH_TaperedCapsuleShapeSettings*>(settings);
 }
 
 /* Shape */
@@ -674,8 +702,8 @@ JPH_MotionType JPH_BodyInterface_GetMotionType(JPH_BodyInterface* interface, JPH
 void JPH_BodyInterface_SetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_MotionType motionType, JPH_ActivationMode activationMode)
 {
     JPH_ASSERT(interface);
-
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
     joltBodyInterface->SetMotionType(
         JPH::BodyID(bodyID),
         static_cast<JPH::EMotionType>(motionType),
@@ -683,46 +711,98 @@ void JPH_BodyInterface_SetMotionType(JPH_BodyInterface* interface, JPH_BodyID bo
     );
 }
 
-/* Body */
-JPH_BodyID JPH_Body_GetID(JPH_Body* body)
+float JPH_BodyInterface_GetRestitution(const JPH_BodyInterface* interface, JPH_BodyID bodyID)
 {
-    auto joltBody = reinterpret_cast<JPH::Body*>(body);
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<const JPH::BodyInterface*>(interface);
+
+    return joltBodyInterface->GetRestitution(JPH::BodyID(bodyID));
+}
+
+void JPH_BodyInterface_SetRestitution(JPH_BodyInterface* interface, JPH_BodyID bodyID, float restitution)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->SetRestitution(JPH::BodyID(bodyID), restitution);
+}
+
+float JPH_BodyInterface_GetFriction(const JPH_BodyInterface* interface, JPH_BodyID bodyID)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<const JPH::BodyInterface*>(interface);
+
+    return joltBodyInterface->GetFriction(JPH::BodyID(bodyID));
+}
+
+void JPH_BodyInterface_SetFriction(JPH_BodyInterface* interface, JPH_BodyID bodyID, float friction)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->SetFriction(JPH::BodyID(bodyID), friction);
+}
+
+/* Body */
+JPH_BodyID JPH_Body_GetID(const JPH_Body* body)
+{
+    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
     return joltBody->GetID().GetIndexAndSequenceNumber();
 }
 
-bool JPH_Body_IsActive(JPH_Body* body)
+bool JPH_Body_IsActive(const JPH_Body* body)
 {
-    return reinterpret_cast<JPH::Body*>(body)->IsActive();
+    return reinterpret_cast<const JPH::Body*>(body)->IsActive();
 }
 
-bool JPH_Body_IsStatic(JPH_Body* body)
+bool JPH_Body_IsStatic(const JPH_Body* body)
 {
-    return reinterpret_cast<JPH::Body*>(body)->IsStatic();
+    return reinterpret_cast<const JPH::Body*>(body)->IsStatic();
 }
 
 bool JPH_Body_IsKinematic(JPH_Body* body)
 {
-    return reinterpret_cast<JPH::Body*>(body)->IsKinematic();
+    return reinterpret_cast<const JPH::Body*>(body)->IsKinematic();
 }
 
-bool JPH_Body_IsDynamic(JPH_Body* body)
+bool JPH_Body_IsDynamic(const JPH_Body* body)
 {
-    return reinterpret_cast<JPH::Body*>(body)->IsDynamic();
+    return reinterpret_cast<const JPH::Body*>(body)->IsDynamic();
 }
 
-bool JPH_Body_IsSensor(JPH_Body* body)
+bool JPH_Body_IsSensor(const JPH_Body* body)
 {
-    return reinterpret_cast<JPH::Body*>(body)->IsSensor();
+    return reinterpret_cast<const JPH::Body*>(body)->IsSensor();
 }
 
-JPH_MotionType JPH_Body_GetMotionType(JPH_Body* body)
+JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body)
 {
-    return static_cast<JPH_MotionType>(reinterpret_cast<JPH::Body*>(body)->GetMotionType());
+    return static_cast<JPH_MotionType>(reinterpret_cast<const JPH::Body*>(body)->GetMotionType());
 }
 
 void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType)
 {
     reinterpret_cast<JPH::Body*>(body)->SetMotionType(static_cast<JPH::EMotionType>(motionType));
+}
+
+float JPH_Body_GetFriction(const JPH_Body* body)
+{
+    return reinterpret_cast<const JPH::Body*>(body)->GetFriction();
+}
+
+void JPH_Body_SetFriction(JPH_Body* body, float friction)
+{
+    reinterpret_cast<JPH::Body*>(body)->SetFriction(friction);
+}
+
+float JPH_Body_GetRestitution(const JPH_Body* body)
+{
+    return reinterpret_cast<const JPH::Body*>(body)->GetRestitution();
+}
+
+void JPH_Body_SetRestitution(JPH_Body* body, float restitution)
+{
+    reinterpret_cast<JPH::Body*>(body)->SetRestitution(restitution);
 }
 
 /* Contact Listener */

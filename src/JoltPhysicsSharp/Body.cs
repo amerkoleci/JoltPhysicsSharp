@@ -36,4 +36,16 @@ public readonly struct Body : IEquatable<Body>
         readonly get => JPH_Body_GetMotionType(Handle);
         set => JPH_Body_SetMotionType(Handle, value);
     }
+
+    public float Friction
+    {
+        readonly get => JPH_Body_GetFriction(Handle);
+        set => JPH_Body_SetFriction(Handle, value);
+    }
+
+    public float Restitution
+    {
+        readonly get => JPH_Body_GetRestitution(Handle);
+        set => JPH_Body_SetRestitution(Handle, value);
+    }
 }
