@@ -2,6 +2,7 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Diagnostics;
+using System.Drawing;
 using System.Numerics;
 using System.Security.AccessControl;
 using JoltPhysicsSharp;
@@ -93,12 +94,51 @@ public static class Program
         }
     }
 
+    private static float WorldScale = 1.0f;
+
+    private static Body CreateFloor(in BodyInterface bodyInterface, float size = 200.0f)
+    {
+        float scale = WorldScale;
+
+        Body floor = bodyInterface.CreateBody(new BodyCreationSettings(
+            new BoxShapeSettings(scale * new Vector3(0.5f * size, 1.0f, 0.5f * size), 0.0f),
+            scale * new Vector3(0.0f, -1.0f, 0.0f),
+            Quaternion.Identity,
+            MotionType.Static,
+            Layers.NonMoving)
+            );
+        bodyInterface.AddBody(floor.ID, ActivationMode.DontActivate);
+        return floor;
+    }
+
+    private static void StackTest(in BodyInterface bodyInterface)
+    {
+        // Floor
+        CreateFloor(bodyInterface);
+
+        Shape boxShape = new BoxShape(new Vector3(0.5f, 1.0f, 2.0f));
+
+        // Dynamic body stack
+        for (int i = 0; i < 10; ++i)
+        {
+            Quaternion rotation;
+            if ((i & 1) != 0)
+                rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, 0.5f * MathF.PI);
+            else
+                rotation = Quaternion.Identity;
+            Body stack = bodyInterface.CreateBody(new BodyCreationSettings(boxShape, new Vector3(10, 1.0f + i * 2.1f, 0), rotation, MotionType.Dynamic, Layers.Moving));
+            bodyInterface.AddBody(stack.ID, ActivationMode.Activate);
+        }
+    }
+
     public static unsafe void Main()
     {
         if (!Foundation.Init())
             return;
 
         {
+            // Malloc
+            //using TempAllocator tempAllocator = new();
             using TempAllocator tempAllocator = new(10 * 1024 * 1024);
             using JobSystemThreadPool jobSystem = new(Foundation.MaxPhysicsJobs, Foundation.MaxPhysicsBarriers);
             using BPLayerInterfaceImpl broadPhaseLayer = new();
@@ -138,6 +178,8 @@ public static class Program
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.
             // (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the physics system)
             bodyInterface.SetLinearVelocity(sphereID, new Vector3(0.0f, -5.0f, 0.0f));
+
+            StackTest(bodyInterface);
 
             // We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
             const float deltaTime = 1.0f / 60.0f;

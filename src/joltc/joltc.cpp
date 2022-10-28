@@ -79,6 +79,11 @@ static JPH::Quat ToQuat(const JPH_Quat* quat)
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
 }
 
+static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
+{
+    return JPH::Triangle(ToFloat3(triangle.v1), ToFloat3(triangle.v2), ToFloat3(triangle.v3), triangle.materialIndex);
+}
+
 static JPH::IndexedTriangle ToIndexedTriangle(const JPH_IndexedTriangle& triangle)
 {
     return JPH::IndexedTriangle(triangle.i1, triangle.i2, triangle.i3, triangle.materialIndex);
@@ -106,6 +111,12 @@ void JPH_Shutdown(void)
     // Destroy the factory
     delete JPH::Factory::sInstance;
     JPH::Factory::sInstance = nullptr;
+}
+
+JPH_TempAllocator* JPH_TempAllocatorMalloc_Create()
+{
+    auto impl = new JPH::TempAllocatorMalloc();
+    return reinterpret_cast<JPH_TempAllocator*>(impl);
 }
 
 JPH_TempAllocator* JPH_TempAllocator_Create(uint32_t size)
@@ -283,19 +294,16 @@ JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, fl
 }
 
 /* MeshShapeSettings */
-JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangle, uint32_t triangleCount)
+JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount)
 {
-    TriangleList triangles;
-    triangles.resize(triangleCount);
+    TriangleList jolTriangles;
+    jolTriangles.resize(triangleCount);
     for (uint32_t i = 0; i < triangleCount; ++i)
     {
-        triangles[i].mV[0] = ToFloat3(triangle[i].v1);
-        triangles[i].mV[1] = ToFloat3(triangle[i].v2);
-        triangles[i].mV[2] = ToFloat3(triangle[i].v3);
-        triangles[i].mMaterialIndex = triangle[i].materialIndex;
+        jolTriangles[i] = ToTriangle(triangles[i]);
     }
 
-    auto settings = new JPH::MeshShapeSettings(triangles);
+    auto settings = new JPH::MeshShapeSettings(jolTriangles);
     return reinterpret_cast<JPH_MeshShapeSettings*>(settings);
 }
 
@@ -335,11 +343,24 @@ JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* s
     return reinterpret_cast<JPH_HeightFieldShapeSettings*>(settings);
 }
 
-uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(JPH_HeightFieldShapeSettings* settings, float maxError)
+void JPH_MeshShapeSettings_DetermineMinAndMaxSample(const JPH_HeightFieldShapeSettings* settings, float* pOutMinValue, float* pOutMaxValue, float* pOutQuantizationScale)
+{
+    auto joltSettings = reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings);
+    float outMinValue, outMaxValue, outQuantizationScale;
+    joltSettings->DetermineMinAndMaxSample(outMinValue, outMaxValue, outQuantizationScale);
+    if (pOutMinValue)
+        *pOutMinValue = outMinValue;
+    if (pOutMaxValue)
+        *pOutMaxValue = outMaxValue;
+    if (pOutQuantizationScale)
+        *pOutQuantizationScale = outQuantizationScale;
+}
+
+uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFieldShapeSettings* settings, float maxError)
 {
     JPH_ASSERT(system);
 
-    return reinterpret_cast<JPH::HeightFieldShapeSettings*>(settings)->CalculateBitsPerSampleForError(maxError);
+    return reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings)->CalculateBitsPerSampleForError(maxError);
 }
 
 /* Shape */

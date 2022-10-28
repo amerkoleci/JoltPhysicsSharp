@@ -7,9 +7,14 @@ namespace JoltPhysicsSharp;
 
 public readonly struct TempAllocator : IEquatable<TempAllocator>, IDisposable
 {
-    public TempAllocator(int size)
-        : this(JPH_TempAllocator_Create((uint)size))
+    public TempAllocator()
     {
+        Handle = JPH_TempAllocatorMalloc_Create();
+    }
+
+    public TempAllocator(int size)
+    {
+        Handle = JPH_TempAllocator_Create((uint)size);
     }
 
     public void Dispose()

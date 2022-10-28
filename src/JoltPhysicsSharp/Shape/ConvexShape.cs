@@ -7,6 +7,10 @@ namespace JoltPhysicsSharp;
 
 public abstract class ConvexShapeSettings : ShapeSettings
 {
+    protected ConvexShapeSettings()
+    {
+    }
+
     internal ConvexShapeSettings(IntPtr handle)
         : base(handle)
     {

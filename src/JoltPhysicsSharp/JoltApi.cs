@@ -103,6 +103,9 @@ internal static unsafe class JoltApi
     public static extern void JPH_Shutdown();
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_TempAllocatorMalloc_Create();
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_TempAllocator_Create(uint size);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
@@ -173,6 +176,26 @@ internal static unsafe class JoltApi
     /* CylinderShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
+
+    /* MeshShapeSettings  */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_MeshShapeSettings_Create(Triangle* triangle, int triangleCount);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_MeshShapeSettings_Create2(Vector3* vertices, int verticesCount, IndexedTriangle* triangles, int triangleCount);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_MeshShapeSettings_Sanitize(IntPtr shape);
+
+    /* HeightFieldShapeSettings  */
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_HeightFieldShapeSettings_Create(float* samples, in Vector3 offset, in Vector3 scale, int sampleCount);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_MeshShapeSettings_DetermineMinAndMaxSample(IntPtr settings, out float outMinValue, out float outMaxValue, out float outQuantizationScale);
+
+    [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_MeshShapeSettings_CalculateBitsPerSampleForError(IntPtr settings, float maxError);
 
     /* Shape */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]

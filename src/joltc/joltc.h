@@ -152,6 +152,7 @@ JPH_CAPI bool JPH_Init(void);
 JPH_CAPI void JPH_Shutdown(void);
 
 /* JPH_TempAllocator */
+JPH_CAPI JPH_TempAllocator* JPH_TempAllocatorMalloc_Create();
 JPH_CAPI JPH_TempAllocator* JPH_TempAllocator_Create(uint32_t size);
 JPH_CAPI void JPH_TempAllocator_Destroy(JPH_TempAllocator* allocator);
 
@@ -186,13 +187,14 @@ JPH_CAPI JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHei
 JPH_CAPI JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
 
 /* MeshShapeSettings */
-JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangle, uint32_t triangleCount);
+JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount);
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, uint32_t verticesCount, const JPH_IndexedTriangle* triangles, uint32_t triangleCount);
 JPH_CAPI void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings);
 
 /* HeightFieldShapeSettings */
 JPH_CAPI JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount);
-JPH_CAPI uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(JPH_HeightFieldShapeSettings* settings, float maxError);
+JPH_CAPI void JPH_MeshShapeSettings_DetermineMinAndMaxSample(const JPH_HeightFieldShapeSettings* settings, float* pOutMinValue, float* pOutMaxValue, float* pOutQuantizationScale);
+JPH_CAPI uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFieldShapeSettings* settings, float maxError);
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);

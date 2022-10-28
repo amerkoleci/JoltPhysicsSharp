@@ -7,6 +7,10 @@ namespace JoltPhysicsSharp;
 
 public abstract class ShapeSettings : NativeObject
 {
+    protected ShapeSettings()
+    {
+    }
+
     protected ShapeSettings(IntPtr handle)
         : base(handle)
     {
