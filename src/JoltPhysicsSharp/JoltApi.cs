@@ -16,7 +16,7 @@ public delegate bool ObjectVsBroadPhaseLayerFilter(ObjectLayer layer1, BroadPhas
 [return: MarshalAs(UnmanagedType.Bool)]
 public delegate bool ObjectLayerPairFilter(ObjectLayer layer1, ObjectLayer layer2);
 
-internal static unsafe class JoltApi
+internal static unsafe partial class JoltApi
 {
 #if NET6_0_OR_GREATER
     static JoltApi()
@@ -133,18 +133,18 @@ internal static unsafe class JoltApi
     public static extern IntPtr JPH_BroadPhaseLayerInterface_Create();
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BroadPhaseLayerInterface_Destroy(IntPtr handle);
+    public static extern void JPH_BroadPhaseLayerInterface_Destroy(nint handle);
 
     /* ShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ShapeSettings_Destroy(IntPtr shape);
+    public static extern void JPH_ShapeSettings_Destroy(nint shape);
 
     /* BoxShapeSettings */
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BoxShapeSettings_Create(in Vector3 halfExtent, float convexRadius);
+    public static extern nint JPH_BoxShapeSettings_Create(in Vector3 halfExtent, float convexRadius);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BoxShape_Create(in Vector3 halfExtent, float convexRadius);
+    public static extern nint JPH_BoxShape_Create(in Vector3 halfExtent, float convexRadius);
 
     [DllImport("joltc", CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BoxShape_GetHalfExtent(IntPtr handle, out Vector3 halfExtent);

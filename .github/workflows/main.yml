@@ -13,6 +13,11 @@ on:
       - '*.md'
       - 'LICENSE'
 
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: false
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+
 jobs:
   build:
     name: build-${{ matrix.os }}
@@ -52,10 +57,10 @@ jobs:
     needs: [ build ]
     if: ${{ github.event_name == 'push' }}
     steps:
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v2
+      - name: Install .NET 7 SDK
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: 7.0.100
       - name: Clone repository
         uses: actions/checkout@v3
         with:

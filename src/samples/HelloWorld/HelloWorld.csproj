@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <Title>Cross platform .NET bindings for Jolt Physics engine</Title>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>

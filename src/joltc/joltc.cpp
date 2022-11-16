@@ -158,6 +158,13 @@ static JPH_BroadPhaseLayerInterface_Procs g_BroadPhaseLayerInterface_Procs;
 class ManagedBroadPhaseLayerInterface final : public JPH::BroadPhaseLayerInterface
 {
 public:
+    ManagedBroadPhaseLayerInterface() = default;
+
+    ManagedBroadPhaseLayerInterface(const ManagedBroadPhaseLayerInterface&) = delete;
+    ManagedBroadPhaseLayerInterface(const ManagedBroadPhaseLayerInterface&&) = delete;
+    ManagedBroadPhaseLayerInterface& operator=(const ManagedBroadPhaseLayerInterface&) = delete;
+    ManagedBroadPhaseLayerInterface& operator=(const ManagedBroadPhaseLayerInterface&&) = delete;
+
     uint GetNumBroadPhaseLayers() const override
     {
         return g_BroadPhaseLayerInterface_Procs.GetNumBroadPhaseLayers(
@@ -465,6 +472,18 @@ void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system)
     }
 }
 
+static JPH_ObjectVsBroadPhaseLayerFilter s_objectVsBroadPhaseLayerFilter;
+
+static bool JPH_BroadPhaseCanCollide(ObjectLayer inLayer1, BroadPhaseLayer inLayer2)
+{
+    JPH_ASSERT(s_objectVsBroadPhaseLayerFilter);
+
+    return s_objectVsBroadPhaseLayerFilter(
+        static_cast<JPH_ObjectLayer>(inLayer1),
+        static_cast<JPH_BroadPhaseLayer>(inLayer2)
+    );
+}
+
 void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
     uint32_t maxBodies, uint32_t numBodyMutexes, uint32_t maxBodyPairs, uint32_t maxContactConstraints,
     JPH_BroadPhaseLayer* layer,
@@ -472,11 +491,12 @@ void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
     JPH_ObjectLayerPairFilter objectLayerPairFilter)
 {
     JPH_ASSERT(system);
+    s_objectVsBroadPhaseLayerFilter = objectVsBroadPhaseLayerFilter;
 
     reinterpret_cast<JPH::PhysicsSystem*>(system)->Init(
         maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
         *reinterpret_cast<const JPH::BroadPhaseLayerInterface*>(layer),
-        reinterpret_cast<JPH::ObjectVsBroadPhaseLayerFilter>(objectVsBroadPhaseLayerFilter),
+        JPH_BroadPhaseCanCollide,
         reinterpret_cast<JPH::ObjectLayerPairFilter>(objectLayerPairFilter)
     );
 }
@@ -813,6 +833,8 @@ class ManagedContactListener final : public JPH::ContactListener
 public:
     ValidateResult OnContactValidate(const Body& inBody1, const Body& inBody2, const CollideShapeResult& inCollisionResult) override
     {
+        JPH_UNUSED(inCollisionResult);
+
         JPH_ValidateResult result = g_ContactListener_Procs.OnContactValidate(
             reinterpret_cast<JPH_ContactListener*>(this),
             reinterpret_cast<const JPH_Body*>(&inBody1),
@@ -825,6 +847,9 @@ public:
 
     void OnContactAdded(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
     {
+        JPH_UNUSED(inManifold);
+        JPH_UNUSED(ioSettings);
+
         g_ContactListener_Procs.OnContactAdded(
             reinterpret_cast<JPH_ContactListener*>(this),
             reinterpret_cast<const JPH_Body*>(&inBody1),
@@ -834,6 +859,9 @@ public:
 
     void OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
     {
+        JPH_UNUSED(inManifold);
+        JPH_UNUSED(ioSettings);
+
         g_ContactListener_Procs.OnContactPersisted(
             reinterpret_cast<JPH_ContactListener*>(this),
             reinterpret_cast<const JPH_Body*>(&inBody1),

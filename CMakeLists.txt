@@ -56,28 +56,33 @@ if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUA
 		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 	endif()
 
-    if (DEFINED VCPKG_TARGET_ARCHITECTURE)
-        set(JOLT_ARCH ${VCPKG_TARGET_ARCHITECTURE})
-    elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Ww][Ii][Nn]32$")
-        set(JOLT_ARCH x86)
-    elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Xx]64$")
-        set(JOLT_ARCH x64)
-    elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Aa][Rr][Mm]$")
-        set(JOLT_ARCH arm)
-    elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Aa][Rr][Mm]64$")
-        set(JOLT_ARCH arm64)
-    endif()
-
 	# Set general compiler flags
-	set(CMAKE_CXX_FLAGS "/std:c++17 /Zc:__cplusplus /GR- /Gm- /W3 /WX /EHsc /MP /nologo /diagnostics:classic /FC /fp:except- /Zc:inline /Zi /DWIN32 /D_WINDOWS /DUNICODE /D_UNICODE")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /Zc:__cplusplus /Gm- /Wall /WX /MP /nologo /diagnostics:classic /FC /fp:except- /Zc:inline /Zi")
+
+	# Remove any existing compiler flag that enables RTTI
+	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
+	# Set compiler flag for disabling RTTI
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
+
+	if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM")
+		# On ARM the exception handling flag is missing which causes warnings
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+	endif()
 
 	# Set compiler flags for various configurations
 	set(CMAKE_CXX_FLAGS_DEBUG "/GS /Od /Ob0 /RTC1")
-	set(CMAKE_CXX_FLAGS_RELEASE "/GS- /GL /Gy /O2 /Oi /Ot")
-	set(CMAKE_CXX_FLAGS_DISTRIBUTION "/GS- /GL /Gy /O2 /Oi /Ot")
+	set(CMAKE_CXX_FLAGS_RELEASE "/GS- /Gy /O2 /Oi /Ot")
+	set(CMAKE_CXX_FLAGS_DISTRIBUTION "/GS- /Gy /O2 /Oi /Ot")
 	set(CMAKE_CXX_FLAGS_RELEASEASAN "-fsanitize=address /Od")
 	set(CMAKE_CXX_FLAGS_RELEASEUBSAN "-fsanitize=undefined,implicit-conversion,float-divide-by-zero,local-bounds -fno-sanitize-recover=all")
 	set(CMAKE_CXX_FLAGS_RELEASECOVERAGE "-fprofile-instr-generate -fcoverage-mapping")
+
+	if (NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM64") AND NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM"))
+		# On ARM, whole program optimization triggers an internal compiler error during code gen, so we don't turn it on
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
+		set(CMAKE_CXX_FLAGS_DISTRIBUTION "${CMAKE_CXX_FLAGS_DISTRIBUTION} /GL")
+	endif()
 
 	# Set linker flags
 	set(CMAKE_EXE_LINKER_FLAGS "/SUBSYSTEM:WINDOWS /ignore:4221 /DEBUG:FASTLINK")
@@ -87,45 +92,40 @@ if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUA
 		else()
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast") # Clang doesn't use fast math because it cannot be turned off inside a single compilation unit
 		endif()
-
-        if(NOT ${JOLT_ARCH} MATCHES "^arm")
-		    if (USE_AVX512)
-			    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX512")
-		    elseif (USE_AVX2)
-			    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
-		    elseif (USE_AVX)
-			    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX")
-		    endif()	
-		    if (USE_SSE4_1)
-			    add_compile_definitions(JPH_USE_SSE4_1)
-		    endif()
-		    if (USE_SSE4_2)
-			    add_compile_definitions(JPH_USE_SSE4_2)
-		    endif()
-		    if (USE_LZCNT)
-			    add_compile_definitions(JPH_USE_LZCNT)
-		    endif()
-		    if (USE_TZCNT)
-			    add_compile_definitions(JPH_USE_TZCNT)
-		    endif()
-		    if (USE_F16C)
-			    add_compile_definitions(JPH_USE_F16C)
-		    endif()
-		    if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
-			    add_compile_definitions(JPH_USE_FMADD)
-		    endif()
-        else()
-            # ARM/ARM64
-		    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-        endif ()
-
+		if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86" OR "${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
+			if (USE_AVX512)
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX512")
+			elseif (USE_AVX2)
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
+			elseif (USE_AVX)
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX")
+			endif()	
+			if (USE_SSE4_1)
+				add_compile_definitions(JPH_USE_SSE4_1)
+			endif()
+			if (USE_SSE4_2)
+				add_compile_definitions(JPH_USE_SSE4_2)
+			endif()
+			if (USE_LZCNT)
+				add_compile_definitions(JPH_USE_LZCNT)
+			endif()
+			if (USE_TZCNT)
+				add_compile_definitions(JPH_USE_TZCNT)
+			endif()
+			if (USE_F16C)
+				add_compile_definitions(JPH_USE_F16C)
+			endif()
+			if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
+				add_compile_definitions(JPH_USE_FMADD)
+			endif()
+		endif()
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED") # Clang turns Float2 into a vector sometimes causing floating point exceptions
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED")
 		set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/INCREMENTAL:NO /LTCG:incremental /OPT:ICF /OPT:REF")
 		set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "/LTCG")
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /showFilenames")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments") # Clang emits warnings about unused arguments such as /MP and /GL
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments") # Clang emits warnings about unused arguments such as /MP and /GL
 		if (USE_AVX512)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f -mavx512vl -mavx512dq -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
 		elseif (USE_AVX2)
@@ -157,7 +157,7 @@ if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUA
 	endif()
 elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR MINGW OR EMSCRIPTEN)
 	# Set general compiler flags
-	set(CMAKE_CXX_FLAGS "-std=c++17 -I. -Wall -Werror")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++17 -I. -Wall -Werror")
 
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		# Somehow -Wcomment doesn't want to be turned off from code and we need this because Doxygen MathJax uses it
@@ -171,7 +171,8 @@ elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQU
 	# Platform specific compiler flags
 	if (CROSS_COMPILE_ARM)
 		set(CMAKE_CXX_FLAGS "--target=aarch64-linux-gnu ${CMAKE_CXX_FLAGS}")
-    elseif (CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
+	elseif (CMAKE_OSX_ARCHITECTURES MATCHES "arm64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+		# ARM64
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
 		# X64
@@ -200,9 +201,6 @@ elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQU
 		if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
 		endif()
-	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
-		# ARM64
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 	endif()
 
 	# Set compiler flags for various configurations
@@ -222,8 +220,14 @@ if (CROSS_PLATFORM_DETERMINISTIC)
 endif()
 
 # Set linker flags
-set(CMAKE_SHARED_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 set(CMAKE_EXE_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+
+set(PHYSICS_REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/joltc)
+include(${CMAKE_CURRENT_SOURCE_DIR}/src/joltc/Jolt/Jolt.cmake)
+if (IOS)
+	# Ensure that we enable SSE4.2 for the x86_64 build, CMAKE_SYSTEM_PROCESSOR is not set for iOS
+	set_property(TARGET Jolt PROPERTY XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=x86_64] "$(inherited) -msse4.2 -mpopcnt") 
+endif()
 
 # Options
 if (IOS OR EMSCRIPTEN)

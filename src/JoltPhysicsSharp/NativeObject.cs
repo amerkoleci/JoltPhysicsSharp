@@ -16,10 +16,10 @@ public abstract class NativeObject : DisposableObject
     /// Initializes a new instance of the <see cref="NativeObject" /> class.
     /// <param name="handle">The handle to initialize width.</param>
     /// </summary>
-    protected NativeObject(IntPtr handle)
+    protected NativeObject(nint handle)
     {
         Handle = handle;
     }
 
-    public IntPtr Handle { get; protected set; }
+    public nint Handle { get; protected set; }
 }

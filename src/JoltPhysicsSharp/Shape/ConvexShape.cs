@@ -11,7 +11,7 @@ public abstract class ConvexShapeSettings : ShapeSettings
     {
     }
 
-    internal ConvexShapeSettings(IntPtr handle)
+    internal ConvexShapeSettings(nint handle)
         : base(handle)
     {
     }
@@ -19,7 +19,7 @@ public abstract class ConvexShapeSettings : ShapeSettings
 
 public abstract class ConvexShape : Shape
 {
-    internal ConvexShape(IntPtr handle)
+    internal ConvexShape(nint handle)
         : base(handle)
     {
     }

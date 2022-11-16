@@ -1,7 +1,3 @@
-set(PHYSICS_REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/Jolt/Jolt.cmake)
-
 # Define target name
 set (TARGET_NAME joltc)
 

@@ -11,7 +11,7 @@ public abstract class ShapeSettings : NativeObject
     {
     }
 
-    protected ShapeSettings(IntPtr handle)
+    protected ShapeSettings(nint handle)
         : base(handle)
     {
     }
