@@ -1,15 +1,14 @@
 <Project>
   <PropertyGroup>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);AD0001;CS1591;CS1701;CA2252;</NoWarn>
-
-    <VersionPrefix>1.2.2</VersionPrefix>
+    <NoWarn>$(NoWarn);CS1591;CS1701;CA2252;</NoWarn>
+    
+    <VersionPrefix>1.2.3</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">beta</VersionSuffix>
   </PropertyGroup>
 

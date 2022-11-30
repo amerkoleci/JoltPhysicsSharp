@@ -1,6 +1,7 @@
 // Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Numerics;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
@@ -47,5 +48,89 @@ public readonly struct Body : IEquatable<Body>
     {
         readonly get => JPH_Body_GetRestitution(Handle);
         set => JPH_Body_SetRestitution(Handle, value);
+    }
+
+    public Vector3 GetLinearVelocity()
+    {
+        JPH_Body_GetLinearVelocity(Handle, out Vector3 velocity);
+        return velocity;
+    }
+
+    public void GetLinearVelocity(out Vector3 velocity)
+    {
+        JPH_Body_GetLinearVelocity(Handle, out velocity);
+    }
+
+    public void SetLinearVelocity(in Vector3 velocity)
+    {
+        JPH_Body_SetLinearVelocity(Handle, velocity);
+    }
+
+    public Vector3 GetAngularVelocity()
+    {
+        JPH_Body_GetAngularVelocity(Handle, out Vector3 velocity);
+        return velocity;
+    }
+
+    public void GetAngularVelocity(out Vector3 velocity)
+    {
+        JPH_Body_GetAngularVelocity(Handle, out velocity);
+    }
+
+    public void SetAngularVelocity(in Vector3 velocity)
+    {
+        JPH_Body_SetAngularVelocity(Handle, velocity);
+    }
+
+    public Vector3 GetAccumulatedForce()
+    {
+        JPH_Body_GetAccumulatedForce(Handle, out Vector3 force);
+        return force;
+    }
+
+    public void GetAccumulatedForce(out Vector3 force)
+    {
+        JPH_Body_GetAccumulatedForce(Handle, out force);
+    }
+
+    public Vector3 GetAccumulatedTorque()
+    {
+        JPH_Body_GetAccumulatedTorque(Handle, out Vector3 torque);
+        return torque;
+    }
+
+    public void GetAccumulatedTorque(out Vector3 torque)
+    {
+        JPH_Body_GetAccumulatedTorque(Handle, out torque);
+    }
+
+    public void AddForce(in Vector3 force)
+    {
+        JPH_Body_AddForce(Handle, force);
+    }
+
+    public void AddForceAtPosition(in Vector3 force, in Vector3 position)
+    {
+        JPH_Body_AddForceAtPosition(Handle, force, position);
+    }
+
+    public void AddTorque(in Vector3 torque)
+    {
+        JPH_Body_AddTorque(Handle, torque);
+    }
+
+    public void AddImpulse(in Vector3 impulse)
+    {
+        JPH_Body_AddImpulse(Handle, impulse);
+    }
+
+    public void AddImpulseAtPosition(in Vector3 impulse, in Vector3 position)
+    {
+        JPH_Body_AddImpulseAtPosition(Handle, impulse, position);
+    }
+
+    public void AddAngularImpulse(in Vector3 angularImpulse)
+    {
+        JPH_Body_AddAngularImpulse(Handle, angularImpulse);
     }
 }

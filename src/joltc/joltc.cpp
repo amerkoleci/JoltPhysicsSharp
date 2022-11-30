@@ -825,6 +825,70 @@ void JPH_Body_SetRestitution(JPH_Body* body, float restitution)
     reinterpret_cast<JPH::Body*>(body)->SetRestitution(restitution);
 }
 
+void JPH_Body_GetLinearVelocity(JPH_Body* body, JPH_Vec3* velocity)
+{
+    auto joltVector = reinterpret_cast<JPH::Body*>(body)->GetLinearVelocity();
+    FromVec3(joltVector, velocity);
+}
+
+void JPH_Body_SetLinearVelocity(JPH_Body* body, const JPH_Vec3* velocity)
+{
+    reinterpret_cast<JPH::Body*>(body)->SetLinearVelocity(ToVec3(velocity));
+}
+
+void JPH_Body_GetAngularVelocity(JPH_Body* body, JPH_Vec3* velocity)
+{
+    auto joltVector = reinterpret_cast<JPH::Body*>(body)->GetAngularVelocity();
+    FromVec3(joltVector, velocity);
+}
+
+void JPH_Body_SetAngularVelocity(JPH_Body* body, const JPH_Vec3* velocity)
+{
+    reinterpret_cast<JPH::Body*>(body)->SetAngularVelocity(ToVec3(velocity));
+}
+
+void JPH_Body_AddForce(JPH_Body* body, const JPH_Vec3* force)
+{
+    reinterpret_cast<JPH::Body*>(body)->AddForce(ToVec3(force));
+}
+
+void JPH_Body_AddForceAtPosition(JPH_Body* body, const JPH_Vec3* force, const JPH_Vec3* position)
+{
+    reinterpret_cast<JPH::Body*>(body)->AddForce(ToVec3(force), ToVec3(position));
+}
+
+void JPH_Body_AddTorque(JPH_Body* body, const JPH_Vec3* force)
+{
+    reinterpret_cast<JPH::Body*>(body)->AddTorque(ToVec3(force));
+}
+
+void JPH_Body_GetAccumulatedForce(JPH_Body* body, JPH_Vec3* force)
+{
+    auto joltVector = reinterpret_cast<JPH::Body*>(body)->GetAccumulatedForce();
+    FromVec3(joltVector, force);
+}
+
+void JPH_Body_GetAccumulatedTorque(JPH_Body* body, JPH_Vec3* force)
+{
+    auto joltVector = reinterpret_cast<JPH::Body*>(body)->GetAccumulatedTorque();
+    FromVec3(joltVector, force);
+}
+
+void JPH_Body_AddImpulse(JPH_Body* body, const JPH_Vec3* impulse)
+{
+    reinterpret_cast<JPH::Body*>(body)->AddImpulse(ToVec3(impulse));
+}
+
+void JPH_Body_AddImpulseAtPosition(JPH_Body* body, const JPH_Vec3* impulse, const JPH_Vec3* position)
+{
+    reinterpret_cast<JPH::Body*>(body)->AddImpulse(ToVec3(impulse), ToVec3(position));
+}
+
+void JPH_Body_AddAngularImpulse(JPH_Body* body, const JPH_Vec3* angularImpulse)
+{
+    reinterpret_cast<JPH::Body*>(body)->AddAngularImpulse(ToVec3(angularImpulse));
+}
+
 /* Contact Listener */
 static JPH_ContactListener_Procs g_ContactListener_Procs;
 

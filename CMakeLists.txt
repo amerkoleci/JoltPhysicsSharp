@@ -13,6 +13,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
 set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build architectures for OS X")
 
+# When turning this option on, the library will be compiled with debug symbols
+option(GENERATE_DEBUG_SYMBOLS "Generate debug symbols" OFF)
+
 # When turning this option on, the library will be compiled in such a way to attempt to keep the simulation deterministic across platforms
 option(CROSS_PLATFORM_DETERMINISTIC "Cross platform deterministic" OFF)
 
@@ -57,7 +60,12 @@ if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUA
 	endif()
 
 	# Set general compiler flags
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /Zc:__cplusplus /Gm- /Wall /WX /MP /nologo /diagnostics:classic /FC /fp:except- /Zc:inline /Zi")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /Zc:__cplusplus /Gm- /Wall /WX /MP /nologo /diagnostics:classic /FC /fp:except- /Zc:inline")
+
+    # Optionally generate debug symbols
+	if (GENERATE_DEBUG_SYMBOLS)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi")
+	endif()
 
 	# Remove any existing compiler flag that enables RTTI
 	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
@@ -157,7 +165,12 @@ if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUA
 	endif()
 elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR MINGW OR EMSCRIPTEN)
 	# Set general compiler flags
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++17 -I. -Wall -Werror")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -I. -Wall -Werror")
+
+    # Optionally generate debug symbols
+	if (GENERATE_DEBUG_SYMBOLS)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+	endif()
 
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		# Somehow -Wcomment doesn't want to be turned off from code and we need this because Doxygen MathJax uses it
@@ -204,6 +217,7 @@ elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQU
 	endif()
 
 	# Set compiler flags for various configurations
+    set(CMAKE_CXX_FLAGS_DEBUG "")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 	set(CMAKE_CXX_FLAGS_DISTRIBUTION "-O3")
 	set(CMAKE_CXX_FLAGS_RELEASEASAN "-fsanitize=address")

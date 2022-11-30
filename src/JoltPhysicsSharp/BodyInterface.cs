@@ -85,16 +85,6 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return JPH_BodyInterface_UnassignBodyID(Handle, bodyID);
     }
 
-    public void SetLinearVelocity(in Body body, in Vector3 velocity)
-    {
-        JPH_BodyInterface_SetLinearVelocity(Handle, body.ID, velocity);
-    }
-
-    public void SetLinearVelocity(in BodyID bodyID, in Vector3 velocity)
-    {
-        JPH_BodyInterface_SetLinearVelocity(Handle, bodyID, velocity);
-    }
-
     public Vector3 GetLinearVelocity(in BodyID bodyID)
     {
         JPH_BodyInterface_GetLinearVelocity(Handle, bodyID, out Vector3 velocity);
@@ -104,6 +94,16 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
     public void GetLinearVelocity(in BodyID bodyID, out Vector3 velocity)
     {
         JPH_BodyInterface_GetLinearVelocity(Handle, bodyID, out velocity);
+    }
+
+    public void SetLinearVelocity(in Body body, in Vector3 velocity)
+    {
+        JPH_BodyInterface_SetLinearVelocity(Handle, body.ID, velocity);
+    }
+
+    public void SetLinearVelocity(in BodyID bodyID, in Vector3 velocity)
+    {
+        JPH_BodyInterface_SetLinearVelocity(Handle, bodyID, velocity);
     }
 
     public Vector3 GetCenterOfMassPosition(in BodyID bodyID)

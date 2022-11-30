@@ -284,6 +284,18 @@ JPH_CAPI float JPH_Body_GetFriction(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetFriction(JPH_Body* body, float friction);
 JPH_CAPI float JPH_Body_GetRestitution(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetRestitution(JPH_Body* body, float restitution);
+JPH_CAPI void JPH_Body_GetLinearVelocity(JPH_Body* body, JPH_Vec3* velocity);
+JPH_CAPI void JPH_Body_SetLinearVelocity(JPH_Body* body, const JPH_Vec3* velocity);
+JPH_CAPI void JPH_Body_GetAngularVelocity(JPH_Body* body, JPH_Vec3* velocity);
+JPH_CAPI void JPH_Body_SetAngularVelocity(JPH_Body* body, const JPH_Vec3* velocity);
+JPH_CAPI void JPH_Body_AddForce(JPH_Body* body, const JPH_Vec3* force);
+JPH_CAPI void JPH_Body_AddForceAtPosition(JPH_Body* body, const JPH_Vec3* force, const JPH_Vec3* position);
+JPH_CAPI void JPH_Body_AddTorque(JPH_Body* body, const JPH_Vec3* force);
+JPH_CAPI void JPH_Body_GetAccumulatedForce(JPH_Body* body, JPH_Vec3* force);
+JPH_CAPI void JPH_Body_GetAccumulatedTorque(JPH_Body* body, JPH_Vec3* force);
+JPH_CAPI void JPH_Body_AddImpulse(JPH_Body* body, const JPH_Vec3* impulse);
+JPH_CAPI void JPH_Body_AddImpulseAtPosition(JPH_Body* body, const JPH_Vec3* impulse, const JPH_Vec3* position);
+JPH_CAPI void JPH_Body_AddAngularImpulse(JPH_Body* body, const JPH_Vec3* angularImpulse);
 
 /* JPH_BroadPhaseLayer */
 typedef struct JPH_BroadPhaseLayerInterface_Procs {
