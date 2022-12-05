@@ -13,6 +13,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
 set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build architectures for OS X")
 
+# When turning this option on, the library will be compiled using doubles for positions. This allows for much bigger worlds.
+option(DOUBLE_PRECISION "Use double precision math" OFF)
+
 # When turning this option on, the library will be compiled with debug symbols
 option(GENERATE_DEBUG_SYMBOLS "Generate debug symbols" OFF)
 
@@ -39,10 +42,16 @@ include(CMakeDependentOption)
 # Windows Store only supports the DLL version
 cmake_dependent_option(USE_STATIC_MSVC_RUNTIME_LIBRARY "Use the static MSVC runtime library" ON "MSVC;NOT WINDOWS_STORE" OFF)
 
+# Determine which configurations exist
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CONFIGURATION_TYPES "Debug;Release;Distribution")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 	set(CMAKE_CONFIGURATION_TYPES "Debug;Release;ReleaseASAN;ReleaseUBSAN;ReleaseCoverage;Distribution")
+endif()
+
+# Pass double precision flag on to the library
+if (DOUBLE_PRECISION)
+	add_compile_definitions(JPH_DOUBLE_PRECISION)
 endif()
 
 if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "WindowsStore") AND NOT MINGW)
@@ -234,6 +243,7 @@ if (CROSS_PLATFORM_DETERMINISTIC)
 endif()
 
 # Set linker flags
+set(CMAKE_SHARED_LINKER_FLAGS_DISTRIBUTION "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 set(CMAKE_EXE_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
 set(PHYSICS_REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/joltc)
