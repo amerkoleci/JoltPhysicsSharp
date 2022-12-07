@@ -1,5 +1,3 @@
-#addin nuget:?package=Cake.FileHelpers&version=5.0.0
-
 var target = Argument("target", "Build");
 var artifactsDir = "artifacts";
 
