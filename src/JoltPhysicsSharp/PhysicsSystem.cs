@@ -1,14 +1,14 @@
 // Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, IntPtr collisionResult);
+public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Vector3 baseOffset, IntPtr collisionResult);
 public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2);
 public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2);
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
@@ -162,12 +162,14 @@ public sealed class PhysicsSystem : NativeObject
 
     #region ContactListener
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-    private static ValidateResult OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, IntPtr collisionResult)
+    private static unsafe ValidateResult OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Vector3* baseOffset, IntPtr collisionResult)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
 
         if (listener.OnContactValidate != null)
-            return listener.OnContactValidate(listener, new Body(body1), new Body(body2), collisionResult);
+        {
+            return listener.OnContactValidate(listener, new Body(body1), new Body(body2), *baseOffset, collisionResult);
+        }
 
         return ValidateResult.AcceptAllContactsForThisBodyPair;
     }

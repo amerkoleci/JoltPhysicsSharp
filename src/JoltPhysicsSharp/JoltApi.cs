@@ -1,7 +1,6 @@
 // Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using System;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -44,7 +43,7 @@ internal static unsafe partial class JoltApi
 
         string rid = RuntimeInformation.RuntimeIdentifier;
 
-        string nugetNativeLibsPath = Path.Combine(AppContext.BaseDirectory, $@"runtimes\{rid}\native");
+        string nugetNativeLibsPath = Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native");
         bool isNuGetRuntimeLibrariesDirectoryPresent = Directory.Exists(nugetNativeLibsPath);
         string dllName = LibName;
 
@@ -61,7 +60,7 @@ internal static unsafe partial class JoltApi
                     _ => "win-x64"
                 };
 
-                nugetNativeLibsPath = Path.Combine(AppContext.BaseDirectory, $@"runtimes\{rid}\native");
+                nugetNativeLibsPath = Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native");
                 isNuGetRuntimeLibrariesDirectoryPresent = Directory.Exists(nugetNativeLibsPath);
             }
         }
@@ -76,7 +75,7 @@ internal static unsafe partial class JoltApi
 
         if (isNuGetRuntimeLibrariesDirectoryPresent)
         {
-            string joltcPath = Path.Combine(AppContext.BaseDirectory, $@"runtimes\{rid}\native\{dllName}");
+            string joltcPath = Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native", dllName);
 
             if (NativeLibrary.TryLoad(joltcPath, out nativeLibrary))
             {
@@ -424,7 +423,7 @@ internal static unsafe partial class JoltApi
     // ContactListener
     public struct JPH_ContactListener_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, IntPtr, ValidateResult> OnContactValidate;
+        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, Vector3*, IntPtr, ValidateResult> OnContactValidate;
         public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactAdded;
         public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactPersisted;
         public delegate* unmanaged[Cdecl]<IntPtr, SubShapeIDPair*, void> OnContactRemoved;

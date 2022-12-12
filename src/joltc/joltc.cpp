@@ -79,7 +79,7 @@ static JPH::RVec3 ToRVec3(const JPH_RVec3* vec)
     return JPH::RVec3(vec->x, vec->y, vec->z);
 }
 
-static void FromVec3(const JPH::RVec3& vec, JPH_RVec3* result)
+static void FromRVec3(const JPH::RVec3& vec, JPH_RVec3* result)
 {
     result->x = vec.GetX();
     result->y = vec.GetY();
@@ -715,7 +715,7 @@ void JPH_BodyInterface_GetCenterOfMassPosition(JPH_BodyInterface* interface, JPH
 
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
     auto joltVector = joltBodyInterface->GetCenterOfMassPosition(JPH::BodyID(bodyID));
-    FromVec3(joltVector, position);
+    FromRVec3(joltVector, position);
 }
 
 JPH_MotionType JPH_BodyInterface_GetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID)
@@ -902,14 +902,17 @@ static JPH_ContactListener_Procs g_ContactListener_Procs;
 class ManagedContactListener final : public JPH::ContactListener
 {
 public:
-    ValidateResult OnContactValidate(const Body& inBody1, const Body& inBody2, const CollideShapeResult& inCollisionResult) override
+    ValidateResult OnContactValidate(const Body& inBody1, const Body& inBody2, RVec3Arg inBaseOffset, const CollideShapeResult& inCollisionResult) override
     {
         JPH_UNUSED(inCollisionResult);
+        JPH_RVec3 baseOffset;
+        FromRVec3(inBaseOffset, &baseOffset);
 
         JPH_ValidateResult result = g_ContactListener_Procs.OnContactValidate(
             reinterpret_cast<JPH_ContactListener*>(this),
             reinterpret_cast<const JPH_Body*>(&inBody1),
             reinterpret_cast<const JPH_Body*>(&inBody2),
+            &baseOffset,
             nullptr
         );
 

@@ -326,6 +326,7 @@ typedef struct JPH_ContactListener_Procs {
     JPH_ValidateResult (JPH_API_CALL *OnContactValidate)(JPH_ContactListener* listener,
         const JPH_Body* body1,
         const JPH_Body* body2,
+        const JPH_RVec3* baseOffset,
         const JPH_CollideShapeResult* collisionResult);
 
     void(JPH_API_CALL* OnContactAdded)(JPH_ContactListener* listener,
