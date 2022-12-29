@@ -230,7 +230,39 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyCreationSettings_Destroy(IntPtr settings);
 
+    /* JPH_ConstraintSettings */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ConstraintSettings_Destroy(IntPtr handle);
 
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Constraint_Destroy(IntPtr handle);
+
+    /* JPH_PointConstraintSettings */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_PointConstraintSettings_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ConstraintSpace JPH_PointConstraintSettings_GetSpace(IntPtr handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_SetSpace(IntPtr handle, ConstraintSpace value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_GetPoint1(IntPtr handle, out Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_SetPoint1(IntPtr handle, in Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_GetPoint2(IntPtr handle, out Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_SetPoint2(IntPtr handle, in Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_PointConstraintSettings_CreateConstraint(IntPtr handle, IntPtr body1, IntPtr body2);
+
+    /* PhysicsSystem */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PhysicsSystem_Create();
 
@@ -267,6 +299,25 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_PhysicsSystem_GetMaxBodies(IntPtr system);
 
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_GetGravity(IntPtr handle, out Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_SetGravity(IntPtr handle, in Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_AddConstraint(IntPtr handle, IntPtr constraint);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_RemoveConstraint(IntPtr handle, IntPtr constraint);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_AddConstraints(IntPtr handle, IntPtr* constraints, uint count);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_RemoveConstraints(IntPtr handle, IntPtr* constraints, uint count);
+
+
     /* BodyInterface */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PhysicsSystem_GetBodyInterface(IntPtr system);
@@ -298,7 +349,6 @@ internal static unsafe partial class JoltApi
     public static extern bool JPH_BodyInterface_AssignBodyID2(IntPtr handle, IntPtr body, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
     public static extern IntPtr JPH_BodyInterface_UnassignBodyID(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]

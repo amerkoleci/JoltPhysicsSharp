@@ -160,6 +160,59 @@ public sealed class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, integrationSubSteps, tempAlocator.Handle, jobSystem.Handle);
     }
 
+    public Vector3 Gravity
+    {
+        get
+        {
+            JPH_PhysicsSystem_GetGravity(Handle, out Vector3 value);
+            return value;
+        }
+        set => JPH_PhysicsSystem_SetGravity(Handle, value);
+    }
+
+    public void GetGravity(out Vector3 gravity)
+    {
+        JPH_PhysicsSystem_GetGravity(Handle, out gravity);
+    }
+
+    public void AddConstraint(Constraint constraint)
+    {
+        JPH_PhysicsSystem_AddConstraint(Handle, constraint.Handle);
+    }
+
+    public void RemoveConstraint(Constraint constraint)
+    {
+        JPH_PhysicsSystem_RemoveConstraint(Handle, constraint.Handle);
+    }
+
+    public void AddConstraints(Constraint[] constraints)
+    {
+        unsafe
+        {
+            int count = constraints.Length;
+            IntPtr* constraintsPtr = stackalloc IntPtr[count];
+            for (int i = 0; i < count; i++)
+            {
+                constraintsPtr[i] = constraints[i].Handle;
+            }
+            JPH_PhysicsSystem_AddConstraints(Handle, constraintsPtr, (uint)count);
+        }
+    }
+
+    public void RemoveConstraints(Constraint[] constraints)
+    {
+        unsafe
+        {
+            int count = constraints.Length;
+            IntPtr* constraintsPtr = stackalloc IntPtr[count];
+            for (int i = 0; i < count; i++)
+            {
+                constraintsPtr[i] = constraints[i].Handle;
+            }
+            JPH_PhysicsSystem_RemoveConstraints(Handle, constraintsPtr, (uint)count);
+        }
+    }
+
     #region ContactListener
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
     private static unsafe ValidateResult OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Vector3* baseOffset, IntPtr collisionResult)

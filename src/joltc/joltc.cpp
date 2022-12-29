@@ -475,6 +475,16 @@ void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
     }
 }
 
+void JPH_Constraint_Destroy(JPH_Constraint* contraint)
+{
+    if (contraint)
+    {
+        delete reinterpret_cast<JPH::Constraint*>(contraint);
+    }
+}
+
+/* JPH_TwoBodyConstraintSettings */
+
 /* JPH_PointConstraintSettings */
 JPH_PointConstraintSettings* JPH_PointConstraintSettings_Create(void)
 {

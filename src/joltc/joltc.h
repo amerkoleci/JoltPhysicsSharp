@@ -250,6 +250,9 @@ JPH_CAPI void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* setting
 
 /* JPH_ConstraintSettings */
 JPH_CAPI void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings);
+JPH_CAPI void JPH_Constraint_Destroy(JPH_Constraint* contraint);
+
+/* JPH_TwoBodyConstraintSettings */
 
 /* JPH_PointConstraintSettings */
 JPH_CAPI JPH_PointConstraintSettings* JPH_PointConstraintSettings_Create(void);
