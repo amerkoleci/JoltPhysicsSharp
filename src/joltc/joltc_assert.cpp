@@ -36,13 +36,17 @@ static_assert(sizeof(JPH::EActivation) == sizeof(JPH_ActivationMode));
 static_assert(JPH_ACTIVATION_MODE_ACTIVATE == (int)JPH::EActivation::Activate);
 static_assert(JPH_ACTIVATION_MODE_DONT_ACTIVATE == (int)JPH::EActivation::DontActivate);
 
-
 // EActivation
 static_assert(sizeof(JPH::ValidateResult) == sizeof(JPH_ValidateResult));
 static_assert(JPH_VALIDATE_RESULT_ACCEPT_ALL_CONTACTS == (int)JPH::ValidateResult::AcceptAllContactsForThisBodyPair);
 static_assert(JPH_VALIDATE_RESULT_ACCEPT_CONTACT == (int)JPH::ValidateResult::AcceptContact);
 static_assert(JPH_VALIDATE_RESULT_REJECT_CONTACT == (int)JPH::ValidateResult::RejectContact);
 static_assert(JPH_VALIDATE_RESULT_REJECT_ALL_CONTACTS == (int)JPH::ValidateResult::RejectAllContactsForThisBodyPair);
+
+// EActivation
+static_assert(sizeof(JPH::EConstraintSpace) == sizeof(JPH_ConstraintSpace));
+static_assert(JPH_CONSTRAINT_SPACE_LOCAL_TO_BODY_COM == (int)JPH::EConstraintSpace::LocalToBodyCOM);
+static_assert(JPH_CONSTRAINT_SPACE_WORLD_SPACE == (int)JPH::EConstraintSpace::WorldSpace);
 
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));

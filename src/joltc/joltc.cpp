@@ -23,6 +23,8 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
+#include <Jolt/Physics/Constraints/PointConstraint.h>
+
 #include <iostream>
 #include <cstdarg>
 #include <thread>
@@ -464,6 +466,80 @@ void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* settings)
     }
 }
 
+/* JPH_ConstraintSettings */
+void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
+{
+    if (settings)
+    {
+        delete reinterpret_cast<JPH::ConstraintSettings*>(settings);
+    }
+}
+
+/* JPH_PointConstraintSettings */
+JPH_PointConstraintSettings* JPH_PointConstraintSettings_Create(void)
+{
+    auto settings = new JPH::PointConstraintSettings();
+    return reinterpret_cast<JPH_PointConstraintSettings*>(settings);
+}
+
+JPH_ConstraintSpace JPH_PointConstraintSettings_GetSpace(JPH_PointConstraintSettings* settings)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
+
+    return static_cast<JPH_ConstraintSpace>(joltSettings->mSpace);
+}
+
+void JPH_PointConstraintSettings_SetSpace(JPH_PointConstraintSettings* settings, JPH_ConstraintSpace space)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
+
+    joltSettings->mSpace = static_cast<JPH::EConstraintSpace>(space);
+}
+
+void JPH_PointConstraintSettings_GetPoint1(JPH_PointConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
+
+    auto joltVector = joltSettings->mPoint1;
+    FromRVec3(joltVector, result);
+}
+
+void JPH_PointConstraintSettings_SetPoint1(JPH_PointConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
+
+    joltSettings->mPoint1 = ToRVec3(value);
+}
+
+void JPH_PointConstraintSettings_GetPoint2(JPH_PointConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
+
+    auto joltVector = joltSettings->mPoint2;
+    FromRVec3(joltVector, result);
+}
+
+void JPH_PointConstraintSettings_SetPoint2(JPH_PointConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
+
+    joltSettings->mPoint2 = ToRVec3(value);
+}
+
+JPH_PointConstraint* JPH_PointConstraintSettings_CreateConstraint(JPH_PointConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
+{
+    auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
+    auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
+    JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::PointConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    return reinterpret_cast<JPH_PointConstraint*>(static_cast<JPH::PointConstraint*>(constraint));
+}
+
 /* JPH_PhysicsSystem */
 JPH_PhysicsSystem* JPH_PhysicsSystem_Create(void)
 {
@@ -575,6 +651,77 @@ uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system)
 
     auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
     return joltSystem->GetMaxBodies();
+}
+
+void JPH_PhysicsSystem_SetGravity(JPH_PhysicsSystem* system, const JPH_Vec3* value)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    joltSystem->SetGravity(ToVec3(value));
+}
+
+void JPH_PhysicsSystem_GetGravity(JPH_PhysicsSystem* system, JPH_Vec3* result)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    auto joltVector = joltSystem->GetGravity();
+    FromVec3(joltVector, result);
+}
+
+void JPH_PhysicsSystem_AddConstraint(JPH_PhysicsSystem* system, JPH_Constraint* constraint)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(constraint);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraint);
+    joltSystem->AddConstraint(joltConstraint);
+}
+
+void JPH_PhysicsSystem_RemoveConstraint(JPH_PhysicsSystem* system, JPH_Constraint* constraint)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(constraint);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraint);
+    joltSystem->RemoveConstraint(joltConstraint);
+}
+
+JPH_CAPI void JPH_PhysicsSystem_AddConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(constraints);
+    JPH_ASSERT(count > 0);
+
+    Array<Constraint*> joltConstraints(count);
+    for (uint32_t i = 0; i < count; ++i)
+    {
+        auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraints[i]);
+        joltConstraints.push_back(joltConstraint);
+    }
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    joltSystem->AddConstraints(joltConstraints.data(), (int)joltConstraints.size());
+}
+
+JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(constraints);
+    JPH_ASSERT(count > 0);
+
+    Array<Constraint*> joltConstraints(count);
+    for (uint32_t i = 0; i < count; ++i)
+    {
+        auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraints[i]);
+        joltConstraints.push_back(joltConstraint);
+    }
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    joltSystem->RemoveConstraints(joltConstraints.data(), (int)joltConstraints.size());
 }
 
 JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)

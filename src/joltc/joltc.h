@@ -78,6 +78,14 @@ typedef enum JPH_ValidateResult {
     _JPH_VALIDATE_RESULT_FORCEU32 = 0x7fffffff
 } JPH_ValidateResult;
 
+typedef enum JPH_ConstraintSpace {
+    JPH_CONSTRAINT_SPACE_LOCAL_TO_BODY_COM = 0,
+    JPH_CONSTRAINT_SPACE_WORLD_SPACE = 1,
+
+    _JPH_CONSTRAINT_SPACE_NUM,
+    _JPH_CONSTRAINT_SPACE_FORCEU32 = 0x7fffffff
+} JPH_ConstraintSpace;
+
 typedef struct JPH_Vec3 {
     float x;
     float y;
@@ -156,6 +164,14 @@ typedef struct JPH_BodyCreationSettings         JPH_BodyCreationSettings;
 typedef struct JPH_BodyInterface                JPH_BodyInterface;
 typedef struct JPH_Body                         JPH_Body;
 
+typedef struct JPH_ConstraintSettings           JPH_ConstraintSettings;
+typedef struct JPH_TwoBodyConstraintSettings    JPH_TwoBodyConstraintSettings;
+typedef struct JPH_PointConstraintSettings      JPH_PointConstraintSettings;
+
+typedef struct JPH_Constraint                   JPH_Constraint;
+typedef struct JPH_TwoBodyConstraint            JPH_TwoBodyConstraint;
+typedef struct JPH_PointConstraint              JPH_PointConstraint;
+
 typedef struct JPH_CollideShapeResult           JPH_CollideShapeResult;
 typedef struct JPH_ContactListener              JPH_ContactListener;
 
@@ -232,6 +248,20 @@ JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(JPH_Shape* s
     JPH_ObjectLayer objectLayer);
 JPH_CAPI void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* settings);
 
+/* JPH_ConstraintSettings */
+JPH_CAPI void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings);
+
+/* JPH_PointConstraintSettings */
+JPH_CAPI JPH_PointConstraintSettings* JPH_PointConstraintSettings_Create(void);
+JPH_CAPI JPH_ConstraintSpace JPH_PointConstraintSettings_GetSpace(JPH_PointConstraintSettings* settings);
+JPH_CAPI void JPH_PointConstraintSettings_SetSpace(JPH_PointConstraintSettings* settings, JPH_ConstraintSpace space);
+JPH_CAPI void JPH_PointConstraintSettings_GetPoint1(JPH_PointConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_PointConstraintSettings_SetPoint1(JPH_PointConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI void JPH_PointConstraintSettings_GetPoint2(JPH_PointConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_PointConstraintSettings_SetPoint2(JPH_PointConstraintSettings* settings, const JPH_RVec3* value);
+
+JPH_CAPI JPH_PointConstraint* JPH_PointConstraintSettings_CreateConstraint(JPH_PointConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2);
+
 /* JPH_PhysicsSystem */
 JPH_CAPI JPH_PhysicsSystem* JPH_PhysicsSystem_Create(void);
 JPH_CAPI void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system);
@@ -253,6 +283,15 @@ JPH_CAPI void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* sys
 JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system);
 JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system);
 JPH_CAPI uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system);
+
+JPH_CAPI void JPH_PhysicsSystem_SetGravity(JPH_PhysicsSystem* system, const JPH_Vec3* value);
+JPH_CAPI void JPH_PhysicsSystem_GetGravity(JPH_PhysicsSystem* system, JPH_Vec3* result);
+
+JPH_CAPI void JPH_PhysicsSystem_AddConstraint(JPH_PhysicsSystem* system, JPH_Constraint* constraint);
+JPH_CAPI void JPH_PhysicsSystem_RemoveConstraint(JPH_PhysicsSystem* system, JPH_Constraint* constraint);
+
+JPH_CAPI void JPH_PhysicsSystem_AddConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count);
+JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count);
 
 /* BodyInterface */
 JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
