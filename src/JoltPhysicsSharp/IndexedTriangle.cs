@@ -13,6 +13,14 @@ public readonly struct IndexedTriangle : IEquatable<IndexedTriangle>
         MaterialIndex = materialIndex;  
     }
 
+    public IndexedTriangle(in int i1, in int i2, in int i3, uint materialIndex = 0)
+    {
+        I1 = (uint)i1;
+        I2 = (uint)i2;
+        I3 = (uint)i3;
+        MaterialIndex = materialIndex;
+    }
+
     public uint I1 { get; }
     public uint I2 { get; }
     public uint I3 { get; }

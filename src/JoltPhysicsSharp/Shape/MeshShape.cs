@@ -45,6 +45,15 @@ public sealed class MeshShapeSettings : ConvexShapeSettings
         }
     }
 
+    public unsafe MeshShapeSettings(Span<Vector3> vertices, Span<IndexedTriangle> triangles)
+    {
+        fixed (Vector3* verticesPtr = vertices)
+        fixed (IndexedTriangle* trianglePtr = triangles)
+        {
+            Handle = JPH_MeshShapeSettings_Create2(verticesPtr, vertices.Length, trianglePtr, triangles.Length);
+        }
+    }
+
     /// <summary>
     /// Finalizes an instance of the <see cref="TriangleShapeSettings" /> class.
     /// </summary>

@@ -28,6 +28,8 @@ option(CROSS_COMPILE_ARM "Cross compile to aarch64-linux-gnu" OFF)
 # When turning this option on, the library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation
 option(INTERPROCEDURAL_OPTIMIZATION "Enable interprocedural optimizations" ON)
 
+# https://devblogs.microsoft.com/cppblog/spectre-mitigations-in-msvc/
+option(ENABLE_SPECTRE_MITIGATION "Build using /Qspectre for MSVC" OFF)
 
 # Select X86 processor features to use (if everything is off it will be SSE2 compatible)
 option(USE_SSE4_1 "Enable SSE4.1" ON)

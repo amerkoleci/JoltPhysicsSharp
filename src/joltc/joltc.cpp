@@ -25,6 +25,11 @@
 
 #include <Jolt/Physics/Constraints/PointConstraint.h>
 
+#ifdef _MSC_VER
+#	pragma warning(push)
+#	pragma warning(disable : 5045) // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+#endif
+
 #include <iostream>
 #include <cstdarg>
 #include <thread>
@@ -64,9 +69,14 @@ static JPH::Vec3 ToVec3(const JPH_Vec3* vec)
     return JPH::Vec3(vec->x, vec->y, vec->z);
 }
 
-static JPH::Float3 ToFloat3(const JPH_Vec3* vec)
+static JPH::Vec3 ToVec3(const JPH_Vec3& vec)
 {
-    return JPH::Float3(vec->x, vec->y, vec->z);
+    return JPH::Vec3(vec.x, vec.y, vec.z);
+}
+
+static JPH::Float3 ToFloat3(const JPH_Vec3& vec)
+{
+    return JPH::Float3(vec.x, vec.y, vec.z);
 }
 
 static void FromVec3(const JPH::Vec3& vec, JPH_Vec3* result)
@@ -93,14 +103,14 @@ static JPH::Quat ToQuat(const JPH_Quat* quat)
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
 }
 
-static JPH::Triangle ToTriangle(const JPH_Triangle* triangle)
+static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
 {
-    return JPH::Triangle(ToFloat3(&triangle->v1), ToFloat3(&triangle->v2), ToFloat3(&triangle->v3), triangle->materialIndex);
+    return JPH::Triangle(ToFloat3(triangle.v1), ToFloat3(triangle.v2), ToFloat3(triangle.v3), triangle.materialIndex);
 }
 
-static JPH::IndexedTriangle ToIndexedTriangle(const JPH_IndexedTriangle* triangle)
+static JPH::IndexedTriangle ToIndexedTriangle(const JPH_IndexedTriangle& triangle)
 {
-    return JPH::IndexedTriangle(triangle->i1, triangle->i2, triangle->i3, triangle->materialIndex);
+    return JPH::IndexedTriangle(triangle.i1, triangle.i2, triangle.i3, triangle.materialIndex);
 }
 
 bool JPH_Init(void)
@@ -319,11 +329,11 @@ JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, fl
 JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* points, uint32_t pointsCount, float maxConvexRadius)
 {
     Array<Vec3> joltPoints;
-    joltPoints.resize(pointsCount);
+    joltPoints.reserve(pointsCount);
 
-    for (uint32_t i = 0; i < pointsCount; i++)
+    for (size_t i = 0; i < joltPoints.size(); i++)
     {
-        joltPoints[i] = ToVec3(&points[i]);
+        joltPoints.push_back(ToVec3(points[i]));
     }
 
     auto settings = new JPH::ConvexHullShapeSettings(joltPoints, maxConvexRadius);
@@ -334,10 +344,11 @@ JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* 
 JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount)
 {
     TriangleList jolTriangles;
-    jolTriangles.resize(triangleCount);
+    jolTriangles.reserve(triangleCount);
+
     for (uint32_t i = 0; i < triangleCount; ++i)
     {
-        jolTriangles[i] = ToTriangle(&triangles[i]);
+        jolTriangles.push_back(ToTriangle(triangles[i]));
     }
 
     auto settings = new JPH::MeshShapeSettings(jolTriangles);
@@ -349,17 +360,17 @@ JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, u
     VertexList joltVertices;
     IndexedTriangleList joltTriangles;
 
-    joltVertices.resize(verticesCount);
-    joltTriangles.resize(triangleCount);
+    joltVertices.reserve(verticesCount);
+    joltTriangles.reserve(triangleCount);
 
-    for (uint32_t i = 0; i < verticesCount; ++i)
+    for (size_t i = 0; i < joltVertices.size(); ++i)
     {
-        joltVertices[i] = ToFloat3(&vertices[i]);
+        joltVertices.push_back(ToFloat3(vertices[i]));
     }
 
     for (uint32_t i = 0; i < triangleCount; ++i)
     {
-        joltTriangles[i] = ToIndexedTriangle(&triangles[i]);
+        joltTriangles.push_back(ToIndexedTriangle(triangles[i]));
     }
 
     auto settings = new JPH::MeshShapeSettings(joltVertices, joltTriangles);
@@ -1171,3 +1182,7 @@ void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener)
         delete reinterpret_cast<ManagedBodyActivationListener*>(listener);
     }
 }
+
+#ifdef _MSC_VER
+#   pragma warning(pop)
+#endif
