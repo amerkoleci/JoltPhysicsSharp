@@ -72,12 +72,12 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
 
     public bool AssignBodyID(in Body body)
     {
-        return JPH_BodyInterface_AssignBodyID(Handle, body.Handle);
+        return JPH_BodyInterface_AssignBodyID(Handle, body.Handle) == 1;
     }
 
     public bool AssignBodyID(in Body body, in BodyID bodyID)
     {
-        return JPH_BodyInterface_AssignBodyID2(Handle, body.Handle, bodyID);
+        return JPH_BodyInterface_AssignBodyID2(Handle, body.Handle, bodyID) == 1;
     }
 
     public Body UnassignBodyID(in BodyID bodyID)
@@ -127,8 +127,8 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_SetMotionType(Handle, bodyID, motionType, activationMode);
     }
 
-    public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID);
-    public bool IsAdded(in BodyID bodyID) => JPH_BodyInterface_IsAdded(Handle, bodyID);
+    public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID) == 1;
+    public bool IsAdded(in BodyID bodyID) => JPH_BodyInterface_IsAdded(Handle, bodyID) == 1;
 
     public float GetRestitution(in BodyID bodyID)
     {

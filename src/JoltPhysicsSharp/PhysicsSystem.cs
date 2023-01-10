@@ -145,8 +145,8 @@ public sealed class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_Init(Handle,
             maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
             layer.Handle,
-            objectVsBroadPhaseLayerFilter,
-            objectLayerPairFilter);
+            objectVsBroadPhaseLayerFilter.Handle,
+            objectLayerPairFilter.Handle);
     }
 
     public void OptimizeBroadPhase()

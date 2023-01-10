@@ -37,6 +37,6 @@ public static class Foundation
     /// </summary>
     public const int MaxPhysicsBarriers = 8;
 
-    public static bool Init() => JPH_Init();
+    public static bool Init() => JPH_Init() == 1;
     public static void Shutdown() => JPH_Shutdown();
 }

@@ -138,23 +138,26 @@ void CharacterVirtual::ContactCastCollector::AddHit(const ShapeCastResult &inRes
 			if (c.mBodyID == inResult.mBodyID2 && c.mSubShapeID == inResult.mSubShapeID2)
 				return;
 
-		BodyLockRead lock(mSystem->GetBodyLockInterface(), inResult.mBodyID2);
-		if (lock.SucceededAndIsInBroadPhase())
+		Contact contact;
+
+		// Lock body only while we fetch contact properties
 		{
-			const Body &body = lock.GetBody();
+			BodyLockRead lock(mSystem->GetBodyLockInterface(), inResult.mBodyID2);
+			if (!lock.SucceededAndIsInBroadPhase())
+				return;
 
 			// Convert the hit result into a contact
-			Contact contact;
-			sFillContactProperties(contact, body, mUp, mBaseOffset, *this, inResult);
-			contact.mFraction = inResult.mFraction;
+			sFillContactProperties(contact, lock.GetBody(), mUp, mBaseOffset, *this, inResult);
+		}
 			
-			// Check if the contact that will make us penetrate more than the allowed tolerance
-			if (contact.mDistance + contact.mContactNormal.Dot(mDisplacement) < -mCharacter->mCollisionTolerance
-				&& mCharacter->ValidateContact(contact))
-			{
-				mContact = contact;
-				UpdateEarlyOutFraction(contact.mFraction);
-			}
+		contact.mFraction = inResult.mFraction;
+
+		// Check if the contact that will make us penetrate more than the allowed tolerance
+		if (contact.mDistance + contact.mContactNormal.Dot(mDisplacement) < -mCharacter->mCollisionTolerance
+			&& mCharacter->ValidateContact(contact))
+		{
+			mContact = contact;
+			UpdateEarlyOutFraction(contact.mFraction);
 		}
 	}
 }
@@ -341,19 +344,20 @@ void CharacterVirtual::DetermineConstraints(TempContactList &inContacts, Constra
 		// Next check if the angle is too steep and if it is add an additional constraint that holds the character back
 		if (IsSlopeTooSteep(c.mSurfaceNormal))
 		{
-			// Only take planes that point up
-			float dot = c.mSurfaceNormal.Dot(mUp);
-			if (dot > 0.0f)
+			// Only take planes that point up. 
+			// Note that we use the contact normal to allow for better sliding as the surface normal may be in the opposite direction of movement.
+			float dot = c.mContactNormal.Dot(mUp);
+			if (dot > 1.0e-3f) // Add a little slack, if the normal is perfectly horizontal we already have our vertical plane.
 			{
 				// Make horizontal normal
-				Vec3 normal = (c.mSurfaceNormal - dot * mUp).Normalized();
+				Vec3 normal = (c.mContactNormal - dot * mUp).Normalized();
 
 				// Create a secondary constraint that blocks horizontal movement
 				outConstraints.emplace_back();
 				Constraint &vertical_constraint = outConstraints.back();
 				vertical_constraint.mContact = &c;
 				vertical_constraint.mLinearVelocity = contact_velocity.Dot(normal) * normal; // Project the contact velocity on the new normal so that both planes push at an equal rate
-				vertical_constraint.mPlane = Plane(normal, c.mDistance / normal.Dot(c.mSurfaceNormal)); // Calculate the distance we have to travel horizontally to hit the contact plane
+				vertical_constraint.mPlane = Plane(normal, c.mDistance / normal.Dot(c.mContactNormal)); // Calculate the distance we have to travel horizontally to hit the contact plane
 			}
 		}
 	}
@@ -1306,6 +1310,41 @@ void CharacterVirtual::ExtendedUpdate(float inDeltaTime, Vec3Arg inGravity, cons
 	}
 }
 
+void CharacterVirtual::Contact::SaveState(StateRecorder &inStream) const
+{
+	inStream.Write(mPosition);
+	inStream.Write(mLinearVelocity);
+	inStream.Write(mContactNormal);
+	inStream.Write(mSurfaceNormal);
+	inStream.Write(mDistance);
+	inStream.Write(mFraction);
+	inStream.Write(mBodyB);
+	inStream.Write(mSubShapeIDB);
+	inStream.Write(mMotionTypeB);
+	inStream.Write(mHadCollision);
+	inStream.Write(mWasDiscarded);
+	inStream.Write(mCanPushCharacter);
+	// Cannot store user data (may be a pointer) and material
+}
+
+void CharacterVirtual::Contact::RestoreState(StateRecorder &inStream)
+{
+	inStream.Read(mPosition);
+	inStream.Read(mLinearVelocity);
+	inStream.Read(mContactNormal);
+	inStream.Read(mSurfaceNormal);
+	inStream.Read(mDistance);
+	inStream.Read(mFraction);
+	inStream.Read(mBodyB);
+	inStream.Read(mSubShapeIDB);
+	inStream.Read(mMotionTypeB);
+	inStream.Read(mHadCollision);
+	inStream.Read(mWasDiscarded);
+	inStream.Read(mCanPushCharacter);
+	mUserData = 0; // Cannot restore user data
+	mMaterial = PhysicsMaterial::sDefault; // Cannot restore material
+}
+
 void CharacterVirtual::SaveState(StateRecorder &inStream) const
 {
 	CharacterBase::SaveState(inStream);
@@ -1313,6 +1352,18 @@ void CharacterVirtual::SaveState(StateRecorder &inStream) const
 	inStream.Write(mPosition);
 	inStream.Write(mRotation);
 	inStream.Write(mLinearVelocity);
+	inStream.Write(mLastDeltaTime);
+	inStream.Write(mMaxHitsExceeded);
+
+	// Store contacts that had collision, we're using it at the beginning of the step in CancelVelocityTowardsSteepSlopes
+	uint32 num_contacts = 0;
+	for (const Contact &c : mActiveContacts)
+		if (c.mHadCollision)
+			++num_contacts;
+	inStream.Write(num_contacts);
+	for (const Contact &c : mActiveContacts)
+		if (c.mHadCollision)
+			c.SaveState(inStream);
 }
 
 void CharacterVirtual::RestoreState(StateRecorder &inStream)
@@ -1322,6 +1373,20 @@ void CharacterVirtual::RestoreState(StateRecorder &inStream)
 	inStream.Read(mPosition);
 	inStream.Read(mRotation);
 	inStream.Read(mLinearVelocity);
+	inStream.Read(mLastDeltaTime);
+	inStream.Read(mMaxHitsExceeded);
+
+	// When validating remove contacts that don't have collision since we didn't save them
+	if (inStream.IsValidating())
+		for (int i = (int)mActiveContacts.size() - 1; i >= 0; --i)
+			if (!mActiveContacts[i].mHadCollision)
+				mActiveContacts.erase(mActiveContacts.begin() + i);
+
+	uint32 num_contacts = (uint32)mActiveContacts.size();
+	inStream.Read(num_contacts);
+	mActiveContacts.resize(num_contacts);
+	for (Contact &c : mActiveContacts)
+		c.RestoreState(inStream);
 }
 
 JPH_NAMESPACE_END

@@ -66,31 +66,37 @@ public static class Program
         }
     }
 
-    private static bool BroadPhaseCanCollide(ObjectLayer layer1, BroadPhaseLayer layer2)
+    class ObjectVsBroadPhaseLayerFilterImpl : ObjectVsBroadPhaseLayerFilter
     {
-        switch (layer1)
+        protected override bool ShouldCollide(ObjectLayer layer1, BroadPhaseLayer layer2)
         {
-            case Layers.NonMoving:
-                return layer2 == BroadPhaseLayers.Moving;
-            case Layers.Moving:
-                return true;
-            default:
-                Debug.Assert(false);
-                return false;
+            switch (layer1)
+            {
+                case Layers.NonMoving:
+                    return layer2 == BroadPhaseLayers.Moving;
+                case Layers.Moving:
+                    return true;
+                default:
+                    Debug.Assert(false);
+                    return false;
+            }
         }
     }
 
-    private static bool ObjectCanCollide(ObjectLayer layer1, ObjectLayer layer2)
+    class ObjectLayerPairFilterImpl : ObjectLayerPairFilter
     {
-        switch (layer1)
+        protected override bool ShouldCollide(ObjectLayer object1, ObjectLayer object2)
         {
-            case Layers.NonMoving:
-                return layer2 == Layers.Moving;
-            case Layers.Moving:
-                return true;
-            default:
-                Debug.Assert(false);
-                return false;
+            switch (object1)
+            {
+                case Layers.NonMoving:
+                    return object2 == Layers.Moving;
+                case Layers.Moving:
+                    return true;
+                default:
+                    Debug.Assert(false);
+                    return false;
+            }
         }
     }
 
@@ -175,11 +181,14 @@ public static class Program
             using TempAllocator tempAllocator = new(10 * 1024 * 1024);
             using JobSystemThreadPool jobSystem = new(Foundation.MaxPhysicsJobs, Foundation.MaxPhysicsBarriers);
             using BPLayerInterfaceImpl broadPhaseLayer = new();
+            using ObjectVsBroadPhaseLayerFilterImpl objectVsBroadphaseLayerFilter = new();
+            using ObjectLayerPairFilterImpl objectVsObjectLayerFilter = new();
+
             using PhysicsSystem physicsSystem = new();
             physicsSystem.Init(MaxBodies, NumBodyMutexes, MaxBodyPairs, MaxContactConstraints,
                 broadPhaseLayer,
-                BroadPhaseCanCollide,
-                ObjectCanCollide);
+                objectVsBroadphaseLayerFilter,
+                objectVsObjectLayerFilter);
 
             // ContactListener
             physicsSystem.OnContactValidate += OnContactValidate;

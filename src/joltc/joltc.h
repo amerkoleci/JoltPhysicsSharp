@@ -35,20 +35,16 @@
 #   define JPH_API_CALL
 #endif
 
-
 #define JPH_CAPI _JPH_EXTERN _JPH_EXPORT
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
+typedef uint32_t JPH_Bool32;
 typedef uint32_t JPH_BodyID;
 typedef uint32_t JPH_SubShapeID;
 typedef uint16_t JPH_ObjectLayer;
 typedef uint8_t  JPH_BroadPhaseLayer;
-
-typedef bool (JPH_API_CALL* JPH_ObjectVsBroadPhaseLayerFilter)(JPH_ObjectLayer inLayer1, JPH_BroadPhaseLayer inLayer2);
-typedef bool (JPH_API_CALL* JPH_ObjectLayerPairFilter)(JPH_ObjectLayer inLayer1, JPH_ObjectLayer inLayer2);
 
 typedef enum JPH_MotionType {
     JPH_MOTION_TYPE_STATIC = 0,
@@ -111,6 +107,13 @@ typedef struct JPH_Quat {
     float w;
 } JPH_Quat;
 
+typedef struct JPH_Matrix4x4 {
+    float m11, m12, m13, m14;
+    float m21, m22, m23, m24;
+    float m31, m32, m33, m34;
+    float m41, m42, m43, m44;
+} JPH_Matrix4x4;
+
 typedef struct JPH_Triangle {
     JPH_Vec3 v1;
     JPH_Vec3 v2;
@@ -139,10 +142,13 @@ typedef struct JPH_SubShapeIDPair
     JPH_SubShapeID subShapeID2;
 } JPH_SubShapeIDPair;
 
-typedef struct JPH_TempAllocator                JPH_TempAllocator;
-typedef struct JPH_JobSystemThreadPool          JPH_JobSystemThreadPool;
-typedef struct JPH_BroadPhaseLayerInterface     JPH_BroadPhaseLayerInterface;
-typedef struct JPH_PhysicsSystem                JPH_PhysicsSystem;
+typedef struct JPH_TempAllocator                    JPH_TempAllocator;
+typedef struct JPH_JobSystemThreadPool              JPH_JobSystemThreadPool;
+typedef struct JPH_BroadPhaseLayerInterface         JPH_BroadPhaseLayerInterface;
+typedef struct JPH_ObjectVsBroadPhaseLayerFilter    JPH_ObjectVsBroadPhaseLayerFilter;
+typedef struct JPH_ObjectLayerPairFilter            JPH_ObjectLayerPairFilter;
+
+typedef struct JPH_PhysicsSystem                    JPH_PhysicsSystem;
 
 typedef struct JPH_ShapeSettings                JPH_ShapeSettings;
 typedef struct JPH_BoxShapeSettings             JPH_BoxShapeSettings;
@@ -177,7 +183,7 @@ typedef struct JPH_ContactListener              JPH_ContactListener;
 
 typedef struct JPH_BodyActivationListener       JPH_BodyActivationListener;
 
-JPH_CAPI bool JPH_Init(void);
+JPH_CAPI JPH_Bool32 JPH_Init(void);
 JPH_CAPI void JPH_Shutdown(void);
 
 /* JPH_TempAllocator */
@@ -271,8 +277,8 @@ JPH_CAPI void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system);
 JPH_CAPI void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
     uint32_t maxBodies, uint32_t numBodyMutexes, uint32_t maxBodyPairs, uint32_t maxContactConstraints,
     JPH_BroadPhaseLayer* layer,
-    JPH_ObjectVsBroadPhaseLayerFilter objectVsBroadPhaseLayerFilter,
-    JPH_ObjectLayerPairFilter objectLayerPairFilter);
+    JPH_ObjectVsBroadPhaseLayerFilter* objectVsBroadPhaseLayerFilter,
+    JPH_ObjectLayerPairFilter* objectLayerPairFilter);
 
 JPH_CAPI void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system);
 JPH_CAPI void JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
@@ -303,14 +309,14 @@ JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JP
 JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_BodyCreationSettings* settings);
 JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithoutID(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings);
 JPH_CAPI void JPH_BodyInterface_DestroyBodyWithoutID(JPH_BodyInterface* interface, JPH_Body* body);
-JPH_CAPI bool JPH_BodyInterface_AssignBodyID(JPH_BodyInterface* interface, JPH_Body* body);
-JPH_CAPI bool JPH_BodyInterface_AssignBodyID2(JPH_BodyInterface* interface, JPH_Body* body, JPH_BodyID bodyID);
+JPH_CAPI JPH_Bool32 JPH_BodyInterface_AssignBodyID(JPH_BodyInterface* interface, JPH_Body* body);
+JPH_CAPI JPH_Bool32 JPH_BodyInterface_AssignBodyID2(JPH_BodyInterface* interface, JPH_Body* body, JPH_BodyID bodyID);
 JPH_CAPI JPH_Body* JPH_BodyInterface_UnassignBodyID(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 
 JPH_CAPI void JPH_BodyInterface_AddBody(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_ActivationMode activation);
 JPH_CAPI void JPH_BodyInterface_RemoveBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
-JPH_CAPI bool JPH_BodyInterface_IsActive(JPH_BodyInterface* interface, JPH_BodyID bodyID);
-JPH_CAPI bool JPH_BodyInterface_IsAdded(JPH_BodyInterface* interface, JPH_BodyID bodyID);
+JPH_CAPI JPH_Bool32 JPH_BodyInterface_IsActive(JPH_BodyInterface* interface, JPH_BodyID bodyID);
+JPH_CAPI JPH_Bool32 JPH_BodyInterface_IsAdded(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 
 JPH_CAPI void JPH_BodyInterface_SetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_Vec3* velocity);
 JPH_CAPI void JPH_BodyInterface_GetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Vec3* velocity);
@@ -327,11 +333,11 @@ JPH_CAPI void JPH_BodyInterface_SetFriction(JPH_BodyInterface* interface, JPH_Bo
 
 /* Body */
 JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsActive(const JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsStatic(const JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsKinematic(const JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsDynamic(const JPH_Body* body);
-JPH_CAPI bool JPH_Body_IsSensor(const JPH_Body* body);
+JPH_CAPI JPH_Bool32 JPH_Body_IsActive(const JPH_Body* body);
+JPH_CAPI JPH_Bool32 JPH_Body_IsStatic(const JPH_Body* body);
+JPH_CAPI JPH_Bool32 JPH_Body_IsKinematic(const JPH_Body* body);
+JPH_CAPI JPH_Bool32 JPH_Body_IsDynamic(const JPH_Body* body);
+JPH_CAPI JPH_Bool32 JPH_Body_IsSensor(const JPH_Body* body);
 JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType);
 JPH_CAPI float JPH_Body_GetFriction(const JPH_Body* body);
@@ -351,6 +357,12 @@ JPH_CAPI void JPH_Body_AddImpulse(JPH_Body* body, const JPH_Vec3* impulse);
 JPH_CAPI void JPH_Body_AddImpulseAtPosition(JPH_Body* body, const JPH_Vec3* impulse, const JPH_RVec3* position);
 JPH_CAPI void JPH_Body_AddAngularImpulse(JPH_Body* body, const JPH_Vec3* angularImpulse);
 
+JPH_CAPI void JPH_Body_GetPosition(const JPH_Body* body, JPH_RVec3* result);
+JPH_CAPI void JPH_Body_GetRotation(const JPH_Body* body, JPH_Quat* result);
+JPH_CAPI void JPH_Body_GetCenterOfMassPosition(const JPH_Body* body, JPH_RVec3* result);
+JPH_CAPI void JPH_Body_GetWorldTransform(const JPH_Body* body, JPH_Matrix4x4* result);
+JPH_CAPI void JPH_Body_GetCenterOfMassTransform(const JPH_Body* body, JPH_Matrix4x4* result);
+
 /* JPH_BroadPhaseLayer */
 typedef struct JPH_BroadPhaseLayerInterface_Procs {
     uint32_t(JPH_API_CALL* GetNumBroadPhaseLayers)(const JPH_BroadPhaseLayerInterface* interface);
@@ -362,6 +374,24 @@ typedef struct JPH_BroadPhaseLayerInterface_Procs {
 JPH_CAPI void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);
 JPH_CAPI JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterface_Create();
 JPH_CAPI void JPH_BroadPhaseLayerInterface_Destroy(JPH_BroadPhaseLayerInterface* layer);
+
+/* JPH_ObjectVsBroadPhaseLayerFilter */
+typedef struct JPH_ObjectVsBroadPhaseLayerFilter_Procs {
+    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_ObjectVsBroadPhaseLayerFilter* filter, JPH_ObjectLayer layer1, JPH_BroadPhaseLayer layer2);
+} JPH_ObjectVsBroadPhaseLayerFilter_Procs;
+
+JPH_CAPI void JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(JPH_ObjectVsBroadPhaseLayerFilter_Procs procs);
+JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilter_Create();
+JPH_CAPI void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(JPH_ObjectVsBroadPhaseLayerFilter* filter);
+
+/* JPH_ObjectLayerPairFilter */
+typedef struct JPH_ObjectLayerPairFilter_Procs {
+    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_ObjectLayerPairFilter* filter, JPH_ObjectLayer object1, JPH_ObjectLayer object2);
+} JPH_ObjectLayerPairFilter_Procs;
+
+JPH_CAPI void JPH_ObjectLayerPairFilter_SetProcs(JPH_ObjectLayerPairFilter_Procs procs);
+JPH_CAPI JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilter_Create();
+JPH_CAPI void JPH_ObjectLayerPairFilter_Destroy(JPH_ObjectLayerPairFilter* filter);
 
 /* Contact listener */
 typedef struct JPH_ContactListener_Procs {

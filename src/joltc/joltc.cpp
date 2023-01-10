@@ -103,6 +103,42 @@ static JPH::Quat ToQuat(const JPH_Quat* quat)
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
 }
 
+static void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
+{
+    result->x = quat.GetX();
+    result->y = quat.GetY();
+    result->z = quat.GetZ();
+    result->w = quat.GetW();
+}
+
+static void FromJolt(const JPH::RMat44& matrix, JPH_Matrix4x4* result)
+{
+    JPH::Vec4 column0 = matrix.GetColumn4(0);
+    JPH::Vec4 column1 = matrix.GetColumn4(1);
+    JPH::Vec4 column2 = matrix.GetColumn4(2);
+    JPH::Vec4 column3 = matrix.GetColumn4(3);
+
+    result->m11 = column0.GetX();
+    result->m12 = column0.GetY();
+    result->m13 = column0.GetZ();
+    result->m14 = column0.GetW();
+
+    result->m21 = column1.GetX();
+    result->m22 = column1.GetY();
+    result->m23 = column1.GetZ();
+    result->m24 = column1.GetW();
+
+    result->m31 = column2.GetX();
+    result->m32 = column2.GetY();
+    result->m33 = column2.GetZ();
+    result->m34 = column2.GetW();
+
+    result->m41 = column3.GetX();
+    result->m42 = column3.GetY();
+    result->m43 = column3.GetZ();
+    result->m44 = column3.GetW();
+}
+
 static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
 {
     return JPH::Triangle(ToFloat3(triangle.v1), ToFloat3(triangle.v2), ToFloat3(triangle.v3), triangle.materialIndex);
@@ -113,7 +149,7 @@ static JPH::IndexedTriangle ToIndexedTriangle(const JPH_IndexedTriangle& triangl
     return JPH::IndexedTriangle(triangle.i1, triangle.i2, triangle.i3, triangle.materialIndex);
 }
 
-bool JPH_Init(void)
+JPH_Bool32 JPH_Init(void)
 {
     JPH::RegisterDefaultAllocator();
 
@@ -229,6 +265,90 @@ void JPH_BroadPhaseLayerInterface_Destroy(JPH_BroadPhaseLayerInterface* layer)
     if (layer)
     {
         delete reinterpret_cast<ManagedBroadPhaseLayerInterface*>(layer);
+    }
+}
+
+/* JPH_ObjectVsBroadPhaseLayerFilter */
+static JPH_ObjectVsBroadPhaseLayerFilter_Procs g_ObjectVsBroadPhaseLayerFilter_Procs;
+
+class ManagedObjectVsBroadPhaseLayerFilter final : public JPH::ObjectVsBroadPhaseLayerFilter
+{
+public:
+    ManagedObjectVsBroadPhaseLayerFilter() = default;
+
+    ManagedObjectVsBroadPhaseLayerFilter(const ManagedObjectVsBroadPhaseLayerFilter&) = delete;
+    ManagedObjectVsBroadPhaseLayerFilter(const ManagedObjectVsBroadPhaseLayerFilter&&) = delete;
+    ManagedObjectVsBroadPhaseLayerFilter& operator=(const ManagedObjectVsBroadPhaseLayerFilter&) = delete;
+    ManagedObjectVsBroadPhaseLayerFilter& operator=(const ManagedObjectVsBroadPhaseLayerFilter&&) = delete;
+
+    bool ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const override
+    {
+        return g_ObjectVsBroadPhaseLayerFilter_Procs.ShouldCollide(
+            reinterpret_cast<const JPH_ObjectVsBroadPhaseLayerFilter*>(this),
+            static_cast<JPH_ObjectLayer>(inLayer1),
+            static_cast<JPH_BroadPhaseLayer>(inLayer2)
+        ) == 1;
+    }
+};
+
+void JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(JPH_ObjectVsBroadPhaseLayerFilter_Procs procs)
+{
+    g_ObjectVsBroadPhaseLayerFilter_Procs = procs;
+}
+
+JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilter_Create()
+{
+    auto filter = new ManagedObjectVsBroadPhaseLayerFilter();
+    return reinterpret_cast<JPH_ObjectVsBroadPhaseLayerFilter*>(filter);
+}
+
+void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(JPH_ObjectVsBroadPhaseLayerFilter* filter)
+{
+    if (filter)
+    {
+        delete reinterpret_cast<ManagedObjectVsBroadPhaseLayerFilter*>(filter);
+    }
+}
+
+/* JPH_ObjectLayerPairFilter */
+static JPH_ObjectLayerPairFilter_Procs g_ObjectLayerPairFilter_Procs;
+
+class ManagedObjectLayerPairFilter final : public JPH::ObjectLayerPairFilter
+{
+public:
+    ManagedObjectLayerPairFilter() = default;
+
+    ManagedObjectLayerPairFilter(const ManagedObjectLayerPairFilter&) = delete;
+    ManagedObjectLayerPairFilter(const ManagedObjectLayerPairFilter&&) = delete;
+    ManagedObjectLayerPairFilter& operator=(const ManagedObjectLayerPairFilter&) = delete;
+    ManagedObjectLayerPairFilter& operator=(const ManagedObjectLayerPairFilter&&) = delete;
+
+    bool ShouldCollide(JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2) const override
+    {
+        return g_ObjectLayerPairFilter_Procs.ShouldCollide(
+            reinterpret_cast<const JPH_ObjectLayerPairFilter*>(this),
+            static_cast<JPH_ObjectLayer>(inObject1),
+            static_cast<JPH_ObjectLayer>(inObject2)
+        ) == 1;
+    }
+};
+
+void JPH_ObjectLayerPairFilter_SetProcs(JPH_ObjectLayerPairFilter_Procs procs)
+{
+    g_ObjectLayerPairFilter_Procs = procs;
+}
+
+JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilter_Create()
+{
+    auto filter = new ManagedObjectLayerPairFilter();
+    return reinterpret_cast<JPH_ObjectLayerPairFilter*>(filter);
+}
+
+void JPH_ObjectLayerPairFilter_Destroy(JPH_ObjectLayerPairFilter* filter)
+{
+    if (filter)
+    {
+        delete reinterpret_cast<ManagedObjectLayerPairFilter*>(filter);
     }
 }
 
@@ -576,32 +696,22 @@ void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system)
     }
 }
 
-static JPH_ObjectVsBroadPhaseLayerFilter s_objectVsBroadPhaseLayerFilter;
-
-static bool JPH_BroadPhaseCanCollide(ObjectLayer inLayer1, BroadPhaseLayer inLayer2)
-{
-    JPH_ASSERT(s_objectVsBroadPhaseLayerFilter);
-
-    return s_objectVsBroadPhaseLayerFilter(
-        static_cast<JPH_ObjectLayer>(inLayer1),
-        static_cast<JPH_BroadPhaseLayer>(inLayer2)
-    );
-}
-
 void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
     uint32_t maxBodies, uint32_t numBodyMutexes, uint32_t maxBodyPairs, uint32_t maxContactConstraints,
     JPH_BroadPhaseLayer* layer,
-    JPH_ObjectVsBroadPhaseLayerFilter objectVsBroadPhaseLayerFilter,
-    JPH_ObjectLayerPairFilter objectLayerPairFilter)
+    JPH_ObjectVsBroadPhaseLayerFilter* objectVsBroadPhaseLayerFilter,
+    JPH_ObjectLayerPairFilter* objectLayerPairFilter)
 {
     JPH_ASSERT(system);
-    s_objectVsBroadPhaseLayerFilter = objectVsBroadPhaseLayerFilter;
+    JPH_ASSERT(layer);
+    JPH_ASSERT(objectVsBroadPhaseLayerFilter);
+    JPH_ASSERT(objectLayerPairFilter);
 
     reinterpret_cast<JPH::PhysicsSystem*>(system)->Init(
         maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
         *reinterpret_cast<const JPH::BroadPhaseLayerInterface*>(layer),
-        JPH_BroadPhaseCanCollide,
-        reinterpret_cast<JPH::ObjectLayerPairFilter>(objectLayerPairFilter)
+        *reinterpret_cast<const JPH::ObjectVsBroadPhaseLayerFilter*>(objectVsBroadPhaseLayerFilter),
+        *reinterpret_cast<const JPH::ObjectLayerPairFilter*>(objectLayerPairFilter)
     );
 }
 
@@ -786,7 +896,7 @@ void JPH_BodyInterface_DestroyBodyWithoutID(JPH_BodyInterface* interface, JPH_Bo
     joltBodyInterface->DestroyBodyWithoutID(joltBody);
 }
 
-bool JPH_BodyInterface_AssignBodyID(JPH_BodyInterface* interface, JPH_Body* body)
+JPH_Bool32 JPH_BodyInterface_AssignBodyID(JPH_BodyInterface* interface, JPH_Body* body)
 {
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
     auto joltBody = reinterpret_cast<JPH::Body*>(body);
@@ -794,7 +904,7 @@ bool JPH_BodyInterface_AssignBodyID(JPH_BodyInterface* interface, JPH_Body* body
     return joltBodyInterface->AssignBodyID(joltBody);
 }
 
-bool JPH_BodyInterface_AssignBodyID2(JPH_BodyInterface* interface, JPH_Body* body, JPH_BodyID bodyID)
+JPH_Bool32 JPH_BodyInterface_AssignBodyID2(JPH_BodyInterface* interface, JPH_Body* body, JPH_BodyID bodyID)
 {
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
     auto joltBody = reinterpret_cast<JPH::Body*>(body);
@@ -844,7 +954,7 @@ void JPH_BodyInterface_RemoveBody(JPH_BodyInterface* interface, JPH_BodyID bodyI
     joltBodyInterface->RemoveBody(JPH::BodyID(bodyID));
 }
 
-bool JPH_BodyInterface_IsActive(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+JPH_Bool32 JPH_BodyInterface_IsActive(JPH_BodyInterface* interface, JPH_BodyID bodyID)
 {
     JPH_ASSERT(interface);
 
@@ -852,7 +962,7 @@ bool JPH_BodyInterface_IsActive(JPH_BodyInterface* interface, JPH_BodyID bodyID)
     return joltBodyInterface->IsActive(JPH::BodyID(bodyID));
 }
 
-bool JPH_BodyInterface_IsAdded(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+JPH_Bool32 JPH_BodyInterface_IsAdded(JPH_BodyInterface* interface, JPH_BodyID bodyID)
 {
     JPH_ASSERT(interface);
 
@@ -945,27 +1055,27 @@ JPH_BodyID JPH_Body_GetID(const JPH_Body* body)
     return joltBody->GetID().GetIndexAndSequenceNumber();
 }
 
-bool JPH_Body_IsActive(const JPH_Body* body)
+JPH_Bool32 JPH_Body_IsActive(const JPH_Body* body)
 {
     return reinterpret_cast<const JPH::Body*>(body)->IsActive();
 }
 
-bool JPH_Body_IsStatic(const JPH_Body* body)
+JPH_Bool32 JPH_Body_IsStatic(const JPH_Body* body)
 {
     return reinterpret_cast<const JPH::Body*>(body)->IsStatic();
 }
 
-bool JPH_Body_IsKinematic(JPH_Body* body)
+JPH_Bool32 JPH_Body_IsKinematic(JPH_Body* body)
 {
     return reinterpret_cast<const JPH::Body*>(body)->IsKinematic();
 }
 
-bool JPH_Body_IsDynamic(const JPH_Body* body)
+JPH_Bool32 JPH_Body_IsDynamic(const JPH_Body* body)
 {
     return reinterpret_cast<const JPH::Body*>(body)->IsDynamic();
 }
 
-bool JPH_Body_IsSensor(const JPH_Body* body)
+JPH_Bool32 JPH_Body_IsSensor(const JPH_Body* body)
 {
     return reinterpret_cast<const JPH::Body*>(body)->IsSensor();
 }
@@ -1063,6 +1173,37 @@ void JPH_Body_AddAngularImpulse(JPH_Body* body, const JPH_Vec3* angularImpulse)
 {
     reinterpret_cast<JPH::Body*>(body)->AddAngularImpulse(ToVec3(angularImpulse));
 }
+
+void JPH_Body_GetPosition(const JPH_Body* body, JPH_RVec3* result)
+{
+    auto joltVector = reinterpret_cast<const JPH::Body*>(body)->GetPosition();
+    FromRVec3(joltVector, result);
+}
+
+void JPH_Body_GetRotation(const JPH_Body* body, JPH_Quat* result)
+{
+    auto joltQuat = reinterpret_cast<const JPH::Body*>(body)->GetRotation();
+    FromJolt(joltQuat, result);
+}
+
+void JPH_Body_GetCenterOfMassPosition(const JPH_Body* body, JPH_RVec3* result)
+{
+    auto joltVector = reinterpret_cast<const JPH::Body*>(body)->GetCenterOfMassPosition();
+    FromRVec3(joltVector, result);
+}
+
+void JPH_Body_GetWorldTransform(const JPH_Body* body, JPH_Matrix4x4* result)
+{
+    auto joltMatrix = reinterpret_cast<const JPH::Body*>(body)->GetWorldTransform();
+    FromJolt(joltMatrix, result);
+}
+
+void JPH_Body_GetCenterOfMassTransform(const JPH_Body* body, JPH_Matrix4x4* result)
+{
+    auto joltMatrix = reinterpret_cast<const JPH::Body*>(body)->GetCenterOfMassTransform();
+    FromJolt(joltMatrix, result);
+}
+
 
 /* Contact Listener */
 static JPH_ContactListener_Procs g_ContactListener_Procs;

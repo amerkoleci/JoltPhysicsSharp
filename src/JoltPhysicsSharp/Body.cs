@@ -26,11 +26,11 @@ public readonly struct Body : IEquatable<Body>
     public override int GetHashCode() => Handle.GetHashCode();
 
     public readonly BodyID ID => JPH_Body_GetID(Handle);
-    public readonly bool IsActive => JPH_Body_IsActive(Handle);
-    public readonly bool IsStatic => JPH_Body_IsStatic(Handle);
-    public readonly bool IsKinematic => JPH_Body_IsKinematic(Handle);
-    public readonly bool IsDynamic => JPH_Body_IsDynamic(Handle);
-    public readonly bool IsSensor => JPH_Body_IsSensor(Handle);
+    public readonly bool IsActive => JPH_Body_IsActive(Handle) == 1;
+    public readonly bool IsStatic => JPH_Body_IsStatic(Handle) == 1;
+    public readonly bool IsKinematic => JPH_Body_IsKinematic(Handle) == 1;
+    public readonly bool IsDynamic => JPH_Body_IsDynamic(Handle) == 1;
+    public readonly bool IsSensor => JPH_Body_IsSensor(Handle) == 1;
 
     public MotionType MotionType
     {
@@ -48,6 +48,76 @@ public readonly struct Body : IEquatable<Body>
     {
         readonly get => JPH_Body_GetRestitution(Handle);
         set => JPH_Body_SetRestitution(Handle, value);
+    }
+
+    public Vector3 Position
+    {
+        get
+        {
+            JPH_Body_GetPosition(Handle, out Vector3 value);
+            return value;
+        }
+    }
+
+    public Quaternion Rotation
+    {
+        get
+        {
+            JPH_Body_GetRotation(Handle, out Quaternion value);
+            return value;
+        }
+    }
+
+    public Vector3 CenterOfMassPosition
+    {
+        get
+        {
+            JPH_Body_GetCenterOfMassPosition(Handle, out Vector3 value);
+            return value;
+        }
+    }
+
+    public Matrix4x4 WorldTransform
+    {
+        get
+        {
+            JPH_Body_GetWorldTransform(Handle, out Matrix4x4 value);
+            return value;
+        }
+    }
+
+    public Matrix4x4 CenterOfMassTransform
+    {
+        get
+        {
+            JPH_Body_GetCenterOfMassTransform(Handle, out Matrix4x4 value);
+            return value;
+        }
+    }
+
+    public void GetPosition(out Vector3 result)
+    {
+        JPH_Body_GetPosition(Handle, out result);
+    }
+
+    public void GetRotation(out Quaternion result)
+    {
+        JPH_Body_GetRotation(Handle, out result);
+    }
+
+    public void GetCenterOfMassPosition(out Vector3 result)
+    {
+        JPH_Body_GetCenterOfMassPosition(Handle, out result);
+    }
+
+    public void GetWorldTransform(out Matrix4x4 result)
+    {
+        JPH_Body_GetWorldTransform(Handle, out result);
+    }
+
+    public void GetCenterOfMassTransform(out Matrix4x4 result)
+    {
+        JPH_Body_GetCenterOfMassTransform(Handle, out result);
     }
 
     public Vector3 GetLinearVelocity()

@@ -7,14 +7,6 @@ using System.Runtime.InteropServices;
 
 namespace JoltPhysicsSharp;
 
-[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-[return: MarshalAs(UnmanagedType.Bool)]
-public delegate bool ObjectVsBroadPhaseLayerFilter(ObjectLayer layer1, BroadPhaseLayer layer2);
-
-[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-[return: MarshalAs(UnmanagedType.Bool)]
-public delegate bool ObjectLayerPairFilter(ObjectLayer layer1, ObjectLayer layer2);
-
 internal static unsafe partial class JoltApi
 {
     private const string LibName = "joltc";
@@ -97,8 +89,7 @@ internal static unsafe partial class JoltApi
 
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_Init();
+    public static extern uint JPH_Init();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Shutdown();
@@ -135,6 +126,36 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BroadPhaseLayerInterface_Destroy(nint handle);
+
+    //  ObjectVsBroadPhaseLayerFilter
+    public struct JPH_ObjectVsBroadPhaseLayerFilter_Procs
+    {
+        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer, uint> ShouldCollide;
+    }
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(JPH_ObjectVsBroadPhaseLayerFilter_Procs procs);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_ObjectVsBroadPhaseLayerFilter_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(nint handle);
+
+    //  ObjectLayerPairFilter
+    public struct JPH_ObjectLayerPairFilter_Procs
+    {
+        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, ObjectLayer, uint> ShouldCollide;
+    }
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ObjectLayerPairFilter_SetProcs(JPH_ObjectLayerPairFilter_Procs procs);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_ObjectLayerPairFilter_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ObjectLayerPairFilter_Destroy(nint handle);
 
     /* ShapeSettings */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -273,8 +294,8 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_PhysicsSystem_Init(IntPtr handle,
         uint inMaxBodies, uint numBodyMutexes, uint maxBodyPairs, uint maxContactConstraints,
         IntPtr layer,
-        ObjectVsBroadPhaseLayerFilter inObjectVsBroadPhaseLayerFilter,
-        ObjectLayerPairFilter inObjectLayerPairFilter);
+        IntPtr inObjectVsBroadPhaseLayerFilter,
+        IntPtr inObjectLayerPairFilter);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_OptimizeBroadPhase(IntPtr handle);
@@ -341,12 +362,10 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_DestroyBodyWithoutID(IntPtr handle, IntPtr body);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_BodyInterface_AssignBodyID(IntPtr handle, IntPtr body);
+    public static extern uint JPH_BodyInterface_AssignBodyID(IntPtr handle, IntPtr body);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_BodyInterface_AssignBodyID2(IntPtr handle, IntPtr body, uint bodyID);
+    public static extern uint JPH_BodyInterface_AssignBodyID2(IntPtr handle, IntPtr body, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyInterface_UnassignBodyID(IntPtr handle, uint bodyID);
@@ -367,12 +386,10 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_GetCenterOfMassPosition(IntPtr handle, uint bodyID, out Vector3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
+    public static extern uint JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_BodyInterface_IsAdded(IntPtr handle, uint bodyID);
+    public static extern uint JPH_BodyInterface_IsAdded(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern MotionType JPH_BodyInterface_GetMotionType(IntPtr handle, uint bodyID);
@@ -397,24 +414,19 @@ internal static unsafe partial class JoltApi
     public static extern uint JPH_Body_GetID(IntPtr body);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_Body_IsActive(IntPtr handle);
+    public static extern uint JPH_Body_IsActive(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_Body_IsStatic(IntPtr handle);
+    public static extern uint JPH_Body_IsStatic(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_Body_IsKinematic(IntPtr handle);
+    public static extern uint JPH_Body_IsKinematic(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_Body_IsDynamic(IntPtr handle);
+    public static extern uint JPH_Body_IsDynamic(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_Body_IsSensor(IntPtr handle);
+    public static extern uint JPH_Body_IsSensor(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern MotionType JPH_Body_GetMotionType(IntPtr handle);
@@ -435,7 +447,22 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_Body_SetRestitution(IntPtr handle, float value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_GetLinearVelocity(IntPtr handle, out Vector3 velocity);
+    public static extern void JPH_Body_GetPosition(IntPtr handle, out Vector3 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_GetRotation(IntPtr handle, out Quaternion result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_GetCenterOfMassPosition(IntPtr handle, out Vector3 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_GetWorldTransform(IntPtr handle, out Matrix4x4 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_GetCenterOfMassTransform(IntPtr handle, out Matrix4x4 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_GetLinearVelocity(IntPtr handle, out Vector3 result);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_SetLinearVelocity(IntPtr handle, in Vector3 velocity);
