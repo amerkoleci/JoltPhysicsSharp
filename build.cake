@@ -9,6 +9,10 @@ Task("BuildWindows")
     .WithCriteria(() => IsRunningOnWindows())
     .Does(() =>
 {
+    CreateDirectory(artifactsDir);
+    CreateDirectory($"{artifactsDir}/win-x64/native");
+    CreateDirectory($"{artifactsDir}/win-arm64/native");
+
     // Build
     var buildDir = "build";
     CreateDirectory(buildDir);
@@ -16,8 +20,16 @@ Task("BuildWindows")
     StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Distribution" });
 
     // Copy artifact
-    CreateDirectory(artifactsDir);
-    CopyFile("build/bin/Distribution/joltc.dll", $"{artifactsDir}/joltc.dll");
+    CopyFile("build/bin/Distribution/joltc.dll", $"{artifactsDir}/win-x64/native/joltc.dll");
+
+    // ARM64
+    buildDir = "build_arm64";
+    CreateDirectory(buildDir);
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-G \"Visual Studio 17 2022\" -A ARM64 ../" });
+    StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Distribution" });
+
+    // Copy artifact
+    CopyFile("build_arm64/bin/Distribution/joltc.dll", $"{artifactsDir}/win-arm64/native/joltc.dll");
 });
 
 Task("BuildMacOS")

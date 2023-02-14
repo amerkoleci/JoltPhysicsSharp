@@ -21,7 +21,7 @@
     <RestoreConfigFile>$(MSBuildThisFileDirectory)NuGet.config</RestoreConfigFile>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     
-    <VersionPrefix>1.3.1</VersionPrefix>
+    <VersionPrefix>1.3.2</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
   </PropertyGroup>
 
