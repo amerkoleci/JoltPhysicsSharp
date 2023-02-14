@@ -30,7 +30,8 @@ public:
 	Vec3								mShapeOffset = Vec3::sZero();
 
 	///@name Movement settings
-	float								mPredictiveContactDistance = 0.1f;						///< How far to scan outside of the shape for predictive contacts
+	EBackFaceMode						mBackFaceMode = EBackFaceMode::CollideWithBackFaces;	///< When colliding with back faces, the character will not be able to move through back facing triangles. Use this if you have triangles that need to collide on both sides.
+	float								mPredictiveContactDistance = 0.1f;						///< How far to scan outside of the shape for predictive contacts. A value of 0 will most likely cause the character to get stuck as it properly calculate a sliding direction anymore. A value that's too high will cause ghost collisions.
 	uint								mMaxCollisionIterations = 5;							///< Max amount of collision loops
 	uint								mMaxConstraintIterations = 15;							///< How often to try stepping in the constraint solving
 	float								mMinTimeRemaining = 1.0e-4f;							///< Early out condition: If this much time is left to simulate we are done
@@ -56,10 +57,20 @@ public:
 	/// Destructor
 	virtual								~CharacterContactListener() = default;
 
+	/// Callback to adjust the velocity of a body as seen by the character. Can be adjusted to e.g. implement a conveyor belt or an inertial dampener system of a sci-fi space ship.
+	/// Note that inBody2 is locked during the callback so you can read its properties freely.
+	virtual void						OnAdjustBodyVelocity(const CharacterVirtual *inCharacter, const Body &inBody2, Vec3 &ioLinearVelocity, Vec3 &ioAngularVelocity) { /* Do nothing, the linear and angular velocity are already filled in */ }
+
 	/// Checks if a character can collide with specified body. Return true if the contact is valid.
 	virtual bool						OnContactValidate(const CharacterVirtual *inCharacter, const BodyID &inBodyID2, const SubShapeID &inSubShapeID2) { return true; }
 
 	/// Called whenever the character collides with a body. Returns true if the contact can push the character.
+	/// @param inCharacter Character that is being solved
+	/// @param inBodyID2 Body ID of body that is being hit
+	/// @param inSubShapeID2 Sub shape ID of shape that is being hit
+	/// @param inContactPosition World space contact position
+	/// @param inContactNormal World space contact normal
+	/// @param ioSettings Settings returned by the contact callback to indicate how the character should behave
 	virtual void						OnContactAdded(const CharacterVirtual *inCharacter, const BodyID &inBodyID2, const SubShapeID &inSubShapeID2, RVec3Arg inContactPosition, Vec3Arg inContactNormal, CharacterContactSettings &ioSettings) { /* Default do nothing */ }
 
 	/// Called whenever a contact is being used by the solver. Allows the listener to override the resulting character velocity (e.g. by preventing sliding along certain surfaces).
@@ -325,13 +336,14 @@ private:
 	class ContactCollector : public CollideShapeCollector
 	{
 	public:
-										ContactCollector(PhysicsSystem *inSystem, uint inMaxHits, float inHitReductionCosMaxAngle, Vec3Arg inUp, RVec3Arg inBaseOffset, TempContactList &outContacts) : mBaseOffset(inBaseOffset), mUp(inUp), mSystem(inSystem), mContacts(outContacts), mMaxHits(inMaxHits), mHitReductionCosMaxAngle(inHitReductionCosMaxAngle) { }
+										ContactCollector(PhysicsSystem *inSystem, const CharacterVirtual *inCharacter, uint inMaxHits, float inHitReductionCosMaxAngle, Vec3Arg inUp, RVec3Arg inBaseOffset, TempContactList &outContacts) : mBaseOffset(inBaseOffset), mUp(inUp), mSystem(inSystem), mCharacter(inCharacter), mContacts(outContacts), mMaxHits(inMaxHits), mHitReductionCosMaxAngle(inHitReductionCosMaxAngle) { }
 
 		virtual void					AddHit(const CollideShapeResult &inResult) override;
 
 		RVec3							mBaseOffset;
 		Vec3							mUp;
 		PhysicsSystem *					mSystem;
+		const CharacterVirtual *		mCharacter;
 		TempContactList &				mContacts;
 		uint							mMaxHits;
 		float							mHitReductionCosMaxAngle;
@@ -357,7 +369,7 @@ private:
 
 	// Helper function to convert a Jolt collision result into a contact
 	template <class taCollector>
-	inline static void					sFillContactProperties(Contact &outContact, const Body &inBody, Vec3Arg inUp, RVec3Arg inBaseOffset, const taCollector &inCollector, const CollideShapeResult &inResult);
+	inline static void					sFillContactProperties(const CharacterVirtual *inCharacter, Contact &outContact, const Body &inBody, Vec3Arg inUp, RVec3Arg inBaseOffset, const taCollector &inCollector, const CollideShapeResult &inResult);
 
 	// Move the shape from ioPosition and try to displace it by inVelocity * inDeltaTime, this will try to slide the shape along the world geometry
 	void								MoveShape(RVec3 &ioPosition, Vec3Arg inVelocity, float inDeltaTime, ContactList *outActiveContacts, const BroadPhaseLayerFilter &inBroadPhaseLayerFilter, const ObjectLayerFilter &inObjectLayerFilter, const BodyFilter &inBodyFilter, const ShapeFilter &inShapeFilter, TempAllocator &inAllocator
@@ -385,6 +397,9 @@ private:
 	#endif // JPH_DEBUG_RENDERER
 		) const;
 
+	// Get the velocity of a body adjusted by the contact listener
+	void								GetAdjustedBodyVelocity(const Body& inBody, Vec3 &outLinearVelocity, Vec3 &outAngularVelocity) const;
+
 	// Handle contact with physics object that we're colliding against
 	bool								HandleContact(Vec3Arg inVelocity, Constraint &ioConstraint, float inDeltaTime) const;
 
@@ -410,7 +425,8 @@ private:
 	CharacterContactListener *			mListener = nullptr;
 
 	// Movement settings
-	float								mPredictiveContactDistance;								// How far to scan outside of the shape for predictive contacts
+	EBackFaceMode						mBackFaceMode;											// When colliding with back faces, the character will not be able to move through back facing triangles. Use this if you have triangles that need to collide on both sides.
+	float								mPredictiveContactDistance;								// How far to scan outside of the shape for predictive contacts. A value of 0 will most likely cause the character to get stuck as it properly calculate a sliding direction anymore. A value that's too high will cause ghost collisions.
 	uint								mMaxCollisionIterations;								// Max amount of collision loops
 	uint								mMaxConstraintIterations;								// How often to try stepping in the constraint solving
 	float								mMinTimeRemaining;										// Early out condition: If this much time is left to simulate we are done

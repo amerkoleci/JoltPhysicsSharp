@@ -5,6 +5,11 @@ project(JoltC CXX)
 # Use solution folders to organize projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# Requires C++ 17
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Configure CMake global variables
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -25,8 +30,15 @@ option(CROSS_PLATFORM_DETERMINISTIC "Cross platform deterministic" OFF)
 # When turning this option on, the library will be compiled for ARM (aarch64-linux-gnu), requires compiling with clang
 option(CROSS_COMPILE_ARM "Cross compile to aarch64-linux-gnu" OFF)
 
-# When turning this option on, the library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation
+# When turning this option on, the library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation.
+# Note that if you turn this on you need to use SET_INTERPROCEDURAL_OPTIMIZATION() or set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON) to enable LTO specificly for your own project as well.
+# If you don't do this you may get an error: /usr/bin/ld: libJolt.a: error adding symbols: file format not recognized
 option(INTERPROCEDURAL_OPTIMIZATION "Enable interprocedural optimizations" ON)
+
+# When turning this on, in Debug and Release mode, the library will emit extra code to ensure that the 4th component of a 3-vector is kept the same as the 3rd component 
+# and will enable floating point exceptions during simulation to detect divisions by zero. 
+# Note that this currently only works using MSVC. Clang turns Float2 into a SIMD vector sometimes causing floating point exceptions (the option is ignored).
+option(FLOATING_POINT_EXCEPTIONS_ENABLED "Enable floating point exceptions" ON)
 
 # https://devblogs.microsoft.com/cppblog/spectre-mitigations-in-msvc/
 option(ENABLE_SPECTRE_MITIGATION "Build using /Qspectre for MSVC" OFF)
@@ -55,11 +67,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}
 	set(CMAKE_CONFIGURATION_TYPES "Debug;Release;ReleaseASAN;ReleaseUBSAN;ReleaseCoverage;Distribution")
 endif()
 
-# Pass double precision flag on to the library
-if (DOUBLE_PRECISION)
-	add_compile_definitions(JPH_DOUBLE_PRECISION)
-endif()
-
 if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "WindowsStore") AND NOT MINGW)
 	# Fill in the path to the asan libraries
 	set(CLANG_LIB_PATH "\"$(VSInstallDir)\\VC\\Tools\\Llvm\\x64\\lib\\clang\\${CMAKE_CXX_COMPILER_VERSION}\\lib\\windows\"")
@@ -75,7 +82,7 @@ if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUA
 	endif()
 
 	# Set general compiler flags
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /Zc:__cplusplus /Gm- /Wall /WX /MP /nologo /diagnostics:classic /FC /fp:except- /Zc:inline")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus /Gm- /Wall /WX /MP /nologo /diagnostics:classic /FC /fp:except- /Zc:inline")
 
     # Optionally generate debug symbols
 	if (GENERATE_DEBUG_SYMBOLS)
@@ -109,70 +116,16 @@ if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUA
 		else()
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast") # Clang doesn't use fast math because it cannot be turned off inside a single compilation unit
 		endif()
-		if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86" OR "${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-			if (USE_AVX512)
-				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX512")
-			elseif (USE_AVX2)
-				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
-			elseif (USE_AVX)
-				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX")
-			endif()	
-			if (USE_SSE4_1)
-				add_compile_definitions(JPH_USE_SSE4_1)
-			endif()
-			if (USE_SSE4_2)
-				add_compile_definitions(JPH_USE_SSE4_2)
-			endif()
-			if (USE_LZCNT)
-				add_compile_definitions(JPH_USE_LZCNT)
-			endif()
-			if (USE_TZCNT)
-				add_compile_definitions(JPH_USE_TZCNT)
-			endif()
-			if (USE_F16C)
-				add_compile_definitions(JPH_USE_F16C)
-			endif()
-			if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
-				add_compile_definitions(JPH_USE_FMADD)
-			endif()
-		endif()
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED") # Clang turns Float2 into a vector sometimes causing floating point exceptions
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DJPH_FLOATING_POINT_EXCEPTIONS_ENABLED")
 	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /showFilenames")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments") # Clang emits warnings about unused arguments such as /MP and /GL
-		if (USE_AVX512)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f -mavx512vl -mavx512dq -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
-		elseif (USE_AVX2)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
-		elseif (USE_AVX)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -mpopcnt")
-		elseif (USE_SSE4_2)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -mpopcnt")
-		elseif (USE_SSE4_1)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
-		else()
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
-		endif()
-		if (USE_LZCNT)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mlzcnt")
-		endif()
-		if (USE_TZCNT)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi")
-		endif()
-		if (USE_F16C)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mf16c")
-		endif()
-		if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
-		endif()
 		set(CMAKE_EXE_LINKER_FLAGS_RELEASEASAN "/SUBSYSTEM:CONSOLE /LIBPATH:${CLANG_LIB_PATH} clang_rt.asan-x86_64.lib -wholearchive:clang_rt.asan-x86_64.lib clang_rt.asan_cxx-x86_64.lib -wholearchive:clang_rt.asan_cxx-x86_64.lib")
 		set(CMAKE_EXE_LINKER_FLAGS_RELEASEUBSAN "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LIBPATH:${CLANG_LIB_PATH}")
 		set(CMAKE_EXE_LINKER_FLAGS_RELEASECOVERAGE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LIBPATH:${CLANG_LIB_PATH}")
 	endif()
 elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR MINGW OR EMSCRIPTEN)
 	# Set general compiler flags
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -I. -Wall -Werror")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I. -Wall -Werror")
 
     # Optionally generate debug symbols
 	if (GENERATE_DEBUG_SYMBOLS)
@@ -194,39 +147,9 @@ elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQU
 		endif()
 	endif()
 
-	# Platform specific compiler flags
+	# Cross compiler flags
 	if (CROSS_COMPILE_ARM)
 		set(CMAKE_CXX_FLAGS "--target=aarch64-linux-gnu ${CMAKE_CXX_FLAGS}")
-	elseif (CMAKE_OSX_ARCHITECTURES MATCHES "arm64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
-		# ARM64
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
-		# X64
-		if (USE_AVX512)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx512f -mavx512vl -mavx512dq -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
-		elseif (USE_AVX2)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c")
-		elseif (USE_AVX)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx -mpopcnt")
-		elseif (USE_SSE4_2)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -mpopcnt")
-		elseif (USE_SSE4_1)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
-		else()
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
-		endif()
-		if (USE_LZCNT)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mlzcnt")
-		endif()
-		if (USE_TZCNT)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi")
-		endif()
-		if (USE_F16C)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mf16c")
-		endif()
-		if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfma")
-		endif()
 	endif()
 
 	# Set compiler flags for various configurations
@@ -241,26 +164,28 @@ elseif ("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR "${CMAKE_SYSTEM_NAME}" STREQU
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif()
 
-# Setting to attempt cross platform determinism
-if (CROSS_PLATFORM_DETERMINISTIC)
-	add_compile_definitions(JPH_CROSS_PLATFORM_DETERMINISTIC)
-endif()
+# Set linker flags
+set(CMAKE_EXE_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE OFF)
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DISTRIBUTION OFF)
+# Enable link time optimization in Release and Distribution mode if requested and available
+function(SET_INTERPROCEDURAL_OPTIMIZATION)
+	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE OFF PARENT_SCOPE)
+	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DISTRIBUTION OFF PARENT_SCOPE)
 
-# On ARM, whole program optimization triggers an internal compiler error during code gen, so we don't turn it on
-if (INTERPROCEDURAL_OPTIMIZATION AND NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM64") AND NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM"))
-	include(CheckIPOSupported)
-	check_ipo_supported(RESULT IS_IPO_SUPPORTED OUTPUT IPO_CHECK_OUTPUT)
+	# On ARM, whole program optimization triggers an internal compiler error during code gen, so we don't turn it on
+	if (INTERPROCEDURAL_OPTIMIZATION AND NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM64") AND NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM"))
+		include(CheckIPOSupported)
+		check_ipo_supported(RESULT IS_IPO_SUPPORTED OUTPUT IPO_CHECK_OUTPUT)
 
-	if (IS_IPO_SUPPORTED)
-		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
-		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DISTRIBUTION ON)
-	else()
-		message(WARNING "Interprocedural optimizations are not supported: ${IPO_CHECK_OUTPUT}")
+		if (IS_IPO_SUPPORTED)
+			set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON PARENT_SCOPE)
+			set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DISTRIBUTION ON PARENT_SCOPE)
+		else()
+			message(WARNING "Interprocedural optimizations are not supported: ${IPO_CHECK_OUTPUT}")
+		endif()
 	endif()
-endif()
+endfunction()
+SET_INTERPROCEDURAL_OPTIMIZATION()
 
 # Set linker flags
 set(CMAKE_SHARED_LINKER_FLAGS_DISTRIBUTION "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
