@@ -168,6 +168,9 @@ JPH_Bool32 JPH_Init(void)
 
 void JPH_Shutdown(void)
 {
+    // Unregisters all types with the factory and cleans up the default material
+    JPH::UnregisterTypes();
+
     // Destroy the factory
     delete JPH::Factory::sInstance;
     JPH::Factory::sInstance = nullptr;

@@ -11,7 +11,6 @@ internal static unsafe partial class JoltApi
 {
     private const string LibName = "joltc";
 
-#if NET6_0_OR_GREATER
     static JoltApi()
     {
         NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), OnDllImport);
@@ -76,7 +75,7 @@ internal static unsafe partial class JoltApi
         }
         else
         {
-            if (NativeLibrary.TryLoad("dxcompiler", assembly, searchPath, out nativeLibrary))
+            if (NativeLibrary.TryLoad(LibName, assembly, searchPath, out nativeLibrary))
             {
                 return true;
             }
@@ -85,7 +84,6 @@ internal static unsafe partial class JoltApi
         nativeLibrary = IntPtr.Zero;
         return false;
     }
-#endif
 
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]

@@ -1,3 +1,4 @@
+// Jolt Physics Library (https://github.com/jrouwe/JoltPhysics)
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
@@ -80,7 +81,7 @@ public:
 	/// bodies will receive an OnContactRemoved callback, if this is the case then Body::IsActive() will return false during the callback.
 	/// When contacts are added, the constraint solver has not run yet, so the collision impulse is unknown at that point.
 	/// The velocities of inBody1 and inBody2 are the velocities before the contact has been resolved, so you can use this to
-	/// estimate the collision impulse to e.g. determine the volume of the impact sound to play.
+	/// estimate the collision impulse to e.g. determine the volume of the impact sound to play (see: EstimateCollisionResponse).
 	virtual void			OnContactAdded(const Body &inBody1, const Body &inBody2, const ContactManifold &inManifold, ContactSettings &ioSettings) { /* Do nothing */ }
 
 	/// Called whenever a contact is detected that was also detected last update.
@@ -99,6 +100,7 @@ public:
 	/// Body 1 and 2 will be sorted such that body 1 ID < body 2 ID, so body 1 may not be dynamic.
 	/// The sub shape ID were created in the previous simulation step too, so if the structure of a shape changes (e.g. by adding/removing a child shape of a compound shape),
 	/// the sub shape ID may not be valid / may not point to the same sub shape anymore.
+	/// If you want to know if this is the last contact between the two bodies, use PhysicsSystem::WereBodiesInContact.
 	virtual void			OnContactRemoved(const SubShapeIDPair &inSubShapePair) { /* Do nothing */ }
 };
 

@@ -1,3 +1,4 @@
+// Jolt Physics Library (https://github.com/jrouwe/JoltPhysics)
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
@@ -140,12 +141,16 @@ void CharacterVirtual::ContactCollector::AddHit(const CollideShapeResult &inResu
 	BodyLockRead lock(mSystem->GetBodyLockInterface(), inResult.mBodyID2);
 	if (lock.SucceededAndIsInBroadPhase())
 	{
+		// We don't collide with sensors, note that you should set up your collision layers so that sensors don't collide with the character.
+		// Rejecting the contact here means a lot of extra work for the collision detection system.
 		const Body &body = lock.GetBody();
-
-		mContacts.emplace_back();
-		Contact &contact = mContacts.back();
-		sFillContactProperties(mCharacter, contact, body, mUp, mBaseOffset, *this, inResult);
-		contact.mFraction = 0.0f;
+		if (!body.IsSensor())
+		{
+			mContacts.emplace_back();
+			Contact &contact = mContacts.back();
+			sFillContactProperties(mCharacter, contact, body, mUp, mBaseOffset, *this, inResult);
+			contact.mFraction = 0.0f;
+		}
 	}
 }
 
@@ -170,8 +175,14 @@ void CharacterVirtual::ContactCastCollector::AddHit(const ShapeCastResult &inRes
 			if (!lock.SucceededAndIsInBroadPhase())
 				return;
 
+			// We don't collide with sensors, note that you should set up your collision layers so that sensors don't collide with the character.
+			// Rejecting the contact here means a lot of extra work for the collision detection system.
+			const Body &body = lock.GetBody();
+			if (body.IsSensor())
+				return;
+
 			// Convert the hit result into a contact
-			sFillContactProperties(mCharacter, contact, lock.GetBody(), mUp, mBaseOffset, *this, inResult);
+			sFillContactProperties(mCharacter, contact, body, mUp, mBaseOffset, *this, inResult);
 		}
 			
 		contact.mFraction = inResult.mFraction;
@@ -790,6 +801,9 @@ void CharacterVirtual::UpdateSupportingContact(bool inSkipContactVelocityCheck, 
 						}
 						else
 						{
+							// Fall back to contact velocity
+							avg_velocity += c.mLinearVelocity;
+
 							angular_velocity = Vec3::sZero();
 							com = RVec3::sZero();
 						}

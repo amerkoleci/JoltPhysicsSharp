@@ -1,3 +1,4 @@
+// Jolt Physics Library (https://github.com/jrouwe/JoltPhysics)
 // SPDX-FileCopyrightText: 2021 Jorrit Rouwe
 // SPDX-License-Identifier: MIT
 
@@ -277,6 +278,11 @@ void VehicleConstraint::BuildIslands(uint32 inConstraintIndex, IslandBuilder &io
 
 	// Link the constraint in the island
 	ioBuilder.LinkConstraint(inConstraintIndex, mBody->GetIndexInActiveBodiesInternal(), min_active_index); 
+}
+
+uint VehicleConstraint::BuildIslandSplits(LargeIslandSplitter &ioSplitter) const
+{
+	return ioSplitter.AssignToNonParallelSplit(mBody);
 }
 
 void VehicleConstraint::CalculateWheelContactPoint(RMat44Arg inBodyTransform, const Wheel &inWheel, Vec3 &outR1PlusU, Vec3 &outR2) const
