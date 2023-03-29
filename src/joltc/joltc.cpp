@@ -20,6 +20,8 @@
 #include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/Collision/Shape/HeightFieldShape.h>
+#include <Jolt/Physics/Collision/Shape/StaticCompoundShape.h>
+#include <Jolt/Physics/Collision/Shape/MutableCompoundShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
@@ -541,6 +543,33 @@ JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create(float ha
     return reinterpret_cast<JPH_TaperedCapsuleShapeSettings*>(settings);
 }
 
+/* CompoundShape */
+void JPH_CompoundShapeSettings_AddShape(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_ShapeSettings* shape, uint32_t userData)
+{
+    auto joltShapeSettings = reinterpret_cast<const JPH::ShapeSettings*>(shape);
+    auto joltSettings = reinterpret_cast<JPH::CompoundShapeSettings*>(settings);
+    joltSettings->AddShape(ToVec3(position), ToQuat(rotation), joltShapeSettings, userData);
+}
+
+void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape, uint32_t userData)
+{
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    auto joltSettings = reinterpret_cast<JPH::CompoundShapeSettings*>(settings);
+    joltSettings->AddShape(ToVec3(position), ToQuat(rotation), joltShape, userData);
+}
+
+JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create()
+{
+    auto settings = new JPH::StaticCompoundShapeSettings();
+    return reinterpret_cast<JPH_StaticCompoundShapeSettings*>(settings);
+}
+
+JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create()
+{
+    auto settings = new JPH::MutableCompoundShapeSettings();
+    return reinterpret_cast<JPH_MutableCompoundShapeSettings*>(settings);
+}
+
 /* Shape */
 void JPH_Shape_Destroy(JPH_Shape* shape)
 {
@@ -576,13 +605,13 @@ JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(
 }
 
 JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(
-    JPH_Shape* shape,
+    const JPH_Shape* shape,
     const JPH_Vec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer)
 {
-    JPH::Shape* joltShape = reinterpret_cast<JPH::Shape*>(shape);
+    const JPH::Shape* joltShape = reinterpret_cast<const JPH::Shape*>(shape);
     auto bodyCreationSettings = new JPH::BodyCreationSettings(
         joltShape,
         ToVec3(position),

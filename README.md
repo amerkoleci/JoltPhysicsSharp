@@ -4,7 +4,7 @@
 [![Build status](https://github.com/amerkoleci/JoltPhysicsSharp/workflows/Build/badge.svg)](https://github.com/amerkoleci/JoltPhysicsSharp/actions)
 [![NuGet](https://img.shields.io/nuget/v/JoltPhysicsSharp.svg)](https://www.nuget.org/packages/JoltPhysicsSharp)
 
-Cross platform modern **.net6.0** and **.net7.0** bindings for [JoltPhysics](https://github.com/jrouwe/JoltPhysics).
+Cross platform modern **.NET 6** and **.NET 7** bindings for [JoltPhysics](https://github.com/jrouwe/JoltPhysics).
 
 ## Sponsors
 Please consider [SPONSOR](https://github.com/sponsors/amerkoleci) me to further help development and to allow faster issue triaging and new features to be implemented.

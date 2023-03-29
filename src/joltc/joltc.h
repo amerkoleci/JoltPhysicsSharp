@@ -160,11 +160,15 @@ typedef struct JPH_ConvexHullShapeSettings      JPH_ConvexHullShapeSettings;
 typedef struct JPH_MeshShapeSettings            JPH_MeshShapeSettings;
 typedef struct JPH_HeightFieldShapeSettings     JPH_HeightFieldShapeSettings;
 typedef struct JPH_TaperedCapsuleShapeSettings  JPH_TaperedCapsuleShapeSettings;
+typedef struct JPH_CompoundShapeSettings        JPH_CompoundShapeSettings;
+typedef struct JPH_StaticCompoundShapeSettings  JPH_StaticCompoundShapeSettings;
+typedef struct JPH_MutableCompoundShapeSettings JPH_MutableCompoundShapeSettings;
 
 typedef struct JPH_Shape                        JPH_Shape;
 typedef struct JPH_ConvexShape                  JPH_ConvexShape;
 typedef struct JPH_BoxShape                     JPH_BoxShape;
 typedef struct JPH_SphereShape                  JPH_SphereShape;
+typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
 
 typedef struct JPH_BodyCreationSettings         JPH_BodyCreationSettings;
 typedef struct JPH_BodyInterface                JPH_BodyInterface;
@@ -237,6 +241,13 @@ JPH_CAPI uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(const JPH
 /* TaperedCapsuleShape */
 JPH_CAPI JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius);
 
+/* CompoundShape */
+JPH_CAPI void JPH_CompoundShapeSettings_AddShape(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_ShapeSettings* shape, uint32_t userData);
+JPH_CAPI void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape, uint32_t userData);
+
+JPH_CAPI JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create();
+JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create();
+
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
 
@@ -247,7 +258,7 @@ JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(JPH_ShapeSet
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer);
-JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(JPH_Shape* shape,
+JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(const JPH_Shape* shape,
     const JPH_Vec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
