@@ -111,7 +111,8 @@ void PhysicsSystem::RemoveStepListener(PhysicsStepListener *inListener)
 
 	StepListeners::iterator i = find(mStepListeners.begin(), mStepListeners.end(), inListener);
 	JPH_ASSERT(i != mStepListeners.end());
-	mStepListeners.erase(i);
+	*i = mStepListeners.back();
+	mStepListeners.pop_back();
 }
 
 void PhysicsSystem::Update(float inDeltaTime, int inCollisionSteps, int inIntegrationSubSteps, TempAllocator *inTempAllocator, JobSystem *inJobSystem)
@@ -1358,11 +1359,15 @@ void PhysicsSystem::JobSolveVelocityConstraints(PhysicsUpdateContext *ioContext,
 					continue;
 				}
 
-				// Sort constraints to give a deterministic simulation
-				ConstraintManager::sSortConstraints(active_constraints, constraints_begin, constraints_end);
+				// Sorting is costly but needed for a deterministic simulation, allow the user to turn this off
+				if (mPhysicsSettings.mDeterministicSimulation)
+				{
+					// Sort constraints to give a deterministic simulation
+					ConstraintManager::sSortConstraints(active_constraints, constraints_begin, constraints_end);
 
-				// Sort contacts to give a deterministic simulation
-				mContactManager.SortContacts(contacts_begin, contacts_end);
+					// Sort contacts to give a deterministic simulation
+					mContactManager.SortContacts(contacts_begin, contacts_end);
+				}
 			}
 			else
 			{

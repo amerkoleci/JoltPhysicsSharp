@@ -225,6 +225,19 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius);
 
+    /* CompoundShape */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CompoundShapeSettings_AddShape(nint handle, in Vector3 position, in Quaternion rotation, nint shapeSettings, uint userData);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CompoundShapeSettings_AddShape2(nint handle, in Vector3 position, in Quaternion rotation, nint shape, uint userData);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_StaticCompoundShapeSettings_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_MutableCompoundShapeSettings_Create();
+
     /* Shape */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Shape_Destroy(IntPtr shape);

@@ -93,7 +93,7 @@ public:
 	Vec3					GetContactLateral() const					{ JPH_ASSERT(mContactBody != nullptr); return mContactLateral; }
 
 	/// Get the length of the suspension for a wheel (m) relative to the suspension attachment point (hard point)
-	float					GetSuspensionLength() const					{ return mContactLength - mSettings->mRadius; }
+	float					GetSuspensionLength() const					{ return mSuspensionLength; }
 
 	/// Check if the suspension hit its upper limit
 	bool					HasHitHardPoint() const						{ return mSuspensionMaxUpPart.IsActive(); }
@@ -120,20 +120,20 @@ protected:
 	BodyID					mContactBodyID;								///< ID of body for ground
 	SubShapeID				mContactSubShapeID;							///< Sub shape ID for ground
 	Body *					mContactBody = nullptr;						///< Body for ground
-	float					mContactLength;								///< Length between attachment point and ground
+	float					mSuspensionLength;							///< Current length of the suspension
 	RVec3					mContactPosition;							///< Position of the contact point between wheel and ground
 	Vec3					mContactPointVelocity;						///< Velocity of the contact point (m / s, not relative to the wheel but in world space)
 	Vec3					mContactNormal;								///< Normal of the contact point between wheel and ground
 	Vec3					mContactLongitudinal;						///< Vector perpendicular to normal in the forward direction
 	Vec3					mContactLateral;							///< Vector perpendicular to normal and longitudinal direction in the right direction
-	Vec3					mWSDirection;								///< Suspension spring direction in world space
+	Real					mAxlePlaneConstant;							///< Constant for the contact plane of the axle, defined as ContactNormal . (WorldSpaceSuspensionPoint + SuspensionLength * WorldSpaceSuspensionDirection)
 	float					mAntiRollBarImpulse = 0.0f;					///< Amount of impulse applied to the suspension from the anti-rollbars
 
 	float					mSteerAngle = 0.0f;							///< Rotation around the suspension direction, positive is to the left
 	float					mAngularVelocity = 0.0f;					///< Rotation speed of wheel, positive when the wheels cause the vehicle to move forwards (rad/s)
 	float					mAngle = 0.0f;								///< Current rotation of the wheel (rad, [0, 2 pi])
 
-	AxisConstraintPart		mSuspensionPart;							///< Controls movement up/down
+	AxisConstraintPart		mSuspensionPart;							///< Controls movement up/down along the contact normal
 	AxisConstraintPart		mSuspensionMaxUpPart;						///< Adds a hard limit when reaching the minimal suspension length
 	AxisConstraintPart		mLongitudinalPart;							///< Controls movement forward/backward
 	AxisConstraintPart		mLateralPart;								///< Controls movement sideways (slip)

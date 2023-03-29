@@ -34,6 +34,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Core/JobSystem.inl
 	${JOLT_PHYSICS_ROOT}/Core/JobSystemThreadPool.cpp
 	${JOLT_PHYSICS_ROOT}/Core/JobSystemThreadPool.h
+	${JOLT_PHYSICS_ROOT}/Core/JobSystemWithBarrier.cpp
+	${JOLT_PHYSICS_ROOT}/Core/JobSystemWithBarrier.h
 	${JOLT_PHYSICS_ROOT}/Core/LinearCurve.cpp
 	${JOLT_PHYSICS_ROOT}/Core/LinearCurve.h
 	${JOLT_PHYSICS_ROOT}/Core/LockFreeHashMap.h
@@ -51,6 +53,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Core/Result.h
 	${JOLT_PHYSICS_ROOT}/Core/RTTI.cpp
 	${JOLT_PHYSICS_ROOT}/Core/RTTI.h
+	${JOLT_PHYSICS_ROOT}/Core/Semaphore.cpp
+	${JOLT_PHYSICS_ROOT}/Core/Semaphore.h
 	${JOLT_PHYSICS_ROOT}/Core/StaticArray.h
 	${JOLT_PHYSICS_ROOT}/Core/StreamIn.h
 	${JOLT_PHYSICS_ROOT}/Core/StreamOut.h
@@ -447,6 +451,11 @@ endif()
 # Setting to attempt cross platform determinism
 if (CROSS_PLATFORM_DETERMINISTIC)
 	target_compile_definitions(Jolt PUBLIC JPH_CROSS_PLATFORM_DETERMINISTIC)
+endif()
+
+# Setting to determine number of bits in ObjectLayer
+if (OBJECT_LAYER_BITS)
+	target_compile_definitions(Jolt PUBLIC JPH_OBJECT_LAYER_BITS=${OBJECT_LAYER_BITS})
 endif()
 
 # Emit the instruction set definitions to ensure that child projects use the same settings even if they override the used instruction sets (a mismatch causes link errors)
