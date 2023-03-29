@@ -267,3 +267,4 @@ artifacts/
 artifacts-*/
 
 build/*
+src/JoltPhysicsSharp/runtimes/
