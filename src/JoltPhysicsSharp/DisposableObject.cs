@@ -40,7 +40,7 @@ public abstract class DisposableObject : IDisposable
     {
         if (_isDisposed != 0)
         {
-            new ObjectDisposedException(GetType().Name);
+            throw new ObjectDisposedException(GetType().Name);
         }
     }
 

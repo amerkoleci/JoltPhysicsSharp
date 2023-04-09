@@ -10,15 +10,15 @@ namespace JoltPhysicsSharp;
 public abstract class ObjectVsBroadPhaseLayerFilter : NativeObject
 {
     private static readonly Dictionary<IntPtr, ObjectVsBroadPhaseLayerFilter> s_listeners = new();
-    private static JPH_ObjectVsBroadPhaseLayerFilter_Procs s_ObjectVsBroadPhaseLayerFilter_Procs;
+    private static JPH_ObjectVsBroadPhaseLayerFilter_Procs s_objectVsBroadPhaseLayerFilter_Procs;
 
     static unsafe ObjectVsBroadPhaseLayerFilter()
     {
-        s_ObjectVsBroadPhaseLayerFilter_Procs = new JPH_ObjectVsBroadPhaseLayerFilter_Procs
+        s_objectVsBroadPhaseLayerFilter_Procs = new JPH_ObjectVsBroadPhaseLayerFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback
         };
-        JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(s_ObjectVsBroadPhaseLayerFilter_Procs);
+        JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(s_objectVsBroadPhaseLayerFilter_Procs);
     }
 
     public ObjectVsBroadPhaseLayerFilter()
