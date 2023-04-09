@@ -8,7 +8,7 @@ namespace JoltPhysicsSharp;
 /// <summary>An object which is disposable.</summary>
 public abstract class DisposableObject : IDisposable
 {
-    private volatile uint _isDisposed;
+    private volatile int _isDisposed;
 
     /// <summary>Initializes a new instance of the <see cref="DisposableObject" /> class.</summary>
     protected DisposableObject()

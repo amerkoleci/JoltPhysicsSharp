@@ -10,7 +10,7 @@ namespace JoltPhysicsSharp;
 internal static unsafe partial class JoltApi
 {
     private const string LibName = "joltc";
-
+#if NET
     static JoltApi()
     {
         NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), OnDllImport);
@@ -84,7 +84,7 @@ internal static unsafe partial class JoltApi
         nativeLibrary = IntPtr.Zero;
         return false;
     }
-
+#endif
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_Init();
