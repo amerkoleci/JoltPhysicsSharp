@@ -26,25 +26,26 @@ public sealed class PhysicsSystem : NativeObject
 
     static unsafe PhysicsSystem()
     {
-        s_contactListener_Procs = new JPH_ContactListener_Procs
+        JPH_ContactListener_Procs contactListener_Procs = new()
         {
             OnContactValidate = &OnContactValidateCallback,
             OnContactAdded = &OnContactAddedCallback,
             OnContactPersisted = &OnContactPersistedCallback,
             OnContactRemoved = &OnContactRemovedCallback
         };
-        JPH_ContactListener_SetProcs(s_contactListener_Procs);
+        JPH_ContactListener_SetProcs(&contactListener_Procs);
+        s_contactListener_Procs = contactListener_Procs;
 
-        s_bodyActivationListener_Procs = new JPH_BodyActivationListener_Procs
+        JPH_BodyActivationListener_Procs bodyActivationListener_Procs = new()
         {
             OnBodyActivated = &OnBodyActivatedCallback,
             OnBodyDeactivated = &OnBodyDeactivatedCallback
         };
-        JPH_BodyActivationListener_SetProcs(s_bodyActivationListener_Procs);
+        JPH_BodyActivationListener_SetProcs(&bodyActivationListener_Procs);
+        s_bodyActivationListener_Procs = bodyActivationListener_Procs;
     }
 
-    public PhysicsSystem()
-        : base(JPH_PhysicsSystem_Create())
+    public PhysicsSystem() : base(JPH_PhysicsSystem_Create())
     {
         _contactListenerHandle = JPH_ContactListener_Create();
         s_contactListeners.Add(_contactListenerHandle, this);

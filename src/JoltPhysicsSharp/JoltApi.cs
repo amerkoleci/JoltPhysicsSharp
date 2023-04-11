@@ -117,7 +117,7 @@ internal static unsafe partial class JoltApi
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);
+    public static extern void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs* procs);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BroadPhaseLayerInterface_Create();
@@ -518,7 +518,7 @@ internal static unsafe partial class JoltApi
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs);
+    public static extern void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs* procs);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_ContactListener_Create();
@@ -534,7 +534,7 @@ internal static unsafe partial class JoltApi
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
+    public static extern void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs* procs);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyActivationListener_Create();

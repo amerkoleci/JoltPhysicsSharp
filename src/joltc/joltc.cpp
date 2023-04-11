@@ -254,9 +254,9 @@ public:
 #endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
 };
 
-void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs)
+void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs* procs)
 {
-    g_BroadPhaseLayerInterface_Procs = procs;
+    g_BroadPhaseLayerInterface_Procs = *procs;
 }
 
 JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterface_Create()
@@ -1293,9 +1293,9 @@ public:
     }
 };
 
-void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs)
+void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs* procs)
 {
-    g_ContactListener_Procs = procs;
+    g_ContactListener_Procs = *procs;
 }
 
 JPH_ContactListener* JPH_ContactListener_Create()
@@ -1337,9 +1337,9 @@ public:
     }
 };
 
-void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs)
+void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs* procs)
 {
-    g_BodyActivationListener_Procs = procs;
+    g_BodyActivationListener_Procs = *procs;
 }
 
 JPH_BodyActivationListener* JPH_BodyActivationListener_Create()

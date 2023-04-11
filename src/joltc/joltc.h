@@ -382,7 +382,7 @@ typedef struct JPH_BroadPhaseLayerInterface_Procs {
     const char* (*GetBroadPhaseLayerName)(const JPH_BroadPhaseLayerInterface* interface, JPH_BroadPhaseLayer layer);
 } JPH_BroadPhaseLayerInterface_Procs;
 
-JPH_CAPI void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);
+JPH_CAPI void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs* procs);
 JPH_CAPI JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterface_Create();
 JPH_CAPI void JPH_BroadPhaseLayerInterface_Destroy(JPH_BroadPhaseLayerInterface* layer);
 
@@ -425,7 +425,7 @@ typedef struct JPH_ContactListener_Procs {
         );
 } JPH_ContactListener_Procs;
 
-JPH_CAPI void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs);
+JPH_CAPI void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs* procs);
 JPH_CAPI JPH_ContactListener* JPH_ContactListener_Create();
 JPH_CAPI void JPH_ContactListener_Destroy(JPH_ContactListener* listener);
 
@@ -435,7 +435,7 @@ typedef struct JPH_BodyActivationListener_Procs {
     void(JPH_API_CALL* OnBodyDeactivated)(JPH_BodyActivationListener* listener, JPH_BodyID bodyID, uint64_t bodyUserData);
 } JPH_BodyActivationListener_Procs;
 
-JPH_CAPI void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
+JPH_CAPI void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs* procs);
 JPH_CAPI JPH_BodyActivationListener* JPH_BodyActivationListener_Create();
 JPH_CAPI void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener);
 

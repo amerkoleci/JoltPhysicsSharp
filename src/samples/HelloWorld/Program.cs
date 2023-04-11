@@ -100,7 +100,7 @@ public static class Program
         }
     }
 
-    private static float WorldScale = 1.0f;
+    private const float WorldScale = 1.0f;
 
     private static Body CreateFloor(in BodyInterface bodyInterface, float size = 200.0f)
     {

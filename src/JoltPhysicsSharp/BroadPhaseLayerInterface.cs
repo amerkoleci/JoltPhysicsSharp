@@ -14,13 +14,14 @@ public abstract class BroadPhaseLayerInterface : NativeObject
 
     static unsafe BroadPhaseLayerInterface()
     {
-        s_broadPhaseLayerInterface_Procs = new JPH_BroadPhaseLayerInterface_Procs
+        JPH_BroadPhaseLayerInterface_Procs broadPhaseLayerInterface_Procs = new()
         {
             GetNumBroadPhaseLayers = &GetNumBroadPhaseLayersCallback,
             GetBroadPhaseLayer = &GetBroadPhaseLayerCallback,
             GetBroadPhaseLayerName= &GetBroadPhaseLayerNameCallback
         };
-        JPH_BroadPhaseLayerInterface_SetProcs(s_broadPhaseLayerInterface_Procs);
+        JPH_BroadPhaseLayerInterface_SetProcs(&broadPhaseLayerInterface_Procs);
+        s_broadPhaseLayerInterface_Procs = broadPhaseLayerInterface_Procs;
     }
 
     public BroadPhaseLayerInterface()
