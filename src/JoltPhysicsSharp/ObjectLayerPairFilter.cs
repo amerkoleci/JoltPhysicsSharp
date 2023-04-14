@@ -10,13 +10,17 @@ namespace JoltPhysicsSharp;
 public abstract class ObjectLayerPairFilter : NativeObject
 {
     private static readonly Dictionary<IntPtr, ObjectLayerPairFilter> s_listeners = new();
-    private static JPH_ObjectLayerPairFilter_Procs s_ObjectLayerPairFilter_Procs;
+    private static readonly JPH_ObjectLayerPairFilter_Procs s_ObjectLayerPairFilter_Procs;
 
     static unsafe ObjectLayerPairFilter()
     {
         s_ObjectLayerPairFilter_Procs = new JPH_ObjectLayerPairFilter_Procs
         {
+#if NET6_0_OR_GREATER
             ShouldCollide = &ShouldCollideCallback
+#else
+            ShouldCollide = ShouldCollideCallback
+#endif
         };
         JPH_ObjectLayerPairFilter_SetProcs(s_ObjectLayerPairFilter_Procs);
     }
@@ -44,7 +48,11 @@ public abstract class ObjectLayerPairFilter : NativeObject
 
     protected abstract bool ShouldCollide(ObjectLayer object1, ObjectLayer object2);
 
+#if NET6_0_OR_GREATER
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+#else
+    [MonoPInvokeCallback(typeof(ObjectLayerPairFilterShouldCollideDelegate))]
+#endif
     private static uint ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer object1, ObjectLayer object2)
     {
         ObjectLayerPairFilter listener = s_listeners[listenerPtr];

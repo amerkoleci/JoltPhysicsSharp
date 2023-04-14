@@ -10,13 +10,17 @@ namespace JoltPhysicsSharp;
 public abstract class ObjectVsBroadPhaseLayerFilter : NativeObject
 {
     private static readonly Dictionary<IntPtr, ObjectVsBroadPhaseLayerFilter> s_listeners = new();
-    private static JPH_ObjectVsBroadPhaseLayerFilter_Procs s_ObjectVsBroadPhaseLayerFilter_Procs;
+    private static readonly JPH_ObjectVsBroadPhaseLayerFilter_Procs s_ObjectVsBroadPhaseLayerFilter_Procs;
 
     static unsafe ObjectVsBroadPhaseLayerFilter()
     {
         s_ObjectVsBroadPhaseLayerFilter_Procs = new JPH_ObjectVsBroadPhaseLayerFilter_Procs
         {
+#if NET6_0_OR_GREATER
             ShouldCollide = &ShouldCollideCallback
+#else
+            ShouldCollide = ShouldCollideCallback
+#endif
         };
         JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(s_ObjectVsBroadPhaseLayerFilter_Procs);
     }
@@ -44,7 +48,11 @@ public abstract class ObjectVsBroadPhaseLayerFilter : NativeObject
 
     protected abstract bool ShouldCollide(ObjectLayer layer1, BroadPhaseLayer layer2);
 
+#if NET6_0_OR_GREATER
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+#else
+    [MonoPInvokeCallback(typeof(ShouldCollideDelegate))]
+#endif
     private static uint ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer layer1, BroadPhaseLayer layer2)
     {
         ObjectVsBroadPhaseLayerFilter listener = s_listeners[listenerPtr];

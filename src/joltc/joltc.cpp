@@ -754,7 +754,7 @@ void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system)
     reinterpret_cast<JPH::PhysicsSystem*>(system)->OptimizeBroadPhase();
 }
 
-void JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
+JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
     JPH_TempAllocator* tempAlocator,
     JPH_JobSystemThreadPool* jobSystem)
 {
@@ -763,7 +763,7 @@ void JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int co
     auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
     auto joltTempAlocator = reinterpret_cast<JPH::TempAllocator*>(tempAlocator);
     auto joltJobSystem = reinterpret_cast<JPH::JobSystemThreadPool*>(jobSystem);
-    joltSystem->Update(deltaTime, collisionSteps, integrationSubSteps, joltTempAlocator, joltJobSystem);
+    return static_cast<JPH_PhysicsUpdateError>(joltSystem->Update(deltaTime, collisionSteps, integrationSubSteps, joltTempAlocator, joltJobSystem));
 }
 
 JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system)

@@ -26,6 +26,12 @@ static_assert(sizeof(JPH::BroadPhaseLayer) == sizeof(JPH_BroadPhaseLayer));
 static_assert(sizeof(JPH::BodyID) == sizeof(JPH_BodyID));
 static_assert(sizeof(JPH::SubShapeID) == sizeof(JPH_SubShapeID));
 
+// EPhysicsUpdateError
+static_assert(JPH_PHYSICS_UPDATE_ERROR_NONE == (int)JPH::EPhysicsUpdateError::None);
+static_assert(JPH_PHYSICS_UPDATE_ERROR_MANIFOLD_CACHE_FULL == (int)JPH::EPhysicsUpdateError::ManifoldCacheFull);
+static_assert(JPH_PHYSICS_UPDATE_ERROR_BODY_PAIR_CACHE_FULL == (int)JPH::EPhysicsUpdateError::BodyPairCacheFull);
+static_assert(JPH_PHYSICS_UPDATE_ERROR_CONTACT_CONSTRAINTS_FULL == (int)JPH::EPhysicsUpdateError::ContactConstraintsFull);
+
 // EMotionType
 static_assert(JPH_MOTION_TYPE_STATIC == (int)JPH::EMotionType::Static);
 static_assert(JPH_MOTION_TYPE_KINEMATIC == (int)JPH::EMotionType::Kinematic);

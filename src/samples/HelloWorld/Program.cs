@@ -129,7 +129,7 @@ public static class Program
         {
             Quaternion rotation;
             if ((i & 1) != 0)
-                rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, 0.5f * MathF.PI);
+                rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, 0.5f * (float)Math.PI);
             else
                 rotation = Quaternion.Identity;
             Body stack = bodyInterface.CreateBody(new BodyCreationSettings(boxShape, new Vector3(10, 1.0f + i * 2.1f, 0), rotation, MotionType.Dynamic, Layers.Moving));
@@ -148,13 +148,13 @@ public static class Program
 
         for (int torus_segment = 0; torus_segment < inTorusSegments; ++torus_segment)
         {
-            Matrix4x4 rotation = Matrix4x4.CreateFromAxisAngle(Vector3.UnitY, (float)torus_segment * 2.0f * MathF.PI / inTorusSegments);
+            Matrix4x4 rotation = Matrix4x4.CreateFromAxisAngle(Vector3.UnitY, (float)torus_segment * 2.0f * (float)Math.PI / inTorusSegments);
             for (int tube_segment = 0; tube_segment < inTubeSegments; ++tube_segment)
             {
                 // Create vertices
-                float tube_angle = (float)tube_segment * 2.0f * MathF.PI / inTubeSegments;
+                float tube_angle = (float)tube_segment * 2.0f * (float)Math.PI / inTubeSegments;
                 Vector3 pos = Vector3.Transform(
-                    new Vector3(inTorusRadius + inTubeRadius * MathF.Sin(tube_angle), inTubeRadius * MathF.Cos(tube_angle), 0),
+                    new Vector3(inTorusRadius + inTubeRadius * (float)Math.Sin(tube_angle), inTubeRadius * (float)Math.Cos(tube_angle), 0),
                     rotation);
                 triangleVertices[triangleIndex] = pos;
 
@@ -252,7 +252,8 @@ public static class Program
                 const int integrationSubSteps = 1;
 
                 // Step the world
-                physicsSystem.Update(deltaTime, collisionSteps, integrationSubSteps, tempAllocator, jobSystem);
+                PhysicsUpdateError error = physicsSystem.Update(deltaTime, collisionSteps, integrationSubSteps, tempAllocator, jobSystem);
+                Debug.Assert(error == PhysicsUpdateError.None);
             }
 
             // Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any time.

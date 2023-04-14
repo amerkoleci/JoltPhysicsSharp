@@ -46,6 +46,16 @@ typedef uint32_t JPH_SubShapeID;
 typedef uint16_t JPH_ObjectLayer;
 typedef uint8_t  JPH_BroadPhaseLayer;
 
+typedef enum JPH_PhysicsUpdateError {
+    JPH_PHYSICS_UPDATE_ERROR_NONE = 0,
+    JPH_PHYSICS_UPDATE_ERROR_MANIFOLD_CACHE_FULL = 1 << 0,
+    JPH_PHYSICS_UPDATE_ERROR_BODY_PAIR_CACHE_FULL = 1 << 1,
+    JPH_PHYSICS_UPDATE_ERROR_CONTACT_CONSTRAINTS_FULL = 1 << 2,
+
+    _JPH_PHYSICS_UPDATE_ERROR_NUM,
+    _JPH_PHYSICS_UPDATE_ERROR_FORCEU32 = 0x7fffffff
+} JPH_PhysicsUpdateError;
+
 typedef enum JPH_MotionType {
     JPH_MOTION_TYPE_STATIC = 0,
     JPH_MOTION_TYPE_KINEMATIC = 1,
@@ -292,7 +302,7 @@ JPH_CAPI void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
     JPH_ObjectLayerPairFilter* objectLayerPairFilter);
 
 JPH_CAPI void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system);
-JPH_CAPI void JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
+JPH_CAPI JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
     JPH_TempAllocator* tempAlocator,
     JPH_JobSystemThreadPool* jobSystem);
 

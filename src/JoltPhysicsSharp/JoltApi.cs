@@ -11,6 +11,7 @@ internal static unsafe partial class JoltApi
 {
     private const string LibName = "joltc";
 
+#if NET6_0_OR_GREATER
     static JoltApi()
     {
         NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), OnDllImport);
@@ -84,7 +85,63 @@ internal static unsafe partial class JoltApi
         nativeLibrary = IntPtr.Zero;
         return false;
     }
+#else
+    private static readonly ILibraryLoader s_loader;
 
+    static JoltApi()
+    {
+        s_loader = GetPlatformLoader();
+
+        string dllName = LibName;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            dllName = $"{LibName}.dll";
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.OSDescription.ToUpper().Contains("BSD"))
+        {
+            dllName = $"{LibName}.so";
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            dllName = $"{LibName}.dylib";
+        }
+
+        foreach (string rid in RuntimeIdentifiers)
+        {
+            string nugetNativeLibsPath = Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native");
+            bool isNuGetRuntimeLibrariesDirectoryPresent = Directory.Exists(nugetNativeLibsPath);
+
+            if (isNuGetRuntimeLibrariesDirectoryPresent)
+            {
+                string joltcPath = Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native", dllName);
+
+                nint handle = s_loader.LoadNativeLibrary(joltcPath);
+                if (handle != 0)
+                {
+                    break;
+                }
+            }
+            else
+            {
+                nint handle = s_loader.LoadNativeLibrary(dllName);
+                if (handle != 0)
+                {
+                    break;
+                }
+
+                string joltcPath = Path.Combine(Directory.GetCurrentDirectory(), "runtimes", rid, "native", dllName);
+
+                handle = s_loader.LoadNativeLibrary(joltcPath);
+                if (handle != 0)
+                {
+                    break;
+                }
+            }
+        }
+    }
+#endif
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_Init();
@@ -109,12 +166,56 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_JobSystemThreadPool_Destroy(IntPtr handle);
 
     //  BroadPhaseLayerInterface
+#if NET6_0_OR_GREATER
     public struct JPH_BroadPhaseLayerInterface_Procs
     {
         public delegate* unmanaged[Cdecl]<IntPtr, uint> GetNumBroadPhaseLayers;
         public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer> GetBroadPhaseLayer;
         public delegate* unmanaged[Cdecl]<IntPtr, BroadPhaseLayer, IntPtr> GetBroadPhaseLayerName;
     }
+#else
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint GetNumBroadPhaseLayersDelegate(IntPtr @this);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate BroadPhaseLayer GetBroadPhaseLayerDelegate(IntPtr @this, ObjectLayer layer);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate IntPtr GetBroadPhaseLayerNameDelegate(IntPtr @this, BroadPhaseLayer layer);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct JPH_BroadPhaseLayerInterface_Procs : IEquatable<JPH_BroadPhaseLayerInterface_Procs>
+    {
+        public GetNumBroadPhaseLayersDelegate GetNumBroadPhaseLayers;
+        public GetBroadPhaseLayerDelegate GetBroadPhaseLayer;
+        public GetBroadPhaseLayerNameDelegate GetBroadPhaseLayerName;
+
+        public readonly bool Equals(JPH_BroadPhaseLayerInterface_Procs obj)
+        {
+            return
+                GetNumBroadPhaseLayers == obj.GetNumBroadPhaseLayers &&
+                GetBroadPhaseLayer == obj.GetBroadPhaseLayer &&
+                GetBroadPhaseLayerName == obj.GetBroadPhaseLayerName;
+        }
+
+        public readonly override bool Equals(object obj) => obj is JPH_BroadPhaseLayerInterface_Procs f && Equals(f);
+
+        public static bool operator ==(JPH_BroadPhaseLayerInterface_Procs left, JPH_BroadPhaseLayerInterface_Procs right) =>
+            left.Equals(right);
+
+        public static bool operator !=(JPH_BroadPhaseLayerInterface_Procs left, JPH_BroadPhaseLayerInterface_Procs right) =>
+            !left.Equals(right);
+
+        public override readonly int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(GetNumBroadPhaseLayers);
+            hash.Add(GetBroadPhaseLayer);
+            hash.Add(GetBroadPhaseLayerName);
+            return hash.ToHashCode();
+        }
+    }
+#endif
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);
@@ -126,10 +227,39 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BroadPhaseLayerInterface_Destroy(nint handle);
 
     //  ObjectVsBroadPhaseLayerFilter
+#if NET6_0_OR_GREATER
     public struct JPH_ObjectVsBroadPhaseLayerFilter_Procs
     {
         public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer, uint> ShouldCollide;
     }
+#else
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint ShouldCollideDelegate(IntPtr @this, ObjectLayer layer, BroadPhaseLayer broadPhaseLayer);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct JPH_ObjectVsBroadPhaseLayerFilter_Procs : IEquatable<JPH_ObjectVsBroadPhaseLayerFilter_Procs>
+    {
+        public ShouldCollideDelegate ShouldCollide;
+
+        public readonly bool Equals(JPH_ObjectVsBroadPhaseLayerFilter_Procs obj)
+        {
+            return ShouldCollide == obj.ShouldCollide;
+        }
+
+        public readonly override bool Equals(object obj) => obj is JPH_ObjectVsBroadPhaseLayerFilter_Procs f && Equals(f);
+
+        public static bool operator ==(JPH_ObjectVsBroadPhaseLayerFilter_Procs left, JPH_ObjectVsBroadPhaseLayerFilter_Procs right) =>
+            left.Equals(right);
+
+        public static bool operator !=(JPH_ObjectVsBroadPhaseLayerFilter_Procs left, JPH_ObjectVsBroadPhaseLayerFilter_Procs right) =>
+            !left.Equals(right);
+
+        public override readonly int GetHashCode()
+        {
+            return ShouldCollide.GetHashCode();
+        }
+    }
+#endif
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(JPH_ObjectVsBroadPhaseLayerFilter_Procs procs);
@@ -141,10 +271,39 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(nint handle);
 
     //  ObjectLayerPairFilter
+#if NET6_0_OR_GREATER
     public struct JPH_ObjectLayerPairFilter_Procs
     {
         public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, ObjectLayer, uint> ShouldCollide;
     }
+#else
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint ObjectLayerPairFilterShouldCollideDelegate(IntPtr @this, ObjectLayer layer1, ObjectLayer layer2);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct JPH_ObjectLayerPairFilter_Procs : IEquatable<JPH_ObjectLayerPairFilter_Procs>
+    {
+        public ObjectLayerPairFilterShouldCollideDelegate ShouldCollide;
+
+        public readonly bool Equals(JPH_ObjectLayerPairFilter_Procs obj)
+        {
+            return ShouldCollide == obj.ShouldCollide;
+        }
+
+        public readonly override bool Equals(object obj) => obj is JPH_ObjectLayerPairFilter_Procs f && Equals(f);
+
+        public static bool operator ==(JPH_ObjectLayerPairFilter_Procs left, JPH_ObjectLayerPairFilter_Procs right) =>
+            left.Equals(right);
+
+        public static bool operator !=(JPH_ObjectLayerPairFilter_Procs left, JPH_ObjectLayerPairFilter_Procs right) =>
+            !left.Equals(right);
+
+        public override readonly int GetHashCode()
+        {
+            return ShouldCollide.GetHashCode();
+        }
+    }
+#endif
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ObjectLayerPairFilter_SetProcs(JPH_ObjectLayerPairFilter_Procs procs);
@@ -312,7 +471,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_PhysicsSystem_OptimizeBroadPhase(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PhysicsSystem_Update(IntPtr handle,
+    public static extern PhysicsUpdateError JPH_PhysicsSystem_Update(IntPtr handle,
         float deltaTime, int collisionSteps, int integrationSubSteps,
         IntPtr tempAlocator, IntPtr jobSystem);
 
@@ -509,13 +668,63 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_Body_AddAngularImpulse(IntPtr handle, in Vector3 angularImpulse);
 
     // ContactListener
+#if NET6_0_OR_GREATER
     public struct JPH_ContactListener_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, Vector3*, IntPtr, ValidateResult> OnContactValidate;
+        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, Vector3*, IntPtr, uint> OnContactValidate;
         public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactAdded;
         public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactPersisted;
         public delegate* unmanaged[Cdecl]<IntPtr, SubShapeIDPair*, void> OnContactRemoved;
     }
+#else
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint OnContactValidateDelegate(IntPtr @this, IntPtr body1, IntPtr body2, Vector3* baseOffset, IntPtr collisionResult);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnContactAddedDelegate(IntPtr @this, IntPtr body1, IntPtr body2);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnContactPersistedDelegate(IntPtr @this, IntPtr body1, IntPtr body2);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnContactRemovedDelegate(IntPtr @this, SubShapeIDPair* subShapePair);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct JPH_ContactListener_Procs : IEquatable<JPH_ContactListener_Procs>
+    {
+        public OnContactValidateDelegate OnContactValidate;
+        public OnContactAddedDelegate OnContactAdded;
+        public OnContactPersistedDelegate OnContactPersisted;
+        public OnContactRemovedDelegate OnContactRemoved;
+
+        public readonly bool Equals(JPH_ContactListener_Procs obj)
+        {
+            return
+                OnContactValidate == obj.OnContactValidate &&
+                OnContactAdded == obj.OnContactAdded &&
+                OnContactPersisted == obj.OnContactPersisted &&
+                OnContactRemoved == obj.OnContactRemoved;
+        }
+
+        public readonly override bool Equals(object obj) => obj is JPH_ContactListener_Procs f && Equals(f);
+
+        public static bool operator ==(JPH_ContactListener_Procs left, JPH_ContactListener_Procs right) =>
+            left.Equals(right);
+
+        public static bool operator !=(JPH_ContactListener_Procs left, JPH_ContactListener_Procs right) =>
+            !left.Equals(right);
+
+        public override readonly int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(OnContactValidate);
+            hash.Add(OnContactAdded);
+            hash.Add(OnContactPersisted);
+            hash.Add(OnContactRemoved);
+            return hash.ToHashCode();
+        }
+    }
+#endif
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs);
@@ -527,11 +736,26 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_ContactListener_Destroy(IntPtr handle);
 
     // BodyActivationListener
+#if NET6_0_OR_GREATER
     public struct JPH_BodyActivationListener_Procs
     {
         public delegate* unmanaged[Cdecl]<IntPtr, uint, ulong, void> OnBodyActivated;
         public delegate* unmanaged[Cdecl]<IntPtr, uint, ulong, void> OnBodyDeactivated;
     }
+#else
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnBodyActivatedDelegate(IntPtr @this, uint bodyID, ulong bodyUserData);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void OnBodyDeactivatedDelegate(IntPtr @this, uint bodyID, ulong bodyUserData);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct JPH_BodyActivationListener_Procs
+    {
+        public OnBodyActivatedDelegate OnBodyActivated;
+        public OnBodyDeactivatedDelegate OnBodyDeactivated;
+    }
+#endif
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
@@ -541,4 +765,190 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyActivationListener_Destroy(IntPtr handle);
+
+#if !NET6_0_OR_GREATER
+    private static IEnumerable<string> RuntimeIdentifiers
+    {
+        get
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                string rid = RuntimeInformation.ProcessArchitecture switch
+                {
+                    Architecture.X86 => "win10-x86",
+                    Architecture.X64 => "win10-x64",
+                    Architecture.Arm => "win10-arm",
+                    Architecture.Arm64 => "win10-arm64",
+                    _ => "win10-x64"
+                };
+
+                yield return rid;
+
+                rid = RuntimeInformation.ProcessArchitecture switch
+                {
+                    Architecture.X86 => "win-x86",
+                    Architecture.X64 => "win-x64",
+                    Architecture.Arm => "win-arm",
+                    Architecture.Arm64 => "win-arm64",
+                    _ => "win-x64"
+                };
+
+                yield return rid;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.OSDescription.ToUpper().Contains("BSD"))
+            {
+                yield return "osx-universal";
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                string rid = RuntimeInformation.ProcessArchitecture switch
+                {
+                    Architecture.X86 => "linux-x86",
+                    Architecture.X64 => "linux-x64",
+                    Architecture.Arm => "linux-arm",
+                    Architecture.Arm64 => "linux-arm64",
+                    _ => "linux-x64"
+                };
+
+                yield return rid;
+            }
+
+            yield break;
+        }
+    }
+
+    private static ILibraryLoader GetPlatformLoader()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return new Win32LibraryLoader();
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
+            RuntimeInformation.OSDescription.ToUpper().Contains("BSD"))
+        {
+            return new BsdLibraryLoader();
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            return new UnixLibraryLoader();
+        }
+
+        throw new PlatformNotSupportedException("This platform cannot load native libraries.");
+    }
+
+    interface ILibraryLoader
+    {
+        nint LoadNativeLibrary(string name);
+        void FreeNativeLibrary(nint handle);
+
+        nint LoadFunctionPointer(nint handle, string name);
+    }
+
+    private class Win32LibraryLoader : ILibraryLoader
+    {
+        public nint LoadNativeLibrary(string name)
+        {
+            return LoadLibrary(name);
+        }
+
+        public void FreeNativeLibrary(nint handle)
+        {
+            FreeLibrary(handle);
+        }
+
+        public nint LoadFunctionPointer(nint handle, string name)
+        {
+            return GetProcAddress(handle, name);
+        }
+
+        [DllImport("kernel32")]
+        private static extern nint LoadLibrary(string fileName);
+
+        [DllImport("kernel32")]
+        private static extern int FreeLibrary(nint module);
+
+        [DllImport("kernel32")]
+        private static extern nint GetProcAddress(nint module, string procName);
+    }
+
+    private class UnixLibraryLoader : ILibraryLoader
+    {
+        public nint LoadNativeLibrary(string name)
+        {
+            return Libdl.dlopen(name, Libdl.RTLD_NOW | Libdl.RTLD_LOCAL);
+        }
+
+        public void FreeNativeLibrary(nint handle)
+        {
+            Libdl.dlclose(handle);
+        }
+
+        public nint LoadFunctionPointer(nint handle, string name)
+        {
+            return Libdl.dlsym(handle, name);
+        }
+    }
+
+    private class BsdLibraryLoader : ILibraryLoader
+    {
+        public nint LoadNativeLibrary(string name)
+        {
+            return Libc.dlopen(name, Libc.RTLD_NOW | Libc.RTLD_LOCAL);
+        }
+
+        public void FreeNativeLibrary(nint handle)
+        {
+            Libc.dlclose(handle);
+        }
+
+        public nint LoadFunctionPointer(nint handle, string name)
+        {
+            return Libc.dlsym(handle, name);
+        }
+    }
+
+    internal static class Libdl
+    {
+        private const string LibName = "libdl";
+
+        public const int RTLD_LOCAL = 0x000;
+        public const int RTLD_NOW = 0x002;
+
+        [DllImport(LibName)]
+        public static extern nint dlopen(string fileName, int flags);
+
+        [DllImport(LibName)]
+        public static extern nint dlsym(nint handle, string name);
+
+        [DllImport(LibName)]
+        public static extern int dlclose(nint handle);
+
+        [DllImport(LibName)]
+        public static extern string dlerror();
+    }
+
+    internal static class Libc
+    {
+        private const string LibName = "libc";
+
+        public const int RTLD_LOCAL = 0x000;
+        public const int RTLD_NOW = 0x002;
+
+        [DllImport(LibName)]
+        public static extern nint dlopen(string fileName, int flags);
+
+        [DllImport(LibName)]
+        public static extern nint dlsym(nint handle, string name);
+
+        [DllImport(LibName)]
+        public static extern int dlclose(nint handle);
+
+        [DllImport(LibName)]
+        public static extern string dlerror();
+    }
+#endif
 }
