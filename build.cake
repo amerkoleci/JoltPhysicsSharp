@@ -25,7 +25,7 @@ Task("BuildWindows")
     CreateDirectory(buildDir);
     StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-G \"Visual Studio 17 2022\" -A x64 -DDOUBLE_PRECISION=ON ../" });
     StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Distribution" });
-    CopyFile("build_winx64_double/bin/Distribution/joltc.dll", $"{artifactsDir}/win-arm64/native/joltc_double.dll");
+    CopyFile("build_winx64_double/bin/Distribution/joltc.dll", $"{artifactsDir}/win-x64/native/joltc_double.dll");
 
     // ARM64
     buildDir = "build_arm64";
@@ -46,30 +46,40 @@ Task("BuildMacOS")
     .WithCriteria(() => IsRunningOnMacOs())
     .Does(() =>
 {
+    CreateDirectory(artifactsDir);
+    
     // Build
     var buildDir = "build";
     CreateDirectory(buildDir);
     StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution" });
     StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
-
-    // Copy artifact
-    CreateDirectory(artifactsDir);
     CopyFile("build/lib/libjoltc.dylib", $"{artifactsDir}/libjoltc.dylib");
+
+    buildDir = "build_double";
+    CreateDirectory(buildDir);
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution" -DDOUBLE_PRECISION=ON });
+    StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
+    CopyFile("build_double/lib/libjoltc.dylib", $"{artifactsDir}/libjoltc_double.dylib");
 });
 
 Task("BuildLinux")
     .WithCriteria(() => IsRunningOnLinux())
     .Does(() =>
 {
+    CreateDirectory(artifactsDir);
+
     // Build
     var buildDir = "build";
     CreateDirectory(buildDir);
     StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution" });
     StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
-
-    // Copy artifact
-    CreateDirectory(artifactsDir);
     CopyFile($"build/lib/libjoltc.so", $"{artifactsDir}/libjoltc.so");
+
+    buildDir = "build_double";
+    CreateDirectory(buildDir);
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution" });
+    StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
+    CopyFile($"build_double/lib/libjoltc.so", $"{artifactsDir}/libjoltc_double.so");
 });
 
 Task("Package")

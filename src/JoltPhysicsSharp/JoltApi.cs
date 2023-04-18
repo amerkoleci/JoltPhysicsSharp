@@ -10,6 +10,9 @@ namespace JoltPhysicsSharp;
 internal static unsafe partial class JoltApi
 {
     private const string LibName = "joltc";
+    private const string LibDoubleName = "joltc_double";
+
+    public static bool DoublePrecision { get; set; }
 
 #if NET6_0_OR_GREATER
     static JoltApi()
@@ -41,7 +44,7 @@ internal static unsafe partial class JoltApi
 
         if (OperatingSystem.IsWindows())
         {
-            dllName = $"{LibName}.dll";
+            dllName = DoublePrecision ? $"{LibDoubleName}.dll" : $"{LibName}.dll";
 
             if (!isNuGetRuntimeLibrariesDirectoryPresent)
             {
@@ -58,11 +61,11 @@ internal static unsafe partial class JoltApi
         }
         else if (OperatingSystem.IsLinux())
         {
-            dllName = $"lib{LibName}.so";
+            dllName = DoublePrecision ? $"lib{LibDoubleName}.so" : $"lib{LibName}.so";
         }
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
         {
-            dllName = $"lib{LibName}.dylib";
+            dllName = DoublePrecision ? $"lib{LibDoubleName}.dylib" : $"lib{LibName}.dylib";
         }
 
         if (isNuGetRuntimeLibrariesDirectoryPresent)
@@ -86,26 +89,22 @@ internal static unsafe partial class JoltApi
         return false;
     }
 #else
-    private static readonly ILibraryLoader s_loader;
+    private static readonly ILibraryLoader s_loader = GetPlatformLoader();
 
-    static JoltApi()
+    public static void LoadNativeLibrary()
     {
-        s_loader = GetPlatformLoader();
-
         string dllName = LibName;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            dllName = $"{LibName}.dll";
+            dllName = DoublePrecision ? $"{LibDoubleName}.dll" : $"{LibName}.dll";
         }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.OSDescription.ToUpper().Contains("BSD"))
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.OSDescription.ToUpper().Contains("BSD"))
         {
-            dllName = $"{LibName}.so";
+            dllName = DoublePrecision ? $"lib{LibDoubleName}.dylib" : $"lib{LibName}.dylib";
         }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            dllName = $"{LibName}.dylib";
+            dllName = DoublePrecision ? $"lib{LibDoubleName}.so" : $"lib{LibName}.so";
         }
 
         foreach (string rid in RuntimeIdentifiers)
@@ -415,8 +414,14 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyCreationSettings_Create2(IntPtr shapeSettings, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
+    [DllImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create2), CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyCreationSettings_Create2_Double(IntPtr shapeSettings, in Double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
+
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyCreationSettings_Create3(IntPtr shape, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
+
+    [DllImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create3), CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyCreationSettings_Create3_Double(IntPtr shape, in Double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyCreationSettings_Destroy(IntPtr settings);
@@ -441,14 +446,26 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_GetPoint1(IntPtr handle, out Vector3 velocity);
 
+    [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_GetPoint1), CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_GetPoint1_Double(IntPtr handle, out Double3 velocity);
+
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_SetPoint1(IntPtr handle, in Vector3 velocity);
+
+    [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_SetPoint1), CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_SetPoint1_Double(IntPtr handle, in Double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_GetPoint2(IntPtr handle, out Vector3 velocity);
 
+    [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_GetPoint2), CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_GetPoint2_Double(IntPtr handle, out Double3 velocity);
+
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_SetPoint2(IntPtr handle, in Vector3 velocity);
+
+    [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_SetPoint2), CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraintSettings_SetPoint2_Double(IntPtr handle, in Double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PointConstraintSettings_CreateConstraint(IntPtr handle, IntPtr body1, IntPtr body2);

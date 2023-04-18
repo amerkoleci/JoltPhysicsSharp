@@ -55,6 +55,54 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
         }
     }
 
+    public Double3 DPoint1
+    {
+        get
+        {
+            if (DoublePrecision)
+            {
+                JPH_PointConstraintSettings_GetPoint1_Double(Handle, out Double3 value);
+                return value;
+            }
+            else
+            {
+                JPH_PointConstraintSettings_GetPoint1(Handle, out Vector3 value);
+                return new(value);
+            }
+        }
+        set
+        {
+            if (DoublePrecision)
+                JPH_PointConstraintSettings_SetPoint1_Double(Handle, value);
+            else
+                JPH_PointConstraintSettings_SetPoint1(Handle, value);
+        }
+    }
+
+    public Double3 DPoint2
+    {
+        get
+        {
+            if (DoublePrecision)
+            {
+                JPH_PointConstraintSettings_GetPoint2_Double(Handle, out Double3 value);
+                return value;
+            }
+            else
+            {
+                JPH_PointConstraintSettings_GetPoint2(Handle, out Vector3 value);
+                return new(value);
+            }
+        }
+        set
+        {
+            if (DoublePrecision)
+                JPH_PointConstraintSettings_SetPoint2_Double(Handle, value);
+            else
+                JPH_PointConstraintSettings_SetPoint2(Handle, value);
+        }
+    }
+
     public void GetPoint1(out Vector3 value)
     {
         JPH_PointConstraintSettings_GetPoint1(Handle, out value);
