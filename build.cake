@@ -57,7 +57,7 @@ Task("BuildMacOS")
 
     buildDir = "build_double";
     CreateDirectory(buildDir);
-    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution" -DDOUBLE_PRECISION=ON });
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution -DDOUBLE_PRECISION=ON" });
     StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
     CopyFile("build_double/lib/libjoltc.dylib", $"{artifactsDir}/libjoltc_double.dylib");
 });
@@ -77,7 +77,7 @@ Task("BuildLinux")
 
     buildDir = "build_double";
     CreateDirectory(buildDir);
-    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution" });
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "../ -DCMAKE_BUILD_TYPE=Distribution -DDOUBLE_PRECISION=ON" });
     StartProcess("make", new ProcessSettings { WorkingDirectory = buildDir });
     CopyFile($"build_double/lib/libjoltc.so", $"{artifactsDir}/libjoltc_double.so");
 });
