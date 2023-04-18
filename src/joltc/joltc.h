@@ -264,12 +264,12 @@ JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
 /* JPH_BodyCreationSettings */
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create();
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(JPH_ShapeSettings* settings,
-    const JPH_Vec3* position,
+    const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer);
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(const JPH_Shape* shape,
-    const JPH_Vec3* position,
+    const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer);

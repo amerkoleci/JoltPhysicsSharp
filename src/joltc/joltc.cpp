@@ -588,7 +588,7 @@ JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create()
 
 JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(
     JPH_ShapeSettings* shapeSettings,
-    const JPH_Vec3* position,
+    const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer)
@@ -596,7 +596,7 @@ JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(
     JPH::ShapeSettings* joltShapeSettings = reinterpret_cast<JPH::ShapeSettings*>(shapeSettings);
     auto bodyCreationSettings = new JPH::BodyCreationSettings(
         joltShapeSettings,
-        ToVec3(position),
+        ToRVec3(position),
         ToQuat(rotation),
         (JPH::EMotionType)motionType,
         objectLayer
@@ -606,7 +606,7 @@ JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(
 
 JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(
     const JPH_Shape* shape,
-    const JPH_Vec3* position,
+    const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer)
@@ -614,7 +614,7 @@ JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(
     const JPH::Shape* joltShape = reinterpret_cast<const JPH::Shape*>(shape);
     auto bodyCreationSettings = new JPH::BodyCreationSettings(
         joltShape,
-        ToVec3(position),
+        ToRVec3(position),
         ToQuat(rotation),
         (JPH::EMotionType)motionType,
         objectLayer
