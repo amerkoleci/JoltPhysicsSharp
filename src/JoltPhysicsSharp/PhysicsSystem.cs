@@ -271,7 +271,7 @@ public sealed class PhysicsSystem : NativeObject
 #else
     [MonoPInvokeCallback(typeof(OnContactRemovedDelegate))]
 #endif
-    private unsafe static void OnContactRemovedCallback(IntPtr listenerPtr, SubShapeIDPair* subShapePair)
+    private static unsafe void OnContactRemovedCallback(IntPtr listenerPtr, SubShapeIDPair* subShapePair)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactRemoved?.Invoke(listener, ref Unsafe.AsRef<SubShapeIDPair>(subShapePair));
@@ -302,3 +302,9 @@ public sealed class PhysicsSystem : NativeObject
     }
     #endregion BodyActivationListener
 }
+#if !NET
+static class Unsafe
+{
+    public static unsafe ref T AsRef<T>(void* source) where T : unmanaged => ref *(T*)source;
+}
+#endif

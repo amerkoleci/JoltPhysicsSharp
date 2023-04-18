@@ -23,13 +23,13 @@ public sealed class BodyCreationSettings : NativeObject
     {
     }
 
-    public BodyCreationSettings(ShapeSettings shapeSettings, in Double3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
-       : base(DoublePrecision ? JPH_BodyCreationSettings_Create2_Double(shapeSettings.Handle, position, rotation, motionType, objectLayer) : JPH_BodyCreationSettings_Create2(shapeSettings.Handle, position, rotation, motionType, objectLayer))
+    public BodyCreationSettings(ShapeSettings shapeSettings, in double3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+       : base(DoublePrecision ? JPH_BodyCreationSettings_Create2_Double(shapeSettings.Handle, position, rotation, motionType, objectLayer) : JPH_BodyCreationSettings_Create2(shapeSettings.Handle, (Vector3)position, rotation, motionType, objectLayer))
     {
     }
 
-    public BodyCreationSettings(Shape shape, in Double3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
-       : base(DoublePrecision ? JPH_BodyCreationSettings_Create3_Double(shape.Handle, position, rotation, motionType, objectLayer) : JPH_BodyCreationSettings_Create3(shape.Handle, position, rotation, motionType, objectLayer))
+    public BodyCreationSettings(Shape shape, in double3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+       : base(DoublePrecision ? JPH_BodyCreationSettings_Create3_Double(shape.Handle, position, rotation, motionType, objectLayer) : JPH_BodyCreationSettings_Create3(shape.Handle, (Vector3)position, rotation, motionType, objectLayer))
     {
     }
 

@@ -415,13 +415,13 @@ internal static unsafe partial class JoltApi
     public static extern IntPtr JPH_BodyCreationSettings_Create2(IntPtr shapeSettings, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create2), CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create2_Double(IntPtr shapeSettings, in Double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
+    public static extern IntPtr JPH_BodyCreationSettings_Create2_Double(IntPtr shapeSettings, in double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyCreationSettings_Create3(IntPtr shape, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create3), CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create3_Double(IntPtr shape, in Double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
+    public static extern IntPtr JPH_BodyCreationSettings_Create3_Double(IntPtr shape, in double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyCreationSettings_Destroy(IntPtr settings);
@@ -447,25 +447,25 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_PointConstraintSettings_GetPoint1(IntPtr handle, out Vector3 velocity);
 
     [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_GetPoint1), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_GetPoint1_Double(IntPtr handle, out Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_GetPoint1_Double(IntPtr handle, out double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_SetPoint1(IntPtr handle, in Vector3 velocity);
 
     [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_SetPoint1), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetPoint1_Double(IntPtr handle, in Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_SetPoint1_Double(IntPtr handle, in double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_GetPoint2(IntPtr handle, out Vector3 velocity);
 
     [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_GetPoint2), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_GetPoint2_Double(IntPtr handle, out Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_GetPoint2_Double(IntPtr handle, out double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_SetPoint2(IntPtr handle, in Vector3 velocity);
 
     [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_SetPoint2), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetPoint2_Double(IntPtr handle, in Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_SetPoint2_Double(IntPtr handle, in double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PointConstraintSettings_CreateConstraint(IntPtr handle, IntPtr body1, IntPtr body2);

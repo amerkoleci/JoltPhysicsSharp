@@ -4,412 +4,604 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace JoltPhysicsSharp;
 
-/// <summary>
-/// Vector type containing three 64 bit floating point components.
-/// </summary>
-[DebuggerDisplay("X={X}, Y={Y}, Z={Z}")]
-public struct Double3 : IEquatable<Double3>, IFormattable
+#pragma warning disable CS8981
+
+/// <summary>A 3 component vector of doubles.</summary>
+[Serializable]
+[DebuggerDisplay("<{x}, {y}, {z}>")]
+public partial struct double3 : IEquatable<double3>, IFormattable
 {
-    /// <summary>
-    /// The X component of the vector.
-    /// </summary>
-    public double X;
+    /// <summary>x component of the vector.</summary>
+    public double x;
+    /// <summary>y component of the vector.</summary>
+    public double y;
+    /// <summary>z component of the vector.</summary>
+    public double z;
 
-    /// <summary>
-    /// The Y component of the vector.
-    /// </summary>
-    public double Y;
+    /// <summary>double3 zero value.</summary>
+    public static readonly double3 zero;
 
-    /// <summary>
-    /// The Z component of the vector.
-    /// </summary>
-    public double Z;
-
-    internal const int Count = 3;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Double3"/> struct.
-    /// </summary>
-    /// <param name="value">The value that will be assigned to all components.</param>
-    public Double3(double value) 
+    /// <summary>Constructs a double3 vector from three double values.</summary>
+    /// <param name="x">The constructed vector's x component will be set to this value.</param>
+    /// <param name="y">The constructed vector's y component will be set to this value.</param>
+    /// <param name="z">The constructed vector's z component will be set to this value.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double3(double x, double y, double z)
     {
-        X = value;
-        Y = value;
-        Z = value;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
-    /// </summary>
-    /// <param name="x">Initial value for the X component of the vector.</param>
-    /// <param name="y">Initial value for the Y component of the vector.</param>
-    /// <param name="z">Initial value for the Z component of the vector.</param>
-    public Double3(double x, double y, double z)
+    /// <summary>Constructs a double3 vector from a double3 vector.</summary>
+    /// <param name="xyz">The constructed vector's xyz components will be set to this value.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double3(double3 xyz)
     {
-        X = x;
-        Y = y;
-        Z = z;
+        x = xyz.x;
+        y = xyz.y;
+        z = xyz.z;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
-    /// </summary>
-    /// <param name="x">Initial value for the X component of the vector.</param>
-    /// <param name="y">Initial value for the Y component of the vector.</param>
-    /// <param name="z">Initial value for the Z component of the vector.</param>
-    public Double3(float x, float y, float z)
+    /// <summary>Constructs a double3 vector from a single double value by assigning it to every component.</summary>
+    /// <param name="v">double to convert to double3</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double3(double v)
     {
-        X = x;
-        Y = y;
-        Z = z;
+        x = v;
+        y = v;
+        z = v;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
-    /// </summary>
-    /// <param name="xyz">Initial value for the X, Y and Z component of the vector.</param>
-    public Double3(in Vector3 xyz)
+    /// <summary>Constructs a double3 vector from a single bool value by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">bool to convert to double3</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double3(bool v)
     {
-        X = xyz.X;
-        Y = xyz.Y;
-        Z = xyz.Z;
+        x = v ? 1.0 : 0.0;
+        y = v ? 1.0 : 0.0;
+        z = v ? 1.0 : 0.0;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
-    /// </summary>
-    /// <param name="xy">Initial value for the X and Y component of the vector.</param>
-    /// <param name="z">Initial value for the Z component of the vector.</param>
-    public Double3(in Vector2 xy, double z)
+    /// <summary>Constructs a double3 vector from a single int value by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">int to convert to double3</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double3(int v)
     {
-        X = xy.X;
-        Y = xy.Y;
-        Z = z;
+        x = v;
+        y = v;
+        z = v;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
-    /// </summary>
-    /// <param name="values">The span of elements to assign to the vector.</param>
-    public Double3(ReadOnlySpan<double> values)
+    /// <summary>Constructs a double3 vector from a single uint value by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">uint to convert to double3</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double3(uint v)
     {
-        if (values.Length < 3)
-        {
-            throw new ArgumentOutOfRangeException(nameof(values), "There must be 3 uint values.");
-        }
-
-        this = Unsafe.ReadUnaligned<Double3>(ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(values)));
+        x = v;
+        y = v;
+        z = v;
     }
 
-    /// <summary>
-    /// A <see cref="Double3"/> with all of its components set to zero.
-    /// </summary>
-    public static Double3 Zero
+    /// <summary>Constructs a double3 vector from a single float value by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">float to convert to double3</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double3(float v)
+    {
+        x = v;
+        y = v;
+        z = v;
+    }
+
+    public double3(Vector3 v) : this()
+    {
+        x = v.X;
+        y = v.Y;
+        z = v.Z;
+    }
+
+    /// <summary>Implicitly converts a single double value to a double3 vector by assigning it to every component.</summary>
+    /// <param name="v">double to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator double3(double v) => new(v);
+
+    /// <summary>Explicitly converts a single bool value to a double3 vector by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">bool to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator double3(bool v) => new(v);
+
+    /// <summary>Implicitly converts a single int value to a double3 vector by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">int to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator double3(int v) => new(v);
+
+    /// <summary>Implicitly converts a single uint value to a double3 vector by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">uint to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator double3(uint v) => new(v);
+
+    /// <summary>Implicitly converts a single float value to a double3 vector by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">float to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator double3(float v) => new(v);
+
+    /// <summary>Implicitly converts a single float value to a double3 vector by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">float to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator Vector3(double3 v) => new((float)v.x, (float)v.y, (float)v.z);
+
+    /// <summary>Returns the result of a componentwise multiplication operation on two double3 vectors.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise multiplication.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise multiplication.</param>
+    /// <returns>double3 result of the componentwise multiplication.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator *(double3 lhs, double3 rhs) { return new double3(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z); }
+
+    /// <summary>Returns the result of a componentwise multiplication operation on a double3 vector and a double value.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise multiplication.</param>
+    /// <param name="rhs">Right hand side double to use to compute componentwise multiplication.</param>
+    /// <returns>double3 result of the componentwise multiplication.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator *(double3 lhs, double rhs) { return new double3(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs); }
+
+    /// <summary>Returns the result of a componentwise multiplication operation on a double value and a double3 vector.</summary>
+    /// <param name="lhs">Left hand side double to use to compute componentwise multiplication.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise multiplication.</param>
+    /// <returns>double3 result of the componentwise multiplication.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator *(double lhs, double3 rhs) { return new double3(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z); }
+
+
+    /// <summary>Returns the result of a componentwise addition operation on two double3 vectors.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise addition.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise addition.</param>
+    /// <returns>double3 result of the componentwise addition.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator +(double3 lhs, double3 rhs) { return new double3(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z); }
+
+    /// <summary>Returns the result of a componentwise addition operation on a double3 vector and a double value.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise addition.</param>
+    /// <param name="rhs">Right hand side double to use to compute componentwise addition.</param>
+    /// <returns>double3 result of the componentwise addition.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator +(double3 lhs, double rhs) { return new double3(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs); }
+
+    /// <summary>Returns the result of a componentwise addition operation on a double value and a double3 vector.</summary>
+    /// <param name="lhs">Left hand side double to use to compute componentwise addition.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise addition.</param>
+    /// <returns>double3 result of the componentwise addition.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator +(double lhs, double3 rhs) { return new double3(lhs + rhs.x, lhs + rhs.y, lhs + rhs.z); }
+
+
+    /// <summary>Returns the result of a componentwise subtraction operation on two double3 vectors.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise subtraction.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise subtraction.</param>
+    /// <returns>double3 result of the componentwise subtraction.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator -(double3 lhs, double3 rhs) { return new double3(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z); }
+
+    /// <summary>Returns the result of a componentwise subtraction operation on a double3 vector and a double value.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise subtraction.</param>
+    /// <param name="rhs">Right hand side double to use to compute componentwise subtraction.</param>
+    /// <returns>double3 result of the componentwise subtraction.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator -(double3 lhs, double rhs) { return new double3(lhs.x - rhs, lhs.y - rhs, lhs.z - rhs); }
+
+    /// <summary>Returns the result of a componentwise subtraction operation on a double value and a double3 vector.</summary>
+    /// <param name="lhs">Left hand side double to use to compute componentwise subtraction.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise subtraction.</param>
+    /// <returns>double3 result of the componentwise subtraction.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator -(double lhs, double3 rhs) { return new double3(lhs - rhs.x, lhs - rhs.y, lhs - rhs.z); }
+
+
+    /// <summary>Returns the result of a componentwise division operation on two double3 vectors.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise division.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise division.</param>
+    /// <returns>double3 result of the componentwise division.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator /(double3 lhs, double3 rhs) { return new double3(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z); }
+
+    /// <summary>Returns the result of a componentwise division operation on a double3 vector and a double value.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise division.</param>
+    /// <param name="rhs">Right hand side double to use to compute componentwise division.</param>
+    /// <returns>double3 result of the componentwise division.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator /(double3 lhs, double rhs) { return new double3(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs); }
+
+    /// <summary>Returns the result of a componentwise division operation on a double value and a double3 vector.</summary>
+    /// <param name="lhs">Left hand side double to use to compute componentwise division.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise division.</param>
+    /// <returns>double3 result of the componentwise division.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator /(double lhs, double3 rhs) { return new double3(lhs / rhs.x, lhs / rhs.y, lhs / rhs.z); }
+
+
+    /// <summary>Returns the result of a componentwise modulus operation on two double3 vectors.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise modulus.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise modulus.</param>
+    /// <returns>double3 result of the componentwise modulus.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator %(double3 lhs, double3 rhs) { return new double3(lhs.x % rhs.x, lhs.y % rhs.y, lhs.z % rhs.z); }
+
+    /// <summary>Returns the result of a componentwise modulus operation on a double3 vector and a double value.</summary>
+    /// <param name="lhs">Left hand side double3 to use to compute componentwise modulus.</param>
+    /// <param name="rhs">Right hand side double to use to compute componentwise modulus.</param>
+    /// <returns>double3 result of the componentwise modulus.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator %(double3 lhs, double rhs) { return new double3(lhs.x % rhs, lhs.y % rhs, lhs.z % rhs); }
+
+    /// <summary>Returns the result of a componentwise modulus operation on a double value and a double3 vector.</summary>
+    /// <param name="lhs">Left hand side double to use to compute componentwise modulus.</param>
+    /// <param name="rhs">Right hand side double3 to use to compute componentwise modulus.</param>
+    /// <returns>double3 result of the componentwise modulus.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator %(double lhs, double3 rhs) { return new double3(lhs % rhs.x, lhs % rhs.y, lhs % rhs.z); }
+
+
+    /// <summary>Returns the result of a componentwise increment operation on a double3 vector.</summary>
+    /// <param name="val">Value to use when computing the componentwise increment.</param>
+    /// <returns>double3 result of the componentwise increment.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator ++(double3 val) { return new double3(++val.x, ++val.y, ++val.z); }
+
+
+    /// <summary>Returns the result of a componentwise decrement operation on a double3 vector.</summary>
+    /// <param name="val">Value to use when computing the componentwise decrement.</param>
+    /// <returns>double3 result of the componentwise decrement.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator --(double3 val) { return new double3(--val.x, --val.y, --val.z); }
+
+    /// <summary>Returns the result of a componentwise unary minus operation on a double3 vector.</summary>
+    /// <param name="val">Value to use when computing the componentwise unary minus.</param>
+    /// <returns>double3 result of the componentwise unary minus.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator -(double3 val) { return new double3(-val.x, -val.y, -val.z); }
+
+
+    /// <summary>Returns the result of a componentwise unary plus operation on a double3 vector.</summary>
+    /// <param name="val">Value to use when computing the componentwise unary plus.</param>
+    /// <returns>double3 result of the componentwise unary plus.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 operator +(double3 val) { return new double3(+val.x, +val.y, +val.z); }
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xxx
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => default;
+        get { return new double3(x, x, x); }
     }
 
-    /// <summary>
-    /// A <see cref="Int3"/> with all of its components set to one.
-    /// </summary>
-    public static Double3 One
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xxy
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(1.0, 1.0, 1.0);
+        get { return new double3(x, x, y); }
     }
 
-    /// <summary>
-    /// The X unit <see cref="Double3"/> (1, 0, 0).
-    /// </summary>
-    public static Double3 UnitX
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xxz
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(1.0, 0.0, 0.0);
+        get { return new double3(x, x, z); }
     }
 
-    /// <summary>
-    /// The Y unit <see cref="Double3"/> (0, 1, 0).
-    /// </summary>
-    public static Double3 UnitY
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xyx
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(0.0, 1.0, 0.0);
+        get { return new double3(x, y, x); }
     }
 
-    /// <summary>
-    /// The Y unit <see cref="Double3"/> (0, 0, 1).
-    /// </summary>
-    public static Double3 UnitZ
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xyy
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => new(0, 0, 1);
+        get { return new double3(x, y, y); }
     }
 
-    public readonly double this[int index] => GetElement(this, index);
-
-    public void Deconstruct(out double x, out double y, out double z)
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xyz
     {
-        x = X;
-        y = Y;
-        z = Z;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(x, y, z); }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set { x = value.x; y = value.y; z = value.z; }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly void CopyTo(double[] array)
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xzx
     {
-        CopyTo(array, 0);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(x, z, x); }
     }
 
-    public readonly void CopyTo(double[] array, int index)
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xzy
     {
-        if (array is null)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(x, z, y); }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set { x = value.x; z = value.y; y = value.z; }
+    }
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 xzz
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(x, z, z); }
+    }
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yxx
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, x, x); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yxy
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, x, y); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yxz
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, x, z); }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set { y = value.x; x = value.y; z = value.z; }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yyx
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, y, x); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yyy
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, y, y); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yyz
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, y, z); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yzx
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, z, x); }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set { y = value.x; z = value.y; x = value.z; }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yzy
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, z, y); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 yzz
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(y, z, z); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zxx
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, x, x); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zxy
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, x, y); }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set { z = value.x; x = value.y; y = value.z; }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zxz
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, x, z); }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zyx
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, y, x); }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set { z = value.x; y = value.y; x = value.z; }
+    }
+
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zyy
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, y, y); }
+    }
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zyz
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, y, z); }
+    }
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zzx
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, z, x); }
+    }
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zzy
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, z, y); }
+    }
+
+    /// <summary>Swizzles the vector.</summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public double3 zzz
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get { return new double3(z, z, z); }
+    }
+
+    /// <summary>Returns the double element at a specified index.</summary>
+    public unsafe double this[int index]
+    {
+        get
         {
-            throw new NullReferenceException(nameof(array));
+            fixed (double3* array = &this) { return ((double*)array)[index]; }
         }
-
-        if ((index < 0) || (index >= array.Length))
+        set
         {
-            throw new ArgumentOutOfRangeException(nameof(index));
+            fixed (double* array = &x) { array[index] = value; }
         }
-
-        if ((array.Length - index) < 3)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        array[index] = X;
-        array[index + 1] = Y;
-        array[index + 2] = Z;
     }
 
-    /// <summary>Copies the vector to the given <see cref="Span{T}" />.The length of the destination span must be at least 2.</summary>
-    /// <param name="destination">The destination span which the values are copied into.</param>
-    /// <exception cref="ArgumentException">If number of elements in source vector is greater than those available in destination span.</exception>
-    public readonly void CopyTo(Span<double> destination)
-    {
-        if (destination.Length < 3)
-        {
-            throw new ArgumentOutOfRangeException(nameof(destination));
-        }
-
-        Unsafe.WriteUnaligned(ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(destination)), this);
-    }
-
-    /// <summary>Attempts to copy the vector to the given <see cref="Span{Double}" />. The length of the destination span must be at least 2.</summary>
-    /// <param name="destination">The destination span which the values are copied into.</param>
-    /// <returns><see langword="true" /> if the source vector was successfully copied to <paramref name="destination" />. <see langword="false" /> if <paramref name="destination" /> is not large enough to hold the source vector.</returns>
-    public readonly bool TryCopyTo(Span<double> destination)
-    {
-        if (destination.Length < 3)
-        {
-            return false;
-        }
-
-        Unsafe.WriteUnaligned(ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(destination)), this);
-        return true;
-    }
-
-    /// <summary>Adds two vectors together.</summary>
-    /// <param name="left">The first vector to add.</param>
-    /// <param name="right">The second vector to add.</param>
-    /// <returns>The summed vector.</returns>
-    /// <remarks>The <see cref="op_Addition" /> method defines the addition operation for <see cref="Vector3" /> objects.</remarks>
+    /// <summary>Returns true if the double3 is equal to a given double3, false otherwise.</summary>
+    /// <param name="rhs">Right hand side argument to compare equality with.</param>
+    /// <returns>The result of the equality comparison.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator +(Double3 left, Double3 right)
-    {
-        return new Double3(
-            left.X + right.X,
-            left.Y + right.Y,
-            left.Z + right.Z
-        );
-    }
+    public bool Equals(double3 rhs) => x == rhs.x && y == rhs.y && z == rhs.z;
 
-    /// <summary>Divides the first vector by the second.</summary>
-    /// <param name="left">The first vector.</param>
-    /// <param name="right">The second vector.</param>
-    /// <returns>The vector that results from dividing <paramref name="left" /> by <paramref name="right" />.</returns>
-    /// <remarks>The <see cref="Vector3.op_Division" /> method defines the division operation for <see cref="Vector3" /> objects.</remarks>
+    /// <summary>Returns true if the double3 is equal to a given double3, false otherwise.</summary>
+    /// <param name="o">Right hand side argument to compare equality with.</param>
+    /// <returns>The result of the equality comparison.</returns>
+    public override bool Equals(object? o) => o is double3 converted && Equals(converted);
+
+    /// <summary>Returns a string representation of the double3.</summary>
+    /// <returns>String representation of the value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator /(Double3 left, Double3 right)
-    {
-        return new Double3(
-            left.X / right.X,
-            left.Y / right.Y,
-            left.Z / right.Z
-        );
-    }
+    public override string ToString() => string.Format("double3({0}, {1}, {2})", x, y, z);
 
-    /// <summary>Divides the specified vector by a specified scalar value.</summary>
-    /// <param name="value1">The vector.</param>
-    /// <param name="value2">The scalar value.</param>
-    /// <returns>The result of the division.</returns>
-    /// <remarks>The <see cref="Vector3.op_Division" /> method defines the division operation for <see cref="Vector3" /> objects.</remarks>
+    /// <summary>Returns a string representation of the double3 using a specified format and culture-specific format information.</summary>
+    /// <param name="format">Format string to use during string formatting.</param>
+    /// <param name="formatProvider">Format provider to use during string formatting.</param>
+    /// <returns>String representation of the value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator /(Double3 value1, double value2)
-    {
-        return value1 / new Double3(value2);
-    }
-
-    /// <summary>Returns a new vector whose values are the product of each pair of elements in two specified vectors.</summary>
-    /// <param name="left">The first vector.</param>
-    /// <param name="right">The second vector.</param>
-    /// <returns>The element-wise product vector.</returns>
-    /// <remarks>The <see cref="Vector3.op_Multiply" /> method defines the multiplication operation for <see cref="Vector3" /> objects.</remarks>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator *(Double3 left, Double3 right)
-    {
-        return new Double3(
-            left.X * right.X,
-            left.Y * right.Y,
-            left.Z * right.Z
-        );
-    }
-
-    /// <summary>Multiplies the specified vector by the specified scalar value.</summary>
-    /// <param name="left">The vector.</param>
-    /// <param name="right">The scalar value.</param>
-    /// <returns>The scaled vector.</returns>
-    /// <remarks>The <see cref="Vector3.op_Multiply" /> method defines the multiplication operation for <see cref="Vector3" /> objects.</remarks>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator *(Double3 left, double right)
-    {
-        return left * new Double3(right);
-    }
-
-    /// <summary>Multiplies the scalar value by the specified vector.</summary>
-    /// <param name="left">The vector.</param>
-    /// <param name="right">The scalar value.</param>
-    /// <returns>The scaled vector.</returns>
-    /// <remarks>The <see cref="Vector3.op_Multiply" /> method defines the multiplication operation for <see cref="Vector3" /> objects.</remarks>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator *(double left, Double3 right)
-    {
-        return right * left;
-    }
-
-    /// <summary>Subtracts the second vector from the first.</summary>
-    /// <param name="left">The first vector.</param>
-    /// <param name="right">The second vector.</param>
-    /// <returns>The vector that results from subtracting <paramref name="right" /> from <paramref name="left" />.</returns>
-    /// <remarks>The <see cref="op_Subtraction" /> method defines the subtraction operation for <see cref="Vector3" /> objects.</remarks>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator -(Double3 left, Double3 right)
-    {
-        return new Double3(
-            left.X - right.X,
-            left.Y - right.Y,
-            left.Z - right.Z
-        );
-    }
-
-    /// <summary>Negates the specified vector.</summary>
-    /// <param name="value">The vector to negate.</param>
-    /// <returns>The negated vector.</returns>
-    /// <remarks>The <see cref="op_UnaryNegation" /> method defines the unary negation operation for <see cref="Vector3" /> objects.</remarks>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator -(Double3 value)
-    {
-        return Zero - value;
-    }
-
-    /// <summary>Returns a vector whose elements are the absolute values of each of the specified vector's elements.</summary>
-    /// <param name="value">A vector.</param>
-    /// <returns>The absolute value vector.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 Abs(Double3 value)
-    {
-        return new Double3(
-            Math.Abs(value.X),
-            Math.Abs(value.Y),
-            Math.Abs(value.Z)
-        );
-    }
-
-    /// <summary>
-    /// Creates a new <see cref="Double3"/> value with the same value for all its components.
-    /// </summary>
-    /// <param name="x">The value to use for the components of the new <see cref="Double3"/> instance.</param>
-    public static implicit operator Double3(double x) => new(x, x, x);
-
-    /// <summary>
-    /// Casts a <see cref="Double3"/> value to a <see cref="Vector3"/> one.
-    /// </summary>
-    /// <param name="xyz">The input <see cref="Double3"/> value to cast.</param>
-    public static implicit operator Vector3(Double3 xyz) => new((float)xyz.X, (float)xyz.Y, (float)xyz.Z);
-
-    /// <summary>
-    /// Casts a <see cref="Vector3"/> value to a <see cref="Double3"/> one.
-    /// </summary>
-    /// <param name="xyz">The input <see cref="Vector3"/> value to cast.</param>
-    public static explicit operator Double3(Vector3 xyz) => new(xyz);
-
+    public string ToString(string? format, IFormatProvider? formatProvider) => string.Format("double3({0}, {1}, {2})", x.ToString(format, formatProvider), y.ToString(format, formatProvider), z.ToString(format, formatProvider));
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is Double3 value && Equals(value);
+    public override int GetHashCode() => HashCode.Combine(x, y, z);
 
-    /// <summary>
-    /// Determines whether the specified <see cref="Double3"/> is equal to this instance.
-    /// </summary>
-    /// <param name="other">The <see cref="Double3"/> to compare with this instance.</param>
+    public static bool operator ==(double3 left, double3 right) => left.x == right.x && left.y == right.y && left.z == right.z;
+
+    public static bool operator !=(double3 left, double3 right) => left.x != right.x || left.y != right.y || left.z != right.z;
+}
+
+public static partial class math
+{
+    /// <summary>Returns a double3 vector constructed from three double values.</summary>
+    /// <param name="x">The constructed vector's x component will be set to this value.</param>
+    /// <param name="y">The constructed vector's y component will be set to this value.</param>
+    /// <param name="z">The constructed vector's z component will be set to this value.</param>
+    /// <returns>double3 constructed from arguments.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Double3 other)
-    {
-        return X == other.X
-            && Y == other.Y
-            && Z == other.Z;
-    }
+    public static double3 double3(double x, double y, double z) => new(x, y, z);
 
-    /// <summary>
-    /// Compares two <see cref="Double3"/> objects for equality.
-    /// </summary>
-    /// <param name="left">The <see cref="Double3"/> on the left hand of the operand.</param>
-    /// <param name="right">The <see cref="Double3"/> on the right hand of the operand.</param>
-    /// <returns>
-    /// True if the current left is equal to the <paramref name="right"/> parameter; otherwise, false.
-    /// </returns>
+    /// <summary>Returns a double3 vector constructed from a double3 vector.</summary>
+    /// <param name="xyz">The constructed vector's xyz components will be set to this value.</param>
+    /// <returns>double3 constructed from arguments.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Double3 left, Double3 right) => left.Equals(right);
+    public static double3 double3(double3 xyz) => new(xyz);
 
-    /// <summary>
-    /// Compares two <see cref="Double3"/> objects for inequality.
-    /// </summary>
-    /// <param name="left">The <see cref="Double3"/> on the left hand of the operand.</param>
-    /// <param name="right">The <see cref="Double3"/> on the right hand of the operand.</param>
-    /// <returns>
-    /// True if the current left is unequal to the <paramref name="right"/> parameter; otherwise, false.
-    /// </returns>
+    /// <summary>Returns a double3 vector constructed from a single double value by assigning it to every component.</summary>
+    /// <param name="v">double to convert to double3</param>
+    /// <returns>Converted value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Double3 left, Double3 right) => !left.Equals(right);
+    public static double3 double3(double v) => new(v);
 
-    /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine(X, Y, Z);
-
-    /// <inheritdoc />
-    public override string ToString() => ToString(format: null, formatProvider: null);
-
-    /// <inheritdoc />
-    public string ToString(string? format, IFormatProvider? formatProvider)
-        => $"{nameof(Double3)} {{ {nameof(X)} = {X.ToString(format, formatProvider)}, {nameof(Y)} = {Y.ToString(format, formatProvider)}, {nameof(Z)} = {Z.ToString(format, formatProvider)} }}";
-
-    internal static double GetElement(Double3 vector, int index)
-    {
-        if (index >= Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        return GetElementUnsafe(ref vector, index);
-    }
-
+    /// <summary>Returns a double3 vector constructed from a single bool value by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">bool to convert to double3</param>
+    /// <returns>Converted value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static double GetElementUnsafe(ref Double3 vector, int index)
-    {
-        Debug.Assert(index is >= 0 and < Count);
+    public static double3 double3(bool v) => new(v);
 
-        return Unsafe.Add(ref Unsafe.As<Double3, double>(ref vector), index);
-    }
+    /// <summary>Returns a double3 vector constructed from a single int value by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">int to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 double3(int v) => new(v);
+
+    /// <summary>Returns a double3 vector constructed from a single uint value by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">uint to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 double3(uint v) => new(v);
+
+    /// <summary>Returns a double3 vector constructed from a single float value by converting it to double and assigning it to every component.</summary>
+    /// <param name="v">float to convert to double3</param>
+    /// <returns>Converted value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double3 double3(float v) => new(v);
 }

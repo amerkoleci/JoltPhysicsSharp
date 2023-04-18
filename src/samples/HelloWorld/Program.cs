@@ -100,7 +100,7 @@ public static class Program
         }
     }
 
-    private static float WorldScale = 1.0f;
+    private const float WorldScale = 1.0f;
 
     private static Body CreateFloor(in BodyInterface bodyInterface, float size = 200.0f)
     {
@@ -108,7 +108,7 @@ public static class Program
 
         Body floor = bodyInterface.CreateBody(new BodyCreationSettings(
             new BoxShapeSettings(scale * new Vector3(0.5f * size, 1.0f, 0.5f * size), 0.0f),
-            scale * new Double3(0.0, -1.0, 0.0),
+            scale * new double3(0.0, -1.0, 0.0),
             Quaternion.Identity,
             MotionType.Static,
             Layers.NonMoving)
@@ -208,7 +208,7 @@ public static class Program
             // Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
             BoxShapeSettings floorShapeSettings = new(new Vector3(100.0f, 1.0f, 100.0f));
 
-            BodyCreationSettings floorSettings = new(floorShapeSettings, new Double3(0.0f, -1.0f, 0.0f), Quaternion.Identity, MotionType.Static, Layers.NonMoving);
+            BodyCreationSettings floorSettings = new(floorShapeSettings, new double3(0.0f, -1.0f, 0.0f), Quaternion.Identity, MotionType.Static, Layers.NonMoving);
 
             // Create the actual rigid body
             Body floor = bodyInterface.CreateBody(floorSettings);
@@ -216,7 +216,7 @@ public static class Program
             // Add it to the world
             bodyInterface.AddBody(floor, ActivationMode.DontActivate);
 
-            BodyCreationSettings spherSettings = new(new SphereShape(0.5f), new Double3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
+            BodyCreationSettings spherSettings = new(new SphereShape(0.5f), new double3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
             BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, ActivationMode.Activate);
 
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.
@@ -226,7 +226,7 @@ public static class Program
             StackTest(bodyInterface);
 
             MeshShapeSettings meshShape = CreateTorusMesh(3.0f, 1.0f);
-            BodyCreationSettings settings = new(meshShape, new Double3(0, 10, 0), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
+            BodyCreationSettings settings = new(meshShape, new double3(0, 10, 0), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
 
             // We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
             const float deltaTime = 1.0f / 60.0f;

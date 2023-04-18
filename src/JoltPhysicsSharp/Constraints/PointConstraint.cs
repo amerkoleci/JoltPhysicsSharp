@@ -55,13 +55,13 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
         }
     }
 
-    public Double3 DPoint1
+    public double3 DPoint1
     {
         get
         {
             if (DoublePrecision)
             {
-                JPH_PointConstraintSettings_GetPoint1_Double(Handle, out Double3 value);
+                JPH_PointConstraintSettings_GetPoint1_Double(Handle, out double3 value);
                 return value;
             }
             else
@@ -75,17 +75,17 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
             if (DoublePrecision)
                 JPH_PointConstraintSettings_SetPoint1_Double(Handle, value);
             else
-                JPH_PointConstraintSettings_SetPoint1(Handle, value);
+                JPH_PointConstraintSettings_SetPoint1(Handle, (Vector3)value);
         }
     }
 
-    public Double3 DPoint2
+    public double3 DPoint2
     {
         get
         {
             if (DoublePrecision)
             {
-                JPH_PointConstraintSettings_GetPoint2_Double(Handle, out Double3 value);
+                JPH_PointConstraintSettings_GetPoint2_Double(Handle, out double3 value);
                 return value;
             }
             else
@@ -99,7 +99,7 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
             if (DoublePrecision)
                 JPH_PointConstraintSettings_SetPoint2_Double(Handle, value);
             else
-                JPH_PointConstraintSettings_SetPoint2(Handle, value);
+                JPH_PointConstraintSettings_SetPoint2(Handle, (Vector3)value);
         }
     }
 
