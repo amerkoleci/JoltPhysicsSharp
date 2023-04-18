@@ -13,23 +13,33 @@ Task("BuildWindows")
     CreateDirectory($"{artifactsDir}/win-x64/native");
     CreateDirectory($"{artifactsDir}/win-arm64/native");
 
-    // Build
-    var buildDir = "build";
+    // win-x64
+    var buildDir = "build_winx64";
     CreateDirectory(buildDir);
     StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-G \"Visual Studio 17 2022\" -A x64 ../" });
     StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Distribution" });
+    CopyFile("build_winx64/bin/Distribution/joltc.dll", $"{artifactsDir}/win-x64/native/joltc.dll");
 
-    // Copy artifact
-    CopyFile("build/bin/Distribution/joltc.dll", $"{artifactsDir}/win-x64/native/joltc.dll");
+    // win-x64 double
+    buildDir = "build_winx64_double";
+    CreateDirectory(buildDir);
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-G \"Visual Studio 17 2022\" -A x64 -DDOUBLE_PRECISION=ON ../" });
+    StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Distribution" });
+    CopyFile("build_winx64_double/bin/Distribution/joltc.dll", $"{artifactsDir}/win-arm64/native/joltc_double.dll");
 
     // ARM64
     buildDir = "build_arm64";
     CreateDirectory(buildDir);
     StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-G \"Visual Studio 17 2022\" -A ARM64 ../" });
     StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Distribution" });
-
-    // Copy artifact
     CopyFile("build_arm64/bin/Distribution/joltc.dll", $"{artifactsDir}/win-arm64/native/joltc.dll");
+
+    // ARM64
+    buildDir = "build_arm64_double";
+    CreateDirectory(buildDir);
+    StartProcess("cmake", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "-G \"Visual Studio 17 2022\" -A ARM64 -DDOUBLE_PRECISION=ON ../" });
+    StartProcess("msbuild", new ProcessSettings { WorkingDirectory = buildDir, Arguments = "JoltC.sln /p:Configuration=Distribution" });
+    CopyFile("build_arm64_double/bin/Distribution/joltc.dll", $"{artifactsDir}/win-arm64/native/joltc_double.dll");
 });
 
 Task("BuildMacOS")
