@@ -22,7 +22,7 @@ jobs:
       run: cmake --build build_win_64_double --config Distribution      
 
     - name: Configure win-arm64
-      run: cmake . -G "Visual Studio 17 2022" -A ARM64 -Bbuild_win_arm64 -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
+      run: cmake . -G "Visual Studio 17 2022" -A ARM64 -Bbuild_win_arm64 -DCMAKE_BUILD_TYPE:String=Distribution
     - name: Build win-arm64
       run: cmake --build build_win_arm64 --config Distribution
 
