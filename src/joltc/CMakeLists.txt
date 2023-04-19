@@ -1,5 +1,9 @@
 # Define target name
-set (TARGET_NAME joltc)
+if (DOUBLE_PRECISION)
+    set (TARGET_NAME joltc_double)
+else()
+    set (TARGET_NAME joltc)
+endif ()
 
 set(SOURCE_FILES
     joltc.h
