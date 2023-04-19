@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.1</PackageVersion>
     <Title>Multi-platform native library for Jolt Physics engine</Title>
     <PackageId>JoltPhysicsSharp.Native</PackageId>
     <ImplicitUsings>disable</ImplicitUsings>
