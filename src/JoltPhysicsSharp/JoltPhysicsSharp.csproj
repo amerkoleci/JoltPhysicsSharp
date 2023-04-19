@@ -9,11 +9,8 @@
     <PackageReference Include="System.Memory" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Condition="$(TargetFramework.StartsWith('netstandard2'))" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="build\**" PackagePath="build" Pack="true" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="runtimes\**" PackagePath="runtimes" Pack="true" CopyToOutputDirectory="PreserveNewest" />
+    
+    <ProjectReference Include="..\JoltPhysicsSharp.Native\JoltPhysicsSharp.Native.csproj" />
   </ItemGroup>
 
 </Project>

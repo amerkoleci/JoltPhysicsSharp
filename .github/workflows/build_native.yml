@@ -22,9 +22,15 @@ jobs:
       run: cmake --build build_win_64_double --config Distribution      
 
     - name: Configure win-arm64
-      run: cmake . -G "Visual Studio 17 2022" -A ARM64 -Bbuild_win_arm64 -DCMAKE_BUILD_TYPE:String=Distribution
+      run: cmake . -G "Visual Studio 17 2022" -A ARM64 -Bbuild_win_arm64 -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
     - name: Build win-arm64
       run: cmake --build build_win_arm64 --config Distribution
+
+    - name: Configure win-arm64 double
+      run: cmake . -G "Visual Studio 17 2022" -A ARM64 -Bbuild_win_arm64_double -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
+    - name: Build win-arm64 double
+      run: cmake --build build_win_arm64_double --config Distribution
+
     - name: Package Windows
       run: |
         mkdir bin/win-x64/native
@@ -32,6 +38,7 @@ jobs:
         mv build_win_64\bin\Distribution\joltc.dll bin/win-x64/native
         mv build_win_64_double\bin\Distribution\joltc_double.dll bin/win-x64/native
         mv build_win_arm64\bin\Distribution\joltc.dll bin/win-arm64/native
+        mv build_win_arm64_double\bin\Distribution\joltc_double.dll bin/win-arm64/native
     - uses: actions/upload-artifact@v3
       with:
         name: libs_windows
@@ -55,7 +62,7 @@ jobs:
     - name: package_linux
       run: |
         mkdir -p bin/linux-x64/native
-        mv build_linux_64/lib/libjoltc.so bin/linux-x64/native/libjoltc
+        mv build_linux_64/lib/libjoltc.so bin/linux-x64/native/libjoltc.so
     - uses: actions/upload-artifact@v3
       with:
         name: libs_linux
