@@ -10,24 +10,24 @@
   <Choose>
     <When Condition="($([MSBuild]::IsOsPlatform('windows')) and '$(RuntimeIdentifier)'=='') or '$(RuntimeIdentifier)'=='win-x64'">
       <ItemGroup>
-        <None Include="$(RepoRootPath)\src\JoltPhysicsSharp.Native\runtimes\win-x64\native\joltc.dll" Link="joltc.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
-        <None Include="$(RepoRootPath)\src\JoltPhysicsSharp.Native\runtimes\win-x64\native\joltc_double.dll" Link="joltc_double.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/win-x64/native/joltc.dll" Link="joltc.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/win-x64/native/joltc_double.dll" Link="joltc_double.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
       </ItemGroup>
     </When>
     <When Condition="($([MSBuild]::IsOsPlatform('windows')) and '$(RuntimeIdentifier)'=='') or '$(RuntimeIdentifier)'=='win-arm64'">
       <ItemGroup>
-        <None Include="$(RepoRootPath)\src\JoltPhysicsSharp.Native\runtimes\win-arm64\native\joltc.dll" Link="joltc.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
-        <None Include="$(RepoRootPath)\src\JoltPhysicsSharp.Native\runtimes\win-arm64\native\joltc_double.dll" Link="joltc_double.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/win-arm64/native/joltc.dll" Link="joltc.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/win-arm64/native/joltc_double.dll" Link="joltc_double.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
       </ItemGroup>
     </When>
     <When Condition="($([MSBuild]::IsOsPlatform('linux')) and '$(RuntimeIdentifier)'=='') or '$(RuntimeIdentifier)'=='linux-x64'">
       <ItemGroup>
-        <None Include="$(RepoRootPath)\src\JoltPhysicsSharp.Native\runtimes\linux-x64\native\libjoltc.so" Link="libjoltc.so" Visible="False" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/linux-x64/native/libjoltc.so" Link="libjoltc.so" Visible="False" CopyToOutputDirectory="PreserveNewest" />
       </ItemGroup>
     </When>
     <When Condition="($([MSBuild]::IsOsPlatform('osx')) and '$(RuntimeIdentifier)'=='') or '$(RuntimeIdentifier)'=='osx-universal'">
       <ItemGroup>
-        <None Include="$(RepoRootPath)\src\JoltPhysicsSharp.Native\runtimes\osx-universal\native\libjoltc.dylib" Link="libjoltc.dylib" Visible="False" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/osx-universal/native/libjoltc.dylib" Link="libjoltc.dylib" Visible="False" CopyToOutputDirectory="PreserveNewest" />
       </ItemGroup>
     </When>
   </Choose>

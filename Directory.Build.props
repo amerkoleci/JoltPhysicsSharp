@@ -11,10 +11,9 @@
 
   <!-- Version -->
   <PropertyGroup>
-    <VersionPrefix>1.6.0</VersionPrefix>
+    <VersionPrefix>1.6.1</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
   </PropertyGroup>
-
 
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

@@ -6,11 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="build\**" PackagePath="build" Pack="true" />
+    <Content Include="runtimes\**" PackagePath="runtimes" Pack="true" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Memory" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Condition="$(TargetFramework.StartsWith('netstandard2'))" />
-    
-    <ProjectReference Include="..\JoltPhysicsSharp.Native\JoltPhysicsSharp.Native.csproj" />
   </ItemGroup>
 
 </Project>
