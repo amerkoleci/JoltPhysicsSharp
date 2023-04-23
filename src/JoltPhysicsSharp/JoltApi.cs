@@ -597,7 +597,25 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_SetFriction(IntPtr handle, uint bodyID, float value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetPosition(IntPtr handle, uint bodyId, in Vector3 position, ActivationMode activationMode);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_GetPosition(IntPtr handle, uint bodyId, out Vector3 position);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetRotation(IntPtr handle, uint bodyId, in Quaternion rotation, ActivationMode activationMode);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_GetRotation(IntPtr handle, uint bodyId, out Quaternion rotation);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetPositionAndRotation(IntPtr handle, uint bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetPositionAndRotationWhenChanged(IntPtr handle, uint bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode);
+
+[DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetPositionRotationAndVelocity(IntPtr handle, uint bodyID, in Vector3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
 
     /* Body */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]

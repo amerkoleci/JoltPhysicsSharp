@@ -1080,12 +1080,60 @@ void JPH_BodyInterface_SetFriction(JPH_BodyInterface* interface, JPH_BodyID body
     joltBodyInterface->SetFriction(JPH::BodyID(bodyID), friction);
 }
 
+void JPH_BodyInterface_SetPosition(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_ActivationMode activationMode)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->SetPosition(JPH::BodyID(bodyId), ToRVec3(position), static_cast<JPH::EActivation>(activationMode));
+}
+
+void JPH_BodyInterface_GetPosition(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* result)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    FromRVec3(joltBodyInterface->GetPosition(JPH::BodyID(bodyId)), result);
+}
+
+void JPH_BodyInterface_SetRotation(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Quat* rotation, JPH_ActivationMode activationMode)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->SetRotation(JPH::BodyID(bodyId), ToQuat(rotation), static_cast<JPH::EActivation>(activationMode));
+}
+
+void JPH_BodyInterface_GetRotation(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Quat* result)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    FromJolt(joltBodyInterface->GetRotation(JPH::BodyID(bodyId)), result);
+}
+
 void JPH_BodyInterface_SetPositionAndRotation(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_ActivationMode activationMode)
 {
     JPH_ASSERT(interface);
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
     joltBodyInterface->SetPositionAndRotation(JPH::BodyID(bodyId), ToRVec3(position), ToQuat(rotation), static_cast<JPH::EActivation>(activationMode));
+}
+
+void JPH_BodyInterface_SetPositionAndRotationWhenChanged(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_ActivationMode activationMode)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->SetPositionAndRotationWhenChanged(JPH::BodyID(bodyId), ToRVec3(position), ToQuat(rotation), static_cast<JPH::EActivation>(activationMode));
+}
+
+void JPH_BodyInterface_SetPositionRotationAndVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_Vec3* linearVelocity, JPH_Vec3* angularVelocity)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    
+    joltBodyInterface->SetPositionRotationAndVelocity(JPH::BodyID(bodyId), ToRVec3(position), ToQuat(rotation), ToVec3(linearVelocity), ToVec3(angularVelocity));
 }
 
 /* Body */
