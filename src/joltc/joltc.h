@@ -352,6 +352,8 @@ JPH_CAPI void JPH_BodyInterface_SetRestitution(JPH_BodyInterface* interface, JPH
 JPH_CAPI float JPH_BodyInterface_GetFriction(const JPH_BodyInterface* interface, JPH_BodyID bodyID);
 JPH_CAPI void JPH_BodyInterface_SetFriction(JPH_BodyInterface* interface, JPH_BodyID bodyID, float friction);
 
+JPH_CAPI void JPH_BodyInterface_SetPositionAndRotation(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_ActivationMode activationMode);
+
 /* Body */
 JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsActive(const JPH_Body* body);

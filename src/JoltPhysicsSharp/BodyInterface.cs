@@ -149,4 +149,9 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
     {
         JPH_BodyInterface_SetFriction(Handle, bodyID, friction);
     }
+
+    public void SetPositionAndRotation(in BodyID bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode)
+    {
+        JPH_BodyInterface_SetPositionAndRotation(Handle, bodyID, position, rotation, activationMode);
+    }
 }

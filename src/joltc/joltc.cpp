@@ -1080,6 +1080,14 @@ void JPH_BodyInterface_SetFriction(JPH_BodyInterface* interface, JPH_BodyID body
     joltBodyInterface->SetFriction(JPH::BodyID(bodyID), friction);
 }
 
+void JPH_BodyInterface_SetPositionAndRotation(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_ActivationMode activationMode)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->SetPositionAndRotation(JPH::BodyID(bodyId), ToRVec3(position), ToQuat(rotation), static_cast<JPH::EActivation>(activationMode));
+}
+
 /* Body */
 JPH_BodyID JPH_Body_GetID(const JPH_Body* body)
 {
