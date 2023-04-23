@@ -614,8 +614,11 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetPositionAndRotationWhenChanged(IntPtr handle, uint bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode);
 
-[DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetPositionRotationAndVelocity(IntPtr handle, uint bodyID, in Vector3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetShape(IntPtr handle, uint bodyId, IntPtr shape, bool updateMassProperties, ActivationMode activationMode);
 
     /* Body */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]

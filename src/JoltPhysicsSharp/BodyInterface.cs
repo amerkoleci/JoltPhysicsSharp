@@ -186,4 +186,9 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
     {
         JPH_BodyInterface_SetPositionRotationAndVelocity(Handle, bodyID, position, rotation, linearVelocity, angularVelocity);
     }
+
+    public void SetShape(in BodyID bodyId, in Shape shape, bool updateMassProperties, ActivationMode activationMode)
+    {
+        JPH_BodyInterface_SetShape(Handle, bodyId, shape.Handle, updateMassProperties, activationMode);
+    }
 }

@@ -1136,6 +1136,16 @@ void JPH_BodyInterface_SetPositionRotationAndVelocity(JPH_BodyInterface* interfa
     joltBodyInterface->SetPositionRotationAndVelocity(JPH::BodyID(bodyId), ToRVec3(position), ToQuat(rotation), ToVec3(linearVelocity), ToVec3(angularVelocity));
 }
 
+void JPH_BodyInterface_SetShape(JPH_BodyInterface* interface, JPH_BodyID bodyId, const JPH_Shape* shape, JPH_Bool32 updateMassProperties, JPH_ActivationMode activationMode)
+{
+    JPH_ASSERT(interface);
+    auto jolyBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    auto jphShape = reinterpret_cast<const JPH::Shape*>(shape);
+
+    jolyBodyInterface->SetShape(JPH::BodyID(bodyId), jphShape, updateMassProperties, static_cast<JPH::EActivation>(activationMode));
+}
+
 /* Body */
 JPH_BodyID JPH_Body_GetID(const JPH_Body* body)
 {
