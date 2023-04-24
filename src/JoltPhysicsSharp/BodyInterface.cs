@@ -191,4 +191,14 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
     {
         JPH_BodyInterface_SetShape(Handle, bodyId, shape.Handle, updateMassProperties, activationMode);
     }
+
+    public void ActivateBody(in BodyID bodyId)
+    {
+        JPH_BodyInterface_ActivateBody(Handle, bodyId);
+    }
+
+    public void DeactivateBody(in BodyID bodyId)
+    {
+        JPH_BodyInterface_DeactivateBody(Handle, bodyId);
+    }
 }

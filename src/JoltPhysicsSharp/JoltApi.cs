@@ -620,6 +620,12 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetShape(IntPtr handle, uint bodyId, IntPtr shape, bool updateMassProperties, ActivationMode activationMode);
 
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_ActivateBody(IntPtr handle, uint bodyId);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_DeactivateBody(IntPtr handle, uint bodyId);
+
     /* Body */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_Body_GetID(IntPtr body);

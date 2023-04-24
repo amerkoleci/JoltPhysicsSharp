@@ -1146,6 +1146,22 @@ void JPH_BodyInterface_SetShape(JPH_BodyInterface* interface, JPH_BodyID bodyId,
     jolyBodyInterface->SetShape(JPH::BodyID(bodyId), jphShape, updateMassProperties, static_cast<JPH::EActivation>(activationMode));
 }
 
+void JPH_BodyInterface_ActivateBody(JPH_BodyInterface* interface, JPH_BodyID bodyId)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->ActivateBody(JPH::BodyID(bodyId));
+}
+
+void JPH_BodyInterface_DeactivateBody(JPH_BodyInterface* interface, JPH_BodyID bodyId)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->DeactivateBody(JPH::BodyID(bodyId));
+}
+
 /* Body */
 JPH_BodyID JPH_Body_GetID(const JPH_Body* body)
 {
