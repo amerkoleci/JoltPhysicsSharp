@@ -1143,7 +1143,8 @@ void JPH_BodyInterface_SetShape(JPH_BodyInterface* interface, JPH_BodyID bodyId,
 
     auto jphShape = reinterpret_cast<const JPH::Shape*>(shape);
 
-    jolyBodyInterface->SetShape(JPH::BodyID(bodyId), jphShape, updateMassProperties, static_cast<JPH::EActivation>(activationMode));
+    // !! is to make ms compiler happy.
+    jolyBodyInterface->SetShape(JPH::BodyID(bodyId), jphShape, !!updateMassProperties, static_cast<JPH::EActivation>(activationMode));
 }
 
 void JPH_BodyInterface_ActivateBody(JPH_BodyInterface* interface, JPH_BodyID bodyId)
