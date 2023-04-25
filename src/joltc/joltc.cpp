@@ -1335,7 +1335,7 @@ void JPH_BodyInterface_GetInverseInertia(JPH_BodyInterface* interface, JPH_BodyI
     JPH_ASSERT(interface);
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
-    JPH::Mat44 mat = joltBodyInterface->GetInverseInertia(JPH::BodyID(bodyId));
+    JPH::RMat44 mat = static_cast<JPH::RMat44>(joltBodyInterface->GetInverseInertia(JPH::BodyID(bodyId)));
     FromJolt(mat, result);
 }
 
