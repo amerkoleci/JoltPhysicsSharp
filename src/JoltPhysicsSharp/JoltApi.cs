@@ -684,6 +684,9 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_AddImpulse2(IntPtr handle, uint bodyId, in Vector3 impulse, in Vector3 point);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_AddAngularImpulse(IntPtr handle, uint bodyId, in Vector3 angularImpulse);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_GetInverseInertia(IntPtr handle, uint bodyId, out Matrix4x4 result);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
