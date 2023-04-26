@@ -149,4 +149,181 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
     {
         JPH_BodyInterface_SetFriction(Handle, bodyID, friction);
     }
+
+    public void SetPosition(in BodyID bodyID, in Vector3 position, ActivationMode activationMode)
+    {
+        JPH_BodyInterface_SetPosition(Handle, bodyID, position, activationMode);
+    }
+
+    public Vector3 GetPosition(in BodyID bodyID)
+    {
+        JPH_BodyInterface_GetPosition(Handle, bodyID, out Vector3 position);
+        return position;
+    }
+
+    public void SetRotation(in BodyID bodyID, in Quaternion rotation, ActivationMode activationMode)
+    {
+        JPH_BodyInterface_SetRotation(Handle, bodyID, rotation, activationMode);
+    }
+
+    public Quaternion GetRotation(in BodyID bodyID)
+    {
+        JPH_BodyInterface_GetRotation(Handle, bodyID, out Quaternion rotation);
+        return rotation;
+    }
+
+    public void SetPositionAndRotation(in BodyID bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode)
+    {
+        JPH_BodyInterface_SetPositionAndRotation(Handle, bodyID, position, rotation, activationMode);
+    }
+
+    public void SetPositionAndRotationWhenChanged(in BodyID bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode)
+    {
+        JPH_BodyInterface_SetPositionAndRotationWhenChanged(Handle, bodyID, position, rotation, activationMode);
+    }
+
+    public void SetPositionRotationAndVelocity(in BodyID bodyID, in Vector3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity)
+    {
+        JPH_BodyInterface_SetPositionRotationAndVelocity(Handle, bodyID, position, rotation, linearVelocity, angularVelocity);
+    }
+
+    public void SetShape(in BodyID bodyId, in Shape shape, bool updateMassProperties, ActivationMode activationMode)
+    {
+        JPH_BodyInterface_SetShape(Handle, bodyId, shape.Handle, updateMassProperties, activationMode);
+    }
+
+    public void NotifyShapeChanged(in BodyID bodyId, in Vector3 previousCenterOfMass, bool updateMassProperties, ActivationMode activationMode)
+    {
+
+    }
+
+    public void ActivateBody(in BodyID bodyId)
+    {
+        JPH_BodyInterface_ActivateBody(Handle, bodyId);
+    }
+
+    public void DeactivateBody(in BodyID bodyId)
+    {
+        JPH_BodyInterface_DeactivateBody(Handle, bodyId);
+    }
+
+    public void SetObjectLayer(in BodyID bodyId, in ObjectLayer layer)
+    {
+        JPH_BodyInterface_SetObjectLayer(Handle, bodyId, layer.Value);
+    }
+
+    public ObjectLayer GetObjectLayer(in BodyID bodyId)
+    {
+        return new ObjectLayer(JPH_BodyInterface_GetObjectLayer(Handle, bodyId));
+    }
+
+    public Matrix4x4 GetWorldTransform(in BodyID bodyID)
+    {
+        JPH_BodyInterface_GetWorldTransform(Handle, bodyID, out Matrix4x4 result);
+        return result;
+    }
+
+    public Matrix4x4 GetCenterOfMassTransform(in BodyID bodyId)
+    {
+        JPH_BodyInterface_GetCenterOfMassTransform(Handle, bodyId, out Matrix4x4 result);
+        return result;
+    }
+
+    public void MoveKinematic(in BodyID bodyId, in Vector3 targetPosition, in Quaternion targetRotation, float deltaTime)
+    {
+        JPH_BodyInterface_MoveKinematic(Handle, bodyId, targetPosition, targetRotation, deltaTime);
+    }
+
+    public void SetLinearAndAngularVelocity(in BodyID bodyId, in Vector3 linearVelocity, in Vector3 angularVelocity)
+    {
+        JPH_BodyInterface_SetLinearAndAngularVelocity(Handle, bodyId, linearVelocity, angularVelocity);
+    }
+
+    public void GetLinearAndAngularVelocity(in BodyID bodyId, out Vector3 linearVelocity, out Vector3 angularVelocity)
+    {
+        JPH_BodyInterface_GetLinearAndAngularVelocity(Handle, bodyId, out linearVelocity, out angularVelocity);
+    }
+
+    public void AddLinearVelocity(in BodyID bodyId, in Vector3 linearVelocity)
+    {
+        JPH_BodyInterface_AddLinearVelocity(Handle, bodyId, linearVelocity);
+    }
+
+    public void AddLinearAndAngularVelocity(in BodyID bodyId, in Vector3 linearVelocity, in Vector3 angularVelocity)
+    {
+        JPH_BodyInterface_AddLinearAndAngularVelocity(Handle, bodyId, linearVelocity, angularVelocity);
+    }
+
+    public void SetAngularVelocity(in BodyID bodyId, in Vector3 angularVelocity)
+    {
+        JPH_BodyInterface_SetAngularVelocity(Handle, bodyId, angularVelocity);
+    }
+
+    public Vector3 GetAngularVelocity(in BodyID bodyId)
+    {
+        JPH_BodyInterface_GetAngularVelocity(Handle, bodyId, out Vector3 result);
+        return result;
+    }
+
+    public Vector3 GetPointVelocity(in BodyID bodyId, in Vector3 point)
+    {
+        JPH_BodyInterface_GetPointVelocity(Handle, bodyId, point, out Vector3 result);
+        return result;
+    }
+
+    public void AddForce(in BodyID bodyId, in Vector3 force)
+    {
+        JPH_BodyInterface_AddForce(Handle, bodyId, force);
+    }
+
+    public void AddForce(in BodyID bodyId, in Vector3 force, in Vector3 point)
+    {
+        JPH_BodyInterface_AddForce2(Handle, bodyId, force, point);
+    }
+
+    public void AddTorque(in BodyID bodyId, in Vector3 torque)
+    {
+        JPH_BodyInterface_AddTorque(Handle, bodyId, torque);
+    }
+
+    public void AddForceAndTorque(in BodyID bodyId, in Vector3 force, in Vector3 torque)
+    {
+        JPH_BodyInterface_AddForceAndTorque(Handle, bodyId, force, torque);
+    }
+
+    public void AddImpulse(in BodyID bodyId, in Vector3 impulse)
+    {
+        JPH_BodyInterface_AddImpulse(Handle, bodyId, impulse);
+    }
+
+    public void AddImpulse(in BodyID bodyId, in Vector3 impulse, in Vector3 point)
+    {
+        JPH_BodyInterface_AddImpulse2(Handle, bodyId, impulse, point);
+    }
+
+    public void AddAngularImpulse(in BodyID bodyId, in Vector3 angularImpulse)
+    {
+        JPH_BodyInterface_AddAngularImpulse(Handle, bodyId, angularImpulse);
+    }
+
+    public Matrix4x4 GetInverseInertia(in BodyID bodyId)
+    {
+        JPH_BodyInterface_GetInverseInertia(Handle, bodyId, out Matrix4x4 result);
+        return result;
+    }
+
+    public void SetGravityFactor(in BodyID bodyId, float gravityFactor)
+    {
+        JPH_BodyInterface_SetGravityFactor(Handle, bodyId, gravityFactor);
+    }
+
+    public float GetGravityFactor(in BodyID bodyId)
+    {
+        return JPH_BodyInterface_GetGravityFactor(Handle, bodyId);
+    }
+
+    public void InvalidateContactCache(in BodyID bodyId)
+    {
+        JPH_BodyInterface_InvalidateContactCache(Handle, bodyId);
+    }
 }
