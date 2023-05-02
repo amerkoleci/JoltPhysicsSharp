@@ -24,7 +24,8 @@
 #include <Jolt/Physics/Collision/Shape/MutableCompoundShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
-
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/NarrowPhaseQuery.h>
 #include <Jolt/Physics/Constraints/PointConstraint.h>
 
 #ifdef _MSC_VER
@@ -774,6 +775,44 @@ JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system)
     return reinterpret_cast<JPH_BodyInterface*>(&joltSystem->GetBodyInterface());
 }
 
+JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterfaceNoLock(JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
+    return reinterpret_cast<JPH_BodyInterface*>(&joltSystem->GetBodyInterfaceNoLock());
+}
+
+const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterface(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
+    return reinterpret_cast<const JPH_BodyLockInterface*>(&joltSystem->GetBodyLockInterface());
+}
+const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
+    return reinterpret_cast<const JPH_BodyLockInterface*>(&joltSystem->GetBodyLockInterfaceNoLock());
+}
+
+const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
+    return reinterpret_cast<const JPH_NarrowPhaseQuery*>(&joltSystem->GetNarrowPhaseQuery());
+}
+const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
+    return reinterpret_cast<const JPH_NarrowPhaseQuery*>(&joltSystem->GetNarrowPhaseQueryNoLock());
+}
+
 void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JPH_ContactListener* listener)
 {
     JPH_ASSERT(system);
@@ -1132,7 +1171,7 @@ void JPH_BodyInterface_SetPositionRotationAndVelocity(JPH_BodyInterface* interfa
 {
     JPH_ASSERT(interface);
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
-    
+
     joltBodyInterface->SetPositionRotationAndVelocity(JPH::BodyID(bodyId), ToRVec3(position), ToQuat(rotation), ToVec3(linearVelocity), ToVec3(angularVelocity));
 }
 
@@ -1361,6 +1400,66 @@ void JPH_BodyInterface_InvalidateContactCache(JPH_BodyInterface* interface, JPH_
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
     joltBodyInterface->InvalidateContactCache(JPH::BodyID(bodyId));
+}
+
+//--------------------------------------------------------------------------------------------------
+// JPH_BodyLockInterface
+//--------------------------------------------------------------------------------------------------
+void JPH_BodyLockInterface_LockRead(const JPH_BodyLockInterface* lockInterface, JPH_BodyID bodyID, JPH_BodyLockRead* outLock)
+{
+    JPH_ASSERT(outLock != nullptr);
+    auto joltBodyLockInterface = reinterpret_cast<const JPH::BodyLockInterface*>(lockInterface);
+
+    ::new (outLock) JPH::BodyLockRead(*joltBodyLockInterface, JPH::BodyID(bodyID));
+}
+
+void JPH_BodyLockInterface_UnlockRead(const JPH_BodyLockInterface* lockInterface, JPH_BodyLockRead* ioLock)
+{
+    JPH_ASSERT(ioLock != nullptr);
+    JPH_ASSERT(lockInterface != nullptr && lockInterface == ioLock->lockInterface);
+    reinterpret_cast<const JPH::BodyLockRead*>(ioLock)->~BodyLockRead();
+}
+
+void JPH_BodyLockInterface_LockWrite(const JPH_BodyLockInterface* lockInterface, JPH_BodyID bodyID, JPH_BodyLockWrite* outLock)
+{
+    JPH_ASSERT(outLock != nullptr);
+    auto joltBodyLockInterface = reinterpret_cast<const JPH::BodyLockInterface*>(lockInterface);
+
+    ::new (outLock) JPH::BodyLockRead(*joltBodyLockInterface, JPH::BodyID(bodyID));
+}
+
+void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* lockInterface, JPH_BodyLockWrite* ioLock)
+{
+    JPH_ASSERT(ioLock != nullptr);
+    JPH_ASSERT(lockInterface != nullptr && lockInterface == ioLock->lockInterface);
+
+    reinterpret_cast<const JPH::BodyLockWrite*>(ioLock)->~BodyLockWrite();
+}
+
+//--------------------------------------------------------------------------------------------------
+// JPH_NarrowPhaseQuery
+//--------------------------------------------------------------------------------------------------
+bool JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
+    const JPH_RVec3* origin, const JPH_Vec3* direction,
+    JPH_RayCastResult* hit, 
+    const void* broadPhaseLayerFilter, // Can be NULL (no filter)
+    const void* objectLayerFilter, // Can be NULL (no filter)
+    const void* bodyFilter)
+{
+    JPH_ASSERT(query && origin && direction && hit);
+    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
+    JPH::RRayCast ray(ToRVec3(origin), ToVec3(direction));
+    const JPH::BroadPhaseLayerFilter broad_phase_layer_filter{};
+    const JPH::ObjectLayerFilter object_layer_filter{};
+    const JPH::BodyFilter body_filter{};
+
+    return joltQuery->CastRay(
+        ray,
+        *reinterpret_cast<JPH::RayCastResult*>(hit),
+        broadPhaseLayerFilter ? *static_cast<const JPH::BroadPhaseLayerFilter*>(broadPhaseLayerFilter) : broad_phase_layer_filter,
+        objectLayerFilter ? *static_cast<const JPH::ObjectLayerFilter*>(objectLayerFilter) : object_layer_filter,
+        bodyFilter ? *static_cast<const JPH::BodyFilter*>(bodyFilter) : body_filter
+    );
 }
 
 /* Body */

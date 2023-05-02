@@ -152,6 +152,15 @@ typedef struct JPH_SubShapeIDPair
     JPH_SubShapeID subShapeID2;
 } JPH_SubShapeIDPair;
 
+// NOTE: Needs to be kept in sync with JPH::RayCastResult
+typedef struct JPH_RayCastResult
+{
+    JPH_BodyID     bodyID; // JPC_BODY_ID_INVALID
+    float          fraction; // 1.0 + JPC_FLT_EPSILON
+    JPH_SubShapeID subShapeID2;
+} JPH_RayCastResult;
+
+
 typedef struct JPH_TempAllocator                    JPH_TempAllocator;
 typedef struct JPH_JobSystemThreadPool              JPH_JobSystemThreadPool;
 typedef struct JPH_BroadPhaseLayerInterface         JPH_BroadPhaseLayerInterface;
@@ -182,6 +191,8 @@ typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
 
 typedef struct JPH_BodyCreationSettings         JPH_BodyCreationSettings;
 typedef struct JPH_BodyInterface                JPH_BodyInterface;
+typedef struct JPH_BodyLockInterface            JPH_BodyLockInterface;
+typedef struct JPH_NarrowPhaseQuery             JPH_NarrowPhaseQuery;
 typedef struct JPH_Body                         JPH_Body;
 
 typedef struct JPH_ConstraintSettings           JPH_ConstraintSettings;
@@ -196,6 +207,23 @@ typedef struct JPH_CollideShapeResult           JPH_CollideShapeResult;
 typedef struct JPH_ContactListener              JPH_ContactListener;
 
 typedef struct JPH_BodyActivationListener       JPH_BodyActivationListener;
+
+
+typedef struct JPH_SharedMutex                  JPH_SharedMutex;
+
+typedef struct JPH_BodyLockRead
+{
+    const JPH_BodyLockInterface* lockInterface;
+    JPH_SharedMutex* mutex;
+    const JPH_Body* body;
+} JPH_BodyLockRead;
+
+typedef struct JPH_BodyLockWrite
+{
+    const JPH_BodyLockInterface* lockInterface;
+    JPH_SharedMutex* mutex;
+    JPH_Body* body;
+} JPH_BodyLockWrite;
 
 JPH_CAPI JPH_Bool32 JPH_Init(void);
 JPH_CAPI void JPH_Shutdown(void);
@@ -307,6 +335,14 @@ JPH_CAPI JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* syst
     JPH_JobSystemThreadPool* jobSystem);
 
 JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system);
+JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterfaceNoLock(JPH_PhysicsSystem* system);
+
+JPH_CAPI const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterface(const JPH_PhysicsSystem* system);
+JPH_CAPI const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const JPH_PhysicsSystem* system);
+
+JPH_CAPI const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system);
+JPH_CAPI const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(const JPH_PhysicsSystem* system);
+
 JPH_CAPI void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JPH_ContactListener* listener);
 JPH_CAPI void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_BodyActivationListener* listener);
 
@@ -406,6 +442,26 @@ JPH_CAPI void JPH_BodyInterface_SetGravityFactor(JPH_BodyInterface* interface, J
 JPH_CAPI float JPH_BodyInterface_GetGravityFactor(JPH_BodyInterface* interface, JPH_BodyID bodyId);
 
 JPH_CAPI void JPH_BodyInterface_InvalidateContactCache(JPH_BodyInterface* interface, JPH_BodyID bodyId);
+
+//--------------------------------------------------------------------------------------------------
+// JPH_BodyLockInterface
+//--------------------------------------------------------------------------------------------------
+JPH_CAPI void JPH_BodyLockInterface_LockRead(const JPH_BodyLockInterface* lockInterface, JPH_BodyID bodyID, JPH_BodyLockRead* outLock);
+JPH_CAPI void JPH_BodyLockInterface_UnlockRead(const JPH_BodyLockInterface* lockInterface, JPH_BodyLockRead* ioLock);
+
+JPH_CAPI void JPH_BodyLockInterface_LockWrite(const JPH_BodyLockInterface* lockInterface, JPH_BodyID bodyID, JPH_BodyLockWrite* outLock);
+JPH_CAPI void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* lockInterface, JPH_BodyLockWrite* ioLock);
+
+//--------------------------------------------------------------------------------------------------
+// JPH_NarrowPhaseQuery
+//--------------------------------------------------------------------------------------------------
+JPH_CAPI bool
+JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
+    const JPH_RVec3* origin, const JPH_Vec3* direction,
+    JPH_RayCastResult* hit, // *Must* be default initialized (see JPH_RayCastResult)
+    const void* broadPhaseLayerFilter, // Can be NULL (no filter)
+    const void* objectLayerFilter, // Can be NULL (no filter)
+    const void* bodyFilter); // Can be NULL (no filter)
 
 /* Body */
 JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
