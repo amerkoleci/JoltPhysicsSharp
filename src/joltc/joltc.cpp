@@ -1415,8 +1415,10 @@ void JPH_BodyLockInterface_LockRead(const JPH_BodyLockInterface* lockInterface, 
 
 void JPH_BodyLockInterface_UnlockRead(const JPH_BodyLockInterface* lockInterface, JPH_BodyLockRead* ioLock)
 {
+    JPH_UNUSED(lockInterface);
     JPH_ASSERT(ioLock != nullptr);
     JPH_ASSERT(lockInterface != nullptr && lockInterface == ioLock->lockInterface);
+
     reinterpret_cast<const JPH::BodyLockRead*>(ioLock)->~BodyLockRead();
 }
 
@@ -1430,6 +1432,7 @@ void JPH_BodyLockInterface_LockWrite(const JPH_BodyLockInterface* lockInterface,
 
 void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* lockInterface, JPH_BodyLockWrite* ioLock)
 {
+    JPH_UNUSED(lockInterface);
     JPH_ASSERT(ioLock != nullptr);
     JPH_ASSERT(lockInterface != nullptr && lockInterface == ioLock->lockInterface);
 
