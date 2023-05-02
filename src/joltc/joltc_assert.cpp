@@ -22,6 +22,10 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
+#ifdef JPH_COMPILER_GCC
+JPH_GCC_SUPPRESS_WARNING("-Winvalid-offsetof")
+#endif
+
 #define ENSURE_SIZE_ALIGN(type0, type1) \
     static_assert(sizeof(type0) == sizeof(type1)); \
     static_assert(alignof(type0) == alignof(type1))
