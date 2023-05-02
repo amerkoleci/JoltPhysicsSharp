@@ -145,6 +145,13 @@ public sealed class PhysicsSystem : NativeObject
     #endregion Events
 
     public BodyInterface BodyInterface => new(JPH_PhysicsSystem_GetBodyInterface(Handle));
+    public BodyInterface BodyInterfaceNoLock => new(JPH_PhysicsSystem_GetBodyInterfaceNoLock(Handle));
+
+    public BodyLockInterface BodyLockInterface => new(JPC_PhysicsSystem_GetBodyLockInterface(Handle));
+    public BodyLockInterface BodyLockInterfaceNoLock => new(JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(Handle));
+
+    public NarrowPhaseQuery NarrowPhaseQuery => new(JPC_PhysicsSystem_GetNarrowPhaseQuery(Handle));
+    public NarrowPhaseQuery NarrowPhaseQueryNoLock => new(JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(Handle));
 
     public void Init(
         uint maxBodies,

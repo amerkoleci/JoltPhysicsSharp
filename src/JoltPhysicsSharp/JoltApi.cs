@@ -531,6 +531,9 @@ internal static unsafe partial class JoltApi
     public static extern IntPtr JPH_PhysicsSystem_GetBodyInterface(IntPtr system);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_PhysicsSystem_GetBodyInterfaceNoLock(IntPtr system);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyInterface_CreateBody(IntPtr handle, IntPtr settings);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -697,6 +700,48 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_InvalidateContactCache(IntPtr handle, uint bodyId);
+
+    /* BodyLockInterface */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPC_PhysicsSystem_GetBodyLockInterface(nint system);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(nint system);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyLockInterface_LockRead(nint lockInterface, uint bodyID, out BodyLockRead @lock);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyLockInterface_UnlockRead(nint lockInterface, in BodyLockRead @lock);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyLockInterface_LockWrite(nint lockInterface, uint bodyID, out BodyLockWrite @lock);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyLockInterface_UnlockWrite(nint lockInterface, in BodyLockWrite @lock);
+
+    /* BodyLockInterface */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPC_PhysicsSystem_GetNarrowPhaseQuery(nint system);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(nint system);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_NarrowPhaseQuery_CastRay(nint system,
+        in Vector3 origin, in Vector3 direction,
+        out RayCastResult hit,
+        IntPtr broadPhaseLayerFilter,
+        IntPtr objectLayerFilter,
+        IntPtr bodyFilter);
+
+    [DllImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay), CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_NarrowPhaseQuery_CastRay_Double(nint system,
+        in Double3 origin, in Vector3 direction,
+        out RayCastResult hit,
+        IntPtr broadPhaseLayerFilter,
+        IntPtr objectLayerFilter,
+        IntPtr bodyFilter);
 
     /* Body */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
