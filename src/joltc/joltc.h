@@ -455,8 +455,7 @@ JPH_CAPI void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* loc
 //--------------------------------------------------------------------------------------------------
 // JPH_NarrowPhaseQuery
 //--------------------------------------------------------------------------------------------------
-JPH_CAPI bool
-JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
+JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     const JPH_RVec3* origin, const JPH_Vec3* direction,
     JPH_RayCastResult* hit, // *Must* be default initialized (see JPH_RayCastResult)
     const void* broadPhaseLayerFilter, // Can be NULL (no filter)
