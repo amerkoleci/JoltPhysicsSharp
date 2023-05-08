@@ -114,7 +114,8 @@ static void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
     result->w = quat.GetW();
 }
 
-static void FromJolt(const JPH::RMat44& matrix, JPH_Matrix4x4* result)
+#ifdef JPH_DOUBLE_PRECISION
+static void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 {
     JPH::Vec4 column0 = matrix.GetColumn4(0);
     JPH::Vec4 column1 = matrix.GetColumn4(1);
@@ -140,6 +141,46 @@ static void FromJolt(const JPH::RMat44& matrix, JPH_Matrix4x4* result)
     result->m42 = column3.GetY();
     result->m43 = column3.GetZ();
     result->m44 = column3.GetW();
+}
+#endif
+
+static void FromJolt(const JPH::RMat44& matrix, JPH_Matrix4x4* result)
+{
+    JPH::Vec4 column0 = matrix.GetColumn4(0);
+    JPH::Vec4 column1 = matrix.GetColumn4(1);
+    JPH::Vec4 column2 = matrix.GetColumn4(2);
+#ifdef JPH_DOUBLE_PRECISION
+    JPH::DVec3 column3 = matrix.GetTranslation();
+#else
+    JPH::Vec4 column3 = matrix.GetColumn4(3);
+#endif
+
+    result->m11 = column0.GetX();
+    result->m12 = column0.GetY();
+    result->m13 = column0.GetZ();
+    result->m14 = column0.GetW();
+
+    result->m21 = column1.GetX();
+    result->m22 = column1.GetY();
+    result->m23 = column1.GetZ();
+    result->m24 = column1.GetW();
+
+    result->m31 = column2.GetX();
+    result->m32 = column2.GetY();
+    result->m33 = column2.GetZ();
+    result->m34 = column2.GetW();
+
+#ifdef JPH_DOUBLE_PRECISION
+    result->m41 = column3.GetX();
+    result->m42 = column3.GetY();
+    result->m43 = column3.GetZ();
+    result->m44 = 0.0f;
+#else
+    result->m41 = column3.GetX();
+    result->m42 = column3.GetY();
+    result->m43 = column3.GetZ();
+    result->m44 = column3.GetW();
+#endif
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
@@ -1231,7 +1272,7 @@ void JPH_BodyInterface_GetWorldTransform(JPH_BodyInterface* interface, JPH_BodyI
     JPH_ASSERT(interface);
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
-    auto mat = joltBodyInterface->GetWorldTransform(JPH::BodyID(bodyId));
+    const JPH::RMat44& mat = joltBodyInterface->GetWorldTransform(JPH::BodyID(bodyId));
     FromJolt(mat, result);
 }
 
@@ -1240,7 +1281,7 @@ void JPH_BodyInterface_GetCenterOfMassTransform(JPH_BodyInterface* interface, JP
     JPH_ASSERT(interface);
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
-    auto mat = joltBodyInterface->GetCenterOfMassTransform(JPH::BodyID(bodyId));
+    const JPH::RMat44& mat = joltBodyInterface->GetCenterOfMassTransform(JPH::BodyID(bodyId));
     FromJolt(mat, resutlt);
 }
 
@@ -1374,7 +1415,7 @@ void JPH_BodyInterface_GetInverseInertia(JPH_BodyInterface* interface, JPH_BodyI
     JPH_ASSERT(interface);
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
-    JPH::RMat44 mat = static_cast<JPH::RMat44>(joltBodyInterface->GetInverseInertia(JPH::BodyID(bodyId)));
+    const JPH::Mat44& mat = joltBodyInterface->GetInverseInertia(JPH::BodyID(bodyId));
     FromJolt(mat, result);
 }
 

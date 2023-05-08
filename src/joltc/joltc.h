@@ -98,6 +98,13 @@ typedef struct JPH_Vec3 {
     float z;
 } JPH_Vec3;
 
+typedef struct JPH_Vec4 {
+    float x;
+    float y;
+    float z;
+    float w;
+} JPH_Vec4;
+
 typedef struct JPH_RVec3 {
 #ifdef JPH_DOUBLE_PRECISION
     double x;
@@ -121,7 +128,11 @@ typedef struct JPH_Matrix4x4 {
     float m11, m12, m13, m14;
     float m21, m22, m23, m24;
     float m31, m32, m33, m34;
+#ifdef JPH_DOUBLE_PRECISION
+    double m41, m42, m43, m44;
+#else
     float m41, m42, m43, m44;
+#endif
 } JPH_Matrix4x4;
 
 typedef struct JPH_Triangle {

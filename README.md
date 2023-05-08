@@ -8,3 +8,4 @@ Cross platform modern **.netstandard2.0**, **.netstandard2.1**, **.net6.0** and 
 
 ## Sponsors
 Please consider [SPONSOR](https://github.com/sponsors/amerkoleci) me to further help development and to allow faster issue triaging and new features to be implemented.
+**_NOTE:_** **any feature request** would require a [sponsor](https://github.com/sponsors/amerkoleci) in order to allow faster implementation and allow this project to continue.
