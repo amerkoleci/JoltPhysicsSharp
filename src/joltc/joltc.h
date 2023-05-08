@@ -331,7 +331,7 @@ JPH_CAPI void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
 
 JPH_CAPI void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system);
 JPH_CAPI JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
-    JPH_TempAllocator* tempAlocator,
+    JPH_TempAllocator* tempAllocator,
     JPH_JobSystemThreadPool* jobSystem);
 
 JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system);
