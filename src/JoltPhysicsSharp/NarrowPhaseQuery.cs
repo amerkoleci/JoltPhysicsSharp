@@ -25,31 +25,31 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     /// <inheritdoc/>
     public override int GetHashCode() => Handle.GetHashCode();
 
-    public bool CastRay(in Vector3 origin, in Vector3 direction, out RayCastResult hit)
+    public bool CastRay(in Vector3 origin, in Vector3 direction, ref RayCastResult hit)
     {
         uint result = 0;
         if (DoublePrecision)
         {
-            result = JPH_NarrowPhaseQuery_CastRay_Double(Handle, new(origin), direction, out hit, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+            result = JPH_NarrowPhaseQuery_CastRay_Double(Handle, new(origin), direction, ref hit, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
         }
         else
         {
-            result = JPH_NarrowPhaseQuery_CastRay(Handle, origin, direction, out hit, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+            result = JPH_NarrowPhaseQuery_CastRay(Handle, origin, direction, ref hit, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
         }
 
         return result == 1;
     }
 
-    public bool CastRay(in Double3 origin, in Vector3 direction, out RayCastResult hit)
+    public bool CastRay(in Double3 origin, in Vector3 direction, ref RayCastResult hit)
     {
         uint result = 0;
         if (DoublePrecision)
         {
-            result = JPH_NarrowPhaseQuery_CastRay_Double(Handle, origin, direction, out hit, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+            result = JPH_NarrowPhaseQuery_CastRay_Double(Handle, origin, direction, ref hit, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
         }
         else
         {
-            result = JPH_NarrowPhaseQuery_CastRay(Handle, origin, direction, out hit, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+            result = JPH_NarrowPhaseQuery_CastRay(Handle, origin, direction, ref hit, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
         }
 
         return result == 1;
