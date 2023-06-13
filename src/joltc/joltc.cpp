@@ -3,6 +3,12 @@
 
 #include "joltc.h"
 
+#ifdef _MSC_VER
+#	pragma warning(push)
+#	pragma warning(disable : 5267)
+#	pragma warning(disable : 5045) // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+#endif
+
 #include <Jolt/Jolt.h>
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
@@ -28,11 +34,6 @@
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/NarrowPhaseQuery.h>
 #include <Jolt/Physics/Constraints/PointConstraint.h>
-
-#ifdef _MSC_VER
-#	pragma warning(push)
-#	pragma warning(disable : 5045) // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
-#endif
 
 #include <iostream>
 #include <cstdarg>

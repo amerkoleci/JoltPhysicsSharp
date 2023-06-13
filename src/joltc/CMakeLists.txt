@@ -16,13 +16,12 @@ target_link_libraries(${TARGET_NAME} PUBLIC Jolt)
 
 set_target_properties(${TARGET_NAME} PROPERTIES
     CXX_STANDARD 17
-    COMPILE_WARNING_AS_ERROR ON
 )
 
 if (MSVC)
-    target_compile_options(${TARGET_NAME} PRIVATE /W4)
+    target_compile_options(${TARGET_NAME} PRIVATE /Wall /WX)
 else()
-    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic)
+    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Werror)
 endif()
 
 if(BUILD_SHARED_LIBS)
