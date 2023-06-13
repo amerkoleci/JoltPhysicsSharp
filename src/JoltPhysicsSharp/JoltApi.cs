@@ -730,7 +730,7 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_NarrowPhaseQuery_CastRay(nint system,
         in Vector3 origin, in Vector3 direction,
-        out RayCastResult hit,
+        ref RayCastResult hit,
         IntPtr broadPhaseLayerFilter,
         IntPtr objectLayerFilter,
         IntPtr bodyFilter);
@@ -738,7 +738,7 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay), CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_NarrowPhaseQuery_CastRay_Double(nint system,
         in Double3 origin, in Vector3 direction,
-        out RayCastResult hit,
+        ref RayCastResult hit,
         IntPtr broadPhaseLayerFilter,
         IntPtr objectLayerFilter,
         IntPtr bodyFilter);

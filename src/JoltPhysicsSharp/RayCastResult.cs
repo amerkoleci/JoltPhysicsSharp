@@ -3,9 +3,25 @@
 
 namespace JoltPhysicsSharp;
 
-public readonly struct RayCastResult
+public struct RayCastResult
 {
-    public readonly BodyID BodyID;
-    public readonly float Fraction;
-    public readonly uint/*SubShapeID*/ subShapeID2;
+    /// <summary>
+    /// C Float Epsilon.
+    /// C# Float Epsilon has a different value than C Float Epsilon, which we need for default values
+    /// </summary>
+    const float CEpsilon = 1.192092896e-07F;
+
+    public BodyID BodyID;
+    public float Fraction;
+    public uint/*SubShapeID*/ subShapeID2;
+
+    /// <summary>
+    /// Default values for raycasting.
+    /// Required for raycasting successfully, as it expects these values to do it correctly.
+    /// </summary>
+    public static RayCastResult Default => new RayCastResult()
+    {
+        BodyID = BodyID.Invalid,
+        Fraction = 1.0f + CEpsilon,
+    };
 }
