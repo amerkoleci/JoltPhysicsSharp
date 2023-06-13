@@ -334,6 +334,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SixDOFConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SliderConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SliderConstraint.h
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SpringSettings.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SpringSettings.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SwingTwistConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SwingTwistConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/TwoBodyConstraint.cpp
@@ -429,19 +431,20 @@ endif()
 source_group(TREE ${JOLT_PHYSICS_ROOT} FILES ${JOLT_PHYSICS_SRC_FILES})
 
 # Create Jolt lib
+add_library(Jolt ${JOLT_PHYSICS_SRC_FILES})
 
-if (COMPILE_AS_SHARED_LIBRARY)
-	add_library(Jolt SHARED ${JOLT_PHYSICS_SRC_FILES})
-
+if (BUILD_SHARED_LIBS)
 	# Set default visibility to hidden
 	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-	if (MSVC)
-		# MSVC specific option to enable PDB generation
-		set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG:FASTLINK")
-	else()
-		# Clang/GCC option to enable debug symbol generation
-		set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -g")
+	if (GENERATE_DEBUG_SYMBOLS)
+		if (MSVC)
+			# MSVC specific option to enable PDB generation
+			set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG:FASTLINK")
+		else()
+			# Clang/GCC option to enable debug symbol generation
+			set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -g")
+		endif()
 	endif()
 
 	# Set linker flags for other build types to be the same as release
@@ -455,8 +458,6 @@ if (COMPILE_AS_SHARED_LIBRARY)
 
 	# Private define to instruct the library to export symbols for shared linking
 	target_compile_definitions(Jolt PRIVATE JPH_BUILD_SHARED_LIBRARY)
-else()
-	add_library(Jolt STATIC ${JOLT_PHYSICS_SRC_FILES})
 endif()
 
 target_include_directories(Jolt PUBLIC ${PHYSICS_REPO_ROOT})

@@ -14,6 +14,17 @@ set(SOURCE_FILES
 add_library(${TARGET_NAME} ${SOURCE_FILES})
 target_link_libraries(${TARGET_NAME} PUBLIC Jolt)
 
+set_target_properties(${TARGET_NAME} PROPERTIES
+    CXX_STANDARD 17
+    COMPILE_WARNING_AS_ERROR ON
+)
+
+if (MSVC)
+    target_compile_options(${TARGET_NAME} PRIVATE /W4)
+else()
+    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic)
+endif()
+
 if(BUILD_SHARED_LIBS)
     set_property(TARGET ${TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 

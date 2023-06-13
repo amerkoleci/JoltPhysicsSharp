@@ -32,7 +32,7 @@ option(CROSS_PLATFORM_DETERMINISTIC "Cross platform deterministic" OFF)
 option(CROSS_COMPILE_ARM "Cross compile to aarch64-linux-gnu" OFF)
 
 # When turning this option on, Jolt will be compiled as a shared library and public symbols will be exported.
-option(COMPILE_AS_SHARED_LIBRARY "Compile Jolt as a shared library" OFF)
+option(BUILD_SHARED_LIBS "Compile Jolt as a shared library" OFF)
 
 # When turning this option on, the library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation.
 # Note that if you turn this on you need to use SET_INTERPROCEDURAL_OPTIMIZATION() or set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON) to enable LTO specificly for your own project as well.
@@ -62,7 +62,7 @@ option(USE_F16C "Enable F16C" ON)
 option(USE_FMADD "Enable FMADD" ON)
 
 # Enable all warnings
-option(ENABLE_ALL_WARNINGS "Enable all warnings and warnings as errors" ON)
+option(ENABLE_ALL_WARNINGS "Enable all warnings and warnings as errors" OFF)
 
 include(CMakeDependentOption)
 include(GNUInstallDirs)
@@ -120,7 +120,7 @@ if (("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" OR "${CMAKE_SYSTEM_NAME}" STREQUA
 	set(CMAKE_CXX_FLAGS_DISTRIBUTION "/GS- /Gy /O2 /Oi /Ot")
 	set(CMAKE_CXX_FLAGS_RELEASEASAN "-fsanitize=address /Od")
 	set(CMAKE_CXX_FLAGS_RELEASEUBSAN "-fsanitize=undefined,implicit-conversion,float-divide-by-zero,local-bounds -fno-sanitize-recover=all")
-	set(CMAKE_CXX_FLAGS_RELEASECOVERAGE "-fprofile-instr-generate -fcoverage-mapping")
+	set(CMAKE_CXX_FLAGS_RELEASECOVERAGE "-O0 -DJPH_NO_FORCE_INLINE -fprofile-instr-generate -fcoverage-mapping")
 
 	# Set linker flags
 	set(CMAKE_EXE_LINKER_FLAGS "/SUBSYSTEM:WINDOWS /ignore:4221 /DEBUG:FASTLINK")
@@ -211,6 +211,8 @@ set(CMAKE_SHARED_LINKER_FLAGS_DISTRIBUTION "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}
 set(CMAKE_EXE_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
 set(PHYSICS_REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/joltc)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Disable shared library when building Jolt" FORCE)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/src/joltc/Jolt/Jolt.cmake)
 if (IOS)
 	# Ensure that we enable SSE4.2 for the x86_64 build, CMAKE_SYSTEM_PROCESSOR is not set for iOS
@@ -229,7 +231,7 @@ endforeach()
 
 # Options
 if (IOS OR EMSCRIPTEN)
-     set(BUILD_SHARED_LIBS OFF CACHE BOOL "Always Disable shared library on (IOS, WEB)" FORCE)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Always Disable shared library on (IOS, WEB)" FORCE)
 else()
     option(BUILD_SHARED_LIBS "Build shared library" ON)
 endif()
