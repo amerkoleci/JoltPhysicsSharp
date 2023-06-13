@@ -3,6 +3,10 @@
 
 #include "joltc.h"
 
+#ifdef _MSC_VER
+__pragma(warning(push, 0))
+#endif
+
 #include <Jolt/Jolt.h>
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
@@ -21,6 +25,10 @@
 #include <Jolt/Physics/Collision/CastResult.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
+
+#ifdef _MSC_VER
+__pragma(warning(pop))
+#endif
 
 #ifdef JPH_COMPILER_GCC
 JPH_GCC_SUPPRESS_WARNING("-Winvalid-offsetof")
