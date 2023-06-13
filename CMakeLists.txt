@@ -233,7 +233,7 @@ endforeach()
 if (IOS OR EMSCRIPTEN)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "Always Disable shared library on (IOS, WEB)" FORCE)
 else()
-    option(BUILD_SHARED_LIBS "Build shared library" ON)
+    set(BUILD_SHARED_LIBS ON CACHE BOOL "Always build shared library" FORCE)
 endif()
 
 add_subdirectory(src/joltc)
