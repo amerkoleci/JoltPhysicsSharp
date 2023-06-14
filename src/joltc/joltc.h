@@ -482,6 +482,7 @@ JPH_CAPI JPH_Bool32 JPH_Body_IsStatic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsKinematic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsDynamic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsSensor(const JPH_Body* body);
+JPH_CAPI void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value);
 JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType);
 JPH_CAPI float JPH_Body_GetFriction(const JPH_Body* body);

@@ -766,6 +766,9 @@ internal static unsafe partial class JoltApi
     public static extern uint JPH_Body_IsSensor(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_SetIsSensor(IntPtr handle, uint value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern MotionType JPH_Body_GetMotionType(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
