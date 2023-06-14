@@ -149,6 +149,9 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_Shutdown();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_SetAssertFailureHandler(IntPtr handler);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_TempAllocatorMalloc_Create();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]

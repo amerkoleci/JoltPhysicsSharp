@@ -39,6 +39,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef uint32_t JPH_Bool32;
 typedef uint32_t JPH_BodyID;
@@ -238,6 +239,7 @@ typedef struct JPH_BodyLockWrite
 
 JPH_CAPI JPH_Bool32 JPH_Init(void);
 JPH_CAPI void JPH_Shutdown(void);
+JPH_CAPI void JPH_SetAssertFailureHandler(bool (*handler)(const char* inExpression, const char* inMessage, const char* inFile, unsigned int inLine));
 
 /* JPH_TempAllocator */
 JPH_CAPI JPH_TempAllocator* JPH_TempAllocatorMalloc_Create();
