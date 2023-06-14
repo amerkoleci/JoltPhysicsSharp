@@ -1,6 +1,7 @@
 // Copyright © Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
@@ -37,6 +38,8 @@ public static class Foundation
     /// </summary>
     public const int MaxPhysicsBarriers = 8;
 
+    public delegate bool AssertFailedImpl(string inExpression, string inMessage, string inFile, uint inLine);
+
     public static bool Init(bool doublePrecision = false)
     {
         JoltApi.DoublePrecision = doublePrecision;
@@ -48,4 +51,6 @@ public static class Foundation
     }
 
     public static void Shutdown() => JPH_Shutdown();
+
+    public static void SetAssertFailureHandler(AssertFailedImpl impl) => JPH_SetAssertFailureHandler(Marshal.GetFunctionPointerForDelegate(impl));
 }

@@ -210,8 +210,8 @@ JPH_Bool32 JPH_Init(void)
     JPH::Trace = TraceImpl;
     JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = AssertFailedImpl;)
 
-        // Create a factory
-        JPH::Factory::sInstance = new JPH::Factory();
+    // Create a factory
+    JPH::Factory::sInstance = new JPH::Factory();
 
     // Register all Jolt physics types
     JPH::RegisterTypes();
@@ -227,6 +227,13 @@ void JPH_Shutdown(void)
     // Destroy the factory
     delete JPH::Factory::sInstance;
     JPH::Factory::sInstance = nullptr;
+}
+
+void JPH_SetAssertFailureHandler(bool (*handler)(const char* inExpression, const char* inMessage, const char* inFile, uint32_t inLine))
+{
+#ifdef JPH_ENABLE_ASSERTS
+    JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = handler;)
+#endif
 }
 
 JPH_TempAllocator* JPH_TempAllocatorMalloc_Create()
