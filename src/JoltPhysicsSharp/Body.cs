@@ -30,7 +30,12 @@ public readonly struct Body : IEquatable<Body>
     public readonly bool IsStatic => JPH_Body_IsStatic(Handle) == 1;
     public readonly bool IsKinematic => JPH_Body_IsKinematic(Handle) == 1;
     public readonly bool IsDynamic => JPH_Body_IsDynamic(Handle) == 1;
-    public readonly bool IsSensor => JPH_Body_IsSensor(Handle) == 1;
+
+    public bool IsSensor
+    {
+        readonly get => JPH_Body_IsSensor(Handle) == 1;
+        set => JPH_Body_SetIsSensor(Handle, (uint)(value ? 1 : 0));
+    }
 
     public MotionType MotionType
     {

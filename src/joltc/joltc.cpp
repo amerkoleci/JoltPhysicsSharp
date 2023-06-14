@@ -1539,7 +1539,7 @@ JPH_Bool32 JPH_Body_IsStatic(const JPH_Body* body)
     return reinterpret_cast<const JPH::Body*>(body)->IsStatic();
 }
 
-JPH_Bool32 JPH_Body_IsKinematic(JPH_Body* body)
+JPH_Bool32 JPH_Body_IsKinematic(const JPH_Body* body)
 {
     return reinterpret_cast<const JPH::Body*>(body)->IsKinematic();
 }
@@ -1552,6 +1552,11 @@ JPH_Bool32 JPH_Body_IsDynamic(const JPH_Body* body)
 JPH_Bool32 JPH_Body_IsSensor(const JPH_Body* body)
 {
     return reinterpret_cast<const JPH::Body*>(body)->IsSensor();
+}
+
+void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value)
+{
+    reinterpret_cast<JPH::Body*>(body)->SetIsSensor(!!value);
 }
 
 JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body)
