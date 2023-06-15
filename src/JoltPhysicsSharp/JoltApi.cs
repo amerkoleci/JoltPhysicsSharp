@@ -316,6 +316,60 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ObjectLayerPairFilter_Destroy(nint handle);
 
+    //  BodyFilter
+#if NET6_0_OR_GREATER
+    public struct JPH_BodyFilter_Procs
+    {
+        public delegate* unmanaged[Cdecl]<IntPtr, BodyID, uint> ShouldCollide;
+        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, uint> ShouldCollideLocked;
+    }
+#else
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint BodyFilterShouldCollideDelegate(IntPtr @this, BodyID bodyID);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate uint BodyFilterShouldCollideLockedDelegate(IntPtr @this, IntPtr body);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct JPH_BodyFilter_Procs : IEquatable<JPH_BodyFilter_Procs>
+    {
+        public BodyFilterShouldCollideDelegate ShouldCollide;
+        public BodyFilterShouldCollideLockedDelegate ShouldCollideLocked;
+
+        public readonly bool Equals(JPH_BodyFilter_Procs obj)
+        {
+            return
+                ShouldCollide == obj.ShouldCollide &&
+                ShouldCollideLocked == obj.ShouldCollideLocked;
+        }
+
+        public readonly override bool Equals(object obj) => obj is JPH_BodyFilter_Procs f && Equals(f);
+
+        public static bool operator ==(JPH_BodyFilter_Procs left, JPH_BodyFilter_Procs right) =>
+            left.Equals(right);
+
+        public static bool operator !=(JPH_BodyFilter_Procs left, JPH_BodyFilter_Procs right) =>
+            !left.Equals(right);
+
+        public override readonly int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(ShouldCollide);
+            hash.Add(ShouldCollideLocked);
+            return hash.ToHashCode();
+        }
+    }
+#endif
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_BodyFilter_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyFilter_Destroy(nint handle);
+
     /* ShapeSettings */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ShapeSettings_Destroy(nint shape);

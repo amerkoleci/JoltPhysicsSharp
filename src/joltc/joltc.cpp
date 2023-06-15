@@ -415,6 +415,53 @@ void JPH_ObjectLayerPairFilter_Destroy(JPH_ObjectLayerPairFilter* filter)
     }
 }
 
+/* JPH_BodyFilter */
+static JPH_BodyFilter_Procs g_BodyFilter_Procs;
+
+class ManagedBodyFilter final : public JPH::BodyFilter
+{
+public:
+    ManagedBodyFilter() = default;
+
+    ManagedBodyFilter(const ManagedBodyFilter&) = delete;
+    ManagedBodyFilter(const ManagedBodyFilter&&) = delete;
+    ManagedBodyFilter& operator=(const ManagedBodyFilter&) = delete;
+    ManagedBodyFilter& operator=(const ManagedBodyFilter&&) = delete;
+
+    bool ShouldCollide(const BodyID &bodyID) const override
+    {
+        return !!g_BodyFilter_Procs.ShouldCollide(
+            reinterpret_cast<const JPH_BodyFilter*>(this),
+            (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
+    }
+
+    bool ShouldCollideLocked(const Body& body) const override
+    {
+        return !!g_BodyFilter_Procs.ShouldCollideLocked(
+            reinterpret_cast<const JPH_BodyFilter*>(this),
+            reinterpret_cast<const JPH_Body *>(&body));
+    }
+};
+
+void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs)
+{
+    g_BodyFilter_Procs = procs;
+}
+
+JPH_BodyFilter* JPH_BodyFilter_Create()
+{
+    auto filter = new ManagedBodyFilter();
+    return reinterpret_cast<JPH_BodyFilter*>(filter);
+}
+
+void JPH_BodyFilter_Destroy(JPH_BodyFilter* filter)
+{
+    if (filter)
+    {
+        delete reinterpret_cast<ManagedBodyFilter*>(filter);
+    }
+}
+
 /* ShapeSettings */
 void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
 {
