@@ -178,6 +178,9 @@ typedef struct JPH_JobSystemThreadPool              JPH_JobSystemThreadPool;
 typedef struct JPH_BroadPhaseLayerInterface         JPH_BroadPhaseLayerInterface;
 typedef struct JPH_ObjectVsBroadPhaseLayerFilter    JPH_ObjectVsBroadPhaseLayerFilter;
 typedef struct JPH_ObjectLayerPairFilter            JPH_ObjectLayerPairFilter;
+typedef struct JPH_BroadPhaseLayerFilter            JPH_BroadPhaseLayerFilter;
+typedef struct JPH_ObjectLayerFilter                JPH_ObjectLayerFilter;
+typedef struct JPH_BodyFilter                       JPH_BodyFilter;
 
 typedef struct JPH_PhysicsSystem                    JPH_PhysicsSystem;
 
@@ -537,6 +540,34 @@ typedef struct JPH_ObjectLayerPairFilter_Procs {
 JPH_CAPI void JPH_ObjectLayerPairFilter_SetProcs(JPH_ObjectLayerPairFilter_Procs procs);
 JPH_CAPI JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilter_Create();
 JPH_CAPI void JPH_ObjectLayerPairFilter_Destroy(JPH_ObjectLayerPairFilter* filter);
+
+/* JPH_BroadPhaseLayerFilter_Procs */
+typedef struct JPH_BroadPhaseLayerFilter_Procs {
+    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_BroadPhaseLayerFilter* filter, JPH_BroadPhaseLayer layer);
+} JPH_BroadPhaseLayerFilter_Procs;
+
+JPH_CAPI void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter_Procs procs);
+JPH_CAPI JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create();
+JPH_CAPI void JPH_BroadPhaseLayerFilter_Destroy(JPH_BroadPhaseLayerFilter* filter);
+
+/* JPH_ObjectLayerFilter */
+typedef struct JPH_ObjectLayerFilter_Procs {
+    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_ObjectLayerFilter *filter, JPH_ObjectLayer layer);
+} JPH_ObjectLayherFilter_Procs;
+
+JPH_CAPI void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter_Procs procs);
+JPH_CAPI JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create();
+JPH_CAPI void JPH_ObjectLayerFilter_Destroy(JPH_ObjectLayerFilter* filter);
+
+/* JPH_BodyFilter */
+typedef struct JPH_BodyFilter_Procs {
+    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_BodyFilter* filter, JPH_BodyID bodyID);
+    JPH_Bool32(JPH_API_CALL* ShouldCollideLocked)(const JPH_BodyFilter* filter, const JPH_Body *bodyID);
+} JPH_BodyFilter_Procs;
+
+JPH_CAPI void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs);
+JPH_CAPI JPH_BodyFilter* JPH_BodyFilter_Create();
+JPH_CAPI void JPH_BodyFilter_Destroy(JPH_BodyFilter* filter);
 
 /* Contact listener */
 typedef struct JPH_ContactListener_Procs {

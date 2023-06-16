@@ -415,6 +415,135 @@ void JPH_ObjectLayerPairFilter_Destroy(JPH_ObjectLayerPairFilter* filter)
     }
 }
 
+/* JPH_BroadPhaseLayerFilter */
+static JPH_BroadPhaseLayerFilter_Procs g_BroadPhaseLayerFilter_Procs;
+
+class ManagedBroadPhaseLayerFilter final : public JPH::BroadPhaseLayerFilter
+{
+public:
+    ManagedBroadPhaseLayerFilter() = default;
+
+    ManagedBroadPhaseLayerFilter(const ManagedBroadPhaseLayerFilter&) = delete;
+    ManagedBroadPhaseLayerFilter(const ManagedBroadPhaseLayerFilter&&) = delete;
+    ManagedBroadPhaseLayerFilter& operator=(const ManagedBroadPhaseLayerFilter&) = delete;
+    ManagedBroadPhaseLayerFilter& operator=(const ManagedBroadPhaseLayerFilter&&) = delete;
+
+    bool ShouldCollide(BroadPhaseLayer inLayer) const override
+    {
+        return g_BroadPhaseLayerFilter_Procs.ShouldCollide(
+            reinterpret_cast<const JPH_BroadPhaseLayerFilter*>(this),
+            static_cast<JPH_BroadPhaseLayer>(inLayer)
+        ) == 1;
+    }
+};
+
+void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter_Procs procs)
+{
+    g_BroadPhaseLayerFilter_Procs = procs;
+}
+
+JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create()
+{
+    auto filter = new ManagedBroadPhaseLayerFilter();
+    return reinterpret_cast<JPH_BroadPhaseLayerFilter*>(filter);
+}
+
+void JPH_BroadPhaseLayerFilter_Destroy(JPH_BroadPhaseLayerFilter* filter)
+{
+    if (filter)
+    {
+        delete reinterpret_cast<ManagedBroadPhaseLayerFilter*>(filter);
+    }
+}
+
+/* JPH_ObjectLayerFilter */
+static JPH_ObjectLayerFilter_Procs g_ObjectLayerFilter_Procs;
+
+class ManagedObjectLayerFilter final : public JPH::ObjectLayerFilter
+{
+public:
+    ManagedObjectLayerFilter() = default;
+
+    ManagedObjectLayerFilter(const ManagedObjectLayerFilter&) = delete;
+    ManagedObjectLayerFilter(const ManagedObjectLayerFilter&&) = delete;
+    ManagedObjectLayerFilter& operator=(const ManagedObjectLayerFilter&) = delete;
+    ManagedObjectLayerFilter& operator=(const ManagedObjectLayerFilter&&) = delete;
+
+    bool ShouldCollide(ObjectLayer inLayer) const override
+    {
+        return g_ObjectLayerFilter_Procs.ShouldCollide(
+            reinterpret_cast<const JPH_ObjectLayerFilter*>(this),
+            static_cast<JPH_ObjectLayer>(inLayer)
+        ) == 1;
+    }
+};
+
+void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter_Procs procs)
+{
+    g_ObjectLayerFilter_Procs = procs;
+}
+
+JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create()
+{
+    auto filter = new ManagedObjectLayerFilter();
+    return reinterpret_cast<JPH_ObjectLayerFilter*>(filter);
+}
+
+void JPH_ObjectLayerFilter_Destroy(JPH_ObjectLayerFilter* filter)
+{
+    if (filter)
+    {
+        delete reinterpret_cast<ManagedObjectLayerFilter*>(filter);
+    }
+}
+
+/* JPH_BodyFilter */
+static JPH_BodyFilter_Procs g_BodyFilter_Procs;
+
+class ManagedBodyFilter final : public JPH::BodyFilter
+{
+public:
+    ManagedBodyFilter() = default;
+
+    ManagedBodyFilter(const ManagedBodyFilter&) = delete;
+    ManagedBodyFilter(const ManagedBodyFilter&&) = delete;
+    ManagedBodyFilter& operator=(const ManagedBodyFilter&) = delete;
+    ManagedBodyFilter& operator=(const ManagedBodyFilter&&) = delete;
+
+    bool ShouldCollide(const BodyID &bodyID) const override
+    {
+        return !!g_BodyFilter_Procs.ShouldCollide(
+            reinterpret_cast<const JPH_BodyFilter*>(this),
+            (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
+    }
+
+    bool ShouldCollideLocked(const Body& body) const override
+    {
+        return !!g_BodyFilter_Procs.ShouldCollideLocked(
+            reinterpret_cast<const JPH_BodyFilter*>(this),
+            reinterpret_cast<const JPH_Body *>(&body));
+    }
+};
+
+void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs)
+{
+    g_BodyFilter_Procs = procs;
+}
+
+JPH_BodyFilter* JPH_BodyFilter_Create()
+{
+    auto filter = new ManagedBodyFilter();
+    return reinterpret_cast<JPH_BodyFilter*>(filter);
+}
+
+void JPH_BodyFilter_Destroy(JPH_BodyFilter* filter)
+{
+    if (filter)
+    {
+        delete reinterpret_cast<ManagedBodyFilter*>(filter);
+    }
+}
+
 /* ShapeSettings */
 void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
 {
