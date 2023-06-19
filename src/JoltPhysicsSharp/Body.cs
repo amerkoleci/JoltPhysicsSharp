@@ -184,7 +184,7 @@ public readonly struct Body : IEquatable<Body>
         JPH_Body_AddForce(Handle, force);
     }
 
-    public void AddForceAtPosition(in Vector3 force, in Vector3 position)
+    public void AddForceAtPosition(in Vector3 force, in Double3 position)
     {
         JPH_Body_AddForceAtPosition(Handle, force, position);
     }
@@ -199,9 +199,9 @@ public readonly struct Body : IEquatable<Body>
         JPH_Body_AddImpulse(Handle, impulse);
     }
 
-    public void AddImpulseAtPosition(in Vector3 impulse, in Vector3 position)
+    public void AddImpulseAtPosition(in Vector3 impulse, in Double3 position)
     {
-        JPH_Body_AddImpulseAtPosition(Handle, impulse, position);
+        JPH_Body_AddImpulseAtPosition(Handle, in impulse, in position);
     }
 
     public void AddAngularImpulse(in Vector3 angularImpulse)

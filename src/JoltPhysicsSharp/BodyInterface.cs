@@ -106,15 +106,15 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_SetLinearVelocity(Handle, bodyID, velocity);
     }
 
-    public Vector3 GetCenterOfMassPosition(in BodyID bodyID)
+    public Double3 GetCenterOfMassPosition(in BodyID bodyID)
     {
-        JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, out Vector3 velocity);
-        return velocity;
+        JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, out Double3 value);
+        return value;
     }
 
-    public void GetCenterOfMassPosition(in BodyID bodyID, out Vector3 velocity)
+    public void GetCenterOfMassPosition(in BodyID bodyID, out Double3 position)
     {
-        JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, out velocity);
+        JPH_BodyInterface_GetCenterOfMassPosition(Handle, bodyID, out position);
     }
 
     public MotionType GetMotionType(in BodyID bodyID)
@@ -244,7 +244,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return result;
     }
 
-    public void MoveKinematic(in BodyID bodyId, in Vector3 targetPosition, in Quaternion targetRotation, float deltaTime)
+    public void MoveKinematic(in BodyID bodyId, in Double3 targetPosition, in Quaternion targetRotation, float deltaTime)
     {
         JPH_BodyInterface_MoveKinematic(Handle, bodyId, targetPosition, targetRotation, deltaTime);
     }
@@ -280,7 +280,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return result;
     }
 
-    public Vector3 GetPointVelocity(in BodyID bodyId, in Vector3 point)
+    public Vector3 GetPointVelocity(in BodyID bodyId, in Double3 point)
     {
         JPH_BodyInterface_GetPointVelocity(Handle, bodyId, point, out Vector3 result);
         return result;
@@ -291,7 +291,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_AddForce(Handle, bodyId, force);
     }
 
-    public void AddForce(in BodyID bodyId, in Vector3 force, in Vector3 point)
+    public void AddForce(in BodyID bodyId, in Vector3 force, in Double3 point)
     {
         JPH_BodyInterface_AddForce2(Handle, bodyId, force, point);
     }
@@ -311,7 +311,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_AddImpulse(Handle, bodyId, impulse);
     }
 
-    public void AddImpulse(in BodyID bodyId, in Vector3 impulse, in Vector3 point)
+    public void AddImpulse(in BodyID bodyId, in Vector3 impulse, in Double3 point)
     {
         JPH_BodyInterface_AddImpulse2(Handle, bodyId, impulse, point);
     }

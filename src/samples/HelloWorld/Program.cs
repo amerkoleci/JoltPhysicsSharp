@@ -273,7 +273,7 @@ public static class Program
     }
 
 
-    private static ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, Vector3 baseOffset, IntPtr collisionResult)
+    private static ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, IntPtr collisionResult)
     {
         Console.WriteLine("Contact validate callback");
 

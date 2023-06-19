@@ -710,7 +710,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_SetLinearVelocity(IntPtr handle, uint bodyID, in Vector3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_GetCenterOfMassPosition(IntPtr handle, uint bodyID, out Vector3 velocity);
+    public static extern void JPH_BodyInterface_GetCenterOfMassPosition(IntPtr handle, uint bodyID, out Double3 position);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern Bool32 JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
@@ -788,7 +788,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_GetCenterOfMassTransform(IntPtr handle, uint bodyId, out Matrix4x4 result);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_MoveKinematic(IntPtr handle, uint bodyId, in Vector3 targetPosition, in Quaternion targetRotation, float deltaTime);
+    public static extern void JPH_BodyInterface_MoveKinematic(IntPtr handle, uint bodyId, in Double3 targetPosition, in Quaternion targetRotation, float deltaTime);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetLinearAndAngularVelocity(IntPtr handle, uint bodyId, in Vector3 linearVelocity, in Vector3 angularVelocity);
@@ -809,13 +809,13 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_GetAngularVelocity(IntPtr handle, uint bodyId, out Vector3 angularVelocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_GetPointVelocity(IntPtr handle, uint bodyId, in Vector3 point, out Vector3 velocity);
+    public static extern void JPH_BodyInterface_GetPointVelocity(IntPtr handle, uint bodyId, in Double3 point, out Vector3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_AddForce(IntPtr handle, uint bodyId, in Vector3 force);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_AddForce2(IntPtr handle, uint bodyId, in Vector3 force, in Vector3 point);
+    public static extern void JPH_BodyInterface_AddForce2(IntPtr handle, uint bodyId, in Vector3 force, in Double3 point);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_AddTorque(IntPtr handle, uint bodyId, in Vector3 torque);
@@ -827,7 +827,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_AddImpulse(IntPtr handle, uint bodyId, in Vector3 impulse);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_AddImpulse2(IntPtr handle, uint bodyId, in Vector3 impulse, in Vector3 point);
+    public static extern void JPH_BodyInterface_AddImpulse2(IntPtr handle, uint bodyId, in Vector3 impulse, in Double3 point);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_AddAngularImpulse(IntPtr handle, uint bodyId, in Vector3 angularImpulse);
@@ -872,7 +872,7 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern Bool32 JPH_NarrowPhaseQuery_CastRay(nint system,
-        in Vector3 origin, in Vector3 direction,
+        in Double3 origin, in Vector3 direction,
         ref RayCastResult hit,
         IntPtr broadPhaseLayerFilter,
         IntPtr objectLayerFilter,
@@ -949,7 +949,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_Body_AddForce(IntPtr handle, in Vector3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_AddForceAtPosition(IntPtr handle, in Vector3 velocity, in Vector3 position);
+    public static extern void JPH_Body_AddForceAtPosition(IntPtr handle, in Vector3 velocity, in Double3 position);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_AddTorque(IntPtr handle, in Vector3 value);
@@ -964,7 +964,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_Body_AddImpulse(IntPtr handle, in Vector3 impulse);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_AddImpulseAtPosition(IntPtr handle, in Vector3 impulse, in Vector3 position);
+    public static extern void JPH_Body_AddImpulseAtPosition(IntPtr handle, in Vector3 impulse, in Double3 position);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_AddAngularImpulse(IntPtr handle, in Vector3 angularImpulse);
@@ -973,14 +973,14 @@ internal static unsafe partial class JoltApi
 #if NET6_0_OR_GREATER
     public struct JPH_ContactListener_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, Vector3*, IntPtr, uint> OnContactValidate;
+        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, Double3*, IntPtr, uint> OnContactValidate;
         public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactAdded;
         public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void> OnContactPersisted;
         public delegate* unmanaged[Cdecl]<IntPtr, SubShapeIDPair*, void> OnContactRemoved;
     }
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint OnContactValidateDelegate(IntPtr @this, IntPtr body1, IntPtr body2, Vector3* baseOffset, IntPtr collisionResult);
+    public delegate uint OnContactValidateDelegate(IntPtr @this, IntPtr body1, IntPtr body2, Double3* baseOffset, IntPtr collisionResult);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void OnContactAddedDelegate(IntPtr @this, IntPtr body1, IntPtr body2);

@@ -8,7 +8,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Vector3 baseOffset, IntPtr collisionResult);
+public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, IntPtr collisionResult);
 public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2);
 public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2);
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
@@ -239,7 +239,7 @@ public sealed class PhysicsSystem : NativeObject
 #else
     [MonoPInvokeCallback(typeof(OnContactValidateDelegate))]
 #endif
-    private static unsafe uint OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Vector3* baseOffset, IntPtr collisionResult)
+    private static unsafe uint OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Double3* baseOffset, IntPtr collisionResult)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
 
