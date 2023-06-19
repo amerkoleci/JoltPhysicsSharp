@@ -63,10 +63,15 @@ static void TraceImpl(const char* inFMT, ...)
 }
 
 #ifdef JPH_ENABLE_ASSERTS
+static JPH_AssertFailureFunc s_AssertFailureFunc = nullptr;
 
 // Callback for asserts, connect this to your own assert handler if you have one
 static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, uint inLine)
 {
+    if (s_AssertFailureFunc) {
+        return !!s_AssertFailureFunc(inExpression, inMessage, inFile, inLine);
+    }
+
     // Print to the TTY
     std::cout << inFile << ":" << inLine << ": (" << inExpression << ") " << (inMessage != nullptr ? inMessage : "") << std::endl;
 
@@ -100,7 +105,11 @@ static void FromVec3(const JPH::Vec3& vec, JPH_Vec3* result)
 
 static JPH::RVec3 ToRVec3(const JPH_RVec3* vec)
 {
+#ifdef JPH_DOUBLE_PRECISION
     return JPH::RVec3(vec->x, vec->y, vec->z);
+#else
+    return JPH::RVec3(static_cast<float>(vec->x), static_cast<float>(vec->y), static_cast<float>(vec->z));
+#endif
 }
 
 static void FromRVec3(const JPH::RVec3& vec, JPH_RVec3* result)
@@ -229,10 +238,12 @@ void JPH_Shutdown(void)
     JPH::Factory::sInstance = nullptr;
 }
 
-void JPH_SetAssertFailureHandler(bool (*handler)(const char* inExpression, const char* inMessage, const char* inFile, uint32_t inLine))
+void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler)
 {
 #ifdef JPH_ENABLE_ASSERTS
-    JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = handler;)
+    s_AssertFailureFunc = handler;
+#else
+    JPH_UNUSED(handler);
 #endif
 }
 
@@ -1553,6 +1564,21 @@ void JPH_BodyInterface_AddAngularImpulse(JPH_BodyInterface* interface, JPH_BodyI
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
     joltBodyInterface->AddAngularImpulse(JPH::BodyID(bodyId), ToVec3(angularImpulse));
+}
+
+void JPH_BodyInterface_SetMotionQuality(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_MotionQuality quality)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    joltBodyInterface->SetMotionQuality(JPH::BodyID(bodyId), static_cast<JPH::EMotionQuality>(quality));
+}
+
+JPH_MotionQuality JPH_BodyInterface_GetMotionQuality(JPH_BodyInterface* interface, JPH_BodyID bodyId)
+{
+    JPH_ASSERT(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    return static_cast<JPH_MotionQuality>(joltBodyInterface->GetMotionQuality(JPH::BodyID(bodyId)));
 }
 
 void JPH_BodyInterface_GetInverseInertia(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Matrix4x4* result)

@@ -71,6 +71,10 @@ static_assert(sizeof(JPH::EConstraintSpace) == sizeof(JPH_ConstraintSpace));
 static_assert(JPH_CONSTRAINT_SPACE_LOCAL_TO_BODY_COM == (int)JPH::EConstraintSpace::LocalToBodyCOM);
 static_assert(JPH_CONSTRAINT_SPACE_WORLD_SPACE == (int)JPH::EConstraintSpace::WorldSpace);
 
+// EMotionQuality
+static_assert(JPH_MOTION_QUALITY_DISCRETE == (int)JPH::EMotionQuality::Discrete);
+static_assert(JPH_MOTION_QUALITY_LINEAR_CAST == (int)JPH::EMotionQuality::LinearCast);
+
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));
 

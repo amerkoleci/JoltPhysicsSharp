@@ -39,7 +39,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 typedef uint32_t JPH_Bool32;
 typedef uint32_t JPH_BodyID;
@@ -93,6 +92,14 @@ typedef enum JPH_ConstraintSpace {
     _JPH_CONSTRAINT_SPACE_FORCEU32 = 0x7fffffff
 } JPH_ConstraintSpace;
 
+typedef enum JPH_MotionQuality {
+    JPH_MOTION_QUALITY_DISCRETE = 0,
+    JPH_MOTION_QUALITY_LINEAR_CAST = 1,
+
+    _JPH_MOTION_QUALITY_NUM,
+    _JPH_MOTION_QUALITY_FORCEU32 = 0x7fffffff
+} JPH_MotionQuality;
+
 typedef struct JPH_Vec3 {
     float x;
     float y;
@@ -107,15 +114,9 @@ typedef struct JPH_Vec4 {
 } JPH_Vec4;
 
 typedef struct JPH_RVec3 {
-#ifdef JPH_DOUBLE_PRECISION
     double x;
     double y;
     double z;
-#else
-    float x;
-    float y;
-    float z;
-#endif
 } JPH_RVec3;
 
 typedef struct JPH_Quat {
@@ -240,9 +241,11 @@ typedef struct JPH_BodyLockWrite
     JPH_Body* body;
 } JPH_BodyLockWrite;
 
+typedef JPH_Bool32(JPH_API_CALL* JPH_AssertFailureFunc)(const char* expression, const char* mssage, const char* file, uint32_t line);
+
 JPH_CAPI JPH_Bool32 JPH_Init(void);
 JPH_CAPI void JPH_Shutdown(void);
-JPH_CAPI void JPH_SetAssertFailureHandler(bool (*handler)(const char* inExpression, const char* inMessage, const char* inFile, unsigned int inLine));
+JPH_CAPI void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler);
 
 /* JPH_TempAllocator */
 JPH_CAPI JPH_TempAllocator* JPH_TempAllocatorMalloc_Create();
@@ -412,7 +415,6 @@ JPH_CAPI void JPH_BodyInterface_GetRotation(JPH_BodyInterface* interface, JPH_Bo
 
 JPH_CAPI void JPH_BodyInterface_SetPositionAndRotation(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_ActivationMode activationMode);
 JPH_CAPI void JPH_BodyInterface_SetPositionAndRotationWhenChanged(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_ActivationMode activationMode);
-
 JPH_CAPI void JPH_BodyInterface_SetPositionRotationAndVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_Vec3* linearVelocity, JPH_Vec3* angularVelocity);
 
 JPH_CAPI void JPH_BodyInterface_SetShape(JPH_BodyInterface* interface, JPH_BodyID bodyId, const JPH_Shape* shape, JPH_Bool32 updateMassProperties, JPH_ActivationMode activationMode);
@@ -449,8 +451,8 @@ JPH_CAPI void JPH_BodyInterface_AddImpulse(JPH_BodyInterface* interface, JPH_Bod
 JPH_CAPI void JPH_BodyInterface_AddImpulse2(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Vec3* impulse, JPH_RVec3* point);
 JPH_CAPI void JPH_BodyInterface_AddAngularImpulse(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Vec3* angularImpulse);
 
-//JPH_CAPI void JPH_BodyInterface_SetMotionQuality(JPH_BodyInterface* interface, JPH_BodyID* bodyId, JPH_MotionQuality quality);
-//JPH_CAPI JPH_MotionQuality JPH_BodyInterface_GetMotionQuality(JPH_BodyInterface* interface, JPH_BodyID* bodyId);
+JPH_CAPI void JPH_BodyInterface_SetMotionQuality(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_MotionQuality quality);
+JPH_CAPI JPH_MotionQuality JPH_BodyInterface_GetMotionQuality(JPH_BodyInterface* interface, JPH_BodyID bodyId);
 
 JPH_CAPI void JPH_BodyInterface_GetInverseInertia(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Matrix4x4* result);
 
