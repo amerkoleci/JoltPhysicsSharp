@@ -7,6 +7,9 @@ using System.Runtime.InteropServices;
 
 namespace JoltPhysicsSharp;
 
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate Bool32 AssertFailedDelegate(string inExpression, string inMessage, string inFile, uint inLine);
+
 internal static unsafe partial class JoltApi
 {
     private const string LibName = "joltc";
@@ -142,14 +145,15 @@ internal static unsafe partial class JoltApi
     }
 #endif
 
+
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_Init();
+    public static extern Bool32 JPH_Init();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Shutdown();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_SetAssertFailureHandler(IntPtr handler);
+    public static extern void JPH_SetAssertFailureHandler(AssertFailedDelegate handler);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_TempAllocatorMalloc_Create();
@@ -232,11 +236,11 @@ internal static unsafe partial class JoltApi
 #if NET6_0_OR_GREATER
     public struct JPH_ObjectVsBroadPhaseLayerFilter_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer, uint> ShouldCollide;
+        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, BroadPhaseLayer, Bool32> ShouldCollide;
     }
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint ShouldCollideDelegate(IntPtr @this, ObjectLayer layer, BroadPhaseLayer broadPhaseLayer);
+    public delegate Bool32 ShouldCollideDelegate(IntPtr @this, ObjectLayer layer, BroadPhaseLayer broadPhaseLayer);
 
     [StructLayout(LayoutKind.Sequential)]
     public struct JPH_ObjectVsBroadPhaseLayerFilter_Procs : IEquatable<JPH_ObjectVsBroadPhaseLayerFilter_Procs>
@@ -276,11 +280,11 @@ internal static unsafe partial class JoltApi
 #if NET6_0_OR_GREATER
     public struct JPH_ObjectLayerPairFilter_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, ObjectLayer, uint> ShouldCollide;
+        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, ObjectLayer, Bool32> ShouldCollide;
     }
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint ObjectLayerPairFilterShouldCollideDelegate(IntPtr @this, ObjectLayer layer1, ObjectLayer layer2);
+    public delegate Bool32 ObjectLayerPairFilterShouldCollideDelegate(IntPtr @this, ObjectLayer layer1, ObjectLayer layer2);
 
     [StructLayout(LayoutKind.Sequential)]
     public struct JPH_ObjectLayerPairFilter_Procs : IEquatable<JPH_ObjectLayerPairFilter_Procs>
@@ -320,11 +324,11 @@ internal static unsafe partial class JoltApi
 #if NET6_0_OR_GREATER
     public struct JPH_BroadPhaseLayerFilter_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, BroadPhaseLayer, uint> ShouldCollide;
+        public delegate* unmanaged[Cdecl]<IntPtr, BroadPhaseLayer, Bool32> ShouldCollide;
     }
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint BroadPhaseLayerFilterShouldCollideDelegate(IntPtr @this, BroadPhaseLayer layer);
+    public delegate Bool32 BroadPhaseLayerFilterShouldCollideDelegate(IntPtr @this, BroadPhaseLayer layer);
 
     [StructLayout(LayoutKind.Sequential)]
     public struct JPH_BroadPhaseLayerFilter_Procs : IEquatable<JPH_BroadPhaseLayerFilter_Procs>
@@ -367,11 +371,11 @@ internal static unsafe partial class JoltApi
 #if NET6_0_OR_GREATER
     public struct JPH_ObjectLayerFilter_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, uint> ShouldCollide;
+        public delegate* unmanaged[Cdecl]<IntPtr, ObjectLayer, Bool32> ShouldCollide;
     }
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint ObjectLayerFilterShouldCollideDelegate(IntPtr @this, ObjectLayer layer);
+    public delegate Bool32 ObjectLayerFilterShouldCollideDelegate(IntPtr @this, ObjectLayer layer);
 
     [StructLayout(LayoutKind.Sequential)]
     public struct JPH_ObjectLayerFilter_Procs : IEquatable<JPH_ObjectLayerFilter_Procs>
@@ -414,15 +418,15 @@ internal static unsafe partial class JoltApi
 #if NET6_0_OR_GREATER
     public struct JPH_BodyFilter_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, BodyID, uint> ShouldCollide;
-        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, uint> ShouldCollideLocked;
+        public delegate* unmanaged[Cdecl]<IntPtr, BodyID, Bool32> ShouldCollide;
+        public delegate* unmanaged[Cdecl]<IntPtr, IntPtr, Bool32> ShouldCollideLocked;
     }
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint BodyFilterShouldCollideDelegate(IntPtr @this, BodyID bodyID);
+    public delegate Bool32 BodyFilterShouldCollideDelegate(IntPtr @this, BodyID bodyID);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate uint BodyFilterShouldCollideLockedDelegate(IntPtr @this, IntPtr body);
+    public delegate Bool32 BodyFilterShouldCollideLockedDelegate(IntPtr @this, IntPtr body);
 
     [StructLayout(LayoutKind.Sequential)]
     public struct JPH_BodyFilter_Procs : IEquatable<JPH_BodyFilter_Procs>
@@ -563,16 +567,10 @@ internal static unsafe partial class JoltApi
     public static extern IntPtr JPH_BodyCreationSettings_Create();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create2(IntPtr shapeSettings, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
-
-    [DllImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create2), CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create2_Double(IntPtr shapeSettings, in Double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
+    public static extern IntPtr JPH_BodyCreationSettings_Create2(IntPtr shapeSettings, in Double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create3(IntPtr shape, in Vector3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
-
-    [DllImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create3), CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create3_Double(IntPtr shape, in Double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
+    public static extern IntPtr JPH_BodyCreationSettings_Create3(IntPtr shape, in Double3 position, in Quaternion rotation, MotionType motionType, ushort objectLayer);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyCreationSettings_Destroy(IntPtr settings);
@@ -595,28 +593,16 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_PointConstraintSettings_SetSpace(IntPtr handle, ConstraintSpace value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_GetPoint1(IntPtr handle, out Vector3 velocity);
-
-    [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_GetPoint1), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_GetPoint1_Double(IntPtr handle, out Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_GetPoint1(IntPtr handle, out Double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetPoint1(IntPtr handle, in Vector3 velocity);
-
-    [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_SetPoint1), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetPoint1_Double(IntPtr handle, in Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_SetPoint1(IntPtr handle, in Double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_GetPoint2(IntPtr handle, out Vector3 velocity);
-
-    [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_GetPoint2), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_GetPoint2_Double(IntPtr handle, out Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_GetPoint2(IntPtr handle, out Double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetPoint2(IntPtr handle, in Vector3 velocity);
-
-    [DllImport(LibName, EntryPoint = nameof(JPH_PointConstraintSettings_SetPoint2), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetPoint2_Double(IntPtr handle, in Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_SetPoint2(IntPtr handle, in Double3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PointConstraintSettings_CreateConstraint(IntPtr handle, IntPtr body1, IntPtr body2);
@@ -703,10 +689,10 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_DestroyBodyWithoutID(IntPtr handle, IntPtr body);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_BodyInterface_AssignBodyID(IntPtr handle, IntPtr body);
+    public static extern Bool32 JPH_BodyInterface_AssignBodyID(IntPtr handle, IntPtr body);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_BodyInterface_AssignBodyID2(IntPtr handle, IntPtr body, uint bodyID);
+    public static extern Bool32 JPH_BodyInterface_AssignBodyID2(IntPtr handle, IntPtr body, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyInterface_UnassignBodyID(IntPtr handle, uint bodyID);
@@ -727,16 +713,22 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_GetCenterOfMassPosition(IntPtr handle, uint bodyID, out Vector3 velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
+    public static extern Bool32 JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_BodyInterface_IsAdded(IntPtr handle, uint bodyID);
+    public static extern Bool32 JPH_BodyInterface_IsAdded(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern MotionType JPH_BodyInterface_GetMotionType(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetMotionType(IntPtr handle, uint bodyID, MotionType motionType, ActivationMode activationMode);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MotionQuality JPH_BodyInterface_GetMotionQuality(IntPtr handle, uint bodyID);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetMotionQuality(IntPtr handle, uint bodyID, MotionQuality quality);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern float JPH_BodyInterface_GetRestitution(IntPtr handle, uint bodyID);
@@ -751,10 +743,10 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_SetFriction(IntPtr handle, uint bodyID, float value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetPosition(IntPtr handle, uint bodyId, in Vector3 position, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetPosition(IntPtr handle, uint bodyId, in Double3 position, ActivationMode activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_GetPosition(IntPtr handle, uint bodyId, out Vector3 position);
+    public static extern void JPH_BodyInterface_GetPosition(IntPtr handle, uint bodyId, out Double3 position);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetRotation(IntPtr handle, uint bodyId, in Quaternion rotation, ActivationMode activationMode);
@@ -763,19 +755,19 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_GetRotation(IntPtr handle, uint bodyId, out Quaternion rotation);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetPositionAndRotation(IntPtr handle, uint bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetPositionAndRotation(IntPtr handle, uint bodyID, in Double3 position, in Quaternion rotation, ActivationMode activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetPositionAndRotationWhenChanged(IntPtr handle, uint bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetPositionAndRotationWhenChanged(IntPtr handle, uint bodyID, in Double3 position, in Quaternion rotation, ActivationMode activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetPositionRotationAndVelocity(IntPtr handle, uint bodyID, in Vector3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
+    public static extern void JPH_BodyInterface_SetPositionRotationAndVelocity(IntPtr handle, uint bodyID, in Double3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetShape(IntPtr handle, uint bodyId, IntPtr shape, bool updateMassProperties, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetShape(IntPtr handle, uint bodyId, IntPtr shape, Bool32 updateMassProperties, ActivationMode activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_NotifyShapeChanged(IntPtr handle, uint bodyId, in Vector3 previousCenterOfMass, bool updateMassProperties, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_NotifyShapeChanged(IntPtr handle, uint bodyId, in Vector3 previousCenterOfMass, Bool32 updateMassProperties, ActivationMode activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_ActivateBody(IntPtr handle, uint bodyId);
@@ -879,16 +871,8 @@ internal static unsafe partial class JoltApi
     public static extern nint JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(nint system);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_NarrowPhaseQuery_CastRay(nint system,
+    public static extern Bool32 JPH_NarrowPhaseQuery_CastRay(nint system,
         in Vector3 origin, in Vector3 direction,
-        ref RayCastResult hit,
-        IntPtr broadPhaseLayerFilter,
-        IntPtr objectLayerFilter,
-        IntPtr bodyFilter);
-
-    [DllImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay), CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_NarrowPhaseQuery_CastRay_Double(nint system,
-        in Double3 origin, in Vector3 direction,
         ref RayCastResult hit,
         IntPtr broadPhaseLayerFilter,
         IntPtr objectLayerFilter,
@@ -899,22 +883,22 @@ internal static unsafe partial class JoltApi
     public static extern uint JPH_Body_GetID(IntPtr body);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_Body_IsActive(IntPtr handle);
+    public static extern Bool32 JPH_Body_IsActive(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_Body_IsStatic(IntPtr handle);
+    public static extern Bool32 JPH_Body_IsStatic(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_Body_IsKinematic(IntPtr handle);
+    public static extern Bool32 JPH_Body_IsKinematic(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_Body_IsDynamic(IntPtr handle);
+    public static extern Bool32 JPH_Body_IsDynamic(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_Body_IsSensor(IntPtr handle);
+    public static extern Bool32 JPH_Body_IsSensor(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_SetIsSensor(IntPtr handle, uint value);
+    public static extern void JPH_Body_SetIsSensor(IntPtr handle, Bool32 value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern MotionType JPH_Body_GetMotionType(IntPtr handle);
@@ -935,13 +919,13 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_Body_SetRestitution(IntPtr handle, float value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_GetPosition(IntPtr handle, out Vector3 result);
+    public static extern void JPH_Body_GetPosition(IntPtr handle, out Double3 result);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_GetRotation(IntPtr handle, out Quaternion result);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_GetCenterOfMassPosition(IntPtr handle, out Vector3 result);
+    public static extern void JPH_Body_GetCenterOfMassPosition(IntPtr handle, out Double3 result);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_GetWorldTransform(IntPtr handle, out Matrix4x4 result);

@@ -25,35 +25,10 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     /// <inheritdoc/>
     public override int GetHashCode() => Handle.GetHashCode();
 
-    public bool CastRay(in Vector3 origin, in Vector3 direction, ref RayCastResult hit, BroadPhaseLayerFilter broadPhaseFilter,
-        ObjectLayerFilter objectLayerFilter, BodyFilter bodyFilter)
-    {
-        uint result;
-        if (DoublePrecision)
-        {
-            result = JPH_NarrowPhaseQuery_CastRay_Double(Handle, new(origin), direction, ref hit, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
-        }
-        else
-        {
-            result = JPH_NarrowPhaseQuery_CastRay(Handle, origin, direction, ref hit, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
-        }
-
-        return result == 1;
-    }
-
     public bool CastRay(in Double3 origin, in Vector3 direction, ref RayCastResult hit, BroadPhaseLayerFilter broadPhaseFilter,
         ObjectLayerFilter objectLayerFilter, BodyFilter bodyFilter)
     {
-        uint result;
-        if (DoublePrecision)
-        {
-            result = JPH_NarrowPhaseQuery_CastRay_Double(Handle, origin, direction, ref hit, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
-        }
-        else
-        {
-            result = JPH_NarrowPhaseQuery_CastRay(Handle, origin, direction, ref hit, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
-        }
-
-        return result == 1;
+        Bool32 result = JPH_NarrowPhaseQuery_CastRay(Handle, origin, direction, ref hit, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
+        return result;
     }
 }

@@ -26,15 +26,15 @@ public readonly struct Body : IEquatable<Body>
     public override int GetHashCode() => Handle.GetHashCode();
 
     public readonly BodyID ID => JPH_Body_GetID(Handle);
-    public readonly bool IsActive => JPH_Body_IsActive(Handle) == 1;
-    public readonly bool IsStatic => JPH_Body_IsStatic(Handle) == 1;
-    public readonly bool IsKinematic => JPH_Body_IsKinematic(Handle) == 1;
-    public readonly bool IsDynamic => JPH_Body_IsDynamic(Handle) == 1;
+    public readonly bool IsActive => JPH_Body_IsActive(Handle);
+    public readonly bool IsStatic => JPH_Body_IsStatic(Handle);
+    public readonly bool IsKinematic => JPH_Body_IsKinematic(Handle);
+    public readonly bool IsDynamic => JPH_Body_IsDynamic(Handle);
 
     public bool IsSensor
     {
-        readonly get => JPH_Body_IsSensor(Handle) == 1;
-        set => JPH_Body_SetIsSensor(Handle, (uint)(value ? 1 : 0));
+        readonly get => JPH_Body_IsSensor(Handle);
+        set => JPH_Body_SetIsSensor(Handle, value);
     }
 
     public MotionType MotionType
@@ -55,11 +55,11 @@ public readonly struct Body : IEquatable<Body>
         set => JPH_Body_SetRestitution(Handle, value);
     }
 
-    public Vector3 Position
+    public Double3 Position
     {
         get
         {
-            JPH_Body_GetPosition(Handle, out Vector3 value);
+            JPH_Body_GetPosition(Handle, out Double3 value);
             return value;
         }
     }
@@ -73,11 +73,11 @@ public readonly struct Body : IEquatable<Body>
         }
     }
 
-    public Vector3 CenterOfMassPosition
+    public Double3 CenterOfMassPosition
     {
         get
         {
-            JPH_Body_GetCenterOfMassPosition(Handle, out Vector3 value);
+            JPH_Body_GetCenterOfMassPosition(Handle, out Double3 value);
             return value;
         }
     }
@@ -100,7 +100,7 @@ public readonly struct Body : IEquatable<Body>
         }
     }
 
-    public void GetPosition(out Vector3 result)
+    public void GetPosition(out Double3 result)
     {
         JPH_Body_GetPosition(Handle, out result);
     }
@@ -110,7 +110,7 @@ public readonly struct Body : IEquatable<Body>
         JPH_Body_GetRotation(Handle, out result);
     }
 
-    public void GetCenterOfMassPosition(out Vector3 result)
+    public void GetCenterOfMassPosition(out Double3 result)
     {
         JPH_Body_GetCenterOfMassPosition(Handle, out result);
     }

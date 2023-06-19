@@ -53,9 +53,9 @@ public abstract class BroadPhaseLayerFilter : NativeObject
 #else
     [MonoPInvokeCallback(typeof(BroadPhaseLayerFilterShouldCollideDelegate))]
 #endif
-    private static uint ShouldCollideCallback(IntPtr listenerPtr, BroadPhaseLayer layer)
+    private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, BroadPhaseLayer layer)
     {
         BroadPhaseLayerFilter listener = s_listeners[listenerPtr];
-        return (uint)(listener.ShouldCollide(layer) ? 1 : 0);
+        return listener.ShouldCollide(layer);
     }
 }

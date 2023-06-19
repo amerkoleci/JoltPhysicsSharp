@@ -53,9 +53,9 @@ public abstract class ObjectVsBroadPhaseLayerFilter : NativeObject
 #else
     [MonoPInvokeCallback(typeof(ShouldCollideDelegate))]
 #endif
-    private static uint ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer layer1, BroadPhaseLayer layer2)
+    private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer layer1, BroadPhaseLayer layer2)
     {
         ObjectVsBroadPhaseLayerFilter listener = s_listeners[listenerPtr];
-        return listener.ShouldCollide(layer1, layer2) ? 1u : 0u;
+        return listener.ShouldCollide(layer1, layer2);
     }
 }

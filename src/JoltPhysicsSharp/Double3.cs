@@ -218,7 +218,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The first vector to add.</param>
     /// <param name="right">The second vector to add.</param>
     /// <returns>The summed vector.</returns>
-    /// <remarks>The <see cref="op_Addition" /> method defines the addition operation for <see cref="Vector3" /> objects.</remarks>
+    /// <remarks>The <see cref="op_Addition" /> method defines the addition operation for <see cref="Double3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Double3 operator +(Double3 left, Double3 right)
     {
@@ -233,7 +233,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The first vector.</param>
     /// <param name="right">The second vector.</param>
     /// <returns>The vector that results from dividing <paramref name="left" /> by <paramref name="right" />.</returns>
-    /// <remarks>The <see cref="Vector3.op_Division" /> method defines the division operation for <see cref="Vector3" /> objects.</remarks>
+    /// <remarks>The <see cref="Double3.op_Division" /> method defines the division operation for <see cref="Double3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Double3 operator /(Double3 left, Double3 right)
     {
@@ -248,7 +248,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="value1">The vector.</param>
     /// <param name="value2">The scalar value.</param>
     /// <returns>The result of the division.</returns>
-    /// <remarks>The <see cref="Vector3.op_Division" /> method defines the division operation for <see cref="Vector3" /> objects.</remarks>
+    /// <remarks>The <see cref="Double3.op_Division" /> method defines the division operation for <see cref="Double3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Double3 operator /(Double3 value1, double value2)
     {
@@ -259,7 +259,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The first vector.</param>
     /// <param name="right">The second vector.</param>
     /// <returns>The element-wise product vector.</returns>
-    /// <remarks>The <see cref="Vector3.op_Multiply" /> method defines the multiplication operation for <see cref="Vector3" /> objects.</remarks>
+    /// <remarks>The <see cref="Double3.op_Multiply" /> method defines the multiplication operation for <see cref="Double3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Double3 operator *(Double3 left, Double3 right)
     {
@@ -274,7 +274,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The vector.</param>
     /// <param name="right">The scalar value.</param>
     /// <returns>The scaled vector.</returns>
-    /// <remarks>The <see cref="Vector3.op_Multiply" /> method defines the multiplication operation for <see cref="Vector3" /> objects.</remarks>
+    /// <remarks>The <see cref="Double3.op_Multiply" /> method defines the multiplication operation for <see cref="Double3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Double3 operator *(Double3 left, double right)
     {
@@ -285,7 +285,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The vector.</param>
     /// <param name="right">The scalar value.</param>
     /// <returns>The scaled vector.</returns>
-    /// <remarks>The <see cref="Vector3.op_Multiply" /> method defines the multiplication operation for <see cref="Vector3" /> objects.</remarks>
+    /// <remarks>The <see cref="Double3.op_Multiply" /> method defines the multiplication operation for <see cref="Double3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Double3 operator *(double left, Double3 right)
     {
@@ -296,7 +296,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The first vector.</param>
     /// <param name="right">The second vector.</param>
     /// <returns>The vector that results from subtracting <paramref name="right" /> from <paramref name="left" />.</returns>
-    /// <remarks>The <see cref="op_Subtraction" /> method defines the subtraction operation for <see cref="Vector3" /> objects.</remarks>
+    /// <remarks>The <see cref="op_Subtraction" /> method defines the subtraction operation for <see cref="Double3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Double3 operator -(Double3 left, Double3 right)
     {
@@ -310,7 +310,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <summary>Negates the specified vector.</summary>
     /// <param name="value">The vector to negate.</param>
     /// <returns>The negated vector.</returns>
-    /// <remarks>The <see cref="op_UnaryNegation" /> method defines the unary negation operation for <see cref="Vector3" /> objects.</remarks>
+    /// <remarks>The <see cref="op_UnaryNegation" /> method defines the unary negation operation for <see cref="Double3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Double3 operator -(Double3 value)
     {

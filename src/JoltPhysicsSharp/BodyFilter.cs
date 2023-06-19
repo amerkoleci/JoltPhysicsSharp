@@ -56,10 +56,10 @@ public abstract class BodyFilter : NativeObject
 #else
     [MonoPInvokeCallback(typeof(BodyFilterShouldCollideDelegate))]
 #endif
-    private static uint ShouldCollideCallback(IntPtr listenerPtr, BodyID bodyID)
+    private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, BodyID bodyID)
     {
         BodyFilter listener = s_listeners[listenerPtr];
-        return (uint)(listener.ShouldCollide(bodyID) ? 1 : 0);
+        return listener.ShouldCollide(bodyID);
     }
 
 #if NET6_0_OR_GREATER
@@ -67,9 +67,9 @@ public abstract class BodyFilter : NativeObject
 #else
     [MonoPInvokeCallback(typeof(BodyFilterShouldCollideLockedDelegate))]
 #endif
-    private static uint ShouldCollideLockedCallback(IntPtr listenerPtr, IntPtr body)
+    private static Bool32 ShouldCollideLockedCallback(IntPtr listenerPtr, IntPtr body)
     {
         BodyFilter listener = s_listeners[listenerPtr];
-        return (uint)(listener.ShouldCollideLocked(body) ? 1 : 0);
+        return listener.ShouldCollideLocked(body);
     }
 }

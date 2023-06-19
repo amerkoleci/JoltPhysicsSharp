@@ -53,9 +53,9 @@ public abstract class ObjectLayerFilter : NativeObject
 #else
     [MonoPInvokeCallback(typeof(ObjectLayerFilterShouldCollideDelegate))]
 #endif
-    private static uint ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer layer)
+    private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer layer)
     {
         ObjectLayerFilter listener = s_listeners[listenerPtr];
-        return (uint)(listener.ShouldCollide(layer) ? 1 : 0);
+        return listener.ShouldCollide(layer);
     }
 }

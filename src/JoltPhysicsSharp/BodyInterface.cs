@@ -72,12 +72,12 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
 
     public bool AssignBodyID(in Body body)
     {
-        return JPH_BodyInterface_AssignBodyID(Handle, body.Handle) == 1;
+        return JPH_BodyInterface_AssignBodyID(Handle, body.Handle);
     }
 
     public bool AssignBodyID(in Body body, in BodyID bodyID)
     {
-        return JPH_BodyInterface_AssignBodyID2(Handle, body.Handle, bodyID) == 1;
+        return JPH_BodyInterface_AssignBodyID2(Handle, body.Handle, bodyID);
     }
 
     public Body UnassignBodyID(in BodyID bodyID)
@@ -127,8 +127,18 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_SetMotionType(Handle, bodyID, motionType, activationMode);
     }
 
-    public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID) == 1;
-    public bool IsAdded(in BodyID bodyID) => JPH_BodyInterface_IsAdded(Handle, bodyID) == 1;
+    public MotionQuality GetMotionQuality(in BodyID bodyID)
+    {
+        return JPH_BodyInterface_GetMotionQuality(Handle, bodyID);
+    }
+
+    public void SetMotionQuality(in BodyID bodyID, MotionQuality quality)
+    {
+        JPH_BodyInterface_SetMotionQuality(Handle, bodyID, quality);
+    }
+
+    public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID);
+    public bool IsAdded(in BodyID bodyID) => JPH_BodyInterface_IsAdded(Handle, bodyID);
 
     public float GetRestitution(in BodyID bodyID)
     {
@@ -150,15 +160,20 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_SetFriction(Handle, bodyID, friction);
     }
 
-    public void SetPosition(in BodyID bodyID, in Vector3 position, ActivationMode activationMode)
+    public void SetPosition(in BodyID bodyID, in Double3 position, ActivationMode activationMode)
     {
         JPH_BodyInterface_SetPosition(Handle, bodyID, position, activationMode);
     }
 
-    public Vector3 GetPosition(in BodyID bodyID)
+    public Double3 GetPosition(in BodyID bodyID)
     {
-        JPH_BodyInterface_GetPosition(Handle, bodyID, out Vector3 position);
+        JPH_BodyInterface_GetPosition(Handle, bodyID, out Double3 position);
         return position;
+    }
+
+    public void GetPosition(in BodyID bodyID, out Double3 position)
+    {
+        JPH_BodyInterface_GetPosition(Handle, bodyID, out position);
     }
 
     public void SetRotation(in BodyID bodyID, in Quaternion rotation, ActivationMode activationMode)
@@ -172,17 +187,17 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return rotation;
     }
 
-    public void SetPositionAndRotation(in BodyID bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode)
+    public void SetPositionAndRotation(in BodyID bodyID, in Double3 position, in Quaternion rotation, ActivationMode activationMode)
     {
         JPH_BodyInterface_SetPositionAndRotation(Handle, bodyID, position, rotation, activationMode);
     }
 
-    public void SetPositionAndRotationWhenChanged(in BodyID bodyID, in Vector3 position, in Quaternion rotation, ActivationMode activationMode)
+    public void SetPositionAndRotationWhenChanged(in BodyID bodyID, in Double3 position, in Quaternion rotation, ActivationMode activationMode)
     {
         JPH_BodyInterface_SetPositionAndRotationWhenChanged(Handle, bodyID, position, rotation, activationMode);
     }
 
-    public void SetPositionRotationAndVelocity(in BodyID bodyID, in Vector3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity)
+    public void SetPositionRotationAndVelocity(in BodyID bodyID, in Double3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity)
     {
         JPH_BodyInterface_SetPositionRotationAndVelocity(Handle, bodyID, position, rotation, linearVelocity, angularVelocity);
     }

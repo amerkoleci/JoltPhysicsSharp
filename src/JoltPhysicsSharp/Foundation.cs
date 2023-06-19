@@ -38,8 +38,6 @@ public static class Foundation
     /// </summary>
     public const int MaxPhysicsBarriers = 8;
 
-    public delegate bool AssertFailedImpl(string inExpression, string inMessage, string inFile, uint inLine);
-
     public static bool Init(bool doublePrecision = false)
     {
         JoltApi.DoublePrecision = doublePrecision;
@@ -47,10 +45,10 @@ public static class Foundation
         JoltApi.LoadNativeLibrary();
 #endif
 
-        return JPH_Init() == 1;
+        return JPH_Init();
     }
 
     public static void Shutdown() => JPH_Shutdown();
 
-    public static void SetAssertFailureHandler(AssertFailedImpl impl) => JPH_SetAssertFailureHandler(Marshal.GetFunctionPointerForDelegate(impl));
+    public static void SetAssertFailureHandler(AssertFailedDelegate impl) => JPH_SetAssertFailureHandler(impl);
 }
