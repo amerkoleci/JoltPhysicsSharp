@@ -56,17 +56,14 @@ JPH_INLINE void ContactConstraintManager::WorldContactPoint::TemplatedCalculateF
 	Vec3 r1 = Vec3(p - inBody1.GetCenterOfMassPosition());
 	Vec3 r2 = Vec3(p - inBody2.GetCenterOfMassPosition());
 
-	const MotionProperties *mp1 = inBody1.GetMotionPropertiesUnchecked();
-	const MotionProperties *mp2 = inBody2.GetMotionPropertiesUnchecked();
-
 	// Calculate velocity of collision points
 	Vec3 relative_velocity;
 	if constexpr (Type1 != EMotionType::Static && Type2 != EMotionType::Static)
-		relative_velocity = mp2->GetPointVelocityCOM(r2) - mp1->GetPointVelocityCOM(r1);
+		relative_velocity = inBody2.GetMotionPropertiesUnchecked()->GetPointVelocityCOM(r2) - inBody1.GetMotionPropertiesUnchecked()->GetPointVelocityCOM(r1);
 	else if constexpr (Type1 != EMotionType::Static)
-		relative_velocity = -mp1->GetPointVelocityCOM(r1);
+		relative_velocity = -inBody1.GetMotionPropertiesUnchecked()->GetPointVelocityCOM(r1);
 	else if constexpr (Type2 != EMotionType::Static)
-		relative_velocity = mp2->GetPointVelocityCOM(r2);
+		relative_velocity = inBody2.GetMotionPropertiesUnchecked()->GetPointVelocityCOM(r2);
 	else
 	{
 		JPH_ASSERT(false); // Static vs static makes no sense
@@ -792,7 +789,7 @@ void ContactConstraintManager::GetContactsFromCache(ContactAllocator &ioContactA
 	RMat44 transform_body2 = body2->GetCenterOfMassTransform();
 
 	// Get time step
-	float delta_time = mUpdateContext->mSubStepDeltaTime;
+	float delta_time = mUpdateContext->mStepDeltaTime;
 
 	// Copy manifolds
 	uint32 output_handle = ManifoldMap::cInvalidHandle;
@@ -1079,7 +1076,7 @@ bool ContactConstraintManager::TemplatedAddContactConstraint(ContactAllocator &i
 		mUpdateContext->mIslandBuilder->LinkContact(constraint_idx, inBody1.GetIndexInActiveBodiesInternal(), inBody2.GetIndexInActiveBodiesInternal());
 
 		// Get time step
-		float delta_time = mUpdateContext->mSubStepDeltaTime;
+		float delta_time = mUpdateContext->mStepDeltaTime;
 
 		// Calculate scaled mass and inertia
 		float inv_m1;
@@ -1414,30 +1411,6 @@ bool ContactConstraintManager::WereBodiesInContact(const BodyID &inBody1ID, cons
 	uint64 key_hash = key.GetHash();
 	const BPKeyValue *kv = read_cache.Find(key, key_hash);
 	return kv != nullptr && kv->GetValue().mFirstCachedManifold != ManifoldMap::cInvalidHandle;
-}
-
-void ContactConstraintManager::SetupVelocityConstraints(const uint32 *inConstraintIdxBegin, const uint32 *inConstraintIdxEnd, float inDeltaTime)
-{
-	JPH_PROFILE_FUNCTION();
-
-	// Note: We don't have the settings anymore here, mass/inertia scaling doesn't work with multiple integration substeps!
-	ContactSettings dummy_settings;
-
-	for (const uint32 *constraint_idx = inConstraintIdxBegin; constraint_idx < inConstraintIdxEnd; ++constraint_idx)
-	{
-		ContactConstraint &constraint = mConstraints[*constraint_idx];
-
-		// Fetch bodies
-		const Body &body1 = *constraint.mBody1;
-		const Body &body2 = *constraint.mBody2;
-		
-		// Get body transforms
-		RMat44 transform_body1 = body1.GetCenterOfMassTransform();
-		RMat44 transform_body2 = body2.GetCenterOfMassTransform();
-
-		// Calculate friction and non-penetration constraint properties for all contact points
-		CalculateFrictionAndNonPenetrationConstraintProperties(constraint, dummy_settings, inDeltaTime, transform_body1, transform_body2, body1, body2);
-	}
 }
 
 template <EMotionType Type1, EMotionType Type2>

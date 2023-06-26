@@ -12,6 +12,7 @@ __pragma(warning(push, 0))
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
+#include <Jolt/Core/JobSystemSingleThreaded.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Collision/CastResult.h>
@@ -267,17 +268,23 @@ void JPH_TempAllocator_Destroy(JPH_TempAllocator* allocator)
     }
 }
 
-JPH_JobSystemThreadPool* JPH_JobSystemThreadPool_Create(uint32_t maxJobs, uint32_t maxBarriers, int inNumThreads)
+JPH_JobSystem* JPH_JobSystemThreadPool_Create(uint32_t maxJobs, uint32_t maxBarriers, int inNumThreads)
 {
     auto job_system = new JPH::JobSystemThreadPool(maxJobs, maxBarriers, inNumThreads);
-    return reinterpret_cast<JPH_JobSystemThreadPool*>(job_system);
+    return reinterpret_cast<JPH_JobSystem*>(job_system);
 }
 
-JPH_CAPI void JPH_JobSystemThreadPool_Destroy(JPH_JobSystemThreadPool* system)
+JPH_JobSystem* JPH_JobSystemSingleThreaded_Create(uint32_t maxJobs)
+{
+    auto job_system = new JPH::JobSystemSingleThreaded(maxJobs);
+    return reinterpret_cast<JPH_JobSystem*>(job_system);
+}
+
+void JPH_JobSystem_Destroy(JPH_JobSystem* system)
 {
     if (system)
     {
-        delete reinterpret_cast<JPH::JobSystemThreadPool*>(system);
+        delete reinterpret_cast<JPH::JobSystem*>(system);
     }
 }
 
@@ -952,16 +959,16 @@ void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system)
     reinterpret_cast<JPH::PhysicsSystem*>(system)->OptimizeBroadPhase();
 }
 
-JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
+JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps,
     JPH_TempAllocator* tempAllocator,
-    JPH_JobSystemThreadPool* jobSystem)
+    JPH_JobSystem* jobSystem)
 {
     JPH_ASSERT(system);
 
     auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
     auto joltTempAllocator = reinterpret_cast<JPH::TempAllocator*>(tempAllocator);
     auto joltJobSystem = reinterpret_cast<JPH::JobSystemThreadPool*>(jobSystem);
-    return static_cast<JPH_PhysicsUpdateError>(joltSystem->Update(deltaTime, collisionSteps, integrationSubSteps, joltTempAllocator, joltJobSystem));
+    return static_cast<JPH_PhysicsUpdateError>(joltSystem->Update(deltaTime, collisionSteps, joltTempAllocator, joltJobSystem));
 }
 
 JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system)

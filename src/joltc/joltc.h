@@ -175,7 +175,7 @@ typedef struct JPH_RayCastResult
 
 
 typedef struct JPH_TempAllocator                    JPH_TempAllocator;
-typedef struct JPH_JobSystemThreadPool              JPH_JobSystemThreadPool;
+typedef struct JPH_JobSystem                        JPH_JobSystem;
 typedef struct JPH_BroadPhaseLayerInterface         JPH_BroadPhaseLayerInterface;
 typedef struct JPH_ObjectVsBroadPhaseLayerFilter    JPH_ObjectVsBroadPhaseLayerFilter;
 typedef struct JPH_ObjectLayerPairFilter            JPH_ObjectLayerPairFilter;
@@ -253,8 +253,9 @@ JPH_CAPI JPH_TempAllocator* JPH_TempAllocator_Create(uint32_t size);
 JPH_CAPI void JPH_TempAllocator_Destroy(JPH_TempAllocator* allocator);
 
 /* JPH_JobSystemThreadPool */
-JPH_CAPI JPH_JobSystemThreadPool* JPH_JobSystemThreadPool_Create(uint32_t maxJobs, uint32_t maxBarriers, int inNumThreads);
-JPH_CAPI void JPH_JobSystemThreadPool_Destroy(JPH_JobSystemThreadPool* system);
+JPH_CAPI JPH_JobSystem* JPH_JobSystemThreadPool_Create(uint32_t maxJobs, uint32_t maxBarriers, int inNumThreads);
+JPH_CAPI JPH_JobSystem* JPH_JobSystemSingleThreaded_Create(uint32_t maxJobs);
+JPH_CAPI void JPH_JobSystem_Destroy(JPH_JobSystem* system);
 
 /* JPH_ShapeSettings */
 JPH_CAPI void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings);
@@ -349,9 +350,9 @@ JPH_CAPI void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
     JPH_ObjectLayerPairFilter* objectLayerPairFilter);
 
 JPH_CAPI void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system);
-JPH_CAPI JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, int integrationSubSteps,
+JPH_CAPI JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, 
     JPH_TempAllocator* tempAllocator,
-    JPH_JobSystemThreadPool* jobSystem);
+    JPH_JobSystem* jobSystem);
 
 JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system);
 JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterfaceNoLock(JPH_PhysicsSystem* system);
