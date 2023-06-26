@@ -78,7 +78,6 @@ static_assert(JPH_MOTION_QUALITY_LINEAR_CAST == (int)JPH::EMotionQuality::Linear
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));
 
-
 ENSURE_SIZE_ALIGN(JPH::RayCastResult, JPH_RayCastResult);
 static_assert(offsetof(JPH::RayCastResult, mBodyID) == offsetof(JPH_RayCastResult, bodyID));
 static_assert(offsetof(JPH::RayCastResult, mFraction) == offsetof(JPH_RayCastResult, fraction));

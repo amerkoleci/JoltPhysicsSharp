@@ -250,11 +250,8 @@ public static class Program
                 // If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
                 const int collisionSteps = 1;
 
-                // If you want more accurate step results you can do multiple sub steps within a collision step. Usually you would set this to 1.
-                const int integrationSubSteps = 1;
-
                 // Step the world
-                PhysicsUpdateError error = physicsSystem.Update(deltaTime, collisionSteps, integrationSubSteps, tempAllocator, jobSystem);
+                PhysicsUpdateError error = physicsSystem.Update(deltaTime, collisionSteps, tempAllocator, jobSystem);
                 Debug.Assert(error == PhysicsUpdateError.None);
             }
 

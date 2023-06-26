@@ -174,10 +174,10 @@ public sealed class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_OptimizeBroadPhase(Handle);
     }
 
-    public PhysicsUpdateError Update(float deltaTime, int collisionSteps, int integrationSubSteps,
+    public PhysicsUpdateError Update(float deltaTime, int collisionSteps, 
         in TempAllocator tempAlocator, in JobSystemThreadPool jobSystem)
     {
-        return JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, integrationSubSteps, tempAlocator.Handle, jobSystem.Handle);
+        return JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, tempAlocator.Handle, jobSystem.Handle);
     }
 
     public Vector3 Gravity

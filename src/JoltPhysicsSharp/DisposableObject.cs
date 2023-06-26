@@ -28,14 +28,14 @@ public abstract class DisposableObject : IDisposable
     {
         if (Interlocked.Exchange(ref _isDisposed, 1) == 0)
         {
-            Dispose(isDisposing: true);
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
     }
 
     /// <inheritdoc cref="Dispose()" />
-    /// <param name="isDisposing"><c>true</c> if the method was called from <see cref="Dispose()" />; otherwise, <c>false</c>.</param>
-    protected abstract void Dispose(bool isDisposing);
+    /// <param name="disposing"><c>true</c> if the method was called from <see cref="Dispose()" />; otherwise, <c>false</c>.</param>
+    protected abstract void Dispose(bool disposing);
 
     /// <summary>Throws an exception if the object has been disposed.</summary>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
@@ -44,7 +44,7 @@ public abstract class DisposableObject : IDisposable
     {
         if (_isDisposed != 0)
         {
-            new ObjectDisposedException(GetType().Name);
+            _ = new ObjectDisposedException(GetType().Name);
         }
     }
 

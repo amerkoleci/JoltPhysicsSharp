@@ -164,12 +164,14 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_TempAllocator_Destroy(IntPtr handle);
 
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_JobSystemThreadPool_Create(uint maxJobs, uint maxBarriers, int inNumThreads);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_JobSystemThreadPool_Destroy(IntPtr handle);
+    public static extern IntPtr JPH_JobSystemSingleThreaded_Create(uint maxJobs);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_JobSystem_Destroy(IntPtr handle);
 
     //  BroadPhaseLayerInterface
 #if NET6_0_OR_GREATER
@@ -625,9 +627,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_PhysicsSystem_OptimizeBroadPhase(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern PhysicsUpdateError JPH_PhysicsSystem_Update(IntPtr handle,
-        float deltaTime, int collisionSteps, int integrationSubSteps,
-        IntPtr tempAlocator, IntPtr jobSystem);
+    public static extern PhysicsUpdateError JPH_PhysicsSystem_Update(IntPtr handle, float deltaTime, int collisionSteps, IntPtr tempAlocator, IntPtr jobSystem);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_SetContactListener(IntPtr system, IntPtr listener);
