@@ -3,7 +3,10 @@
 
 namespace JoltPhysicsSharp;
 
-public enum ActivationMode
+/// <summary>
+/// Enum used by AddBody to determine if the body needs to be initially active
+/// </summary>
+public enum Activation
 {
     /// <summary>
     /// Activate the body, making it part of the simulation.

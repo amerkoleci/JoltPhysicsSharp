@@ -577,6 +577,30 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyCreationSettings_Destroy(IntPtr settings);
 
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyCreationSettings_GetLinearVelocity(IntPtr settings, out Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyCreationSettings_SetLinearVelocity(IntPtr settings, in Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyCreationSettings_GetAngularVelocity(IntPtr settings, out Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyCreationSettings_SetAngularVelocity(IntPtr settings, in Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern MotionType JPH_BodyCreationSettings_GetMotionType(IntPtr settings);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyCreationSettings_SetMotionType(IntPtr settings, MotionType value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern AllowedDOFs JPH_BodyCreationSettings_GetAllowedDOFs(IntPtr settings);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyCreationSettings_SetAllowedDOFs(IntPtr settings, AllowedDOFs value);
+
     /* JPH_ConstraintSettings */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ConstraintSettings_Destroy(IntPtr handle);
@@ -674,7 +698,7 @@ internal static unsafe partial class JoltApi
     public static extern IntPtr JPH_BodyInterface_CreateBody(IntPtr handle, IntPtr settings);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_BodyInterface_CreateAndAddBody(IntPtr handle, IntPtr bodyID, ActivationMode activation);
+    public static extern uint JPH_BodyInterface_CreateAndAddBody(IntPtr handle, IntPtr bodyID, Activation activation);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyInterface_CreateBodyWithID(IntPtr handle, uint bodyID, IntPtr settings);
@@ -698,7 +722,7 @@ internal static unsafe partial class JoltApi
     public static extern IntPtr JPH_BodyInterface_UnassignBodyID(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_AddBody(IntPtr handle, uint bodyID, ActivationMode activation);
+    public static extern void JPH_BodyInterface_AddBody(IntPtr handle, uint bodyID, Activation activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_RemoveBody(IntPtr handle, uint bodyID);
@@ -722,7 +746,7 @@ internal static unsafe partial class JoltApi
     public static extern MotionType JPH_BodyInterface_GetMotionType(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetMotionType(IntPtr handle, uint bodyID, MotionType motionType, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetMotionType(IntPtr handle, uint bodyID, MotionType motionType, Activation activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern MotionQuality JPH_BodyInterface_GetMotionQuality(IntPtr handle, uint bodyID);
@@ -743,31 +767,31 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_SetFriction(IntPtr handle, uint bodyID, float value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetPosition(IntPtr handle, uint bodyId, in Double3 position, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetPosition(IntPtr handle, uint bodyId, in Double3 position, Activation activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_GetPosition(IntPtr handle, uint bodyId, out Double3 position);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetRotation(IntPtr handle, uint bodyId, in Quaternion rotation, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetRotation(IntPtr handle, uint bodyId, in Quaternion rotation, Activation activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_GetRotation(IntPtr handle, uint bodyId, out Quaternion rotation);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetPositionAndRotation(IntPtr handle, uint bodyID, in Double3 position, in Quaternion rotation, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetPositionAndRotation(IntPtr handle, uint bodyID, in Double3 position, in Quaternion rotation, Activation activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetPositionAndRotationWhenChanged(IntPtr handle, uint bodyID, in Double3 position, in Quaternion rotation, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetPositionAndRotationWhenChanged(IntPtr handle, uint bodyID, in Double3 position, in Quaternion rotation, Activation activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_SetPositionRotationAndVelocity(IntPtr handle, uint bodyID, in Double3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetShape(IntPtr handle, uint bodyId, IntPtr shape, Bool32 updateMassProperties, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_SetShape(IntPtr handle, uint bodyId, IntPtr shape, Bool32 updateMassProperties, Activation activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_NotifyShapeChanged(IntPtr handle, uint bodyId, in Vector3 previousCenterOfMass, Bool32 updateMassProperties, ActivationMode activationMode);
+    public static extern void JPH_BodyInterface_NotifyShapeChanged(IntPtr handle, uint bodyId, in Vector3 previousCenterOfMass, Bool32 updateMassProperties, Activation activationMode);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_ActivateBody(IntPtr handle, uint bodyId);

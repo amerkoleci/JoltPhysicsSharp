@@ -30,7 +30,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return JPH_BodyInterface_CreateBody(Handle, settings.Handle);
     }
 
-    public BodyID CreateAndAddBody(BodyCreationSettings settings, ActivationMode activationMode)
+    public BodyID CreateAndAddBody(BodyCreationSettings settings, Activation activationMode)
     {
         return new(JPH_BodyInterface_CreateAndAddBody(Handle, settings.Handle, activationMode));
     }
@@ -55,12 +55,12 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_DestroyBodyWithoutID(Handle, body.Handle);
     }
 
-    public void AddBody(in BodyID bodyID, ActivationMode activationMode)
+    public void AddBody(in BodyID bodyID, Activation activationMode)
     {
         JPH_BodyInterface_AddBody(Handle, bodyID, activationMode);
     }
 
-    public void AddBody(in Body body, ActivationMode activationMode)
+    public void AddBody(in Body body, Activation activationMode)
     {
         JPH_BodyInterface_AddBody(Handle, body.ID, activationMode);
     }
@@ -122,7 +122,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return JPH_BodyInterface_GetMotionType(Handle, bodyID);
     }
 
-    public void SetMotionType(in BodyID bodyID, MotionType motionType, ActivationMode activationMode)
+    public void SetMotionType(in BodyID bodyID, MotionType motionType, Activation activationMode)
     {
         JPH_BodyInterface_SetMotionType(Handle, bodyID, motionType, activationMode);
     }
@@ -160,7 +160,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_SetFriction(Handle, bodyID, friction);
     }
 
-    public void SetPosition(in BodyID bodyID, in Double3 position, ActivationMode activationMode)
+    public void SetPosition(in BodyID bodyID, in Double3 position, Activation activationMode)
     {
         JPH_BodyInterface_SetPosition(Handle, bodyID, position, activationMode);
     }
@@ -176,7 +176,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_GetPosition(Handle, bodyID, out position);
     }
 
-    public void SetRotation(in BodyID bodyID, in Quaternion rotation, ActivationMode activationMode)
+    public void SetRotation(in BodyID bodyID, in Quaternion rotation, Activation activationMode)
     {
         JPH_BodyInterface_SetRotation(Handle, bodyID, rotation, activationMode);
     }
@@ -187,12 +187,12 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return rotation;
     }
 
-    public void SetPositionAndRotation(in BodyID bodyID, in Double3 position, in Quaternion rotation, ActivationMode activationMode)
+    public void SetPositionAndRotation(in BodyID bodyID, in Double3 position, in Quaternion rotation, Activation activationMode)
     {
         JPH_BodyInterface_SetPositionAndRotation(Handle, bodyID, position, rotation, activationMode);
     }
 
-    public void SetPositionAndRotationWhenChanged(in BodyID bodyID, in Double3 position, in Quaternion rotation, ActivationMode activationMode)
+    public void SetPositionAndRotationWhenChanged(in BodyID bodyID, in Double3 position, in Quaternion rotation, Activation activationMode)
     {
         JPH_BodyInterface_SetPositionAndRotationWhenChanged(Handle, bodyID, position, rotation, activationMode);
     }
@@ -202,12 +202,12 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         JPH_BodyInterface_SetPositionRotationAndVelocity(Handle, bodyID, position, rotation, linearVelocity, angularVelocity);
     }
 
-    public void SetShape(in BodyID bodyId, in Shape shape, bool updateMassProperties, ActivationMode activationMode)
+    public void SetShape(in BodyID bodyId, in Shape shape, bool updateMassProperties, Activation activationMode)
     {
         JPH_BodyInterface_SetShape(Handle, bodyId, shape.Handle, updateMassProperties, activationMode);
     }
 
-    public void NotifyShapeChanged(in BodyID bodyId, in Vector3 previousCenterOfMass, bool updateMassProperties, ActivationMode activationMode)
+    public void NotifyShapeChanged(in BodyID bodyId, in Vector3 previousCenterOfMass, bool updateMassProperties, Activation activationMode)
     {
 
     }

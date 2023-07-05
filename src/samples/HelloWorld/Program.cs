@@ -113,7 +113,7 @@ public static class Program
             MotionType.Static,
             Layers.NonMoving)
             );
-        bodyInterface.AddBody(floor.ID, ActivationMode.DontActivate);
+        bodyInterface.AddBody(floor.ID, Activation.DontActivate);
         return floor;
     }
 
@@ -133,7 +133,7 @@ public static class Program
             else
                 rotation = Quaternion.Identity;
             Body stack = bodyInterface.CreateBody(new BodyCreationSettings(boxShape, new Vector3(10, 1.0f + i * 2.1f, 0), rotation, MotionType.Dynamic, Layers.Moving));
-            bodyInterface.AddBody(stack.ID, ActivationMode.Activate);
+            bodyInterface.AddBody(stack.ID, Activation.Activate);
         }
     }
 
@@ -214,10 +214,10 @@ public static class Program
             Body floor = bodyInterface.CreateBody(floorSettings);
 
             // Add it to the world
-            bodyInterface.AddBody(floor, ActivationMode.DontActivate);
+            bodyInterface.AddBody(floor, Activation.DontActivate);
 
             BodyCreationSettings spherSettings = new(new SphereShape(0.5f), new Double3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
-            BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, ActivationMode.Activate);
+            BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, Activation.Activate);
 
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.
             // (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the physics system)

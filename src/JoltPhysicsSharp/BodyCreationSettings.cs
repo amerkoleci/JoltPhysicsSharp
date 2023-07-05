@@ -33,6 +33,38 @@ public sealed class BodyCreationSettings : NativeObject
     {
     }
 
+    public Vector3 LinearVelocity
+    {
+        get
+        {
+            JPH_BodyCreationSettings_GetLinearVelocity(Handle, out Vector3 velocity);
+            return velocity;
+        }
+        set => JPH_BodyCreationSettings_SetLinearVelocity(Handle, value);
+    }
+
+    public Vector3 AngularVelocity
+    {
+        get
+        {
+            JPH_BodyCreationSettings_GetAngularVelocity(Handle, out Vector3 velocity);
+            return velocity;
+        }
+        set => JPH_BodyCreationSettings_SetAngularVelocity(Handle, value);
+    }
+
+    public MotionType MotionType
+    {
+        get => JPH_BodyCreationSettings_GetMotionType(Handle);
+        set => JPH_BodyCreationSettings_SetMotionType(Handle, value);
+    }
+
+    public AllowedDOFs AllowedDOFs
+    {
+        get => JPH_BodyCreationSettings_GetAllowedDOFs(Handle);
+        set => JPH_BodyCreationSettings_SetAllowedDOFs(Handle, value);
+    }
+
     /// <summary>
     /// Finalizes an instance of the <see cref="BodyCreationSettings" /> class.
     /// </summary>
@@ -44,5 +76,15 @@ public sealed class BodyCreationSettings : NativeObject
         {
             JPH_BodyCreationSettings_Destroy(Handle);
         }
+    }
+
+    public void GetLinearVelocity(out Vector3 velocity)
+    {
+        JPH_BodyCreationSettings_GetLinearVelocity(Handle, out velocity);
+    }
+
+    public void GetAngularVelocity(out Vector3 velocity)
+    {
+        JPH_BodyCreationSettings_GetAngularVelocity(Handle, out velocity);
     }
 }
