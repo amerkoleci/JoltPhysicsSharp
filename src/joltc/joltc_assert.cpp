@@ -57,9 +57,9 @@ static_assert(JPH_MotionType_Kinematic == (int)JPH::EMotionType::Kinematic);
 static_assert(JPH_MotionType_Dynamic == (int)JPH::EMotionType::Dynamic);
 
 // EActivation
-static_assert(sizeof(JPH::EActivation) == sizeof(JPH_ActivationMode));
-static_assert(JPH_ActivationMode_Activate == (int)JPH::EActivation::Activate);
-static_assert(JPH_ActivationMode_DontActivate == (int)JPH::EActivation::DontActivate);
+static_assert(sizeof(JPH::EActivation) == sizeof(JPH_Activation));
+static_assert(JPH_Activation_Activate == (int)JPH::EActivation::Activate);
+static_assert(JPH_Activation_DontActivate == (int)JPH::EActivation::DontActivate);
 
 // EActivation
 static_assert(sizeof(JPH::ValidateResult) == sizeof(JPH_ValidateResult));
