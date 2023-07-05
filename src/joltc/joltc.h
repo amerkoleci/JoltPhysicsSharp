@@ -47,58 +47,72 @@ typedef uint16_t JPH_ObjectLayer;
 typedef uint8_t  JPH_BroadPhaseLayer;
 
 typedef enum JPH_PhysicsUpdateError {
-    JPH_PHYSICS_UPDATE_ERROR_NONE = 0,
-    JPH_PHYSICS_UPDATE_ERROR_MANIFOLD_CACHE_FULL = 1 << 0,
-    JPH_PHYSICS_UPDATE_ERROR_BODY_PAIR_CACHE_FULL = 1 << 1,
-    JPH_PHYSICS_UPDATE_ERROR_CONTACT_CONSTRAINTS_FULL = 1 << 2,
+    JPH_PhysicsUpdateError_None = 0,
+    JPH_PhysicsUpdateError_ManifoldCacheFull = 1 << 0,
+    JPH_PhysicsUpdateError_BodyPairCacheFull = 1 << 1,
+    JPH_PhysicsUpdateError_ContactConstraintsFull = 1 << 2,
 
-    _JPH_PHYSICS_UPDATE_ERROR_NUM,
-    _JPH_PHYSICS_UPDATE_ERROR_FORCEU32 = 0x7fffffff
+    _JPH_PhysicsUpdateError_Count,
+    _JPH_PhysicsUpdateError_Force32 = 0x7fffffff
 } JPH_PhysicsUpdateError;
 
 typedef enum JPH_MotionType {
-    JPH_MOTION_TYPE_STATIC = 0,
-    JPH_MOTION_TYPE_KINEMATIC = 1,
-    JPH_MOTION_TYPE_DYNAMIC = 2,
+    JPH_MotionType_Static = 0,
+    JPH_MotionType_Kinematic = 1,
+    JPH_MotionType_Dynamic = 2,
 
-    _JPH_MOTION_TYPE__NUM,
-    _JPH_MOTION_TYPE_FORCEU32 = 0x7fffffff
+    _JPH_MotionType_Count,
+    _JPH_MotionType_Force32 = 0x7fffffff
 } JPH_MotionType;
 
 typedef enum JPH_ActivationMode
 {
-    JPH_ACTIVATION_MODE_ACTIVATE = 0,
-    JPH_ACTIVATION_MODE_DONT_ACTIVATE = 1,
+    JPH_ActivationMode_Activate = 0,
+    JPH_ActivationMode_DontActivate = 1,
 
-    _JPH_ACTIVATION_MODE_NUM,
-    _JPH_ACTIVATION_MODE_FORCEU32 = 0x7fffffff
+    _JPH_ActivationMode_Count,
+    _JPH_ActivationMode_Force32 = 0x7fffffff
 } JPH_ActivationMode;
 
 typedef enum JPH_ValidateResult {
-    JPH_VALIDATE_RESULT_ACCEPT_ALL_CONTACTS = 0,
-    JPH_VALIDATE_RESULT_ACCEPT_CONTACT = 1,
-    JPH_VALIDATE_RESULT_REJECT_CONTACT = 2,
-    JPH_VALIDATE_RESULT_REJECT_ALL_CONTACTS = 3,
+    JPH_ValidateResult_AcceptAllContactsForThisBodyPair = 0,
+    JPH_ValidateResult_AcceptContact = 1,
+    JPH_ValidateResult_RejectContact = 2,
+    JPH_ValidateResult_RejectAllContactsForThisBodyPair = 3,
 
-    _JPH_VALIDATE_RESULT_NUM,
-    _JPH_VALIDATE_RESULT_FORCEU32 = 0x7fffffff
+    _JPH_ValidateResult_Count,
+    _JPH_ValidateResult_Force32 = 0x7fffffff
 } JPH_ValidateResult;
 
 typedef enum JPH_ConstraintSpace {
-    JPH_CONSTRAINT_SPACE_LOCAL_TO_BODY_COM = 0,
-    JPH_CONSTRAINT_SPACE_WORLD_SPACE = 1,
+    JPH_ConstraintSpace_LocalToBodyCOM = 0,
+    JPH_ConstraintSpace_WorldSpace = 1,
 
-    _JPH_CONSTRAINT_SPACE_NUM,
-    _JPH_CONSTRAINT_SPACE_FORCEU32 = 0x7fffffff
+    _JPH_ConstraintSpace_Count,
+    _JPH_ConstraintSpace_Force32 = 0x7fffffff
 } JPH_ConstraintSpace;
 
 typedef enum JPH_MotionQuality {
-    JPH_MOTION_QUALITY_DISCRETE = 0,
-    JPH_MOTION_QUALITY_LINEAR_CAST = 1,
+    JPH_MotionQuality_Discrete = 0,
+    JPH_MotionQuality_LinearCast = 1,
 
-    _JPH_MOTION_QUALITY_NUM,
-    _JPH_MOTION_QUALITY_FORCEU32 = 0x7fffffff
+    _JPH_MotionQuality_Count,
+    _JPH_MotionQuality_Force32 = 0x7fffffff
 } JPH_MotionQuality;
+
+typedef enum JPH_AllowedDOFs {
+    JPH_AllowedDOFs_All = 0b111111,									
+    JPH_AllowedDOFs_TranslationX = 0b000001,								
+    JPH_AllowedDOFs_TranslationY = 0b000010,								
+    JPH_AllowedDOFs_TranslationZ = 0b000100,								
+    JPH_AllowedDOFs_RotationX = 0b001000,									
+    JPH_AllowedDOFs_RotationY = 0b010000,									
+    JPH_AllowedDOFs_RotationZ = 0b100000,									
+    JPH_AllowedDOFs_Plane2D = JPH_AllowedDOFs_TranslationX | JPH_AllowedDOFs_TranslationY | JPH_AllowedDOFs_RotationZ,
+
+    _JPH_AllowedDOFs_Count,
+    _JPH_AllowedDOFs_Force32 = 0x7FFFFFFF
+} JPH_AllowedDOFs;
 
 typedef struct JPH_Vec3 {
     float x;
@@ -322,6 +336,18 @@ JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(const JPH_Sh
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer);
 JPH_CAPI void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* settings);
+
+JPH_CAPI void JPH_BodyCreationSettings_GetLinearVelocity(JPH_BodyCreationSettings* settings, JPH_Vec3* velocity);
+JPH_CAPI void JPH_BodyCreationSettings_SetLinearVelocity(JPH_BodyCreationSettings* settings, const JPH_Vec3* velocity);
+
+JPH_CAPI void JPH_BodyCreationSettings_GetAngularVelocity(JPH_BodyCreationSettings* settings, JPH_Vec3* velocity);
+JPH_CAPI void JPH_BodyCreationSettings_SetAngularVelocity(JPH_BodyCreationSettings* settings, const JPH_Vec3* velocity);
+
+JPH_CAPI JPH_MotionType JPH_BodyCreationSettings_GetMotionType(JPH_BodyCreationSettings* settings);
+JPH_CAPI void JPH_BodyCreationSettings_SetMotionType(JPH_BodyCreationSettings* settings, JPH_MotionType value);
+
+JPH_CAPI JPH_AllowedDOFs JPH_BodyCreationSettings_GetAllowedDOFs(JPH_BodyCreationSettings* settings);
+JPH_CAPI void JPH_BodyCreationSettings_SetAllowedDOFs(JPH_BodyCreationSettings* settings, JPH_AllowedDOFs value);
 
 /* JPH_ConstraintSettings */
 JPH_CAPI void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings);

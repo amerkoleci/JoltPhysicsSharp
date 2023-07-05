@@ -834,6 +834,62 @@ void JPH_BodyCreationSettings_Destroy(JPH_BodyCreationSettings* settings)
     }
 }
 
+void JPH_BodyCreationSettings_GetLinearVelocity(JPH_BodyCreationSettings* settings, JPH_Vec3* velocity)
+{
+    JPH_ASSERT(settings);
+
+    auto joltVector = reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mLinearVelocity;
+    FromVec3(joltVector, velocity);
+}
+
+void JPH_BodyCreationSettings_SetLinearVelocity(JPH_BodyCreationSettings* settings, const JPH_Vec3* velocity)
+{
+    JPH_ASSERT(settings);
+
+    reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mLinearVelocity = ToVec3(velocity);
+}
+
+void JPH_BodyCreationSettings_GetAngularVelocity(JPH_BodyCreationSettings* settings, JPH_Vec3* velocity)
+{
+    JPH_ASSERT(settings);
+
+    auto joltVector = reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mAngularVelocity;
+    FromVec3(joltVector, velocity);
+}
+
+void JPH_BodyCreationSettings_SetAngularVelocity(JPH_BodyCreationSettings* settings, const JPH_Vec3* velocity)
+{
+    JPH_ASSERT(settings);
+
+    reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mAngularVelocity = ToVec3(velocity);
+}
+
+JPH_MotionType JPH_BodyCreationSettings_GetMotionType(JPH_BodyCreationSettings* settings)
+{
+    JPH_ASSERT(settings);
+
+    return static_cast<JPH_MotionType>(reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mMotionType);
+}
+
+void JPH_BodyCreationSettings_SetMotionType(JPH_BodyCreationSettings* settings, JPH_MotionType value)
+{
+    JPH_ASSERT(settings);
+
+    reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mMotionType = (JPH::EMotionType)value;
+}
+
+JPH_AllowedDOFs JPH_BodyCreationSettings_GetAllowedDOFs(JPH_BodyCreationSettings* settings)
+{
+    JPH_ASSERT(settings);
+
+    return static_cast<JPH_AllowedDOFs>(reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mAllowedDOFs);
+}
+
+void JPH_BodyCreationSettings_SetAllowedDOFs(JPH_BodyCreationSettings* settings, JPH_AllowedDOFs value)
+{
+    reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mAllowedDOFs = (JPH::EAllowedDOFs)value;
+}
+
 /* JPH_ConstraintSettings */
 void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
 {

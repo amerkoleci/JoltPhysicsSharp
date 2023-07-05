@@ -25,6 +25,7 @@ __pragma(warning(push, 0))
 #include <Jolt/Physics/Collision/CastResult.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
+#include <Jolt/Physics/Body/AllowedDOFs.h>
 
 #ifdef _MSC_VER
 __pragma(warning(pop))
@@ -44,36 +45,48 @@ static_assert(sizeof(JPH::BodyID) == sizeof(JPH_BodyID));
 static_assert(sizeof(JPH::SubShapeID) == sizeof(JPH_SubShapeID));
 
 // EPhysicsUpdateError
-static_assert(JPH_PHYSICS_UPDATE_ERROR_NONE == (int)JPH::EPhysicsUpdateError::None);
-static_assert(JPH_PHYSICS_UPDATE_ERROR_MANIFOLD_CACHE_FULL == (int)JPH::EPhysicsUpdateError::ManifoldCacheFull);
-static_assert(JPH_PHYSICS_UPDATE_ERROR_BODY_PAIR_CACHE_FULL == (int)JPH::EPhysicsUpdateError::BodyPairCacheFull);
-static_assert(JPH_PHYSICS_UPDATE_ERROR_CONTACT_CONSTRAINTS_FULL == (int)JPH::EPhysicsUpdateError::ContactConstraintsFull);
+static_assert(sizeof(JPH_PhysicsUpdateError) == sizeof(JPH::EPhysicsUpdateError));
+static_assert(JPH_PhysicsUpdateError_None == (int)JPH::EPhysicsUpdateError::None);
+static_assert(JPH_PhysicsUpdateError_ManifoldCacheFull == (int)JPH::EPhysicsUpdateError::ManifoldCacheFull);
+static_assert(JPH_PhysicsUpdateError_BodyPairCacheFull == (int)JPH::EPhysicsUpdateError::BodyPairCacheFull);
+static_assert(JPH_PhysicsUpdateError_ContactConstraintsFull == (int)JPH::EPhysicsUpdateError::ContactConstraintsFull);
 
 // EMotionType
-static_assert(JPH_MOTION_TYPE_STATIC == (int)JPH::EMotionType::Static);
-static_assert(JPH_MOTION_TYPE_KINEMATIC == (int)JPH::EMotionType::Kinematic);
-static_assert(JPH_MOTION_TYPE_DYNAMIC == (int)JPH::EMotionType::Dynamic);
+static_assert(JPH_MotionType_Static == (int)JPH::EMotionType::Static);
+static_assert(JPH_MotionType_Kinematic == (int)JPH::EMotionType::Kinematic);
+static_assert(JPH_MotionType_Dynamic == (int)JPH::EMotionType::Dynamic);
 
 // EActivation
 static_assert(sizeof(JPH::EActivation) == sizeof(JPH_ActivationMode));
-static_assert(JPH_ACTIVATION_MODE_ACTIVATE == (int)JPH::EActivation::Activate);
-static_assert(JPH_ACTIVATION_MODE_DONT_ACTIVATE == (int)JPH::EActivation::DontActivate);
+static_assert(JPH_ActivationMode_Activate == (int)JPH::EActivation::Activate);
+static_assert(JPH_ActivationMode_DontActivate == (int)JPH::EActivation::DontActivate);
 
 // EActivation
 static_assert(sizeof(JPH::ValidateResult) == sizeof(JPH_ValidateResult));
-static_assert(JPH_VALIDATE_RESULT_ACCEPT_ALL_CONTACTS == (int)JPH::ValidateResult::AcceptAllContactsForThisBodyPair);
-static_assert(JPH_VALIDATE_RESULT_ACCEPT_CONTACT == (int)JPH::ValidateResult::AcceptContact);
-static_assert(JPH_VALIDATE_RESULT_REJECT_CONTACT == (int)JPH::ValidateResult::RejectContact);
-static_assert(JPH_VALIDATE_RESULT_REJECT_ALL_CONTACTS == (int)JPH::ValidateResult::RejectAllContactsForThisBodyPair);
+static_assert(JPH_ValidateResult_AcceptAllContactsForThisBodyPair == (int)JPH::ValidateResult::AcceptAllContactsForThisBodyPair);
+static_assert(JPH_ValidateResult_AcceptContact == (int)JPH::ValidateResult::AcceptContact);
+static_assert(JPH_ValidateResult_RejectContact == (int)JPH::ValidateResult::RejectContact);
+static_assert(JPH_ValidateResult_RejectAllContactsForThisBodyPair == (int)JPH::ValidateResult::RejectAllContactsForThisBodyPair);
 
 // EActivation
 static_assert(sizeof(JPH::EConstraintSpace) == sizeof(JPH_ConstraintSpace));
-static_assert(JPH_CONSTRAINT_SPACE_LOCAL_TO_BODY_COM == (int)JPH::EConstraintSpace::LocalToBodyCOM);
-static_assert(JPH_CONSTRAINT_SPACE_WORLD_SPACE == (int)JPH::EConstraintSpace::WorldSpace);
+static_assert(JPH_ConstraintSpace_LocalToBodyCOM == (int)JPH::EConstraintSpace::LocalToBodyCOM);
+static_assert(JPH_ConstraintSpace_WorldSpace == (int)JPH::EConstraintSpace::WorldSpace);
 
 // EMotionQuality
-static_assert(JPH_MOTION_QUALITY_DISCRETE == (int)JPH::EMotionQuality::Discrete);
-static_assert(JPH_MOTION_QUALITY_LINEAR_CAST == (int)JPH::EMotionQuality::LinearCast);
+static_assert(JPH_MotionQuality_Discrete == (int)JPH::EMotionQuality::Discrete);
+static_assert(JPH_MotionQuality_LinearCast == (int)JPH::EMotionQuality::LinearCast);
+
+// JPH_AllowedDOFs
+static_assert(sizeof(JPH_AllowedDOFs) == sizeof(uint32_t));
+static_assert(JPH_AllowedDOFs_All == (int)JPH::EAllowedDOFs::All);
+static_assert(JPH_AllowedDOFs_TranslationX == (int)JPH::EAllowedDOFs::TranslationX);
+static_assert(JPH_AllowedDOFs_TranslationY == (int)JPH::EAllowedDOFs::TranslationY);
+static_assert(JPH_AllowedDOFs_TranslationZ == (int)JPH::EAllowedDOFs::TranslationZ);
+static_assert(JPH_AllowedDOFs_RotationX == (int)JPH::EAllowedDOFs::RotationX);
+static_assert(JPH_AllowedDOFs_RotationY == (int)JPH::EAllowedDOFs::RotationY);
+static_assert(JPH_AllowedDOFs_RotationZ == (int)JPH::EAllowedDOFs::RotationZ);
+static_assert(JPH_AllowedDOFs_Plane2D == (int)JPH::EAllowedDOFs::Plane2D);
 
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));
