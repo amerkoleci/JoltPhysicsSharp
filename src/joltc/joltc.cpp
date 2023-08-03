@@ -898,15 +898,15 @@ JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create()
     return reinterpret_cast<JPH_SoftBodyCreationSettings*>(bodyCreationSettings);
 }
 
-void JPH_SoftBodyCreationSettings_Destroy(JPH_SoftBodyCreationSettings* settings)
-{
-    if (settings)
-    {
-		// TODO: MSVC issue -> `scalar deleting destructor'(unsigned int) __ptr64': function not inlined
-		auto bodyCreationSettings = reinterpret_cast<JPH::SoftBodyCreationSettings*>(settings);
-		//delete bodyCreationSettings;
-    }
-}
+//void JPH_SoftBodyCreationSettings_Destroy(JPH_SoftBodyCreationSettings* settings)
+//{
+//    if (settings)
+//    {
+//		// TODO: MSVC issue -> `scalar deleting destructor'(unsigned int) __ptr64': function not inlined
+//		auto bodyCreationSettings = reinterpret_cast<JPH::SoftBodyCreationSettings*>(settings);
+//		delete bodyCreationSettings;
+//    }
+//}
 
 /* JPH_ConstraintSettings */
 void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
