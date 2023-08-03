@@ -30,6 +30,11 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return JPH_BodyInterface_CreateBody(Handle, settings.Handle);
     }
 
+    public Body CreateSoftBody(SoftBodyCreationSettings settings)
+    {
+        return JPH_BodyInterface_CreateSoftBody(Handle, settings.Handle);
+    }
+
     public BodyID CreateAndAddBody(BodyCreationSettings settings, Activation activationMode)
     {
         return new(JPH_BodyInterface_CreateAndAddBody(Handle, settings.Handle, activationMode));
@@ -139,6 +144,7 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
 
     public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID);
     public bool IsAdded(in BodyID bodyID) => JPH_BodyInterface_IsAdded(Handle, bodyID);
+    public BodyType GetBodyType(in BodyID bodyID) => JPH_BodyInterface_GetBodyType(Handle, bodyID);
 
     public float GetRestitution(in BodyID bodyID)
     {

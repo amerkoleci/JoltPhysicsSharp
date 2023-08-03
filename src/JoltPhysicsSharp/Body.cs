@@ -26,6 +26,21 @@ public readonly struct Body : IEquatable<Body>
     public override int GetHashCode() => Handle.GetHashCode();
 
     public readonly BodyID ID => JPH_Body_GetID(Handle);
+
+    /// <summary>
+    /// Get the type of body (rigid or soft)
+    /// </summary>
+    public readonly BodyType BodyType => JPH_Body_GetBodyType(Handle);
+
+    /// <summary>
+    /// Gets where this body is a rigid body.
+    /// </summary>
+    public readonly bool IsRigidBody => JPH_Body_GetBodyType(Handle) == BodyType.Rigid;
+
+    /// <summary>
+    /// Gets where this body is a soft body.
+    /// </summary>
+    public readonly bool IsSoftBody => JPH_Body_GetBodyType(Handle) == BodyType.Soft;
     public readonly bool IsActive => JPH_Body_IsActive(Handle);
     public readonly bool IsStatic => JPH_Body_IsStatic(Handle);
     public readonly bool IsKinematic => JPH_Body_IsKinematic(Handle);

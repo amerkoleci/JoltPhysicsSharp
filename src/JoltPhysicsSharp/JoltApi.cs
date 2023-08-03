@@ -601,6 +601,13 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyCreationSettings_SetAllowedDOFs(IntPtr settings, AllowedDOFs value);
 
+    /* SoftBodyCreationSettings */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_SoftBodyCreationSettings_Create();
+
+    //[DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    //public static extern void JPH_SoftBodyCreationSettings_Destroy(IntPtr settings);
+
     /* JPH_ConstraintSettings */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ConstraintSettings_Destroy(IntPtr handle);
@@ -663,7 +670,7 @@ internal static unsafe partial class JoltApi
     public static extern uint JPH_PhysicsSystem_GetNumBodies(IntPtr system);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_PhysicsSystem_GetNumActiveBodies(IntPtr system);
+    public static extern uint JPH_PhysicsSystem_GetNumActiveBodies(IntPtr system, BodyType type);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_PhysicsSystem_GetMaxBodies(IntPtr system);
@@ -696,6 +703,9 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_BodyInterface_CreateBody(IntPtr handle, IntPtr settings);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_BodyInterface_CreateSoftBody(IntPtr handle, IntPtr settings);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_BodyInterface_CreateAndAddBody(IntPtr handle, IntPtr bodyID, Activation activation);
@@ -741,6 +751,9 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern Bool32 JPH_BodyInterface_IsAdded(IntPtr handle, uint bodyID);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern BodyType JPH_BodyInterface_GetBodyType(IntPtr handle, uint bodyID);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern MotionType JPH_BodyInterface_GetMotionType(IntPtr handle, uint bodyID);
@@ -905,6 +918,9 @@ internal static unsafe partial class JoltApi
     /* Body */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_Body_GetID(IntPtr body);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern BodyType JPH_Body_GetBodyType(IntPtr body);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern Bool32 JPH_Body_IsActive(IntPtr handle);
