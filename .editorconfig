@@ -159,10 +159,17 @@ csharp_style_namespace_declarations=file_scoped:error
 # License header
 file_header_template = Copyright © Amer Koleci and Contributors.\nLicensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-# C++ Files
-[*.{cpp,h,in}]
-curly_bracket_next_line = true
-indent_brace_style = Allman
+[*.{cpp,h,inl,cmake,sh,bat,hlsl}]
+indent_style = tab
+tab_width = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[CMakeLists.txt]
+indent_style = tab
+tab_width = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
 
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]

@@ -30,6 +30,7 @@ __pragma(warning(push, 0))
 #include <Jolt/Physics/Collision/Shape/MutableCompoundShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
+#include <Jolt/Physics/SoftBody/SoftBodyCreationSettings.h>
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/NarrowPhaseQuery.h>
 #include <Jolt/Physics/Constraints/PointConstraint.h>
@@ -890,6 +891,21 @@ void JPH_BodyCreationSettings_SetAllowedDOFs(JPH_BodyCreationSettings* settings,
     reinterpret_cast<JPH::BodyCreationSettings*>(settings)->mAllowedDOFs = (JPH::EAllowedDOFs)value;
 }
 
+/* JPH_SoftBodyCreationSettings */
+JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create()
+{
+    auto bodyCreationSettings = new JPH::SoftBodyCreationSettings();
+    return reinterpret_cast<JPH_SoftBodyCreationSettings*>(bodyCreationSettings);
+}
+
+void JPH_SoftBodyCreationSettings_Destroy(JPH_SoftBodyCreationSettings* settings)
+{
+    if (settings)
+    {
+        delete reinterpret_cast<JPH::SoftBodyCreationSettings*>(settings);
+    }
+}
+
 /* JPH_ConstraintSettings */
 void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
 {
@@ -1099,12 +1115,12 @@ uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system)
     return joltSystem->GetNumBodies();
 }
 
-uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system)
+uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system, JPH_BodyType type)
 {
     JPH_ASSERT(system);
 
     auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
-    return joltSystem->GetNumActiveBodies();
+    return joltSystem->GetNumActiveBodies(static_cast<JPH::EBodyType>(type));
 }
 
 uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system)
@@ -1192,6 +1208,17 @@ JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCre
 
     auto body = joltBodyInterface->CreateBody(
         *reinterpret_cast<const JPH::BodyCreationSettings*>(settings)
+    );
+
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_Body* JPH_BodyInterface_CreateSoftBody(JPH_BodyInterface* interface, JPH_SoftBodyCreationSettings* settings)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+    auto body = joltBodyInterface->CreateSoftBody(
+        *reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings)
     );
 
     return reinterpret_cast<JPH_Body*>(body);
@@ -1299,6 +1326,14 @@ JPH_Bool32 JPH_BodyInterface_IsAdded(JPH_BodyInterface* interface, JPH_BodyID bo
 
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
     return joltBodyInterface->IsAdded(JPH::BodyID(bodyID));
+}
+
+JPH_BodyType JPH_BodyInterface_GetBodyType(JPH_BodyInterface* interface, JPH_BodyID bodyID)
+{
+    JPH_ASSERT(interface);
+
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    return static_cast<JPH_BodyType>(joltBodyInterface->GetBodyType(JPH::BodyID(bodyID)));
 }
 
 void JPH_BodyInterface_SetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_Vec3* velocity)
@@ -1745,6 +1780,12 @@ JPH_BodyID JPH_Body_GetID(const JPH_Body* body)
 {
     auto joltBody = reinterpret_cast<const JPH::Body*>(body);
     return joltBody->GetID().GetIndexAndSequenceNumber();
+}
+
+JPH_BodyType JPH_Body_GetBodyType(const JPH_Body* body)
+{
+    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
+    return static_cast<JPH_BodyType>(joltBody->GetBodyType());
 }
 
 JPH_Bool32 JPH_Body_IsActive(const JPH_Body* body)

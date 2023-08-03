@@ -56,6 +56,14 @@ typedef enum JPH_PhysicsUpdateError {
     _JPH_PhysicsUpdateError_Force32 = 0x7fffffff
 } JPH_PhysicsUpdateError;
 
+typedef enum JPH_BodyType {
+    JPH_BodyType_Rigid = 0,
+    JPH_BodyType_Soft = 1,
+
+    _JPH_BodyType_Count,
+    _JPH_BodyType_Force32 = 0x7fffffff
+} JPH_BodyType;
+
 typedef enum JPH_MotionType {
     JPH_MotionType_Static = 0,
     JPH_MotionType_Kinematic = 1,
@@ -220,6 +228,7 @@ typedef struct JPH_SphereShape                  JPH_SphereShape;
 typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
 
 typedef struct JPH_BodyCreationSettings         JPH_BodyCreationSettings;
+typedef struct JPH_SoftBodyCreationSettings     JPH_SoftBodyCreationSettings;
 typedef struct JPH_BodyInterface                JPH_BodyInterface;
 typedef struct JPH_BodyLockInterface            JPH_BodyLockInterface;
 typedef struct JPH_NarrowPhaseQuery             JPH_NarrowPhaseQuery;
@@ -349,6 +358,10 @@ JPH_CAPI void JPH_BodyCreationSettings_SetMotionType(JPH_BodyCreationSettings* s
 JPH_CAPI JPH_AllowedDOFs JPH_BodyCreationSettings_GetAllowedDOFs(JPH_BodyCreationSettings* settings);
 JPH_CAPI void JPH_BodyCreationSettings_SetAllowedDOFs(JPH_BodyCreationSettings* settings, JPH_AllowedDOFs value);
 
+/* JPH_SoftBodyCreationSettings */
+JPH_CAPI JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create();
+JPH_CAPI void JPH_SoftBodyCreationSettings_Destroy(JPH_SoftBodyCreationSettings* settings);
+
 /* JPH_ConstraintSettings */
 JPH_CAPI void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings);
 JPH_CAPI void JPH_Constraint_Destroy(JPH_Constraint* contraint);
@@ -393,7 +406,7 @@ JPH_CAPI void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JP
 JPH_CAPI void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_BodyActivationListener* listener);
 
 JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system);
-JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system);
+JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system, JPH_BodyType type);
 JPH_CAPI uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system);
 
 JPH_CAPI void JPH_PhysicsSystem_SetGravity(JPH_PhysicsSystem* system, const JPH_Vec3* value);
@@ -409,6 +422,7 @@ JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH
 JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 JPH_CAPI JPH_BodyID JPH_BodyInterface_CreateAndAddBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings, JPH_Activation activationMode);
 JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings);
+JPH_CAPI JPH_Body* JPH_BodyInterface_CreateSoftBody(JPH_BodyInterface* interface, JPH_SoftBodyCreationSettings* settings);
 JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_BodyCreationSettings* settings);
 JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithoutID(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings);
 JPH_CAPI void JPH_BodyInterface_DestroyBodyWithoutID(JPH_BodyInterface* interface, JPH_Body* body);
@@ -420,6 +434,7 @@ JPH_CAPI void JPH_BodyInterface_AddBody(JPH_BodyInterface* interface, JPH_BodyID
 JPH_CAPI void JPH_BodyInterface_RemoveBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 JPH_CAPI JPH_Bool32 JPH_BodyInterface_IsActive(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 JPH_CAPI JPH_Bool32 JPH_BodyInterface_IsAdded(JPH_BodyInterface* interface, JPH_BodyID bodyID);
+JPH_CAPI JPH_BodyType JPH_BodyInterface_GetBodyType(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 
 JPH_CAPI void JPH_BodyInterface_SetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_Vec3* velocity);
 JPH_CAPI void JPH_BodyInterface_GetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Vec3* velocity);
@@ -509,6 +524,7 @@ JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* que
 
 /* Body */
 JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
+JPH_CAPI JPH_BodyType JPH_Body_GetBodyType(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsActive(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsStatic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsKinematic(const JPH_Body* body);

@@ -51,6 +51,10 @@ static_assert(JPH_PhysicsUpdateError_ManifoldCacheFull == (int)JPH::EPhysicsUpda
 static_assert(JPH_PhysicsUpdateError_BodyPairCacheFull == (int)JPH::EPhysicsUpdateError::BodyPairCacheFull);
 static_assert(JPH_PhysicsUpdateError_ContactConstraintsFull == (int)JPH::EPhysicsUpdateError::ContactConstraintsFull);
 
+// EBodyType
+static_assert(JPH_BodyType_Rigid == (int)JPH::EBodyType::RigidBody);
+static_assert(JPH_BodyType_Soft == (int)JPH::EBodyType::SoftBody);
+
 // EMotionType
 static_assert(JPH_MotionType_Static == (int)JPH::EMotionType::Static);
 static_assert(JPH_MotionType_Kinematic == (int)JPH::EMotionType::Kinematic);
