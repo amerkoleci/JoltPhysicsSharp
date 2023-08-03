@@ -902,7 +902,9 @@ void JPH_SoftBodyCreationSettings_Destroy(JPH_SoftBodyCreationSettings* settings
 {
     if (settings)
     {
-        delete reinterpret_cast<JPH::SoftBodyCreationSettings*>(settings);
+		// TODO: MSVC issue -> `scalar deleting destructor'(unsigned int) __ptr64': function not inlined
+		auto bodyCreationSettings = reinterpret_cast<JPH::SoftBodyCreationSettings*>(settings);
+		//delete bodyCreationSettings;
     }
 }
 
