@@ -8,6 +8,7 @@
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/Collision/CollisionGroup.h>
 #include <Jolt/ObjectStream/SerializableObject.h>
+#include <Jolt/Core/StreamUtils.h>
 
 JPH_NAMESPACE_BEGIN
 
@@ -20,13 +21,30 @@ public:
 
 	/// Constructor
 						SoftBodyCreationSettings() = default;
-						SoftBodyCreationSettings(const SoftBodySharedSettings *inSettings, RVec3Arg inPosition = RVec3::sZero(), QuatArg inRotation = Quat::sIdentity()) : mSettings(inSettings), mPosition(inPosition), mRotation(inRotation) { }
+						SoftBodyCreationSettings(const SoftBodySharedSettings *inSettings, RVec3Arg inPosition, QuatArg inRotation, ObjectLayer inObjectLayer) : mSettings(inSettings), mPosition(inPosition), mRotation(inRotation), mObjectLayer(inObjectLayer) { }
 
 	/// Saves the state of this object in binary form to inStream. Doesn't store the shared settings nor the group filter.
 	void				SaveBinaryState(StreamOut &inStream) const;
 
 	/// Restore the state of this object from inStream. Doesn't restore the shared settings nor the group filter.
 	void				RestoreBinaryState(StreamIn &inStream);
+
+	using GroupFilterToIDMap = StreamUtils::ObjectToIDMap<GroupFilter>;
+	using IDToGroupFilterMap = StreamUtils::IDToObjectMap<GroupFilter>;
+	using SharedSettingsToIDMap = SoftBodySharedSettings::SharedSettingsToIDMap;
+	using IDToSharedSettingsMap = SoftBodySharedSettings::IDToSharedSettingsMap;
+	using MaterialToIDMap = StreamUtils::ObjectToIDMap<PhysicsMaterial>;
+	using IDToMaterialMap = StreamUtils::IDToObjectMap<PhysicsMaterial>;
+
+	/// Save this body creation settings, its shared settings and group filter. Pass in an empty map in ioSharedSettingsMap / ioMaterialMap / ioGroupFilterMap or reuse the same map while saving multiple shapes to the same stream in order to avoid writing duplicates.
+	/// Pass nullptr to ioSharedSettingsMap and ioMaterial map to skip saving shared settings and materials
+	/// Pass nullptr to ioGroupFilterMap to skip saving group filters
+	void				SaveWithChildren(StreamOut &inStream, SharedSettingsToIDMap *ioSharedSettingsMap, MaterialToIDMap *ioMaterialMap, GroupFilterToIDMap *ioGroupFilterMap) const;
+
+	using SBCSResult = Result<SoftBodyCreationSettings>;
+
+	/// Restore a shape, all its children and materials. Pass in an empty map in ioSharedSettingsMap / ioMaterialMap / ioGroupFilterMap or reuse the same map while reading multiple shapes from the same stream in order to restore duplicates.
+	static SBCSResult	sRestoreWithChildren(StreamIn &inStream, IDToSharedSettingsMap &ioSharedSettingsMap, IDToMaterialMap &ioMaterialMap, IDToGroupFilterMap &ioGroupFilterMap);
 
 	RefConst<SoftBodySharedSettings> mSettings;				///< Defines the configuration of this soft body
 
@@ -41,7 +59,8 @@ public:
 	CollisionGroup		mCollisionGroup;					///< The collision group this body belongs to (determines if two objects can collide)
 
 	uint32				mNumIterations = 5;					///< Number of solver iterations
-	float				mLinearDamping = 0.05f;				///< Linear damping: dv/dt = -mLinearDamping * v
+	float				mLinearDamping = 0.1f;				///< Linear damping: dv/dt = -mLinearDamping * v
+	float				mMaxLinearVelocity = 500.0f;		///< Maximum linear velocity that a vertex can reach (m/s)
 	float				mRestitution = 0.0f;				///< Restitution when colliding
 	float				mFriction = 0.2f;					///< Friction coefficient when colliding
 	float				mPressure = 0.0f;					///< n * R * T, amount of substance * ideal gass constant * absolute temperature, see https://en.wikipedia.org/wiki/Pressure

@@ -6,6 +6,7 @@
 
 #include <Jolt/Physics/Body/Body.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/Physics/SoftBody/SoftBodyCreationSettings.h>
 #include <Jolt/Physics/SoftBody/SoftBodyMotionProperties.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/StateRecorder.h>
@@ -98,7 +99,7 @@ void Body::CalculateWorldSpaceBoundsInternal()
 	mBounds = mShape->GetWorldSpaceBounds(GetCenterOfMassTransform(), Vec3::sReplicate(1.0f));
 }
 
-void Body::SetPositionAndRotationInternal(RVec3Arg inPosition, QuatArg inRotation)
+void Body::SetPositionAndRotationInternal(RVec3Arg inPosition, QuatArg inRotation, bool inResetSleepTestSpheres)
 {
 	JPH_ASSERT(BodyAccess::sCheckRights(BodyAccess::sPositionAccess, BodyAccess::EAccess::ReadWrite));
 
@@ -109,7 +110,7 @@ void Body::SetPositionAndRotationInternal(RVec3Arg inPosition, QuatArg inRotatio
 	CalculateWorldSpaceBoundsInternal();
 
 	// Reset sleeping test
-	if (mMotionProperties != nullptr)
+	if (inResetSleepTestSpheres && mMotionProperties != nullptr)
 		ResetSleepTestSpheres();
 }
 
@@ -141,7 +142,7 @@ void Body::SetShapeInternal(const Shape *inShape, bool inUpdateMassProperties)
 	CalculateWorldSpaceBoundsInternal();
 }
 
-Body::ECanSleep Body::UpdateSleepStateInternal(float inDeltaTime, float inMaxMovement, float inTimeBeforeSleep)
+ECanSleep Body::UpdateSleepStateInternal(float inDeltaTime, float inMaxMovement, float inTimeBeforeSleep)
 {
 	// Check override & sensors will never go to sleep (they would stop detecting collisions with sleeping bodies)
 	if (!mMotionProperties->mAllowSleeping || IsSensor())
@@ -179,8 +180,7 @@ Body::ECanSleep Body::UpdateSleepStateInternal(float inDeltaTime, float inMaxMov
 		}
 	}
 
-	mMotionProperties->mSleepTestTimer += inDeltaTime;
-	return mMotionProperties->mSleepTestTimer >= inTimeBeforeSleep? ECanSleep::CanSleep : ECanSleep::CannotSleep;
+	return mMotionProperties->AccumulateSleepTime(inDeltaTime, inTimeBeforeSleep);
 }
 
 bool Body::ApplyBuoyancyImpulse(RVec3Arg inSurfacePosition, Vec3Arg inSurfaceNormal, float inBuoyancy, float inLinearDrag, float inAngularDrag, Vec3Arg inFluidVelocity, Vec3Arg inGravity, float inDeltaTime)
@@ -349,6 +349,31 @@ BodyCreationSettings Body::GetBodyCreationSettings() const
 	result.mMassPropertiesOverride.mMass = mMotionProperties != nullptr? 1.0f / mMotionProperties->GetInverseMassUnchecked() : FLT_MAX;
 	result.mMassPropertiesOverride.mInertia = mMotionProperties != nullptr? mMotionProperties->GetLocalSpaceInverseInertiaUnchecked().Inversed3x3() : Mat44::sIdentity();
 	result.SetShape(GetShape());
+
+	return result;
+}
+
+SoftBodyCreationSettings Body::GetSoftBodyCreationSettings() const
+{
+	JPH_ASSERT(IsSoftBody());
+
+	SoftBodyCreationSettings result;
+
+	result.mPosition = GetPosition();
+	result.mRotation = GetRotation();
+	result.mUserData = mUserData;
+	result.mObjectLayer = GetObjectLayer();
+	result.mCollisionGroup = GetCollisionGroup();
+	result.mFriction = GetFriction();
+	result.mRestitution = GetRestitution();
+	const SoftBodyMotionProperties *mp = static_cast<const SoftBodyMotionProperties *>(mMotionProperties);
+	result.mNumIterations = mp->GetNumIterations();
+	result.mLinearDamping = mp->GetLinearDamping();
+	result.mMaxLinearVelocity = mp->GetMaxLinearVelocity();
+	result.mGravityFactor = mp->GetGravityFactor();
+	result.mPressure = mp->GetPressure();
+	result.mUpdatePosition = mp->GetUpdatePosition();
+	result.mSettings = mp->GetSettings();
 
 	return result;
 }
