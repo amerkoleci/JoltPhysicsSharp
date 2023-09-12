@@ -7,7 +7,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.1
       
@@ -47,7 +47,7 @@ jobs:
   linux:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install dependencies
       run: |
@@ -71,7 +71,7 @@ jobs:
   macos:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup dependencies
       run: |
