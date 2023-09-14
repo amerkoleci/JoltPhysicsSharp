@@ -662,7 +662,7 @@ JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* 
     Array<Vec3> joltPoints;
     joltPoints.reserve(pointsCount);
 
-    for (size_t i = 0; i < joltPoints.size(); i++)
+    for (uint32_t i = 0; i < pointsCount; i++)
     {
         joltPoints.push_back(ToVec3(points[i]));
     }
@@ -694,7 +694,7 @@ JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, u
     joltVertices.reserve(verticesCount);
     joltTriangles.reserve(triangleCount);
 
-    for (size_t i = 0; i < joltVertices.size(); ++i)
+    for (uint32_t i = 0; i < verticesCount; ++i)
     {
         joltVertices.push_back(ToFloat3(vertices[i]));
     }
@@ -1176,7 +1176,8 @@ JPH_CAPI void JPH_PhysicsSystem_AddConstraints(JPH_PhysicsSystem* system, JPH_Co
     JPH_ASSERT(constraints);
     JPH_ASSERT(count > 0);
 
-    Array<Constraint*> joltConstraints(count);
+    Array<Constraint*> joltConstraints;
+	joltConstraints.reserve(count);
     for (uint32_t i = 0; i < count; ++i)
     {
         auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraints[i]);
@@ -1184,7 +1185,7 @@ JPH_CAPI void JPH_PhysicsSystem_AddConstraints(JPH_PhysicsSystem* system, JPH_Co
     }
 
     auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
-    joltSystem->AddConstraints(joltConstraints.data(), (int)joltConstraints.size());
+    joltSystem->AddConstraints(joltConstraints.data(), (int)count);
 }
 
 JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count)
@@ -1193,7 +1194,8 @@ JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH
     JPH_ASSERT(constraints);
     JPH_ASSERT(count > 0);
 
-    Array<Constraint*> joltConstraints(count);
+    Array<Constraint*> joltConstraints;
+	joltConstraints.size();
     for (uint32_t i = 0; i < count; ++i)
     {
         auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraints[i]);
@@ -1201,7 +1203,7 @@ JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH
     }
 
     auto joltSystem = reinterpret_cast<JPH::PhysicsSystem*>(system);
-    joltSystem->RemoveConstraints(joltConstraints.data(), (int)joltConstraints.size());
+    joltSystem->RemoveConstraints(joltConstraints.data(), (int)count);
 }
 
 JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
