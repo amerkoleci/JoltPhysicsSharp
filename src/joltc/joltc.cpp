@@ -1195,7 +1195,7 @@ JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH
     JPH_ASSERT(count > 0);
 
     Array<Constraint*> joltConstraints;
-	joltConstraints.size();
+	joltConstraints.reserve(count);
     for (uint32_t i = 0; i < count; ++i)
     {
         auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraints[i]);
