@@ -3,13 +3,9 @@
   <PropertyGroup>
     <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <!-- Trimming assemblies requires .NET Core 3.0 or higher. -->
+    <NoWarn>$(NoWarn);NETSDK1124</NoWarn>
   </PropertyGroup>
-
-  <!--<ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)..\JoltPhysicsSharp\runtimes\win-x64\native\joltc.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>-->
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" PrivateAssets="all" />

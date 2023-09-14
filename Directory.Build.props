@@ -11,7 +11,7 @@
 
   <!-- Version -->
   <PropertyGroup>
-    <VersionPrefix>1.9.2</VersionPrefix>
+    <VersionPrefix>1.9.3</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
   </PropertyGroup>
 
@@ -23,7 +23,7 @@
     <!-- Local builds should embed PDBs so we never lose them when a subsequent build occurs. -->
     <DebugType Condition=" '$(CI)' != 'true' and '$(TF_BUILD)' != 'true' ">embedded</DebugType>
     <Features>strict</Features>
-    <AnalysisLevel>preview</AnalysisLevel>
+    <AnalysisLevel>preview-recommended</AnalysisLevel>
     <RestoreConfigFile>$(MSBuildThisFileDirectory)NuGet.config</RestoreConfigFile>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>

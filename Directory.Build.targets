@@ -2,16 +2,16 @@
 <Project>
 
   <!-- Settings that are only set for executables -->
-  <PropertyGroup Condition="'$(OutputType)' != 'Library' AND '$(UseWindowsForms)' != 'true'">
+  <PropertyGroup Condition="'$(OutputType)' != 'Library' AND '$(UseWindowsForms)' != 'true' AND $(TargetFramework.StartsWith('net4')) != 'True'">
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
   <!-- Settings that are only set for libraries -->
-  <PropertyGroup Condition=" '$(OutputType)' == 'Library' AND $(TargetFramework.StartsWith('netstandard')) != 'True' ">
+  <PropertyGroup Condition=" '$(OutputType)' == 'Library' AND $(TargetFramework.StartsWith('netstandard')) != 'True' AND $(TargetFramework.StartsWith('net4')) != 'True' ">
+    <IsTrimmable>true</IsTrimmable>
     <EnableAotAnalyzer>true</EnableAotAnalyzer>
     <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
 </Project>

@@ -6,14 +6,14 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public sealed class MeshShapeSettings : ConvexShapeSettings
+public sealed unsafe class MeshShapeSettings : ConvexShapeSettings
 {
-    public unsafe MeshShapeSettings(Triangle* triangles, int triangleCount)
+    public MeshShapeSettings(Triangle* triangles, int triangleCount)
        : base(JPH_MeshShapeSettings_Create(triangles, triangleCount))
     {
     }
 
-    public unsafe MeshShapeSettings(Vector3* vertices, int verticesCount, IndexedTriangle* triangles, int triangleCount)
+    public MeshShapeSettings(Vector3* vertices, int verticesCount, IndexedTriangle* triangles, int triangleCount)
       : base(JPH_MeshShapeSettings_Create2(vertices, verticesCount, triangles, triangleCount))
     {
     }
@@ -23,7 +23,7 @@ public sealed class MeshShapeSettings : ConvexShapeSettings
     {
     }
 
-    public unsafe MeshShapeSettings(ReadOnlySpan<Triangle> triangles)
+    public MeshShapeSettings(ReadOnlySpan<Triangle> triangles)
     {
         fixed (Triangle* trianglePtr = triangles)
         {
@@ -36,7 +36,7 @@ public sealed class MeshShapeSettings : ConvexShapeSettings
     {
     }
 
-    public unsafe MeshShapeSettings(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<IndexedTriangle> triangles)
+    public MeshShapeSettings(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<IndexedTriangle> triangles)
     {
         fixed (Vector3* verticesPtr = vertices)
         fixed (IndexedTriangle* trianglePtr = triangles)
@@ -45,7 +45,7 @@ public sealed class MeshShapeSettings : ConvexShapeSettings
         }
     }
 
-    public unsafe MeshShapeSettings(Span<Vector3> vertices, Span<IndexedTriangle> triangles)
+    public MeshShapeSettings(Span<Vector3> vertices, Span<IndexedTriangle> triangles)
     {
         fixed (Vector3* verticesPtr = vertices)
         fixed (IndexedTriangle* trianglePtr = triangles)
