@@ -55,7 +55,12 @@
 #else
 	#define JPH_VERSION_FEATURE_BIT_9 0
 #endif
-#define JPH_VERSION_FEATURES (uint64(JPH_VERSION_FEATURE_BIT_1) | (JPH_VERSION_FEATURE_BIT_2 << 1) | (JPH_VERSION_FEATURE_BIT_3 << 2) | (JPH_VERSION_FEATURE_BIT_4 << 3) | (JPH_VERSION_FEATURE_BIT_5 << 4) | (JPH_VERSION_FEATURE_BIT_6 << 5) | (JPH_VERSION_FEATURE_BIT_7 << 6) | (JPH_VERSION_FEATURE_BIT_8 << 7) | (JPH_VERSION_FEATURE_BIT_9 << 8))
+#ifdef JPH_ENABLE_ASSERTS
+	#define JPH_VERSION_FEATURE_BIT_10 1
+#else
+	#define JPH_VERSION_FEATURE_BIT_10 0
+#endif
+#define JPH_VERSION_FEATURES (uint64(JPH_VERSION_FEATURE_BIT_1) | (JPH_VERSION_FEATURE_BIT_2 << 1) | (JPH_VERSION_FEATURE_BIT_3 << 2) | (JPH_VERSION_FEATURE_BIT_4 << 3) | (JPH_VERSION_FEATURE_BIT_5 << 4) | (JPH_VERSION_FEATURE_BIT_6 << 5) | (JPH_VERSION_FEATURE_BIT_7 << 6) | (JPH_VERSION_FEATURE_BIT_8 << 7) | (JPH_VERSION_FEATURE_BIT_9 << 8) | (JPH_VERSION_FEATURE_BIT_10 << 9))
 
 // Combine the version and features in a single ID
 #define JPH_VERSION_ID ((JPH_VERSION_FEATURES << 24) | (JPH_VERSION_MAJOR << 16) | (JPH_VERSION_MINOR << 8) | JPH_VERSION_PATCH)
@@ -310,13 +315,13 @@
 	// Configuration for a popular game console.
 	// This file is not distributed because it would violate an NDA.
 	// Creating one should only be a couple of minutes of work if you have the documentation for the platform
-	// (you only need to define JPH_BREAKPOINT, JPH_PLATFORM_BLUE_GET_TICKS and JPH_PLATFORM_BLUE_GET_TICK_FREQUENCY and include the right header).
+	// (you only need to define JPH_BREAKPOINT, JPH_PLATFORM_BLUE_GET_TICKS, JPH_PLATFORM_BLUE_MUTEX*, JPH_PLATFORM_BLUE_RWLOCK* and include the right header).
 	#include <Jolt/Core/PlatformBlue.h>
 #elif defined(JPH_PLATFORM_LINUX) || defined(JPH_PLATFORM_ANDROID) || defined(JPH_PLATFORM_MACOS) || defined(JPH_PLATFORM_IOS)
 	#if defined(JPH_CPU_X86)
-		#define JPH_BREAKPOINT		__asm volatile ("int $0x3")
+		#define JPH_BREAKPOINT	__asm volatile ("int $0x3")
 	#elif defined(JPH_CPU_ARM)
-		#define JPH_BREAKPOINT		__builtin_trap()
+		#define JPH_BREAKPOINT	__builtin_trap()
 	#endif
 #elif defined(JPH_PLATFORM_WASM)
 	#define JPH_BREAKPOINT		do { } while (false) // Not supported
