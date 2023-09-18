@@ -572,6 +572,14 @@ void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
     }
 }
 
+/* Shape */
+JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape)
+{
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    static auto joltMassProperties = joltShape->GetMassProperties();
+    return reinterpret_cast<JPH_MassProperties*>(&joltMassProperties);
+}
+
 /* BoxShape */
 JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius)
 {
@@ -1074,6 +1082,45 @@ const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const 
 
     auto joltSystem = reinterpret_cast<const JPH::PhysicsSystem*>(system);
     return reinterpret_cast<const JPH_BodyLockInterface*>(&joltSystem->GetBodyLockInterfaceNoLock());
+}
+
+void JPH_MotionProperties_SetLinearDamping(JPH_MotionProperties* properties, float damping)
+{
+    reinterpret_cast<JPH::MotionProperties*>(properties)->SetLinearDamping(damping);
+}
+
+float JPH_MotionProperties_GetLinearDamping(const JPH_MotionProperties* properties)
+{
+    return reinterpret_cast<const JPH::MotionProperties*>(properties)->GetLinearDamping();
+}
+
+void JPH_MotionProperties_SetAngularDamping(JPH_MotionProperties* properties, float damping)
+{
+    reinterpret_cast<JPH::MotionProperties*>(properties)->SetAngularDamping(damping);
+}
+
+float JPH_MotionProperties_GetAngularDamping(const JPH_MotionProperties* properties)
+{
+    return reinterpret_cast<const JPH::MotionProperties*>(properties)->GetAngularDamping();
+}
+
+float JPH_MotionProperties_GetInverseMassUnchecked(JPH_MotionProperties* properties)
+{
+    return reinterpret_cast<JPH::MotionProperties*>(properties)->GetInverseMassUnchecked();
+}
+
+void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JPH_AllowedDOFs allowedDOFs, JPH_MassProperties* massProperties)
+{
+    reinterpret_cast<JPH::MotionProperties*>(properties)->SetMassProperties(
+        static_cast<EAllowedDOFs>(allowedDOFs),
+        *reinterpret_cast<JPH::MassProperties*>(massProperties)
+	);
+}
+
+/* JPH_MassProperties */
+void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
+{
+    reinterpret_cast<JPH::MassProperties*>(properties)->ScaleToMass(mass);
 }
 
 const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system)
@@ -1822,6 +1869,11 @@ void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value)
     reinterpret_cast<JPH::Body*>(body)->SetIsSensor(!!value);
 }
 
+JPH_MotionProperties* JPH_Body_GetMotionProperties(JPH_Body* body)
+{
+    return reinterpret_cast<JPH_MotionProperties*>(reinterpret_cast<JPH::Body*>(body)->GetMotionProperties());
+}
+
 JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body)
 {
     return static_cast<JPH_MotionType>(reinterpret_cast<const JPH::Body*>(body)->GetMotionType());
@@ -1830,6 +1882,16 @@ JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body)
 void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType)
 {
     reinterpret_cast<JPH::Body*>(body)->SetMotionType(static_cast<JPH::EMotionType>(motionType));
+}
+
+JPH_Bool32 JPH_Body_GetAllowSleeping(JPH_Body* body)
+{
+    return reinterpret_cast<JPH::Body*>(body)->GetAllowSleeping();
+}
+
+void JPH_Body_SetAllowSleeping(JPH_Body* body, JPH_Bool32 allowSleeping)
+{
+    reinterpret_cast<JPH::Body*>(body)->SetAllowSleeping(!!allowSleeping);
 }
 
 float JPH_Body_GetFriction(const JPH_Body* body)
