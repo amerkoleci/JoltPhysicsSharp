@@ -52,10 +52,18 @@ public readonly struct Body : IEquatable<Body>
         set => JPH_Body_SetIsSensor(Handle, value);
     }
 
+    public MotionProperties MotionProperties => JPH_Body_GetMotionProperties(Handle);
+
     public MotionType MotionType
     {
         readonly get => JPH_Body_GetMotionType(Handle);
         set => JPH_Body_SetMotionType(Handle, value);
+    }
+
+    public bool AllowSleeping
+    {
+        readonly get => JPH_Body_GetAllowSleeping(Handle);
+        set => JPH_Body_SetAllowSleeping(Handle, value);
     }
 
     public float Friction

@@ -572,14 +572,6 @@ void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
     }
 }
 
-/* Shape */
-JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape)
-{
-    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
-    static auto joltMassProperties = joltShape->GetMassProperties();
-    return reinterpret_cast<JPH_MassProperties*>(&joltMassProperties);
-}
-
 /* BoxShape */
 JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius)
 {
@@ -791,6 +783,13 @@ void JPH_Shape_Destroy(JPH_Shape* shape)
     {
         delete reinterpret_cast<JPH::Shape*>(shape);
     }
+}
+
+JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape)
+{
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    static auto joltMassProperties = joltShape->GetMassProperties();
+    return reinterpret_cast<JPH_MassProperties*>(&joltMassProperties);
 }
 
 /* JPH_BodyCreationSettings */

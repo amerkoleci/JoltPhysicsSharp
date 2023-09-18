@@ -326,7 +326,7 @@ internal static unsafe partial class JoltApi
 #if NET6_0_OR_GREATER
     public struct JPH_BroadPhaseLayerFilter_Procs
     {
-        public delegate* unmanaged[Cdecl]<IntPtr, BroadPhaseLayer, Bool32> ShouldCollide;
+        public delegate* unmanaged[Cdecl]<nint, BroadPhaseLayer, Bool32> ShouldCollide;
     }
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -556,6 +556,9 @@ internal static unsafe partial class JoltApi
     /* Shape */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Shape_Destroy(IntPtr shape);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_Shape_GetMassProperties(nint shape);
 
     /* SphereShape */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -900,6 +903,29 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyLockInterface_UnlockWrite(nint lockInterface, in BodyLockWrite @lock);
 
+    /* JPH_MotionProperties */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_MotionProperties_SetLinearDamping(nint properties, float damping);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_MotionProperties_GetLinearDamping(nint properties);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_MotionProperties_SetAngularDamping(nint properties, float damping);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_MotionProperties_GetAngularDamping(nint properties);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_MotionProperties_GetInverseMassUnchecked(nint properties);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_MotionProperties_SetMassProperties(nint properties, AllowedDOFs allowedDOFs, nint massProperties);
+
+    /* JPH_MassProperties */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_MassProperties_ScaleToMass(nint properties, float mass);
+
     /* BodyLockInterface */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint JPC_PhysicsSystem_GetNarrowPhaseQuery(nint system);
@@ -938,13 +964,22 @@ internal static unsafe partial class JoltApi
     public static extern Bool32 JPH_Body_IsSensor(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_SetIsSensor(IntPtr handle, Bool32 value);
+    public static extern void JPH_Body_SetIsSensor(nint handle, Bool32 value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern MotionType JPH_Body_GetMotionType(IntPtr handle);
+    public static extern nint JPH_Body_GetMotionProperties(nint handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_SetMotionType(IntPtr handle, MotionType motionType);
+    public static extern MotionType JPH_Body_GetMotionType(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_SetMotionType(nint handle, MotionType motionType);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Bool32 JPH_Body_GetAllowSleeping(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_SetAllowSleeping(nint handle, Bool32 motionType);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern float JPH_Body_GetFriction(IntPtr handle);

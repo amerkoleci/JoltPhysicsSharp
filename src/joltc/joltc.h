@@ -285,9 +285,6 @@ JPH_CAPI void JPH_JobSystem_Destroy(JPH_JobSystem* system);
 /* JPH_ShapeSettings */
 JPH_CAPI void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings);
 
-/* Shape */
-JPH_CAPI JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape);
-
 /* BoxShape */
 JPH_CAPI JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius);
 JPH_CAPI JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius);
@@ -336,6 +333,7 @@ JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Crea
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
+JPH_CAPI JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape);
 
 /* JPH_BodyCreationSettings */
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create();

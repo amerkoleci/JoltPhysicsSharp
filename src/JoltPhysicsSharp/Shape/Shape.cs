@@ -50,4 +50,6 @@ public abstract class Shape : NativeObject
             JPH_Shape_Destroy(Handle);
         }
     }
+
+    public MassProperties MassProperties => JPH_Shape_GetMassProperties(Handle);
 }
