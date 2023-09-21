@@ -19,3 +19,18 @@ public sealed class CapsuleShapeSettings : ConvexShapeSettings
     ~CapsuleShapeSettings() => Dispose(isDisposing: false);
 }
 
+public sealed class CapsuleShape : ConvexShape
+{
+    public CapsuleShape(float halfHeightOfCylinder, float radius)
+        : base(JPH_CapsuleShape_Create(halfHeightOfCylinder, radius))
+    {
+    }
+
+    /// <summary>
+    /// Finalizes an instance of the <see cref="CapsuleShape" /> class.
+    /// </summary>
+    ~CapsuleShape() => Dispose(isDisposing: false);
+
+    public float Radius => JPH_CapsuleShape_GetRadius(Handle);
+    public float HalfHeightOfCylinder => JPH_CapsuleShape_GetHalfHeightOfCylinder(Handle);
+}

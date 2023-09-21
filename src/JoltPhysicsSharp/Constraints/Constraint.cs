@@ -50,4 +50,16 @@ public abstract class Constraint : NativeObject
             JPH_Constraint_Destroy(Handle);
         }
     }
+
+    // TODO: Handle type of settings here stuff here
+    public nint ConstraintSettings
+    {
+        get => JPH_Constraint_GetConstraintSettings(Handle);
+    }
+
+    public bool Enabled
+    {
+        get => JPH_Constraint_GetEnabled(Handle);
+        set => JPH_Constraint_SetEnabled(Handle, value);
+    }
 }

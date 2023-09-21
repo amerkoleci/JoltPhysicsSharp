@@ -474,6 +474,13 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ShapeSettings_Destroy(nint shape);
 
+    /* ConvexShape */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_ConvexShape_GetDensity(nint shape);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ConvexShape_SetDensity(nint shape, float value);
+
     /* BoxShapeSettings */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint JPH_BoxShapeSettings_Create(in Vector3 halfExtent, float convexRadius);
@@ -504,13 +511,31 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_TriangleShapeSettings_Create(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius);
 
-    /* CapsuleShapeSettings */
+    /* CapsuleShape */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius);
 
-    /* CylinderShapeSettings */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
+    public static extern nint JPH_CapsuleShape_Create(float halfHeightOfCylinder, float radius);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_CapsuleShape_GetRadius(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_CapsuleShape_GetHalfHeightOfCylinder(nint handle);
+
+    /* CylinderShape */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_CylinderShape_Create(float halfHeight, float radius);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_CylinderShape_GetRadius(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float JPH_CylinderShape_GetHalfHeight(nint handle);
 
     /* ConvexHullShape */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -525,6 +550,9 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_MeshShapeSettings_Sanitize(IntPtr shape);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_MeshShapeSettings_CreateShape(nint settings);
 
     /* HeightFieldShape  */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -556,6 +584,9 @@ internal static unsafe partial class JoltApi
     /* Shape */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Shape_Destroy(IntPtr shape);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Shape_GetLocalBounds(IntPtr shape, BoundingBox* box);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint JPH_Shape_GetMassProperties(nint shape);
@@ -611,14 +642,39 @@ internal static unsafe partial class JoltApi
     //[DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     //public static extern void JPH_SoftBodyCreationSettings_Destroy(IntPtr settings);
 
-    /* JPH_ConstraintSettings */
+    #region JPH_Constraint
+    /* JPH_Constraint */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ConstraintSettings_Destroy(IntPtr handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Constraint_Destroy(IntPtr handle);
+    public static extern void JPH_Constraint_Destroy(IntPtr constraint);
 
-    /* JPH_PointConstraintSettings */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_Constraint_GetConstraintSettings(nint constraint);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Bool32 JPH_Constraint_GetEnabled(IntPtr constraint);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Constraint_SetEnabled(IntPtr constraint, Bool32 value);
+    #endregion
+
+    #region JPH_TwoBodyConstraint
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_TwoBodyConstraint_GetBody1(nint constraint);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_TwoBodyConstraint_GetBody2(nint constraint);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(nint constraint, out Matrix4x4 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(nint constraint, out Matrix4x4 result);
+    #endregion
+
+    #region JPH_PointConstraint
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PointConstraintSettings_Create();
 
@@ -629,19 +685,78 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_PointConstraintSettings_SetSpace(IntPtr handle, ConstraintSpace value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_GetPoint1(IntPtr handle, out Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_GetPoint1(IntPtr handle, out Double3 result);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetPoint1(IntPtr handle, in Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_SetPoint1(IntPtr handle, in Double3 value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_GetPoint2(IntPtr handle, out Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_GetPoint2(IntPtr handle, out Double3 result);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetPoint2(IntPtr handle, in Double3 velocity);
+    public static extern void JPH_PointConstraintSettings_SetPoint2(IntPtr handle, in Double3 value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_PointConstraintSettings_CreateConstraint(IntPtr handle, IntPtr body1, IntPtr body2);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraint_SetPoint1(IntPtr handle, ConstraintSpace space, in Double3 value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PointConstraint_SetPoint2(IntPtr handle, ConstraintSpace space, in Double3 value); 
+    #endregion
+
+    #region JPH_DistanceConstraint
+    /* JPH_DistanceConstraint */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_DistanceConstraintSettings_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_DistanceConstraintSettings_GetPoint1(nint handle, out Vector3 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_DistanceConstraintSettings_SetPoint1(nint handle, in Vector3 value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_DistanceConstraintSettings_GetPoint2(nint handle, out Vector3 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_DistanceConstraintSettings_SetPoint2(nint handle, in Vector3 value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_DistanceConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    #endregion
+
+    #region JPH_HingeConstraint
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_HingeConstraintSettings_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_HingeConstraintSettings_GetPoint1(IntPtr handle, out Double3 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_HingeConstraintSettings_SetPoint1(IntPtr handle, in Double3 value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_HingeConstraintSettings_GetPoint2(IntPtr handle, out Double3 result);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_HingeConstraintSettings_SetPoint2(IntPtr handle, in Double3 value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_HingeConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    #endregion
+
+    #region JPH_SliderConstraint
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_SliderConstraintSettings_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_SliderConstraintSettings_SetSliderAxis(IntPtr handle, in Vector3 value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_SliderConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    #endregion
 
     /* PhysicsSystem */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -884,6 +999,12 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_InvalidateContactCache(IntPtr handle, uint bodyId);
 
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_BodyInterface_SetUserData(IntPtr handle, uint bodyId, ulong userData);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ulong JPH_BodyInterface_GetUserData(IntPtr handle, uint bodyId);
+
     /* BodyLockInterface */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint JPC_PhysicsSystem_GetBodyLockInterface(nint system);
@@ -947,6 +1068,9 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern BodyType JPH_Body_GetBodyType(IntPtr body);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_GetWorldSpaceBounds(IntPtr body, BoundingBox* box);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern Bool32 JPH_Body_IsActive(IntPtr handle);
@@ -1043,6 +1167,12 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_AddAngularImpulse(IntPtr handle, in Vector3 angularImpulse);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_Body_SetUserData(IntPtr handle, ulong userData);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ulong JPH_Body_GetUserData(IntPtr handle);
 
     // ContactListener
 #if NET6_0_OR_GREATER

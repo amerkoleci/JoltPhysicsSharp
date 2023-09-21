@@ -51,5 +51,15 @@ public abstract class Shape : NativeObject
         }
     }
 
+    public unsafe BoundingBox LocalBounds
+    {
+        get
+        {
+            BoundingBox result = default;
+            JPH_Shape_GetLocalBounds(Handle, &result);
+            return result;
+        }
+    }
+
     public MassProperties MassProperties => JPH_Shape_GetMassProperties(Handle);
 }

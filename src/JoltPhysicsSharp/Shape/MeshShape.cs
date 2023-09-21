@@ -61,3 +61,16 @@ public sealed unsafe class MeshShapeSettings : ConvexShapeSettings
 
     public void Sanitize() => JPH_MeshShapeSettings_Sanitize(Handle);
 }
+
+public sealed class MeshShape : Shape
+{
+    internal MeshShape(nint handle)
+        : base(handle)
+    {
+    }
+
+    public MeshShape(MeshShapeSettings settings)
+        : base(JPH_MeshShapeSettings_CreateShape(settings.Handle))
+    {
+    }
+}

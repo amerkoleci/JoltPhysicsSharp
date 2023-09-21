@@ -68,7 +68,7 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
 
 public sealed class PointConstraint : TwoBodyConstraint
 {
-    internal PointConstraint(IntPtr handle)
+    internal PointConstraint(nint handle)
         : base(handle)
     {
     }
@@ -77,4 +77,14 @@ public sealed class PointConstraint : TwoBodyConstraint
     /// Finalizes an instance of the <see cref="PointConstraint" /> class.
     /// </summary>
     ~PointConstraint() => Dispose(isDisposing: false);
+
+    public void SetPoint1(ConstraintSpace space, in Double3 value)
+    {
+        JPH_PointConstraint_SetPoint1(Handle, space, in value);
+    }
+
+    public void SetPoint2(ConstraintSpace space, in Double3 value)
+    {
+        JPH_PointConstraint_SetPoint2(Handle, space, in value);
+    }
 }

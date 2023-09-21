@@ -347,4 +347,14 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
     {
         JPH_BodyInterface_InvalidateContactCache(Handle, bodyId);
     }
+
+    public ulong GetUserData(in BodyID bodyId)
+    {
+        return JPH_BodyInterface_GetUserData(Handle, bodyId);
+    }
+
+    public void SetUserData(in BodyID bodyId, ulong userData)
+    {
+        JPH_BodyInterface_SetUserData(Handle, bodyId, userData);
+    }
 }

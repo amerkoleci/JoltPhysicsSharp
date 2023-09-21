@@ -52,6 +52,16 @@ public readonly struct Body : IEquatable<Body>
         set => JPH_Body_SetIsSensor(Handle, value);
     }
 
+    public unsafe BoundingBox WorldSpaceBounds
+    {
+        get
+        {
+            BoundingBox result = default;
+            JPH_Body_GetWorldSpaceBounds(Handle, &result);
+            return result;
+        }
+    }
+
     public MotionProperties MotionProperties => JPH_Body_GetMotionProperties(Handle);
 
     public MotionType MotionType
@@ -230,5 +240,15 @@ public readonly struct Body : IEquatable<Body>
     public void AddAngularImpulse(in Vector3 angularImpulse)
     {
         JPH_Body_AddAngularImpulse(Handle, angularImpulse);
+    }
+
+    public ulong GetUserData()
+    {
+        return JPH_Body_GetUserData(Handle);
+    }
+
+    public void SetUserData(ulong userData)
+    {
+        JPH_Body_SetUserData(Handle, userData);
     }
 }

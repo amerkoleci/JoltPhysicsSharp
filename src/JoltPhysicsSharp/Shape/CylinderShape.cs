@@ -18,15 +18,19 @@ public sealed class CylinderShapeSettings : ConvexShapeSettings
     ~CylinderShapeSettings() => Dispose(isDisposing: false);
 }
 
-//public sealed class TriangleShape : ConvexShape
-//{
-//    public unsafe TriangleShape(float radius)
-//        : base(JPH_SphereShape_Create(radius))
-//    {
-//    }
 
-//    /// <summary>
-//    /// Finalizes an instance of the <see cref="TriangleShape" /> class.
-//    /// </summary>
-//    ~TriangleShape() => Dispose(isDisposing: false);
-//}
+public sealed class CylinderShape : ConvexShape
+{
+    public CylinderShape(float halfHeight, float radius)
+        : base(JPH_CylinderShape_Create(halfHeight, radius))
+    {
+    }
+
+    /// <summary>
+    /// Finalizes an instance of the <see cref="CylinderShape" /> class.
+    /// </summary>
+    ~CylinderShape() => Dispose(isDisposing: false);
+
+    public float Radius => JPH_CylinderShape_GetRadius(Handle);
+    public float HalfHeight => JPH_CylinderShape_GetHalfHeight(Handle);
+}

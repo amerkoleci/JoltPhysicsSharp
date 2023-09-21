@@ -682,8 +682,6 @@ float JPH_CapsuleShape_GetHalfHeightOfCylinder(const JPH_CapsuleShape* shape)
     return reinterpret_cast<const JPH::CapsuleShape*>(shape)->GetHalfHeightOfCylinder();
 }
 
-
-
 /* CylinderShapeSettings */
 JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius)
 {
@@ -1186,12 +1184,12 @@ void JPH_HingeConstraintSettings_GetNormalAxis2(JPH_HingeConstraintSettings* set
     FromVec3(joltSettings->mNormalAxis2, result);
 }
 
-JPH_DistanceConstraint * JPH_HingeConstraintSettings_CreateConstraint(JPH_HingeConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
+JPH_HingeConstraint* JPH_HingeConstraintSettings_CreateConstraint(JPH_HingeConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
 {
     auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
     auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::HingeConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
-    return reinterpret_cast<JPH_DistanceConstraint*>(static_cast<JPH::HingeConstraint*>(constraint));
+    return reinterpret_cast<JPH_HingeConstraint*>(static_cast<JPH::HingeConstraint*>(constraint));
 }
 
 JPH_HingeConstraintSettings * JPH_HingeConstraint_GetSettings(JPH_HingeConstraint* constraint)
@@ -1247,8 +1245,17 @@ JPH_SliderConstraintSettings* JPH_SliderConstraintSettings_Create(void)
 void JPH_SliderConstraintSettings_SetSliderAxis(JPH_SliderConstraintSettings* settings, const JPH_Vec3* axis)
 {
     JPH_ASSERT(settings);
+
     auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
     joltSettings->SetSliderAxis(ToVec3(axis));
+}
+
+void JPH_SliderConstraintSettings_GetSliderAxis(JPH_SliderConstraintSettings* settings, JPH_Vec3* axis)
+{
+	JPH_ASSERT(settings);
+
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    FromVec3(joltSettings->mSliderAxis1, axis);
 }
 
 float JPH_SliderConstraint_GetCurrentPosition(JPH_SliderConstraint* constraint)
@@ -1276,7 +1283,7 @@ JPH_Bool32 JPH_SliderConstraint_HasLimits(JPH_SliderConstraint* constraint)
     return reinterpret_cast<JPH::SliderConstraint*>(constraint)->HasLimits();
 }
 
-JPH_SliderConstraint * JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
+JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
 {
     auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
     auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
