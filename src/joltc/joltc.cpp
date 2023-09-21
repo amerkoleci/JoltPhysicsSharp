@@ -1130,52 +1130,60 @@ void JPH_HingeConstraintSettings_SetPoint2(JPH_HingeConstraintSettings* settings
     joltSettings->mPoint2 = ToRVec3(value);
 }
 
-void JPH_HingeConstraintSettings_SetHingeAxis1(JPH_HingeConstraintSettings* settings, const JPH_RVec3* value) {
+void JPH_HingeConstraintSettings_SetHingeAxis1(JPH_HingeConstraintSettings* settings, const JPH_Vec3* value)
+{
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::HingeConstraintSettings*>(settings);
-    joltSettings->mHingeAxis1 = ToRVec3(value);
+    joltSettings->mHingeAxis1 = ToVec3(value);
 }
 
-void JPH_HingeConstraintSettings_GetHingeAxis1(JPH_HingeConstraintSettings* settings, JPH_RVec3* result) {
+void JPH_HingeConstraintSettings_GetHingeAxis1(JPH_HingeConstraintSettings* settings, JPH_Vec3* result)
+{
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::HingeConstraintSettings*>(settings);
-    FromRVec3(joltSettings->mHingeAxis1, result);
+    FromVec3(joltSettings->mHingeAxis1, result);
 }
 
-void JPH_HingeConstraintSettings_SetNormalAxis1(JPH_HingeConstraintSettings* settings, const JPH_RVec3* value) {
+void JPH_HingeConstraintSettings_SetNormalAxis1(JPH_HingeConstraintSettings* settings, const JPH_Vec3* value)
+{
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::HingeConstraintSettings*>(settings);
-    joltSettings->mNormalAxis1 = ToRVec3(value);
+    joltSettings->mNormalAxis1 = ToVec3(value);
 }
 
-void JPH_HingeConstraintSettings_GetNormalAxis1(JPH_HingeConstraintSettings* settings, JPH_RVec3* result) {
+void JPH_HingeConstraintSettings_GetNormalAxis1(JPH_HingeConstraintSettings* settings, JPH_Vec3* result)
+{
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::HingeConstraintSettings*>(settings);
-    FromRVec3(joltSettings->mNormalAxis1, result);
+    FromVec3(joltSettings->mNormalAxis1, result);
 }
 
-void JPH_HingeConstraintSettings_SetHingeAxis2(JPH_HingeConstraintSettings* settings, const JPH_RVec3* value) {
+void JPH_HingeConstraintSettings_SetHingeAxis2(JPH_HingeConstraintSettings* settings, const JPH_Vec3* value)
+{
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::HingeConstraintSettings*>(settings);
-    joltSettings->mHingeAxis2 = ToRVec3(value);
+    joltSettings->mHingeAxis2 = ToVec3(value);
 }
 
-void JPH_HingeConstraintSettings_GetHingeAxis2(JPH_HingeConstraintSettings* settings, JPH_RVec3* result) {
+void JPH_HingeConstraintSettings_GetHingeAxis2(JPH_HingeConstraintSettings* settings, JPH_Vec3* result)
+{
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::HingeConstraintSettings*>(settings);
-    FromRVec3(joltSettings->mHingeAxis2, result);
+    FromVec3(joltSettings->mHingeAxis2, result);
 }
 
-void JPH_HingeConstraintSettings_SetNormalAxis2(JPH_HingeConstraintSettings* settings, const JPH_RVec3* value) {
+void JPH_HingeConstraintSettings_SetNormalAxis2(JPH_HingeConstraintSettings* settings, const JPH_Vec3* value)
+{
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::HingeConstraintSettings*>(settings);
-    joltSettings->mNormalAxis2 = ToRVec3(value);
+    joltSettings->mNormalAxis2 = ToVec3(value);
 }
 
-void JPH_HingeConstraintSettings_GetNormalAxis2(JPH_HingeConstraintSettings* settings, JPH_RVec3* result) {
+void JPH_HingeConstraintSettings_GetNormalAxis2(JPH_HingeConstraintSettings* settings, JPH_Vec3* result)
+{
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::HingeConstraintSettings*>(settings);
-    FromRVec3(joltSettings->mNormalAxis2, result);
+    FromVec3(joltSettings->mNormalAxis2, result);
 }
 
 JPH_DistanceConstraint * JPH_HingeConstraintSettings_CreateConstraint(JPH_HingeConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
@@ -1236,11 +1244,11 @@ JPH_SliderConstraintSettings* JPH_SliderConstraintSettings_Create(void)
     return reinterpret_cast<JPH_SliderConstraintSettings*>(settings);
 }
 
-void JPH_SliderConstraintSettings_SetSliderAxis(JPH_SliderConstraintSettings* settings, const JPH_RVec3* axis)
+void JPH_SliderConstraintSettings_SetSliderAxis(JPH_SliderConstraintSettings* settings, const JPH_Vec3* axis)
 {
     JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
-    joltSettings->SetSliderAxis(ToRVec3(axis));
+    joltSettings->SetSliderAxis(ToVec3(axis));
 }
 
 float JPH_SliderConstraint_GetCurrentPosition(JPH_SliderConstraint* constraint)
