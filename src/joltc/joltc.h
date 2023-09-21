@@ -343,7 +343,7 @@ JPH_CAPI JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const J
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount);
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, uint32_t verticesCount, const JPH_IndexedTriangle* triangles, uint32_t triangleCount);
 JPH_CAPI void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings);
-JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(JPH_MeshShapeSettings* settings); // binding for MeshShapeSettings::Create()
+JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* settings); // binding for MeshShapeSettings::Create()
 
 /* HeightFieldShape */
 JPH_CAPI JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount);
@@ -361,8 +361,8 @@ JPH_CAPI JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create
 JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create();
 
 /* Shape */
-JPH_CAPI JPH_AABox JPH_GetLocalBounds(JPH_Shape* shape);
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
+JPH_CAPI void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result);
 JPH_CAPI JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape);
 
 /* JPH_BodyCreationSettings */
@@ -644,7 +644,7 @@ JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* que
 /* Body */
 JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
 JPH_CAPI JPH_BodyType JPH_Body_GetBodyType(const JPH_Body* body);
-JPH_CAPI JPH_AABox JPH_Body_GetWorldSpaceBounds(const JPH_Body* body);
+JPH_CAPI void JPH_Body_GetWorldSpaceBounds(const JPH_Body* body, JPH_AABox* result);
 
 JPH_CAPI JPH_Bool32 JPH_Body_IsActive(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsStatic(const JPH_Body* body);

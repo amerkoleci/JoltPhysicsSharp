@@ -768,10 +768,10 @@ void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings)
     reinterpret_cast<JPH::MeshShapeSettings*>(settings)->Sanitize();
 }
 
-JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(JPH_MeshShapeSettings* settings)
+JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* settings)
 {
-    JPH::MeshShapeSettings* jolt_settings = reinterpret_cast<JPH::MeshShapeSettings*>(settings);
-    auto shape_res = reinterpret_cast<JPH::MeshShapeSettings*>(settings)->Create();
+    const JPH::MeshShapeSettings* jolt_settings = reinterpret_cast<const JPH::MeshShapeSettings*>(settings);
+    auto shape_res = jolt_settings->Create();
     return reinterpret_cast<JPH_MeshShape*>(shape_res.Get().GetPtr());
 }
 
@@ -838,19 +838,6 @@ JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Crea
 }
 
 /* Shape */
-JPH_AABox JPH_GetLocalBounds(JPH_Shape* shape)
-{
-    auto bounds = reinterpret_cast<JPH::Shape*>(shape)->GetLocalBounds();
-    JPH_AABox box;
-    box.min.x = bounds.mMin.GetX();
-    box.min.y = bounds.mMin.GetY();
-    box.min.z = bounds.mMin.GetZ();
-    box.max.x = bounds.mMax.GetX();
-    box.max.y = bounds.mMax.GetY();
-    box.max.z = bounds.mMax.GetZ();
-    return box;
-}
-
 void JPH_Shape_Destroy(JPH_Shape* shape)
 {
     if (shape)
@@ -858,6 +845,17 @@ void JPH_Shape_Destroy(JPH_Shape* shape)
         delete reinterpret_cast<JPH::Shape*>(shape);
     }
 }
+
+void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result)
+{
+	JPH_ASSERT(shape);
+	JPH_ASSERT(result);
+
+    auto bounds = reinterpret_cast<JPH::Shape*>(shape)->GetLocalBounds();
+	FromVec3(bounds.mMin, &result->min);
+	FromVec3(bounds.mMax, &result->max);
+}
+
 
 JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape)
 {
@@ -1015,7 +1013,7 @@ JPH_Bool32 JPH_Constraint_GetEnabled(JPH_Constraint* constraint)
 void JPH_Constraint_SetEnabled(JPH_Constraint* constraint, JPH_Bool32 enabled)
 {
     auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
-    joltConstraint->SetEnabled(enabled);
+    joltConstraint->SetEnabled(!!enabled);
 }
 
 void JPH_Constraint_Destroy(JPH_Constraint* constraint)
@@ -1049,6 +1047,7 @@ JPH_DistanceConstraintSettings* JPH_DistanceConstraintSettings_Create(void)
 void JPH_DistanceConstraintSettings_GetPoint1(JPH_DistanceConstraintSettings* settings, JPH_RVec3* result)
 {
     JPH_ASSERT(settings);
+	JPH_ASSERT(result);
     auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
 
     auto joltVector = joltSettings->mPoint1;
@@ -1058,6 +1057,7 @@ void JPH_DistanceConstraintSettings_GetPoint1(JPH_DistanceConstraintSettings* se
 void JPH_DistanceConstraintSettings_SetPoint1(JPH_DistanceConstraintSettings* settings, const JPH_RVec3* value)
 {
     JPH_ASSERT(settings);
+	JPH_ASSERT(value);
     auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
 
     joltSettings->mPoint1 = ToRVec3(value);
@@ -1066,6 +1066,7 @@ void JPH_DistanceConstraintSettings_SetPoint1(JPH_DistanceConstraintSettings* se
 void JPH_DistanceConstraintSettings_GetPoint2(JPH_DistanceConstraintSettings* settings, JPH_RVec3* result)
 {
     JPH_ASSERT(settings);
+	JPH_ASSERT(result);
     auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
 
     auto joltVector = joltSettings->mPoint2;
@@ -1075,6 +1076,7 @@ void JPH_DistanceConstraintSettings_GetPoint2(JPH_DistanceConstraintSettings* se
 void JPH_DistanceConstraintSettings_SetPoint2(JPH_DistanceConstraintSettings* settings, const JPH_RVec3* value)
 {
     JPH_ASSERT(settings);
+	JPH_ASSERT(value);
     auto joltSettings = reinterpret_cast<JPH::PointConstraintSettings*>(settings);
 
     joltSettings->mPoint2 = ToRVec3(value);
@@ -2265,18 +2267,15 @@ JPH_BodyType JPH_Body_GetBodyType(const JPH_Body* body)
     return static_cast<JPH_BodyType>(joltBody->GetBodyType());
 }
 
-JPH_AABox JPH_Body_GetWorldSpaceBounds(const JPH_Body* body)
+void JPH_Body_GetWorldSpaceBounds(const JPH_Body* body, JPH_AABox* result)
 {
+	JPH_ASSERT(body);
+	JPH_ASSERT(result);
+
     auto joltBody = reinterpret_cast<const JPH::Body*>(body);
     auto bounds = joltBody->GetWorldSpaceBounds();
-    JPH_AABox box;
-    box.min.x = bounds.mMin.GetX();
-    box.min.y = bounds.mMin.GetY();
-    box.min.z = bounds.mMin.GetZ();
-    box.max.x = bounds.mMax.GetX();
-    box.max.y = bounds.mMax.GetY();
-    box.max.z = bounds.mMax.GetZ();
-    return box;
+    FromVec3(bounds.mMin, &result->min);
+	FromVec3(bounds.mMax, &result->max);
 }
 
 JPH_Bool32 JPH_Body_IsActive(const JPH_Body* body)
