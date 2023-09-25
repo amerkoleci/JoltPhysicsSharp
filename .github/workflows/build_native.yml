@@ -115,6 +115,16 @@ jobs:
         with:
           name: libs_windows
           path: src/JoltPhysicsSharp/runtimes
+      - name: Download ubuntu lib
+        uses: actions/download-artifact@v3
+        with:
+          name: libs_linux
+          path: src/JoltPhysicsSharp/runtimes
+      - name: Download macos lib
+        uses: actions/download-artifact@v3
+        with:
+          name: libs_osx
+          path: src/JoltPhysicsSharp/runtimes
       - name: Display structure of downloaded files
         run: ls -R
         working-directory: src/JoltPhysicsSharp/runtimes
