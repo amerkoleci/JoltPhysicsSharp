@@ -1,6 +1,15 @@
 name: Build Native
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'src/joltc/**'
+  pull_request:
+    paths:
+      - 'src/joltc/**'
 
 jobs:
   windows:
@@ -102,31 +111,13 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          path: artifacts
+          path: src/JoltPhysicsSharp/runtimes
       - name: Display structure of downloaded files
         run: ls -R
-        working-directory: artifacts
-      - name: combine
-        run: |
-          mkdir native_libs
-          cp -r artifacts/libs_windows/* native_libs
-          cp -r artifacts/libs_linux/* native_libs
-          cp -r artifacts/libs_osx/* native_libs
-      - uses: edgarrc/action-7z@v1
+        working-directory: src/JoltPhysicsSharp/runtimes
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9.1.3
         with:
-          args: 7z a -t7z native_libs.7z ./native_libs/
-      - uses: AButler/upload-release-assets@v2.0
-        if: github.event_name == 'release' && github.event.action == 'created'
-        with:
-          files: native_libs.zip
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v3
-        with:
-          name: 'Build Artifacts'
-          path: native_libs.7z
-      - uses: geekyeggo/delete-artifact@v2
-        with:
-          name: |
-            libs_windows
-            libs_linux
-            libs_osx
+          message: Updated native libs
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
