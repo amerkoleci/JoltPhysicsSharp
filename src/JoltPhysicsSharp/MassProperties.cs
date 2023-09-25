@@ -10,8 +10,8 @@ public readonly struct MassProperties : IEquatable<MassProperties>
 {
     public MassProperties(nint handle) { Handle = handle; }
     public nint Handle { get; }
-    public bool IsNull => Handle != 0;
-    public bool IsNotNull => Handle == 0;
+    public bool IsNull => Handle == 0;
+    public bool IsNotNull => Handle != 0;
     public static MassProperties Null => new(0);
     public static implicit operator MassProperties(nint handle) => new(handle);
     public static bool operator ==(MassProperties left, MassProperties right) => left.Handle == right.Handle;

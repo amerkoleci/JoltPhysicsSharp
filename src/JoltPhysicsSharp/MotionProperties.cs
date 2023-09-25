@@ -10,8 +10,8 @@ public readonly struct MotionProperties : IEquatable<MotionProperties>
 {
     public MotionProperties(nint handle) { Handle = handle; }
     public nint Handle { get; }
-    public bool IsNull => Handle != 0;
-    public bool IsNotNull => Handle == 0;
+    public bool IsNull => Handle == 0;
+    public bool IsNotNull => Handle != 0;
     public static MassProperties Null => new(0);
     public static implicit operator MotionProperties(nint handle) => new(handle);
     public static bool operator ==(MotionProperties left, MotionProperties right) => left.Handle == right.Handle;
