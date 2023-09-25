@@ -103,14 +103,17 @@ jobs:
         name: libs_osx
         path: bin
 
-  combine:
-    name: combine artifacts
-    runs-on: ubuntu-20.04
+  update_libs:
+    name: Update Native Libs
+    runs-on: windows-latest
     needs: [windows, linux, macos]
     steps:
-      - name: Download artifacts
+      - name: Checkout
+        uses: actions/checkout@v4.0.0
+      - name: Download windows lib
         uses: actions/download-artifact@v3
         with:
+          name: libs_windows
           path: src/JoltPhysicsSharp/runtimes
       - name: Display structure of downloaded files
         run: ls -R
