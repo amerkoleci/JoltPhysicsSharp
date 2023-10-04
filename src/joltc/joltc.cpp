@@ -138,13 +138,12 @@ static void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
     result->w = quat.GetW();
 }
 
-#ifdef JPH_DOUBLE_PRECISION
 static void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 {
     JPH::Vec4 column0 = matrix.GetColumn4(0);
     JPH::Vec4 column1 = matrix.GetColumn4(1);
     JPH::Vec4 column2 = matrix.GetColumn4(2);
-    JPH::Vec4 column3 = matrix.GetColumn4(3);
+    JPH::Vec3 translation = matrix.GetTranslation();
 
     result->m11 = column0.GetX();
     result->m12 = column0.GetY();
@@ -161,17 +160,12 @@ static void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
     result->m33 = column2.GetZ();
     result->m34 = column2.GetW();
 
-    result->m41 = column3.GetX();
-    result->m42 = column3.GetY();
-    result->m43 = column3.GetZ();
-    result->m44 = column3.GetW();
+    result->m41 = translation.GetX();
+    result->m42 = translation.GetY();
+    result->m43 = translation.GetZ();
+    result->m44 = 1.0f;
 }
-#endif
 
-static void FromJolt(const JPH::RMat44& matrix, JPH_Matrix4x4* result)
-{
-	matrix.StoreFloat4x4(reinterpret_cast<JPH::Float4 *>(&result->m11));
-}
 
 static JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
 {
@@ -182,6 +176,67 @@ static JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
 	result.SetColumn4(3, JPH::Vec4(matrix.m41, matrix.m42, matrix.m43, matrix.m44));
     return result;
 }
+
+#ifdef JPH_DOUBLE_PRECISION
+static void FromJolt(const JPH::DMat44& matrix, JPH_RMatrix4x4* result)
+{
+    JPH::Vec4 column0 = matrix.GetColumn4(0);
+    JPH::Vec4 column1 = matrix.GetColumn4(1);
+    JPH::Vec4 column2 = matrix.GetColumn4(2);
+    JPH::DVec3 translation = matrix.GetTranslation();
+
+    result->m11 = column0.GetX();
+    result->m12 = column0.GetY();
+    result->m13 = column0.GetZ();
+    result->m14 = column0.GetW();
+
+    result->m21 = column1.GetX();
+    result->m22 = column1.GetY();
+    result->m23 = column1.GetZ();
+    result->m24 = column1.GetW();
+
+    result->m31 = column2.GetX();
+    result->m32 = column2.GetY();
+    result->m33 = column2.GetZ();
+    result->m34 = column2.GetW();
+
+    result->m41 = translation.GetX();
+    result->m42 = translation.GetY();
+    result->m43 = translation.GetZ();
+    result->m44 = 1.0f;
+}
+#else
+
+static void FromJolt(const JPH::Mat44& matrix, JPH_RMatrix4x4* result)
+{
+    JPH::Vec4 column0 = matrix.GetColumn4(0);
+    JPH::Vec4 column1 = matrix.GetColumn4(1);
+    JPH::Vec4 column2 = matrix.GetColumn4(2);
+    JPH::Vec3 translation = matrix.GetTranslation();
+
+    result->m11 = column0.GetX();
+    result->m12 = column0.GetY();
+    result->m13 = column0.GetZ();
+    result->m14 = column0.GetW();
+
+    result->m21 = column1.GetX();
+    result->m22 = column1.GetY();
+    result->m23 = column1.GetZ();
+    result->m24 = column1.GetW();
+
+    result->m31 = column2.GetX();
+    result->m32 = column2.GetY();
+    result->m33 = column2.GetZ();
+    result->m34 = column2.GetW();
+
+    result->m41 = translation.GetX();
+    result->m42 = translation.GetY();
+    result->m43 = translation.GetZ();
+    result->m44 = 1.0;
+}
+
+#endif
+
 
 static void FromJolt(const JPH::MassProperties& jolt, JPH_MassProperties* result)
 {
@@ -2035,7 +2090,7 @@ JPH_ObjectLayer JPH_BodyInterface_GetObjectLayer(JPH_BodyInterface* interface, J
     return joltBodyInterface->GetObjectLayer(JPH::BodyID(bodyId));
 }
 
-void JPH_BodyInterface_GetWorldTransform(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Matrix4x4* result)
+void JPH_BodyInterface_GetWorldTransform(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RMatrix4x4* result)
 {
     JPH_ASSERT(interface);
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
@@ -2044,7 +2099,7 @@ void JPH_BodyInterface_GetWorldTransform(JPH_BodyInterface* interface, JPH_BodyI
     FromJolt(mat, result);
 }
 
-void JPH_BodyInterface_GetCenterOfMassTransform(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Matrix4x4* resutlt)
+void JPH_BodyInterface_GetCenterOfMassTransform(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RMatrix4x4* resutlt)
 {
     JPH_ASSERT(interface);
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
@@ -2484,13 +2539,13 @@ void JPH_Body_GetCenterOfMassPosition(const JPH_Body* body, JPH_RVec3* result)
     FromRVec3(joltVector, result);
 }
 
-void JPH_Body_GetWorldTransform(const JPH_Body* body, JPH_Matrix4x4* result)
+void JPH_Body_GetWorldTransform(const JPH_Body* body, JPH_RMatrix4x4* result)
 {
     auto joltMatrix = reinterpret_cast<const JPH::Body*>(body)->GetWorldTransform();
     FromJolt(joltMatrix, result);
 }
 
-void JPH_Body_GetCenterOfMassTransform(const JPH_Body* body, JPH_Matrix4x4* result)
+void JPH_Body_GetCenterOfMassTransform(const JPH_Body* body, JPH_RMatrix4x4* result)
 {
     auto joltMatrix = reinterpret_cast<const JPH::Body*>(body)->GetCenterOfMassTransform();
     FromJolt(joltMatrix, result);

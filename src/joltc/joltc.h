@@ -135,6 +135,13 @@ typedef struct JPH_Vec4 {
     float w;
 } JPH_Vec4;
 
+typedef struct JPH_Matrix4x4 {
+    float m11, m12, m13, m14;
+    float m21, m22, m23, m24;
+    float m31, m32, m33, m34;
+    float m41, m42, m43, m44;
+} JPH_Matrix4x4;
+
 typedef struct JPH_RVec3 {
     double x;
     double y;
@@ -148,16 +155,12 @@ typedef struct JPH_Quat {
     float w;
 } JPH_Quat;
 
-typedef struct JPH_Matrix4x4 {
+typedef struct JPH_RMatrix4x4 {
     float m11, m12, m13, m14;
     float m21, m22, m23, m24;
     float m31, m32, m33, m34;
-#ifdef JPH_DOUBLE_PRECISION
     double m41, m42, m43, m44;
-#else
-    float m41, m42, m43, m44;
-#endif
-} JPH_Matrix4x4;
+} JPH_RMatrix4x4;
 
 typedef struct JPH_AABox {
     JPH_Vec3 min;
@@ -588,8 +591,8 @@ JPH_CAPI void JPH_BodyInterface_DeactivateBody(JPH_BodyInterface* interface, JPH
 JPH_CAPI void JPH_BodyInterface_SetObjectLayer(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_ObjectLayer layer);
 JPH_CAPI JPH_ObjectLayer JPH_BodyInterface_GetObjectLayer(JPH_BodyInterface* interface, JPH_BodyID bodyId);
 
-JPH_CAPI void JPH_BodyInterface_GetWorldTransform(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Matrix4x4* result);
-JPH_CAPI void JPH_BodyInterface_GetCenterOfMassTransform(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Matrix4x4* resutlt);
+JPH_CAPI void JPH_BodyInterface_GetWorldTransform(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RMatrix4x4* result);
+JPH_CAPI void JPH_BodyInterface_GetCenterOfMassTransform(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RMatrix4x4* resutlt);
 
 JPH_CAPI void JPH_BodyInterface_MoveKinematic(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* targetPosition, JPH_Quat* targetRotation, float deltaTime);
 
@@ -689,8 +692,8 @@ JPH_CAPI void JPH_Body_AddAngularImpulse(JPH_Body* body, const JPH_Vec3* angular
 JPH_CAPI void JPH_Body_GetPosition(const JPH_Body* body, JPH_RVec3* result);
 JPH_CAPI void JPH_Body_GetRotation(const JPH_Body* body, JPH_Quat* result);
 JPH_CAPI void JPH_Body_GetCenterOfMassPosition(const JPH_Body* body, JPH_RVec3* result);
-JPH_CAPI void JPH_Body_GetWorldTransform(const JPH_Body* body, JPH_Matrix4x4* result);
-JPH_CAPI void JPH_Body_GetCenterOfMassTransform(const JPH_Body* body, JPH_Matrix4x4* result);
+JPH_CAPI void JPH_Body_GetWorldTransform(const JPH_Body* body, JPH_RMatrix4x4* result);
+JPH_CAPI void JPH_Body_GetCenterOfMassTransform(const JPH_Body* body, JPH_RMatrix4x4* result);
 
 JPH_CAPI void JPH_Body_SetUserData(JPH_Body* body, uint64_t userData);
 JPH_CAPI uint64_t JPH_Body_GetUserData(JPH_Body* body);
