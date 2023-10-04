@@ -28,29 +28,17 @@ public sealed class PhysicsSystem : NativeObject
     {
         s_contactListener_Procs = new JPH_ContactListener_Procs
         {
-#if NET6_0_OR_GREATER
             OnContactValidate = &OnContactValidateCallback,
             OnContactAdded = &OnContactAddedCallback,
             OnContactPersisted = &OnContactPersistedCallback,
             OnContactRemoved = &OnContactRemovedCallback
-#else
-            OnContactValidate = OnContactValidateCallback,
-            OnContactAdded = OnContactAddedCallback,
-            OnContactPersisted = OnContactPersistedCallback,
-            OnContactRemoved = OnContactRemovedCallback
-#endif
         };
         JPH_ContactListener_SetProcs(s_contactListener_Procs);
 
         s_BodyActivationListener_Procs = new JPH_BodyActivationListener_Procs
         {
-#if NET6_0_OR_GREATER
             OnBodyActivated = &OnBodyActivatedCallback,
             OnBodyDeactivated = &OnBodyDeactivatedCallback
-#else
-            OnBodyActivated = OnBodyActivatedCallback,
-            OnBodyDeactivated = OnBodyDeactivatedCallback
-#endif
         };
         JPH_BodyActivationListener_SetProcs(s_BodyActivationListener_Procs);
     }
@@ -234,11 +222,7 @@ public sealed class PhysicsSystem : NativeObject
     }
 
     #region ContactListener
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(OnContactValidateDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static unsafe uint OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Double3* baseOffset, IntPtr collisionResult)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
@@ -251,33 +235,21 @@ public sealed class PhysicsSystem : NativeObject
         return (uint)ValidateResult.AcceptAllContactsForThisBodyPair;
     }
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(OnContactAddedDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static void OnContactAddedCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactAdded?.Invoke(listener, new Body(body1), new Body(body2));
     }
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(OnContactPersistedDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static void OnContactPersistedCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactPersisted?.Invoke(listener, new Body(body1), new Body(body2));
     }
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(OnContactRemovedDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private unsafe static void OnContactRemovedCallback(IntPtr listenerPtr, SubShapeIDPair* subShapePair)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
@@ -286,22 +258,14 @@ public sealed class PhysicsSystem : NativeObject
     #endregion ContactListener
 
     #region BodyActivationListener
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(OnBodyActivatedDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static void OnBodyActivatedCallback(IntPtr listenerPtr, uint bodyID, ulong bodyUserData)
     {
         PhysicsSystem listener = s_bodyActivationListenerListeners[listenerPtr];
         listener.OnBodyActivated?.Invoke(listener, bodyID, bodyUserData);
     }
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(OnBodyActivatedDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static void OnBodyDeactivatedCallback(IntPtr listenerPtr, uint bodyID, ulong bodyUserData)
     {
         PhysicsSystem listener = s_bodyActivationListenerListeners[listenerPtr];

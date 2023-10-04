@@ -15,6 +15,12 @@ public abstract class ConvexShapeSettings : ShapeSettings
         : base(handle)
     {
     }
+
+    public float Density
+    {
+        get => JPH_ConvexShapeSettings_GetDensity(Handle);
+        set => JPH_ConvexShapeSettings_SetDensity(Handle, value);
+    }
 }
 
 public abstract class ConvexShape : Shape

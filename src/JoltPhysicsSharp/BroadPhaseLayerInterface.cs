@@ -16,15 +16,9 @@ public abstract class BroadPhaseLayerInterface : NativeObject
     {
         s_broadPhaseLayerInterface_Procs = new JPH_BroadPhaseLayerInterface_Procs
         {
-#if NET6_0_OR_GREATER
             GetNumBroadPhaseLayers = &GetNumBroadPhaseLayersCallback,
             GetBroadPhaseLayer = &GetBroadPhaseLayerCallback,
             GetBroadPhaseLayerName = &GetBroadPhaseLayerNameCallback
-#else
-            GetNumBroadPhaseLayers = GetNumBroadPhaseLayersCallback,
-            GetBroadPhaseLayer = GetBroadPhaseLayerCallback,
-            GetBroadPhaseLayerName = GetBroadPhaseLayerNameCallback
-#endif
         };
         JPH_BroadPhaseLayerInterface_SetProcs(s_broadPhaseLayerInterface_Procs);
     }
@@ -54,33 +48,21 @@ public abstract class BroadPhaseLayerInterface : NativeObject
     protected abstract BroadPhaseLayer GetBroadPhaseLayer(ObjectLayer layer);
     protected abstract string GetBroadPhaseLayerName(BroadPhaseLayer layer);
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(GetNumBroadPhaseLayersDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static uint GetNumBroadPhaseLayersCallback(IntPtr listenerPtr)
     {
         BroadPhaseLayerInterface listener = s_listeners[listenerPtr];
         return (uint)listener.GetNumBroadPhaseLayers();
     }
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(GetBroadPhaseLayerDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static BroadPhaseLayer GetBroadPhaseLayerCallback(IntPtr listenerPtr, ObjectLayer layer)
     {
         BroadPhaseLayerInterface listener = s_listeners[listenerPtr];
         return listener.GetBroadPhaseLayer(layer);
     }
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(GetBroadPhaseLayerNameDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static unsafe IntPtr GetBroadPhaseLayerNameCallback(IntPtr listenerPtr, BroadPhaseLayer layer)
     {
         BroadPhaseLayerInterface listener = s_listeners[listenerPtr];

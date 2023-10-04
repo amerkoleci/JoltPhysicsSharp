@@ -12,7 +12,7 @@ public readonly struct MotionProperties : IEquatable<MotionProperties>
     public nint Handle { get; }
     public bool IsNull => Handle == 0;
     public bool IsNotNull => Handle != 0;
-    public static MassProperties Null => new(0);
+    public static MotionProperties Null => new(0);
     public static implicit operator MotionProperties(nint handle) => new(handle);
     public static bool operator ==(MotionProperties left, MotionProperties right) => left.Handle == right.Handle;
     public static bool operator !=(MotionProperties left, MotionProperties right) => left.Handle != right.Handle;
@@ -45,6 +45,6 @@ public readonly struct MotionProperties : IEquatable<MotionProperties>
 
     public void SetMassProperties(AllowedDOFs allowedDOFs, in MassProperties massProperties)
     {
-        JPH_MotionProperties_SetMassProperties(Handle, allowedDOFs, massProperties.Handle);
+        //JPH_MotionProperties_SetMassProperties(Handle, allowedDOFs, massProperties.Handle);
     }
 }

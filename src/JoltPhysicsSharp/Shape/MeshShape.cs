@@ -64,12 +64,7 @@ public sealed unsafe class MeshShapeSettings : ConvexShapeSettings
 
 public sealed class MeshShape : Shape
 {
-    internal MeshShape(nint handle)
-        : base(handle)
-    {
-    }
-
-    public MeshShape(MeshShapeSettings settings)
+    public MeshShape(in MeshShapeSettings settings)
         : base(JPH_MeshShapeSettings_CreateShape(settings.Handle))
     {
     }

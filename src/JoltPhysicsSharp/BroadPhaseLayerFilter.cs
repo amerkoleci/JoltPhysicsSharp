@@ -16,11 +16,7 @@ public abstract class BroadPhaseLayerFilter : NativeObject
     {
         s_broadPhaseLayerFilter_Procs = new JPH_BroadPhaseLayerFilter_Procs
         {
-#if NET6_0_OR_GREATER
             ShouldCollide = &ShouldCollideCallback,
-#else
-            ShouldCollide = ShouldCollideCallback,
-#endif
         };
         JPH_BroadPhaseLayerFilter_SetProcs(s_broadPhaseLayerFilter_Procs);
     }
@@ -48,11 +44,7 @@ public abstract class BroadPhaseLayerFilter : NativeObject
 
     protected abstract bool ShouldCollide(BroadPhaseLayer layer);
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(BroadPhaseLayerFilterShouldCollideDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, BroadPhaseLayer layer)
     {
         BroadPhaseLayerFilter listener = s_listeners[listenerPtr];

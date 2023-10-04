@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
     <Description>Cross platform .NET bindings for Jolt Physics engine</Description>
     <PackageTags>physics standard game gamedev jolt</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -12,12 +12,6 @@
     <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
     <Content Include="build\**" PackagePath="build" Pack="true" />
     <Content Include="runtimes\**" PackagePath="runtimes" Pack="true" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="Microsoft.Bcl.HashCode" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Condition="$(TargetFramework.StartsWith('netstandard2'))" />
   </ItemGroup>
 
 </Project>

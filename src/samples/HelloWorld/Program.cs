@@ -122,6 +122,40 @@ public static class Program
         // Floor
         CreateFloor(bodyInterface);
 
+        ReadOnlySpan<Vector3> box = [
+            new(5, 6, 7),
+            new(5, 6, 14),
+            new(5, 12, 7),
+            new(5, 12, 14),
+            new(10, 6, 7),
+            new(10, 6, 14),
+            new(10, 12, 7),
+            new(10, 12, 14)
+        ];
+
+        const float cDensity = 1.5f;
+        ConvexHullShapeSettings settings = new ConvexHullShapeSettings(box);
+        settings.Density = cDensity;
+
+        using ConvexHullShape shape = new(settings);
+        Vector3 com = shape.CenterOfMass;
+        CHECK_APPROX_EQUAL(new Vector3(7.5f, 9.0f, 10.5f), com, 1.0e-5f);
+
+        // Calculate reference value of mass and inertia of a box
+        MassProperties reference = default;
+        reference.SetMassAndInertiaOfSolidBox(new Vector3(5, 6, 7), cDensity);
+        
+        // Mass is easy to calculate, double check if SetMassAndInertiaOfSolidBox calculated it correctly
+        CHECK_APPROX_EQUAL(5.0f * 6.0f * 7.0f * cDensity, reference.Mass, 1.0e-6f);
+
+        /// Get calculated inertia tensor
+        MassProperties m = shape.MassProperties;
+        CHECK_APPROX_EQUAL(reference.Mass, m.Mass, 1.0e-6f);
+        //CHECK_APPROX_EQUAL(reference.Inertia, m.Inertia, 1.0e-4f);
+        //
+        // Check inner radius
+        CHECK_APPROX_EQUAL(shape.InnerRadius, 2.5f);
+
         Shape boxShape = new BoxShape(new Vector3(0.5f, 1.0f, 2.0f));
 
         // Dynamic body stack
@@ -135,6 +169,21 @@ public static class Program
             Body stack = bodyInterface.CreateBody(new BodyCreationSettings(boxShape, new Vector3(10, 1.0f + i * 2.1f, 0), rotation, MotionType.Dynamic, Layers.Moving));
             bodyInterface.AddBody(stack.ID, Activation.Activate);
         }
+    }
+
+    private static void CHECK_APPROX_EQUAL(float inLHS, float inRHS, float inTolerance = 1.0e-6f)
+    {
+        Debug.Assert(MathF.Abs(inRHS - inLHS) <= inTolerance);
+    }
+
+    private static void CHECK_APPROX_EQUAL(in Vector3 inLHS, in Vector3 inRHS, float inTolerance = 1.0e-6f)
+    {
+        Debug.Assert(IsClose(inLHS, inRHS, inTolerance * inTolerance));
+    }
+
+    private static bool IsClose(in Vector3 inV1, in Vector3 inV2, float inMaxDistSq = 1.0e-12f)
+    {
+        return (inV2 - inV1).LengthSquared() <= inMaxDistSq;
     }
 
     private static MeshShapeSettings CreateTorusMesh(float inTorusRadius, float inTubeRadius, int inTorusSegments = 16, int inTubeSegments = 16)

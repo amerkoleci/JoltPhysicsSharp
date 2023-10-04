@@ -26,8 +26,13 @@ public sealed class SphereShapeSettings : ConvexShapeSettings
 
 public sealed class SphereShape : ConvexShape
 {
-    public unsafe SphereShape(float radius)
+    public SphereShape(float radius)
         : base(JPH_SphereShape_Create(radius))
+    {
+    }
+
+    public SphereShape(SphereShapeSettings settings)
+        : base(JPH_SphereShapeSettings_CreateShape(settings.Handle))
     {
     }
 

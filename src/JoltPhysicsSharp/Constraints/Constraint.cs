@@ -30,7 +30,6 @@ public abstract class ConstraintSettings : NativeObject
     }
 }
 
-
 public abstract class Constraint : NativeObject
 {
     protected Constraint(IntPtr handle)

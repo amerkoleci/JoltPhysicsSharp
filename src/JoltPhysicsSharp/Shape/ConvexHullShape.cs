@@ -31,3 +31,16 @@ public sealed class ConvexHullShapeSettings : ConvexShapeSettings
     /// </summary>
     ~ConvexHullShapeSettings() => Dispose(isDisposing: false);
 }
+
+public sealed class ConvexHullShape : ConvexShape
+{
+    public ConvexHullShape(ConvexHullShapeSettings settings)
+        : base(JPH_ConvexHullShapeSettings_CreateShape(settings.Handle))
+    {
+    }
+
+    /// <summary>
+    /// Finalizes an instance of the <see cref="ConvexHullShape" /> class.
+    /// </summary>
+    ~ConvexHullShape() => Dispose(isDisposing: false);
+}

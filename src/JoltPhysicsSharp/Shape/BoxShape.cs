@@ -17,12 +17,22 @@ public sealed class BoxShapeSettings : ConvexShapeSettings
     /// Finalizes an instance of the <see cref="BoxShapeSettings" /> class.
     /// </summary>
     ~BoxShapeSettings() => Dispose(isDisposing: false);
+
+    //public override Shape Create()
+    //{
+    //    return new BoxShape(JPH_BoxShapeSettings_CreateShape(Handle));
+    //}
 }
 
 public sealed class BoxShape : ConvexShape
 {
     public BoxShape(in Vector3 halfExent, float convexRadius = Foundation.DefaultConvexRadius)
         : base(JPH_BoxShape_Create(halfExent, convexRadius))
+    {
+    }
+
+    public BoxShape(BoxShapeSettings settings)
+        : base(JPH_BoxShapeSettings_CreateShape(settings.Handle))
     {
     }
 

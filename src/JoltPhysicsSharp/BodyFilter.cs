@@ -16,13 +16,8 @@ public abstract class BodyFilter : NativeObject
     {
         s_bodyFilter_Procs = new JPH_BodyFilter_Procs
         {
-#if NET6_0_OR_GREATER
             ShouldCollide = &ShouldCollideCallback,
             ShouldCollideLocked = &ShouldCollideLockedCallback,
-#else
-            ShouldCollide = ShouldCollideCallback,
-            ShouldCollideLocked = ShouldCollideLockedCallback,
-#endif
         };
         JPH_BodyFilter_SetProcs(s_bodyFilter_Procs);
     }
@@ -51,22 +46,14 @@ public abstract class BodyFilter : NativeObject
     protected abstract bool ShouldCollide(BodyID bodyID);
     protected abstract bool ShouldCollideLocked(Body body);
     
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(BodyFilterShouldCollideDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, BodyID bodyID)
     {
         BodyFilter listener = s_listeners[listenerPtr];
         return listener.ShouldCollide(bodyID);
     }
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(BodyFilterShouldCollideLockedDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static Bool32 ShouldCollideLockedCallback(IntPtr listenerPtr, IntPtr body)
     {
         BodyFilter listener = s_listeners[listenerPtr];

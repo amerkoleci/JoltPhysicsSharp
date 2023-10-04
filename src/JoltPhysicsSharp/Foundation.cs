@@ -41,10 +41,6 @@ public static class Foundation
     public static bool Init(bool doublePrecision = false)
     {
         JoltApi.DoublePrecision = doublePrecision;
-#if !NET6_0_OR_GREATER
-        JoltApi.LoadNativeLibrary();
-#endif
-
         return JPH_Init();
     }
 

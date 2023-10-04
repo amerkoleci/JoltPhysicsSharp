@@ -16,11 +16,7 @@ public abstract class ObjectLayerFilter : NativeObject
     {
         s_objectLayerFilter_Procs = new JPH_ObjectLayerFilter_Procs
         {
-#if NET6_0_OR_GREATER
             ShouldCollide = &ShouldCollideCallback,
-#else
-            ShouldCollide = ShouldCollideCallback,
-#endif
         };
         JPH_ObjectLayerFilter_SetProcs(s_objectLayerFilter_Procs);
     }
@@ -48,11 +44,7 @@ public abstract class ObjectLayerFilter : NativeObject
 
     protected abstract bool ShouldCollide(ObjectLayer layer);
 
-#if NET6_0_OR_GREATER
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
-#else
-    [MonoPInvokeCallback(typeof(ObjectLayerFilterShouldCollideDelegate))]
-#endif
+    [UnmanagedCallersOnly]
     private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer layer)
     {
         ObjectLayerFilter listener = s_listeners[listenerPtr];
