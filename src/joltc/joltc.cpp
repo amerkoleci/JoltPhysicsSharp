@@ -170,41 +170,31 @@ static void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 
 static void FromJolt(const JPH::RMat44& matrix, JPH_Matrix4x4* result)
 {
-    JPH::Vec4 column0 = matrix.GetColumn4(0);
-    JPH::Vec4 column1 = matrix.GetColumn4(1);
-    JPH::Vec4 column2 = matrix.GetColumn4(2);
-#ifdef JPH_DOUBLE_PRECISION
-    JPH::DVec3 column3 = matrix.GetTranslation();
-#else
-    JPH::Vec4 column3 = matrix.GetColumn4(3);
-#endif
+	matrix.StoreFloat4x4(reinterpret_cast<JPH::Float4 *>(&result->m11));
+}
 
-    result->m11 = column0.GetX();
-    result->m12 = column0.GetY();
-    result->m13 = column0.GetZ();
-    result->m14 = column0.GetW();
+static JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
+{
+	JPH::Mat44 result{};
+	result.SetColumn4(0, JPH::Vec4(matrix.m11, matrix.m12, matrix.m13, matrix.m14));
+	result.SetColumn4(1, JPH::Vec4(matrix.m21, matrix.m22, matrix.m23, matrix.m24));
+	result.SetColumn4(2, JPH::Vec4(matrix.m31, matrix.m32, matrix.m33, matrix.m34));
+	result.SetColumn4(3, JPH::Vec4(matrix.m41, matrix.m42, matrix.m43, matrix.m44));
+    return result;
+}
 
-    result->m21 = column1.GetX();
-    result->m22 = column1.GetY();
-    result->m23 = column1.GetZ();
-    result->m24 = column1.GetW();
+static void FromJolt(const JPH::MassProperties& jolt, JPH_MassProperties* result)
+{
+	result->mass = jolt.mMass;
+	FromJolt(jolt.mInertia, &result->inertia);
+}
 
-    result->m31 = column2.GetX();
-    result->m32 = column2.GetY();
-    result->m33 = column2.GetZ();
-    result->m34 = column2.GetW();
-
-#ifdef JPH_DOUBLE_PRECISION
-    result->m41 = column3.GetX();
-    result->m42 = column3.GetY();
-    result->m43 = column3.GetZ();
-    result->m44 = 0.0f;
-#else
-    result->m41 = column3.GetX();
-    result->m42 = column3.GetY();
-    result->m43 = column3.GetZ();
-    result->m44 = column3.GetW();
-#endif
+static JPH::MassProperties ToJolt(const JPH_MassProperties* properties)
+{
+	JPH::MassProperties result{};
+	result.mMass = properties->mass;
+	result.mInertia = ToJolt(properties->inertia);
+	return result;
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
@@ -577,9 +567,9 @@ void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
 }
 
 /* ConvexShape */
-float JPH_ConvexShape_GetDensity(JPH_ConvexShape* shape)
+float JPH_ConvexShape_GetDensity(const JPH_ConvexShape* shape)
 {
-    return reinterpret_cast<JPH::ConvexShape*>(shape)->GetDensity();
+    return reinterpret_cast<const JPH::ConvexShape*>(shape)->GetDensity();
 }
 
 void JPH_ConvexShape_SetDensity(JPH_ConvexShape* shape, float density)
@@ -592,6 +582,13 @@ JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, fl
 {
     auto settings = new JPH::BoxShapeSettings(ToVec3(halfExtent), convexRadius);
     return reinterpret_cast<JPH_BoxShapeSettings*>(settings);
+}
+
+JPH_BoxShape* JPH_BoxShapeSettings_CreateShape(const JPH_BoxShapeSettings* settings)
+{
+	const JPH::BoxShapeSettings* jolt_settings = reinterpret_cast<const JPH::BoxShapeSettings*>(settings);
+    auto shape_res = jolt_settings->Create();
+    return reinterpret_cast<JPH_BoxShape*>(shape_res.Get().GetPtr());
 }
 
 JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius)
@@ -624,6 +621,13 @@ JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius)
 {
     auto settings = new JPH::SphereShapeSettings(radius);
     return reinterpret_cast<JPH_SphereShapeSettings*>(settings);
+}
+
+JPH_SphereShape* JPH_SphereShapeSettings_CreateShape(const JPH_SphereShapeSettings* settings)
+{
+	const JPH::SphereShapeSettings* jolt_settings = reinterpret_cast<const JPH::SphereShapeSettings*>(settings);
+    auto shape_res = jolt_settings->Create();
+    return reinterpret_cast<JPH_SphereShape*>(shape_res.Get().GetPtr());
 }
 
 float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings)
@@ -708,6 +712,16 @@ float JPH_CylinderShape_GetHalfHeight(const JPH_CylinderShape* shape)
 }
 
 /* ConvexHullShape */
+float JPH_ConvexShapeSettings_GetDensity(const JPH_ConvexShapeSettings* shape)
+{
+	return reinterpret_cast<const JPH::ConvexShapeSettings*>(shape)->mDensity;
+}
+
+void JPH_ConvexShapeSettings_SetDensity(JPH_ConvexShapeSettings* shape, float value)
+{
+    reinterpret_cast<JPH::ConvexShapeSettings*>(shape)->SetDensity(value);
+}
+
 JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* points, uint32_t pointsCount, float maxConvexRadius)
 {
     Array<Vec3> joltPoints;
@@ -720,6 +734,13 @@ JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* 
 
     auto settings = new JPH::ConvexHullShapeSettings(joltPoints, maxConvexRadius);
     return reinterpret_cast<JPH_ConvexHullShapeSettings*>(settings);
+}
+
+JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHullShapeSettings* settings)
+{
+	const JPH::ConvexHullShapeSettings* jolt_settings = reinterpret_cast<const JPH::ConvexHullShapeSettings*>(settings);
+    auto shape_res = jolt_settings->Create();
+    return reinterpret_cast<JPH_ConvexHullShape*>(shape_res.Get().GetPtr());
 }
 
 /* MeshShapeSettings */
@@ -772,7 +793,6 @@ JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* se
     auto shape_res = jolt_settings->Create();
     return reinterpret_cast<JPH_MeshShape*>(shape_res.Get().GetPtr());
 }
-
 
 /* MeshShapeSettings */
 JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount)
@@ -829,11 +849,20 @@ JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create()
     return reinterpret_cast<JPH_StaticCompoundShapeSettings*>(settings);
 }
 
+/* MutableCompoundShape */
 JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create()
 {
     auto settings = new JPH::MutableCompoundShapeSettings();
     return reinterpret_cast<JPH_MutableCompoundShapeSettings*>(settings);
 }
+
+JPH_MutableCompoundShape* JPH_MutableCompoundShape_Create(const JPH_MutableCompoundShapeSettings* settings)
+{
+	const JPH::MutableCompoundShapeSettings* jolt_settings = reinterpret_cast<const JPH::MutableCompoundShapeSettings*>(settings);
+    auto shape_res = jolt_settings->Create();
+    return reinterpret_cast<JPH_MutableCompoundShape*>(shape_res.Get().GetPtr());
+}
+
 
 /* Shape */
 void JPH_Shape_Destroy(JPH_Shape* shape)
@@ -854,12 +883,23 @@ void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result)
 	FromVec3(bounds.mMax, &result->max);
 }
 
-
-JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape)
+void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* result)
 {
     auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
-    static auto joltMassProperties = joltShape->GetMassProperties();
-    return reinterpret_cast<JPH_MassProperties*>(&joltMassProperties);
+	FromJolt(joltShape->GetMassProperties(), result);
+}
+
+void JPH_Shape_GetCenterOfMass(JPH_Shape* shape, JPH_Vec3* result)
+{
+	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+	auto joltVector = joltShape->GetCenterOfMass();
+	FromVec3(joltVector, result);
+}
+
+float JPH_Shape_GetInnerRadius(JPH_Shape* shape)
+{
+	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+	return joltShape->GetInnerRadius();
 }
 
 /* JPH_BodyCreationSettings */
@@ -1539,17 +1579,11 @@ float JPH_MotionProperties_GetInverseMassUnchecked(JPH_MotionProperties* propert
     return reinterpret_cast<JPH::MotionProperties*>(properties)->GetInverseMassUnchecked();
 }
 
-void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JPH_AllowedDOFs allowedDOFs, JPH_MassProperties* massProperties)
+void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JPH_AllowedDOFs allowedDOFs, const JPH_MassProperties* massProperties)
 {
     reinterpret_cast<JPH::MotionProperties*>(properties)->SetMassProperties(
         static_cast<EAllowedDOFs>(allowedDOFs),
-        *reinterpret_cast<JPH::MassProperties*>(massProperties));
-}
-
-/* JPH_MassProperties */
-void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
-{
-    reinterpret_cast<JPH::MassProperties*>(properties)->ScaleToMass(mass);
+        ToJolt(massProperties));
 }
 
 const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system)

@@ -99,3 +99,5 @@ ENSURE_SIZE_ALIGN(JPH::RayCastResult, JPH_RayCastResult);
 static_assert(offsetof(JPH::RayCastResult, mBodyID) == offsetof(JPH_RayCastResult, bodyID));
 static_assert(offsetof(JPH::RayCastResult, mFraction) == offsetof(JPH_RayCastResult, fraction));
 static_assert(offsetof(JPH::RayCastResult, mSubShapeID2) == offsetof(JPH_RayCastResult, subShapeID2));
+
+//static_assert(offsetof(JPH::MassProperties, mMass) == offsetof(JPH_MassProperties, mass));

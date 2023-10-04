@@ -184,6 +184,11 @@ typedef struct JPH_IndexedTriangle {
     uint32_t materialIndex;
 } JPH_IndexedTriangle;
 
+typedef struct JPH_MassProperties {
+    float mass;
+    JPH_Matrix4x4 inertia;
+} JPH_MassProperties;
+
 typedef struct JPH_SubShapeIDPair
 {
     JPH_BodyID     Body1ID;
@@ -199,7 +204,6 @@ typedef struct JPH_RayCastResult
     float          fraction; // 1.0 + JPC_FLT_EPSILON
     JPH_SubShapeID subShapeID2;
 } JPH_RayCastResult;
-
 
 typedef struct JPH_TempAllocator                    JPH_TempAllocator;
 typedef struct JPH_JobSystem                        JPH_JobSystem;
@@ -218,6 +222,7 @@ typedef struct JPH_SphereShapeSettings          JPH_SphereShapeSettings;
 typedef struct JPH_TriangleShapeSettings        JPH_TriangleShapeSettings;
 typedef struct JPH_CapsuleShapeSettings         JPH_CapsuleShapeSettings;
 typedef struct JPH_CylinderShapeSettings        JPH_CylinderShapeSettings;
+typedef struct JPH_ConvexShapeSettings			JPH_ConvexShapeSettings;
 typedef struct JPH_ConvexHullShapeSettings      JPH_ConvexHullShapeSettings;
 typedef struct JPH_MeshShapeSettings            JPH_MeshShapeSettings;
 typedef struct JPH_HeightFieldShapeSettings     JPH_HeightFieldShapeSettings;
@@ -234,6 +239,8 @@ typedef struct JPH_CylinderShape                JPH_CylinderShape;
 typedef struct JPH_CapsuleShape                 JPH_CapsuleShape;
 typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
 typedef struct JPH_MeshShape                    JPH_MeshShape;
+typedef struct JPH_MutableCompoundShape         JPH_MutableCompoundShape;
+typedef struct JPH_ConvexHullShape              JPH_ConvexHullShape;
 
 typedef struct JPH_BodyCreationSettings         JPH_BodyCreationSettings;
 typedef struct JPH_SoftBodyCreationSettings     JPH_SoftBodyCreationSettings;
@@ -302,11 +309,12 @@ JPH_CAPI void JPH_JobSystem_Destroy(JPH_JobSystem* system);
 JPH_CAPI void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings);
 
 /* JPH_ConvexShape */
-JPH_CAPI float JPH_ConvexShape_GetDensity(JPH_ConvexShape* shape);
+JPH_CAPI float JPH_ConvexShape_GetDensity(const JPH_ConvexShape* shape);
 JPH_CAPI void JPH_ConvexShape_SetDensity(JPH_ConvexShape* shape, float inDensity);
 
 /* BoxShape */
 JPH_CAPI JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius);
+JPH_CAPI JPH_BoxShape* JPH_BoxShapeSettings_CreateShape(const JPH_BoxShapeSettings* settings); 
 JPH_CAPI JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius);
 JPH_CAPI void JPH_BoxShape_GetHalfExtent(const JPH_BoxShape* shape, JPH_Vec3* halfExtent);
 JPH_CAPI float JPH_BoxShape_GetVolume(const JPH_BoxShape* shape);
@@ -314,6 +322,7 @@ JPH_CAPI float JPH_BoxShape_GetConvexRadius(const JPH_BoxShape* shape);
 
 /* SphereShapeSettings */
 JPH_CAPI JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius);
+JPH_CAPI JPH_SphereShape* JPH_SphereShapeSettings_CreateShape(const JPH_SphereShapeSettings* settings); 
 JPH_CAPI float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings);
 JPH_CAPI void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float radius);
 JPH_CAPI JPH_SphereShape* JPH_SphereShape_Create(float radius);
@@ -328,22 +337,24 @@ JPH_CAPI JPH_CapsuleShape* JPH_CapsuleShape_Create(float halfHeightOfCylinder, f
 JPH_CAPI float JPH_CapsuleShape_GetRadius(const JPH_CapsuleShape* shape);
 JPH_CAPI float JPH_CapsuleShape_GetHalfHeightOfCylinder(const JPH_CapsuleShape* shape);
 
-
 /* CylinderShape */
 JPH_CAPI JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
 JPH_CAPI JPH_CylinderShape* JPH_CylinderShape_Create(float halfHeight, float radius);
 JPH_CAPI float JPH_CylinderShape_GetRadius(const JPH_CylinderShape* shape);
 JPH_CAPI float JPH_CylinderShape_GetHalfHeight(const JPH_CylinderShape* shape);
 
-
 /* ConvexHullShape */
+JPH_CAPI float JPH_ConvexShapeSettings_GetDensity(const JPH_ConvexShapeSettings* shape);
+JPH_CAPI void JPH_ConvexShapeSettings_SetDensity(JPH_ConvexShapeSettings* shape, float value);
+
 JPH_CAPI JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* points, uint32_t pointsCount, float maxConvexRadius);
+JPH_CAPI JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHullShapeSettings* settings);
 
 /* MeshShape */
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount);
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, uint32_t verticesCount, const JPH_IndexedTriangle* triangles, uint32_t triangleCount);
 JPH_CAPI void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings);
-JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* settings); // binding for MeshShapeSettings::Create()
+JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* settings); 
 
 /* HeightFieldShape */
 JPH_CAPI JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount);
@@ -358,12 +369,17 @@ JPH_CAPI void JPH_CompoundShapeSettings_AddShape(JPH_CompoundShapeSettings* sett
 JPH_CAPI void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape, uint32_t userData);
 
 JPH_CAPI JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create();
+
+/* MutableCompoundShape */
 JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create();
+JPH_CAPI JPH_MutableCompoundShape* JPH_MutableCompoundShape_Create(const JPH_MutableCompoundShapeSettings* settings);
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
 JPH_CAPI void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result);
-JPH_CAPI JPH_MassProperties * JPH_Shape_GetMassProperties(const JPH_Shape* shape);
+JPH_CAPI void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* result);
+JPH_CAPI void JPH_Shape_GetCenterOfMass(JPH_Shape* shape, JPH_Vec3* result);
+JPH_CAPI float JPH_Shape_GetInnerRadius(JPH_Shape* shape);
 
 /* JPH_BodyCreationSettings */
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create();
@@ -625,12 +641,7 @@ JPH_CAPI float JPH_MotionProperties_GetLinearDamping(const JPH_MotionProperties*
 JPH_CAPI void JPH_MotionProperties_SetAngularDamping(JPH_MotionProperties* properties, float damping);
 JPH_CAPI float JPH_MotionProperties_GetAngularDamping(const JPH_MotionProperties* properties);
 JPH_CAPI float JPH_MotionProperties_GetInverseMassUnchecked(JPH_MotionProperties* properties);
-JPH_CAPI void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JPH_AllowedDOFs allowedDOFs, JPH_MassProperties* massProperties);
-
-//--------------------------------------------------------------------------------------------------
-// JPH_MassProperties
-//--------------------------------------------------------------------------------------------------
-JPH_CAPI void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass);
+JPH_CAPI void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JPH_AllowedDOFs allowedDOFs, const JPH_MassProperties* massProperties);
 
 //--------------------------------------------------------------------------------------------------
 // JPH_NarrowPhaseQuery
