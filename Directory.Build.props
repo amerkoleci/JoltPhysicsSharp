@@ -9,12 +9,6 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
-  <!-- Version -->
-  <PropertyGroup>
-    <VersionPrefix>1.9.7</VersionPrefix>
-    <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
-  </PropertyGroup>
-
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>

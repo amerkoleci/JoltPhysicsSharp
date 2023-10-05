@@ -8,6 +8,12 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <!-- Version -->
+  <PropertyGroup>
+    <VersionPrefix>1.9.8</VersionPrefix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
     <Content Include="build\**" PackagePath="build" Pack="true" />
