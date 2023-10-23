@@ -28,7 +28,7 @@
 
   <PropertyGroup>
     <Authors>Amer Koleci and Contributors</Authors>
-    <Copyright>Copyright © Amer Koleci and Contributors</Copyright>
+    <Copyright>Copyright (c) Amer Koleci and Contributors</Copyright>
     <Product>JoltPhysicsSharp</Product>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
