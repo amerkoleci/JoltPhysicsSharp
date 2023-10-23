@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 #ifndef _JOLT_C_H
@@ -192,8 +192,7 @@ typedef struct JPH_MassProperties {
     JPH_Matrix4x4 inertia;
 } JPH_MassProperties;
 
-typedef struct JPH_SubShapeIDPair
-{
+typedef struct JPH_SubShapeIDPair {
     JPH_BodyID     Body1ID;
     JPH_SubShapeID subShapeID1;
     JPH_BodyID     Body2ID;
@@ -201,8 +200,7 @@ typedef struct JPH_SubShapeIDPair
 } JPH_SubShapeIDPair;
 
 // NOTE: Needs to be kept in sync with JPH::RayCastResult
-typedef struct JPH_RayCastResult
-{
+typedef struct JPH_RayCastResult {
     JPH_BodyID     bodyID; // JPC_BODY_ID_INVALID
     float          fraction; // 1.0 + JPC_FLT_EPSILON
     JPH_SubShapeID subShapeID2;
@@ -217,6 +215,7 @@ typedef struct JPH_BroadPhaseLayerFilter            JPH_BroadPhaseLayerFilter;
 typedef struct JPH_ObjectLayerFilter                JPH_ObjectLayerFilter;
 typedef struct JPH_BodyFilter                       JPH_BodyFilter;
 
+typedef struct JPH_Interface						JPH_Interface;
 typedef struct JPH_PhysicsSystem                    JPH_PhysicsSystem;
 
 typedef struct JPH_ShapeSettings                JPH_ShapeSettings;
@@ -274,7 +273,6 @@ typedef struct JPH_CollideShapeResult           JPH_CollideShapeResult;
 typedef struct JPH_ContactListener              JPH_ContactListener;
 
 typedef struct JPH_BodyActivationListener       JPH_BodyActivationListener;
-
 
 typedef struct JPH_SharedMutex                  JPH_SharedMutex;
 
@@ -500,7 +498,6 @@ JPH_CAPI JPH_Body* JPH_TwoBodyConstraint_GetBody1(JPH_TwoBodyConstraint* constra
 JPH_CAPI JPH_Body* JPH_TwoBodyConstraint_GetBody2(JPH_TwoBodyConstraint* constraint);
 JPH_CAPI void JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(JPH_TwoBodyConstraint* constraint, JPH_Matrix4x4* result);
 JPH_CAPI void JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(JPH_TwoBodyConstraint* constraint, JPH_Matrix4x4* result);
-
 
 /* JPH_PhysicsSystem */
 JPH_CAPI JPH_PhysicsSystem* JPH_PhysicsSystem_Create(void);

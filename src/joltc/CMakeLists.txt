@@ -9,6 +9,7 @@ set(SOURCE_FILES
     joltc.h
     joltc.cpp
     joltc_assert.cpp
+	joltc.c
 )
 
 add_library(${TARGET_NAME} ${SOURCE_FILES})
