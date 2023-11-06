@@ -10,13 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="System.Memory" Version="4.5.5" />
-    <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
-    <PackageVersion Include="System.Numerics.Vectors" Version="4.5.0" />
-    <PackageVersion Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-    
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageVersion Include="NUnit" Version="3.13.3" />
+    <PackageVersion Include="NUnit" Version="3.14.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.5.0" />
   </ItemGroup>
 

@@ -1,16 +1,11 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 namespace JoltPhysicsSharp;
 
-public readonly partial struct Bool32 : IComparable, IComparable<Bool32>, IEquatable<Bool32>
+public readonly partial struct Bool32(int value) : IComparable, IComparable<Bool32>, IEquatable<Bool32>
 {
-    public readonly int Value;
-
-    public Bool32(int value)
-    {
-        Value = value;
-    }
+    public readonly int Value = value;
 
     public static Bool32 True => new(1);
     public static Bool32 False => new(0);

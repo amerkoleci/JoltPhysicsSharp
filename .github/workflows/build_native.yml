@@ -7,9 +7,11 @@ on:
       - 'main'
     paths:
       - 'src/joltc/**'
+      - .github/workflows/build_native.yml
   pull_request:
     paths:
       - 'src/joltc/**'
+      - .github/workflows/build_native.yml
 
 jobs:
   windows:

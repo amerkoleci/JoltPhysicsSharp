@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -6,11 +6,9 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public readonly struct Body : IEquatable<Body>
+public readonly struct Body(IntPtr handle) : IEquatable<Body>
 {
-    public Body(IntPtr handle) { Handle = handle; }
-    public IntPtr Handle { get; }
-    public bool IsNull => Handle == IntPtr.Zero;
+    public IntPtr Handle { get; } = handle; public bool IsNull => Handle == IntPtr.Zero;
     public static Body Null => new(IntPtr.Zero);
     public static implicit operator Body(IntPtr handle) => new(handle);
     public static bool operator ==(Body left, Body right) => left.Handle == right.Handle;

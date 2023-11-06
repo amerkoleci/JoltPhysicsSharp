@@ -1,16 +1,13 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using System.Numerics;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public readonly struct MotionProperties : IEquatable<MotionProperties>
+public readonly struct MotionProperties(nint handle) : IEquatable<MotionProperties>
 {
-    public MotionProperties(nint handle) { Handle = handle; }
-    public nint Handle { get; }
-    public bool IsNull => Handle == 0;
+    public nint Handle { get; } = handle; public bool IsNull => Handle == 0;
     public bool IsNotNull => Handle != 0;
     public static MotionProperties Null => new(0);
     public static implicit operator MotionProperties(nint handle) => new(handle);
