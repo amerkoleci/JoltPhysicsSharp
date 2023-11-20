@@ -192,6 +192,10 @@
 			#define JPH_EXPORT __declspec(dllexport)
 		#else
 			#define JPH_EXPORT __attribute__ ((visibility ("default")))
+			#if defined(JPH_COMPILER_GCC)
+				// Prevents an issue with GCC attribute parsing (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69585)
+				#define JPH_EXPORT_GCC_BUG_WORKAROUND [[gnu::visibility("default")]]
+			#endif
 		#endif
 	#else
 		// When linking against Jolt, we must import these symbols
@@ -199,11 +203,19 @@
 			#define JPH_EXPORT __declspec(dllimport)
 		#else
 			#define JPH_EXPORT __attribute__ ((visibility ("default")))
+			#if defined(JPH_COMPILER_GCC)
+				// Prevents an issue with GCC attribute parsing (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69585)
+				#define JPH_EXPORT_GCC_BUG_WORKAROUND [[gnu::visibility("default")]]
+			#endif
 		#endif
 	#endif
 #else
 	// If the define is not set, we use static linking and symbols don't need to be imported or exported
 	#define JPH_EXPORT
+#endif
+
+#ifndef JPH_EXPORT_GCC_BUG_WORKAROUND
+	#define JPH_EXPORT_GCC_BUG_WORKAROUND JPH_EXPORT
 #endif
 
 // Macro used by the RTTI macros to not export a function
@@ -360,6 +372,9 @@
 	JPH_SUPPRESS_WARNING_POP
 
 // Standard C++ includes
+#include <float.h>
+#include <limits.h>
+#include <string.h>
 JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <vector>
 #include <utility>
@@ -369,9 +384,6 @@ JPH_SUPPRESS_WARNINGS_STD_BEGIN
 #include <algorithm>
 #include <cstdint>
 JPH_SUPPRESS_WARNINGS_STD_END
-#include <limits.h>
-#include <float.h>
-#include <string.h>
 #if defined(JPH_USE_SSE)
 	#include <immintrin.h>
 #elif defined(JPH_USE_NEON)
