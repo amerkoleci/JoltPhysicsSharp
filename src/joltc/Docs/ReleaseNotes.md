@@ -1,27 +1,35 @@
+# Release Notes
+
 For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysics/blob/master/Docs/APIChanges.md).
 
-# Unreleased changes
+## Unreleased changes
 
-* None
+* Changed the meaning of Constraint::mNumVelocity/PositionStepsOverride. Before the number of steps would be the maximum of all constraints and the default value, now an overridden value of 0 means that the constraint uses the default value, otherwise it will use the value as specified. This means that if all constraints in an island have a lower value than the default, we will now use the lower value instead of the default. This allows simulating an island at a lower precision than the default.
+* Bodies can now also override the default number of solver iterations. This value is used when the body collides with another body and a contact constraint is created (for constraints, the constraint override is always used).
+* Added BodyInterface::SetUseManifoldReduction which will clear the contact cache and ensure that you get consistent contact callbacks in case the body that you're changing already has contacts.
+* Created implementations of BroadPhaseLayerInterface, ObjectVsBroadPhaseLayerFilter and ObjectLayerPairFilter that use a bit table internally. These make it easier to define ObjectLayers which object layers collide.
+* Support for compiling with ninja on Windows.
+* Added wheel index and friction direction to VehicleConstraint::CombineFunction friction callback so you can have more differentiation between wheels.
+* Added ability to disable the lean steering limit for the motorcycle, turning this off makes the motorcycle more unstable, but gives you more control over the final steering angle.
 
-# v4.0.1
+## v4.0.1
 
-## New functionality
+### New functionality
 
 * Ability to stop overriding CMAKE_CXX_FLAGS_DEBUG/CMAKE_CXX_FLAGS_RELEASE which is important for Android as it uses a lot of extra flags. Set the OVERRIDE_CXX_FLAGS=NO cmake flag to enable this.
 * Reduced size of a contact constraint which saves a bit of memory during simulation.
 * Can now build a linux shared library using GCC.
 
-## Bug fixes
+### Bug fixes
 
 * Fixed mass scaling (as provided by the ContactListener) not applied correctly to CCD objects & during solve position constraints. This led to kinematic objects being pushed by dynamic objects.
 * Workaround for MSVC 17.8, limits.h doesn't include corecrt.h and triggers an error that \_\_STDC_WANT_SECURE_LIB\_\_ is not defined.
 * Fixed bug in MustIncludeC logic in GetClosestPointOnTriangle.
 * Removed the need for specifying -Wno-comment when compiling with GCC.
 
-# v4.0.0
+## v4.0.0
 
-## New functionality
+### New functionality
 * Added support for soft bodies (feature still in development, see [announcement](https://x.com/jrouwe/status/1687051655898955776?s=20)).
 * Support for limiting the degrees of freedom of a body to support 2D simulations (see [announcement](https://x.com/jrouwe/status/1676311800797622279?s=20)).
 * Support for setting surface velocity of a body (see [announcement](https://x.com/jrouwe/status/1662727355553443844?s=20)).
@@ -40,13 +48,13 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Support for building Jolt as a shared library on Windows.
 * Optimized Indexify function from O(N^2) to O(N log(N)).
 
-## Removed functionality
+### Removed functionality
 * Removed support for integration sub steps for PhysicsSystem::Update.
 
-## New supported platforms
+### New supported platforms
 * 32-bit versions of Android on ARM and x86.
 
-## Bug fixes
+### Bug fixes
 * Motor frequency/stiffness of 0 should turn the motor off.
 * RotatedTranslatedShape::GetPosition returned the wrong value.
 * If a body is removed between the broad phase detecting an overlap and the narrow phase locking the body, callbacks could be called on a body that has already been removed.
@@ -70,7 +78,7 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Don't allow the vehicle to sleep when the transmission is switching.
 * Fixed bug that caused suspension to be weaker when driving a vehicle over dynamic bodies.
 
-# v3.0.0
+## v3.0.0
 
 * Support for double precision simulation for large worlds (see [announcement](https://twitter.com/jrouwe/status/1599366630273712128))
 * Performance optimization that allows solving large islands on multiple threads (see [announcement](https://twitter.com/jrouwe/status/1633229953775828994))
@@ -83,13 +91,13 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Added a JobSystemWithBarrier class that makes it easier to integrate with your own job system
 * Support for 32-bit object layers to allow easier integration with existing collision filtering systems
  
-# v2.0.1
+## v2.0.1
 
 * Adds ARM 32-bit support to support vcpkg-tool
 
-# v2.0.0
+## v2.0.0
 
-## Major new functionality
+### Major new functionality
 * Simulation is now deterministic between Windows, Linux and macOS.
 * Support for custom memory allocators.
 * A new character class that lives outside the main simulation update and is mainly used for player movement (CharacterVirtual).
@@ -99,11 +107,11 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Improved engine model for wheeled vehicles.
 * Most constraints can now also be configured in local space.
 
-## New supported compilers
+### New supported compilers
 * MinGW
 * GCC
 
-## New supported platforms
+### New supported platforms
 * All intel platforms supporting SSE2 and higher (was SSE4.2)
 * 32-bit applications (was 64 bit only)
 * Windows on ARM
@@ -112,10 +120,10 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * iOS
 * WebAssembly
 
-# v1.1.0
+## v1.1.0
 
 * Optimizations.
 
-# v1.0.0
+## v1.0.0
 
 * Initial stable release.
