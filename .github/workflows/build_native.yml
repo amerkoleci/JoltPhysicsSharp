@@ -19,26 +19,27 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Get CMake
+      uses: lukka/get-cmake@v3.28
       
     - name: Configure win-x64
-      run: cmake . -G "Visual Studio 17 2022" -A x64 -Bbuild_win_64 -DCMAKE_BUILD_TYPE:String=Distribution
+      run: cmake -S "." -B "build_win_64" -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE:String=Distribution
     - name: Build win-x64
       run: cmake --build build_win_64 --config Distribution
 
     - name: Configure win-x64 double
-      run: cmake . -G "Visual Studio 17 2022" -A x64 -Bbuild_win_64_double -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
+      run: cmake -S "." -B "build_win_64_double" -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
     - name: Build win-x64 double
       run: cmake --build build_win_64_double --config Distribution      
 
     - name: Configure win-arm64
-      run: cmake . -G "Visual Studio 17 2022" -A ARM64 -Bbuild_win_arm64 -DCMAKE_BUILD_TYPE:String=Distribution
+      run: cmake -S "." -B "build_win_arm64" -G "Visual Studio 17 2022" -A ARM64 -DCMAKE_BUILD_TYPE:String=Distribution
     - name: Build win-arm64
       run: cmake --build build_win_arm64 --config Distribution
 
     - name: Configure win-arm64 double
-      run: cmake . -G "Visual Studio 17 2022" -A ARM64 -Bbuild_win_arm64_double -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
+      run: cmake -S "." -B "build_win_arm64_double" -G "Visual Studio 17 2022" -A ARM64 -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
     - name: Build win-arm64 double
       run: cmake --build build_win_arm64_double --config Distribution
 
@@ -60,12 +61,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get -qq update
-        sudo apt-get -qq install libzstd-dev ninja-build
+    - name: Get CMake
+      uses: lukka/get-cmake@v3.28
+
     - name: Configure linux-x64
-      run: cmake S . -Bbuild_linux_64 -G Ninja -DCMAKE_BUILD_TYPE=Distribution
+      run: cmake -S "." -B "build_linux_64" -G Ninja -DCMAKE_BUILD_TYPE=Distribution
     - name: Build linux-x64
       run: cmake --build build_linux_64 --config Distribution --verbose --parallel
 
@@ -84,14 +84,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup dependencies
-      run: |
-        brew install \
-          ninja \
-          llvm
+    - name: Get CMake
+      uses: lukka/get-cmake@v3.28
 
     - name: Configure osx-universal
-      run: cmake -S . -Bbuild_osx -G Ninja -DCMAKE_BUILD_TYPE=Distribution
+      run: cmake -S "." -B "build_osx" -G Ninja -DCMAKE_BUILD_TYPE=Distribution
     - name: Build osx-universal
       run: cmake --build build_osx --config Distribution --verbose --parallel
 
