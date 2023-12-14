@@ -14,7 +14,11 @@ endif ()
     set_target_properties(${TARGET_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 endif ()
 
-target_link_libraries(${TARGET_NAME} joltc)
+if (DOUBLE_PRECISION)
+	target_link_libraries(${TARGET_NAME} joltc_double)
+else()
+	target_link_libraries(${TARGET_NAME} joltc)
+endif ()
 
 set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "Samples")
 
