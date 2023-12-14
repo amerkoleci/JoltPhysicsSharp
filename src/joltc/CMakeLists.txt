@@ -13,6 +13,7 @@ set(SOURCE_FILES
 )
 
 add_library(${TARGET_NAME} ${SOURCE_FILES})
+target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 target_link_libraries(${TARGET_NAME} PUBLIC Jolt)
 
 set_target_properties(${TARGET_NAME} PROPERTIES

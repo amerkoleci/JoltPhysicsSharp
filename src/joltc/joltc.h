@@ -206,16 +206,14 @@ typedef struct JPH_RayCastResult {
     JPH_SubShapeID subShapeID2;
 } JPH_RayCastResult;
 
-typedef struct JPH_TempAllocator                    JPH_TempAllocator;
-typedef struct JPH_JobSystem                        JPH_JobSystem;
-typedef struct JPH_BroadPhaseLayerInterface         JPH_BroadPhaseLayerInterface;
-typedef struct JPH_ObjectVsBroadPhaseLayerFilter    JPH_ObjectVsBroadPhaseLayerFilter;
-typedef struct JPH_ObjectLayerPairFilter            JPH_ObjectLayerPairFilter;
+typedef struct JPH_BroadPhaseLayerInterfaceTable    JPH_BroadPhaseLayerInterfaceTable;
+typedef struct JPH_ObjectVsBroadPhaseLayerFilterTable   JPH_ObjectVsBroadPhaseLayerFilterTable;
+typedef struct JPH_ObjectLayerPairFilterTable       JPH_ObjectLayerPairFilterTable;
+
 typedef struct JPH_BroadPhaseLayerFilter            JPH_BroadPhaseLayerFilter;
 typedef struct JPH_ObjectLayerFilter                JPH_ObjectLayerFilter;
 typedef struct JPH_BodyFilter                       JPH_BodyFilter;
 
-typedef struct JPH_Interface						JPH_Interface;
 typedef struct JPH_PhysicsSystem                    JPH_PhysicsSystem;
 
 typedef struct JPH_ShapeSettings                JPH_ShapeSettings;
@@ -292,19 +290,65 @@ typedef struct JPH_BodyLockWrite
 
 typedef JPH_Bool32(JPH_API_CALL* JPH_AssertFailureFunc)(const char* expression, const char* mssage, const char* file, uint32_t line);
 
-JPH_CAPI JPH_Bool32 JPH_Init(void);
+JPH_CAPI JPH_Bool32 JPH_Init(uint32_t tempAllocatorSize);
 JPH_CAPI void JPH_Shutdown(void);
 JPH_CAPI void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler);
 
-/* JPH_TempAllocator */
-JPH_CAPI JPH_TempAllocator* JPH_TempAllocatorMalloc_Create();
-JPH_CAPI JPH_TempAllocator* JPH_TempAllocator_Create(uint32_t size);
-JPH_CAPI void JPH_TempAllocator_Destroy(JPH_TempAllocator* allocator);
+/* JPH_BroadPhaseLayerInterfaceTable */
+JPH_CAPI JPH_BroadPhaseLayerInterfaceTable* JPH_BroadPhaseLayerInterfaceTable_Create(uint32_t numObjectLayers, uint32_t numBroadPhaseLayers);
+JPH_CAPI void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(JPH_BroadPhaseLayerInterfaceTable* bpInterface, JPH_ObjectLayer objectLayer, JPH_BroadPhaseLayer broadPhaseLayer);
 
-/* JPH_JobSystemThreadPool */
-JPH_CAPI JPH_JobSystem* JPH_JobSystemThreadPool_Create(uint32_t maxJobs, uint32_t maxBarriers, int inNumThreads);
-JPH_CAPI JPH_JobSystem* JPH_JobSystemSingleThreaded_Create(uint32_t maxJobs);
-JPH_CAPI void JPH_JobSystem_Destroy(JPH_JobSystem* system);
+/* JPH_ObjectLayerPairFilter */
+JPH_CAPI JPH_ObjectLayerPairFilterTable* JPH_ObjectLayerPairFilterTable_Create(uint32_t numObjectLayers);
+JPH_CAPI void JPH_ObjectLayerPairFilterTable_DisableCollision(JPH_ObjectLayerPairFilterTable* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
+JPH_CAPI void JPH_ObjectLayerPairFilterTable_EnableCollision(JPH_ObjectLayerPairFilterTable* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
+
+/* JPH_ObjectVsBroadPhaseLayerFilter */
+JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilterTable* JPH_ObjectVsBroadPhaseLayerFilterTable_Create(
+	JPH_BroadPhaseLayerInterfaceTable* broadPhaseLayerInterface, uint32_t numBroadPhaseLayers,
+	JPH_ObjectLayerPairFilterTable* objectLayerPairFilter, uint32_t numObjectLayers);
+
+/* JPH_PhysicsSystem */
+typedef struct JPH_PhysicsSystemSettings {
+	uint32_t maxBodies; /* 10240 */
+	uint32_t maxBodyPairs; /* 65536 */
+	uint32_t maxContactConstraints; /* 10240 */
+	uint32_t _padding;
+	JPH_BroadPhaseLayerInterfaceTable* broadPhaseLayerInterface;
+	JPH_ObjectLayerPairFilterTable*	objectLayerPairFilter;
+	JPH_ObjectVsBroadPhaseLayerFilterTable* objectVsBroadPhaseLayerFilter;
+} JPH_PhysicsSystemSettings;
+
+JPH_CAPI JPH_PhysicsSystem* JPH_PhysicsSystem_Create(const JPH_PhysicsSystemSettings* settings);
+JPH_CAPI void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system);
+
+JPH_CAPI void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system);
+JPH_CAPI JPH_PhysicsUpdateError JPH_PhysicsSystem_Step(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps);
+
+JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system);
+JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterfaceNoLock(JPH_PhysicsSystem* system);
+
+JPH_CAPI const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterface(const JPH_PhysicsSystem* system);
+JPH_CAPI const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const JPH_PhysicsSystem* system);
+
+JPH_CAPI const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system);
+JPH_CAPI const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(const JPH_PhysicsSystem* system);
+
+JPH_CAPI void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JPH_ContactListener* listener);
+JPH_CAPI void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_BodyActivationListener* listener);
+
+JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system);
+JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system, JPH_BodyType type);
+JPH_CAPI uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system);
+
+JPH_CAPI void JPH_PhysicsSystem_SetGravity(JPH_PhysicsSystem* system, const JPH_Vec3* value);
+JPH_CAPI void JPH_PhysicsSystem_GetGravity(JPH_PhysicsSystem* system, JPH_Vec3* result);
+
+JPH_CAPI void JPH_PhysicsSystem_AddConstraint(JPH_PhysicsSystem* system, JPH_Constraint* constraint);
+JPH_CAPI void JPH_PhysicsSystem_RemoveConstraint(JPH_PhysicsSystem* system, JPH_Constraint* constraint);
+
+JPH_CAPI void JPH_PhysicsSystem_AddConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count);
+JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count);
 
 /* JPH_ShapeSettings */
 JPH_CAPI void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings);
@@ -499,45 +543,6 @@ JPH_CAPI JPH_Body* JPH_TwoBodyConstraint_GetBody2(JPH_TwoBodyConstraint* constra
 JPH_CAPI void JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(JPH_TwoBodyConstraint* constraint, JPH_Matrix4x4* result);
 JPH_CAPI void JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(JPH_TwoBodyConstraint* constraint, JPH_Matrix4x4* result);
 
-/* JPH_PhysicsSystem */
-JPH_CAPI JPH_PhysicsSystem* JPH_PhysicsSystem_Create(void);
-JPH_CAPI void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system);
-JPH_CAPI void JPH_PhysicsSystem_Init(JPH_PhysicsSystem* system,
-    uint32_t maxBodies, uint32_t numBodyMutexes, uint32_t maxBodyPairs, uint32_t maxContactConstraints,
-    JPH_BroadPhaseLayer* layer,
-    JPH_ObjectVsBroadPhaseLayerFilter* objectVsBroadPhaseLayerFilter,
-    JPH_ObjectLayerPairFilter* objectLayerPairFilter);
-
-JPH_CAPI void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system);
-JPH_CAPI JPH_PhysicsUpdateError JPH_PhysicsSystem_Update(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps, 
-    JPH_TempAllocator* tempAllocator,
-    JPH_JobSystem* jobSystem);
-
-JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterface(JPH_PhysicsSystem* system);
-JPH_CAPI JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterfaceNoLock(JPH_PhysicsSystem* system);
-
-JPH_CAPI const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterface(const JPH_PhysicsSystem* system);
-JPH_CAPI const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const JPH_PhysicsSystem* system);
-
-JPH_CAPI const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system);
-JPH_CAPI const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(const JPH_PhysicsSystem* system);
-
-JPH_CAPI void JPH_PhysicsSystem_SetContactListener(JPH_PhysicsSystem* system, JPH_ContactListener* listener);
-JPH_CAPI void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_BodyActivationListener* listener);
-
-JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system);
-JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* system, JPH_BodyType type);
-JPH_CAPI uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system);
-
-JPH_CAPI void JPH_PhysicsSystem_SetGravity(JPH_PhysicsSystem* system, const JPH_Vec3* value);
-JPH_CAPI void JPH_PhysicsSystem_GetGravity(JPH_PhysicsSystem* system, JPH_Vec3* result);
-
-JPH_CAPI void JPH_PhysicsSystem_AddConstraint(JPH_PhysicsSystem* system, JPH_Constraint* constraint);
-JPH_CAPI void JPH_PhysicsSystem_RemoveConstraint(JPH_PhysicsSystem* system, JPH_Constraint* constraint);
-
-JPH_CAPI void JPH_PhysicsSystem_AddConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count);
-JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count);
-
 /* BodyInterface */
 JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
 JPH_CAPI JPH_BodyID JPH_BodyInterface_CreateAndAddBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings, JPH_Activation activationMode);
@@ -695,35 +700,6 @@ JPH_CAPI void JPH_Body_GetCenterOfMassTransform(const JPH_Body* body, JPH_RMatri
 JPH_CAPI void JPH_Body_SetUserData(JPH_Body* body, uint64_t userData);
 JPH_CAPI uint64_t JPH_Body_GetUserData(JPH_Body* body);
 
-/* JPH_BroadPhaseLayer */
-typedef struct JPH_BroadPhaseLayerInterface_Procs {
-    uint32_t(JPH_API_CALL* GetNumBroadPhaseLayers)(const JPH_BroadPhaseLayerInterface* interface);
-    JPH_BroadPhaseLayer(JPH_API_CALL* GetBroadPhaseLayer)(const JPH_BroadPhaseLayerInterface* interface, JPH_ObjectLayer layer);
-
-    const char* (*GetBroadPhaseLayerName)(const JPH_BroadPhaseLayerInterface* interface, JPH_BroadPhaseLayer layer);
-} JPH_BroadPhaseLayerInterface_Procs;
-
-JPH_CAPI void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);
-JPH_CAPI JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterface_Create();
-JPH_CAPI void JPH_BroadPhaseLayerInterface_Destroy(JPH_BroadPhaseLayerInterface* layer);
-
-/* JPH_ObjectVsBroadPhaseLayerFilter */
-typedef struct JPH_ObjectVsBroadPhaseLayerFilter_Procs {
-    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_ObjectVsBroadPhaseLayerFilter* filter, JPH_ObjectLayer layer1, JPH_BroadPhaseLayer layer2);
-} JPH_ObjectVsBroadPhaseLayerFilter_Procs;
-
-JPH_CAPI void JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(JPH_ObjectVsBroadPhaseLayerFilter_Procs procs);
-JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilter_Create();
-JPH_CAPI void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(JPH_ObjectVsBroadPhaseLayerFilter* filter);
-
-/* JPH_ObjectLayerPairFilter */
-typedef struct JPH_ObjectLayerPairFilter_Procs {
-    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_ObjectLayerPairFilter* filter, JPH_ObjectLayer object1, JPH_ObjectLayer object2);
-} JPH_ObjectLayerPairFilter_Procs;
-
-JPH_CAPI void JPH_ObjectLayerPairFilter_SetProcs(JPH_ObjectLayerPairFilter_Procs procs);
-JPH_CAPI JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilter_Create();
-JPH_CAPI void JPH_ObjectLayerPairFilter_Destroy(JPH_ObjectLayerPairFilter* filter);
 
 /* JPH_BroadPhaseLayerFilter_Procs */
 typedef struct JPH_BroadPhaseLayerFilter_Procs {
