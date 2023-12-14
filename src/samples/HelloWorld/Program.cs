@@ -17,86 +17,17 @@ public static class Program
 
     static class Layers
     {
-        public const byte NonMoving = 0;
-        public const byte Moving = 1;
-        public const int NumLayers = 2;
+        public static readonly ObjectLayer NonMoving = 0;
+        public static readonly ObjectLayer Moving = 1;
     };
 
     static class BroadPhaseLayers
     {
-        public const byte NonMoving = 0;
-        public const byte Moving = 1;
-        public const int NumLayers = 2;
+        public static readonly BroadPhaseLayer NonMoving = 0;
+        public static readonly BroadPhaseLayer Moving = 1;
     };
 
-    class BPLayerInterfaceImpl : BroadPhaseLayerInterface
-    {
-        private readonly BroadPhaseLayer[] _objectToBroadPhase = new BroadPhaseLayer[Layers.NumLayers];
-
-        public BPLayerInterfaceImpl()
-        {
-            // Create a mapping table from object to broad phase layer
-            _objectToBroadPhase[Layers.NonMoving] = BroadPhaseLayers.NonMoving;
-            _objectToBroadPhase[Layers.Moving] = BroadPhaseLayers.Moving;
-        }
-
-        protected override int GetNumBroadPhaseLayers()
-        {
-            return BroadPhaseLayers.NumLayers;
-        }
-
-        protected override BroadPhaseLayer GetBroadPhaseLayer(ObjectLayer layer)
-        {
-            Debug.Assert(layer < Layers.NumLayers);
-            return _objectToBroadPhase[layer];
-        }
-
-        protected override string GetBroadPhaseLayerName(BroadPhaseLayer layer)
-        {
-            switch ((byte)layer)
-            {
-                case BroadPhaseLayers.NonMoving: return "NON_MOVING";
-                case BroadPhaseLayers.Moving: return "MOVING";
-                default:
-                    Debug.Assert(false);
-                    return "INVALID";
-            }
-        }
-    }
-
-    class ObjectVsBroadPhaseLayerFilterImpl : ObjectVsBroadPhaseLayerFilter
-    {
-        protected override bool ShouldCollide(ObjectLayer layer1, BroadPhaseLayer layer2)
-        {
-            switch (layer1)
-            {
-                case Layers.NonMoving:
-                    return layer2 == BroadPhaseLayers.Moving;
-                case Layers.Moving:
-                    return true;
-                default:
-                    Debug.Assert(false);
-                    return false;
-            }
-        }
-    }
-
-    class ObjectLayerPairFilterImpl : ObjectLayerPairFilter
-    {
-        protected override bool ShouldCollide(ObjectLayer object1, ObjectLayer object2)
-        {
-            switch (object1)
-            {
-                case Layers.NonMoving:
-                    return object2 == Layers.Moving;
-                case Layers.Moving:
-                    return true;
-                default:
-                    Debug.Assert(false);
-                    return false;
-            }
-        }
-    }
+    public const int NumLayers = 2;
 
     private static float WorldScale = 1.0f;
 
@@ -142,7 +73,7 @@ public static class Program
         // Calculate reference value of mass and inertia of a box
         MassProperties reference = default;
         reference.SetMassAndInertiaOfSolidBox(new Vector3(5, 6, 7), cDensity);
-        
+
         // Mass is easy to calculate, double check if SetMassAndInertiaOfSolidBox calculated it correctly
         CHECK_APPROX_EQUAL(5.0f * 6.0f * 7.0f * cDensity, reference.Mass, 1.0e-6f);
 
@@ -219,25 +150,32 @@ public static class Program
 
     public static unsafe void Main()
     {
-        if (!Foundation.Init(true))
+        if (!Foundation.Init(0u, false))
         {
             return;
         }
 
         {
-            // Malloc
-            //using TempAllocator tempAllocator = new();
-            using TempAllocator tempAllocator = new(10 * 1024 * 1024);
-            using JobSystemThreadPool jobSystem = new(Foundation.MaxPhysicsJobs, Foundation.MaxPhysicsBarriers);
-            using BPLayerInterfaceImpl broadPhaseLayer = new();
-            using ObjectVsBroadPhaseLayerFilterImpl objectVsBroadphaseLayerFilter = new();
-            using ObjectLayerPairFilterImpl objectVsObjectLayerFilter = new();
+            // We use only 2 layers: one for non-moving objects and one for moving objects
+            var objectLayerPairFilter = new ObjectLayerPairFilterTable(2);
+            objectLayerPairFilter.EnableCollision(Layers.NonMoving, Layers.Moving);
+            objectLayerPairFilter.EnableCollision(Layers.Moving, Layers.Moving);
 
-            using PhysicsSystem physicsSystem = new();
-            physicsSystem.Init(MaxBodies, NumBodyMutexes, MaxBodyPairs, MaxContactConstraints,
-                broadPhaseLayer,
-                objectVsBroadphaseLayerFilter,
-                objectVsObjectLayerFilter);
+            // We use a 1-to-1 mapping between object layers and broadphase layers
+            var broadPhaseLayerInterface = new BroadPhaseLayerInterfaceTable(2, 2);
+            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(Layers.NonMoving, BroadPhaseLayers.NonMoving);
+            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(Layers.Moving, BroadPhaseLayers.Moving);
+
+            var objectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterTable(broadPhaseLayerInterface, 2, objectLayerPairFilter, 2);
+
+            PhysicsSystemSettings settings = new()
+            {
+                ObjectLayerPairFilter = objectLayerPairFilter,
+                BroadPhaseLayerInterface = broadPhaseLayerInterface,
+                ObjectVsBroadPhaseLayerFilter = objectVsBroadPhaseLayerFilter
+            };
+
+            using PhysicsSystem physicsSystem = new(settings);
 
             // ContactListener
             physicsSystem.OnContactValidate += OnContactValidate;
@@ -270,10 +208,10 @@ public static class Program
             // (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the physics system)
             bodyInterface.SetLinearVelocity(sphereID, new Vector3(0.0f, -5.0f, 0.0f));
 
-            StackTest(bodyInterface);
+            //StackTest(bodyInterface);
 
             MeshShapeSettings meshShape = CreateTorusMesh(3.0f, 1.0f);
-            BodyCreationSettings settings = new(meshShape, new Double3(0, 10, 0), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
+            BodyCreationSettings bodySettings = new(meshShape, new Double3(0, 10, 0), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
 
             // We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
             const float deltaTime = 1.0f / 60.0f;
@@ -298,7 +236,7 @@ public static class Program
                 const int collisionSteps = 1;
 
                 // Step the world
-                PhysicsUpdateError error = physicsSystem.Update(deltaTime, collisionSteps, tempAllocator, jobSystem);
+                PhysicsUpdateError error = physicsSystem.Step(deltaTime, collisionSteps);
                 Debug.Assert(error == PhysicsUpdateError.None);
             }
 

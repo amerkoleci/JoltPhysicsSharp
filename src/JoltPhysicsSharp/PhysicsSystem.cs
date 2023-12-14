@@ -14,6 +14,20 @@ public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
 public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData);
 
+public readonly struct PhysicsSystemSettings
+{
+    public readonly int MaxBodies { get; init; } = 10240;
+    public readonly int MaxBodyPairs { get; init; } = 65536;
+    public readonly int MaxContactConstraints { get; init; } = 10240;
+    public ObjectLayerPairFilterTable? ObjectLayerPairFilter { get; init; }
+    public BroadPhaseLayerInterfaceTable? BroadPhaseLayerInterface { get; init; }
+    public ObjectVsBroadPhaseLayerFilterTable? ObjectVsBroadPhaseLayerFilter { get; init; }
+
+    public PhysicsSystemSettings()
+    {
+    }
+}
+
 public sealed class PhysicsSystem : NativeObject
 {
     private static readonly Dictionary<IntPtr, PhysicsSystem> s_contactListeners = new();
@@ -43,9 +57,21 @@ public sealed class PhysicsSystem : NativeObject
         JPH_BodyActivationListener_SetProcs(s_BodyActivationListener_Procs);
     }
 
-    public PhysicsSystem()
-        : base(JPH_PhysicsSystem_Create())
+    public unsafe PhysicsSystem(PhysicsSystemSettings settings)
     {
+        ArgumentNullException.ThrowIfNull(settings.ObjectLayerPairFilter, nameof(settings.ObjectLayerPairFilter));
+        ArgumentNullException.ThrowIfNull(settings.BroadPhaseLayerInterface, nameof(settings.BroadPhaseLayerInterface));
+        ArgumentNullException.ThrowIfNull(settings.ObjectVsBroadPhaseLayerFilter, nameof(settings.ObjectVsBroadPhaseLayerFilter));
+
+        NativePhysicsSystemSettings nativeSettings = new();
+        nativeSettings.maxBodies = settings.MaxBodies;
+        nativeSettings.maxBodyPairs = settings.MaxBodyPairs;
+        nativeSettings.maxContactConstraints = settings.MaxContactConstraints;
+        nativeSettings.broadPhaseLayerInterface = settings.BroadPhaseLayerInterface.Handle;
+        nativeSettings.objectLayerPairFilter = settings.ObjectLayerPairFilter.Handle;
+        nativeSettings.objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter.Handle;
+        Handle = JPH_PhysicsSystem_Create(&nativeSettings);
+
         contactListenerHandle = JPH_ContactListener_Create();
         s_contactListeners.Add(contactListenerHandle, this);
 
@@ -141,31 +167,14 @@ public sealed class PhysicsSystem : NativeObject
     public NarrowPhaseQuery NarrowPhaseQuery => new(JPC_PhysicsSystem_GetNarrowPhaseQuery(Handle));
     public NarrowPhaseQuery NarrowPhaseQueryNoLock => new(JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(Handle));
 
-    public void Init(
-        uint maxBodies,
-        uint numBodyMutexes,
-        uint maxBodyPairs,
-        uint maxContactConstraints,
-        BroadPhaseLayerInterface layer,
-        ObjectVsBroadPhaseLayerFilter objectVsBroadPhaseLayerFilter,
-        ObjectLayerPairFilter objectLayerPairFilter)
-    {
-        JPH_PhysicsSystem_Init(Handle,
-            maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
-            layer.Handle,
-            objectVsBroadPhaseLayerFilter.Handle,
-            objectLayerPairFilter.Handle);
-    }
-
     public void OptimizeBroadPhase()
     {
         JPH_PhysicsSystem_OptimizeBroadPhase(Handle);
     }
 
-    public PhysicsUpdateError Update(float deltaTime, int collisionSteps, 
-        in TempAllocator tempAlocator, in JobSystemThreadPool jobSystem)
+    public PhysicsUpdateError Step(float deltaTime, int collisionSteps)
     {
-        return JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, tempAlocator.Handle, jobSystem.Handle);
+        return JPH_PhysicsSystem_Step(Handle, deltaTime, collisionSteps);
     }
 
     public Vector3 Gravity

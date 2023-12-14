@@ -3,15 +3,10 @@
 
 namespace JoltPhysicsSharp;
 
-public readonly struct BroadPhaseLayer : IEquatable<BroadPhaseLayer>
+public readonly struct BroadPhaseLayer(byte value) : IEquatable<BroadPhaseLayer>
 {
-    public BroadPhaseLayer(byte value)
-    {
-        Value = value;
-    }
+    public byte Value { get; } = value;
 
-    public byte Value { get; }
-    
     public static implicit operator BroadPhaseLayer(byte id) => new(id);
     public static implicit operator byte(in BroadPhaseLayer id) => id.Value;
 

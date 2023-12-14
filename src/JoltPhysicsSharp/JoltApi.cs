@@ -91,78 +91,38 @@ internal static unsafe partial class JoltApi
         return false;
     }
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern Bool32 JPH_Init();
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Init(uint tempAllocatorSize);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Shutdown();
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shutdown();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_SetAssertFailureHandler(AssertFailedDelegate handler);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_TempAllocatorMalloc_Create();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_TempAllocator_Create(uint size);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_TempAllocator_Destroy(IntPtr handle);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_JobSystemThreadPool_Create(uint maxJobs, uint maxBarriers, int inNumThreads);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_JobSystemSingleThreaded_Create(uint maxJobs);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_JobSystem_Destroy(IntPtr handle);
-
     //  BroadPhaseLayerInterface
-    public struct JPH_BroadPhaseLayerInterface_Procs
-    {
-        public delegate* unmanaged<IntPtr, uint> GetNumBroadPhaseLayers;
-        public delegate* unmanaged<IntPtr, ObjectLayer, BroadPhaseLayer> GetBroadPhaseLayer;
-        public delegate* unmanaged<IntPtr, BroadPhaseLayer, IntPtr> GetBroadPhaseLayerName;
-    }
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);
+    [LibraryImport(LibName)]
+    public static partial IntPtr JPH_BroadPhaseLayerInterfaceTable_Create(uint numObjectLayers, uint numBroadPhaseLayers);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BroadPhaseLayerInterface_Create();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BroadPhaseLayerInterface_Destroy(nint handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(nint bpInterface, ObjectLayer objectLayer, BroadPhaseLayer broadPhaseLayer);
 
     //  ObjectVsBroadPhaseLayerFilter
-    public struct JPH_ObjectVsBroadPhaseLayerFilter_Procs
-    {
-        public delegate* unmanaged<IntPtr, ObjectLayer, BroadPhaseLayer, Bool32> ShouldCollide;
-    }
-
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ObjectVsBroadPhaseLayerFilter_SetProcs(JPH_ObjectVsBroadPhaseLayerFilter_Procs procs);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_ObjectVsBroadPhaseLayerFilter_Create();
+    public static extern nint JPH_ObjectVsBroadPhaseLayerFilterTable_Create(nint broadPhaseLayerInterface, uint numBroadPhaseLayers, nint objectLayerPairFilter, uint numObjectLayers);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(nint handle);
 
-    //  ObjectLayerPairFilter
-    public struct JPH_ObjectLayerPairFilter_Procs
-    {
-        public delegate* unmanaged<IntPtr, ObjectLayer, ObjectLayer, Bool32> ShouldCollide;
-    }
+    //  ObjectLayerPairFilterTable
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ObjectLayerPairFilterTable_Create(uint numObjectLayers);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ObjectLayerPairFilter_SetProcs(JPH_ObjectLayerPairFilter_Procs procs);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ObjectLayerPairFilterTable_DisableCollision(nint objectFilter, ObjectLayer layer1, ObjectLayer layer2);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_ObjectLayerPairFilter_Create();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ObjectLayerPairFilter_Destroy(nint handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ObjectLayerPairFilterTable_EnableCollision(nint objectFilter, ObjectLayer layer1, ObjectLayer layer2);
 
     //  BroadPhaseLayerFilter
     public struct JPH_BroadPhaseLayerFilter_Procs
@@ -520,24 +480,29 @@ internal static unsafe partial class JoltApi
     #endregion
 
     /* PhysicsSystem */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_PhysicsSystem_Create();
+    [StructLayout(LayoutKind.Sequential)]
+    public struct NativePhysicsSystemSettings
+    {
+        public int maxBodies; /* 10240 */
+        public int maxBodyPairs; /* 65536 */
+        public int maxContactConstraints; /* 10240 */
+        private int _padding;
+        public /*BroadPhaseLayerInterfaceTable*/ nint broadPhaseLayerInterface;
+        public /*ObjectLayerPairFilterTable**/ nint objectLayerPairFilter;
+        public /*ObjectVsBroadPhaseLayerFilterTable* */nint objectVsBroadPhaseLayerFilter;
+    }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PhysicsSystem_Destroy(IntPtr handle);
+    public static extern nint JPH_PhysicsSystem_Create(NativePhysicsSystemSettings* settings);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PhysicsSystem_Init(IntPtr handle,
-        uint inMaxBodies, uint numBodyMutexes, uint maxBodyPairs, uint maxContactConstraints,
-        IntPtr layer,
-        IntPtr inObjectVsBroadPhaseLayerFilter,
-        IntPtr inObjectLayerPairFilter);
+    public static extern void JPH_PhysicsSystem_Destroy(nint handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PhysicsSystem_OptimizeBroadPhase(IntPtr handle);
+    public static extern void JPH_PhysicsSystem_OptimizeBroadPhase(nint handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern PhysicsUpdateError JPH_PhysicsSystem_Update(IntPtr handle, float deltaTime, int collisionSteps, IntPtr tempAlocator, IntPtr jobSystem);
+    public static extern PhysicsUpdateError JPH_PhysicsSystem_Step(nint handle, float deltaTime, int collisionSteps);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_SetContactListener(IntPtr system, IntPtr listener);

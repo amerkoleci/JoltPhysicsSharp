@@ -31,7 +31,10 @@ public abstract class DisposableObject : IDisposable
 
     /// <inheritdoc cref="Dispose()" />
     /// <param name="disposing"><c>true</c> if the method was called from <see cref="Dispose()" />; otherwise, <c>false</c>.</param>
-    protected abstract void Dispose(bool disposing);
+    protected virtual void Dispose(bool disposing)
+    {
+
+    }
 
     /// <summary>Throws an exception if the object has been disposed.</summary>
     /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>

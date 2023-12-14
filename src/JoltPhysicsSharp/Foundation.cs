@@ -27,20 +27,10 @@ public static class Foundation
     /// </summary>
     public const float CapsuleProjectionSlop = 0.02f;
 
-    /// <summary>
-    /// Maximum amount of jobs to allow
-    /// </summary>
-    public const int MaxPhysicsJobs = 2048;
-
-    /// <summary>
-    ///  Maximum amount of barriers to allow
-    /// </summary>
-    public const int MaxPhysicsBarriers = 8;
-
-    public static bool Init(bool doublePrecision = false)
+    public static bool Init(uint tempAllocatorSize = 0u, bool doublePrecision = false)
     {
         JoltApi.DoublePrecision = doublePrecision;
-        return JPH_Init();
+        return JPH_Init(tempAllocatorSize);
     }
 
     public static void Shutdown() => JPH_Shutdown();
