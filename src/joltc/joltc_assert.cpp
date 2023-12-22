@@ -26,6 +26,7 @@ __pragma(warning(push, 0))
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 #include <Jolt/Physics/Body/AllowedDOFs.h>
+#include <Jolt/Physics/Constraints/SixDOFConstraint.h>
 
 #ifdef _MSC_VER
 __pragma(warning(pop))
@@ -91,6 +92,22 @@ static_assert(JPH_AllowedDOFs_RotationX == (int)JPH::EAllowedDOFs::RotationX);
 static_assert(JPH_AllowedDOFs_RotationY == (int)JPH::EAllowedDOFs::RotationY);
 static_assert(JPH_AllowedDOFs_RotationZ == (int)JPH::EAllowedDOFs::RotationZ);
 static_assert(JPH_AllowedDOFs_Plane2D == (int)JPH::EAllowedDOFs::Plane2D);
+
+// JPH_MotorState
+static_assert(sizeof(JPH_MotorState) == sizeof(uint32_t));
+static_assert(JPH_MotorState_Off == (int)JPH::EMotorState::Off);
+static_assert(JPH_MotorState_Velocity == (int)JPH::EMotorState::Velocity);
+static_assert(JPH_MotorState_Position == (int)JPH::EMotorState::Position);
+
+// JPH_SixDOFConstraintAxis
+static_assert(sizeof(JPH_SixDOFConstraintAxis) == sizeof(uint32_t));
+static_assert(JPH_SixDOFConstraintAxis_TranslationX == (int)JPH::SixDOFConstraintSettings::EAxis::TranslationX);
+static_assert(JPH_SixDOFConstraintAxis_TranslationY == (int)JPH::SixDOFConstraintSettings::EAxis::TranslationY);
+static_assert(JPH_SixDOFConstraintAxis_TranslationZ == (int)JPH::SixDOFConstraintSettings::EAxis::TranslationZ);
+static_assert(JPH_SixDOFConstraintAxis_RotationX == (int)JPH::SixDOFConstraintSettings::EAxis::RotationX);
+static_assert(JPH_SixDOFConstraintAxis_RotationY == (int)JPH::SixDOFConstraintSettings::EAxis::RotationY);
+static_assert(JPH_SixDOFConstraintAxis_RotationZ == (int)JPH::SixDOFConstraintSettings::EAxis::RotationZ);
+
 
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));

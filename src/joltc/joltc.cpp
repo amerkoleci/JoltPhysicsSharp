@@ -14,6 +14,12 @@ __pragma(warning(push, 0))
 #include "Jolt/Core/JobSystemThreadPool.h"
 #include "Jolt/Physics/PhysicsSettings.h"
 #include "Jolt/Physics/PhysicsSystem.h"
+#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayerInterfaceMask.h>
+#include <Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterMask.h>
+#include <Jolt/Physics/Collision/ObjectLayerPairFilterMask.h>
+#include "Jolt/Physics/Collision/BroadPhase/BroadPhaseLayerInterfaceTable.h"
+#include "Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterTable.h"
+#include "Jolt/Physics/Collision/ObjectLayerPairFilterTable.h"
 #include "Jolt/Physics/Collision/CastResult.h"
 #include "Jolt/Physics/Collision/CollideShape.h"
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
@@ -37,9 +43,8 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Constraints/DistanceConstraint.h"
 #include "Jolt/Physics/Constraints/HingeConstraint.h"
 #include "Jolt/Physics/Constraints/SliderConstraint.h"
-#include "Jolt/Physics/Collision/BroadPhase/BroadPhaseLayerInterfaceTable.h"
-#include "Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterTable.h"
-#include "Jolt/Physics/Collision/ObjectLayerPairFilterTable.h"
+#include "Jolt/Physics/Constraints/SwingTwistConstraint.h"
+#include "Jolt/Physics/Constraints/SixDOFConstraint.h"
 
 #ifdef _MSC_VER
 __pragma(warning(pop))
@@ -313,13 +318,28 @@ void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler)
 }
 
 /* JPH_BroadPhaseLayerInterface */
-JPH_BroadPhaseLayerInterfaceTable* JPH_BroadPhaseLayerInterfaceTable_Create(uint32_t numObjectLayers, uint32_t numBroadPhaseLayers)
+JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterfaceMask_Create(uint32_t numBroadPhaseLayers)
 {
-    auto system = new BroadPhaseLayerInterfaceTable(numObjectLayers, numBroadPhaseLayers);
-    return reinterpret_cast<JPH_BroadPhaseLayerInterfaceTable*>(system);
+    auto system = new BroadPhaseLayerInterfaceMask(numBroadPhaseLayers);
+    return reinterpret_cast<JPH_BroadPhaseLayerInterface*>(system);
 }
 
-void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(JPH_BroadPhaseLayerInterfaceTable* bpInterface, JPH_ObjectLayer objectLayer, JPH_BroadPhaseLayer broadPhaseLayer)
+void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(JPH_BroadPhaseLayerInterface* bpInterface, JPH_BroadPhaseLayer broadPhaseLayer, uint32_t groupsToInclude, uint32_t groupsToExclude)
+{
+	reinterpret_cast<JPH::BroadPhaseLayerInterfaceMask*>(bpInterface)->ConfigureLayer(
+		static_cast<JPH::BroadPhaseLayer>(broadPhaseLayer),
+		groupsToInclude,
+		groupsToExclude
+	);
+}
+
+JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterfaceTable_Create(uint32_t numObjectLayers, uint32_t numBroadPhaseLayers)
+{
+    auto system = new BroadPhaseLayerInterfaceTable(numObjectLayers, numBroadPhaseLayers);
+    return reinterpret_cast<JPH_BroadPhaseLayerInterface*>(system);
+}
+
+void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(JPH_BroadPhaseLayerInterface* bpInterface, JPH_ObjectLayer objectLayer, JPH_BroadPhaseLayer broadPhaseLayer)
 {
 	reinterpret_cast<JPH::BroadPhaseLayerInterfaceTable*>(bpInterface)->MapObjectToBroadPhaseLayer(
 		static_cast<JPH::ObjectLayer>(objectLayer),
@@ -328,13 +348,34 @@ void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(JPH_BroadPhase
 }
 
 /* JPH_ObjectLayerPairFilter */
-JPH_ObjectLayerPairFilterTable* JPH_ObjectLayerPairFilterTable_Create(uint32_t numObjectLayers)
+JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilterMask_Create(void)
 {
-    auto filter = new JPH::ObjectLayerPairFilterTable(numObjectLayers);
-    return reinterpret_cast<JPH_ObjectLayerPairFilterTable*>(filter);
+	auto filter = new JPH::ObjectLayerPairFilterMask();
+    return reinterpret_cast<JPH_ObjectLayerPairFilter*>(filter);
 }
 
-void JPH_ObjectLayerPairFilterTable_DisableCollision(JPH_ObjectLayerPairFilterTable* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2)
+JPH_ObjectLayer JPH_ObjectLayerPairFilterMask_GetObjectLayer(uint32_t group, uint32_t mask)
+{
+	return static_cast<JPH_ObjectLayer>(JPH::ObjectLayerPairFilterMask::sGetObjectLayer(group, mask));
+}
+
+uint32_t JPH_ObjectLayerPairFilterMask_GetGroup(JPH_ObjectLayer layer)
+{
+	return JPH::ObjectLayerPairFilterMask::sGetGroup(static_cast<JPH::ObjectLayer>(layer));
+}
+
+uint32_t JPH_ObjectLayerPairFilterMask_GetMask(JPH_ObjectLayer layer)
+{
+	return JPH::ObjectLayerPairFilterMask::sGetMask(static_cast<JPH::ObjectLayer>(layer));
+}
+
+JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilterTable_Create(uint32_t numObjectLayers)
+{
+    auto filter = new JPH::ObjectLayerPairFilterTable(numObjectLayers);
+    return reinterpret_cast<JPH_ObjectLayerPairFilter*>(filter);
+}
+
+void JPH_ObjectLayerPairFilterTable_DisableCollision(JPH_ObjectLayerPairFilter* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2)
 {
 	reinterpret_cast<JPH::ObjectLayerPairFilterTable*>(objectFilter)->DisableCollision(
 		static_cast<JPH::ObjectLayer>(layer1),
@@ -342,7 +383,7 @@ void JPH_ObjectLayerPairFilterTable_DisableCollision(JPH_ObjectLayerPairFilterTa
 	);
 }
 
-void JPH_ObjectLayerPairFilterTable_EnableCollision(JPH_ObjectLayerPairFilterTable* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2)
+void JPH_ObjectLayerPairFilterTable_EnableCollision(JPH_ObjectLayerPairFilter* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2)
 {
 	reinterpret_cast<JPH::ObjectLayerPairFilterTable*>(objectFilter)->EnableCollision(
 		static_cast<JPH::ObjectLayer>(layer1),
@@ -351,21 +392,27 @@ void JPH_ObjectLayerPairFilterTable_EnableCollision(JPH_ObjectLayerPairFilterTab
 }
 
 /* JPH_ObjectVsBroadPhaseLayerFilter */
-JPH_ObjectVsBroadPhaseLayerFilterTable* JPH_ObjectVsBroadPhaseLayerFilterTable_Create(
-	JPH_BroadPhaseLayerInterfaceTable* broadPhaseLayerInterface, uint32_t numBroadPhaseLayers,
-	JPH_ObjectLayerPairFilterTable* objectLayerPairFilter, uint32_t numObjectLayers)
+JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilterMask_Create(const JPH_BroadPhaseLayerInterface* broadPhaseLayerInterface)
 {
-	auto joltBroadPhaseLayerInterface = reinterpret_cast<JPH::BroadPhaseLayerInterfaceTable*>(broadPhaseLayerInterface);
-	auto joltObjectLayerPairFilterTable = reinterpret_cast<JPH::ObjectLayerPairFilterTable*>(objectLayerPairFilter);
+	auto joltBroadPhaseLayerInterface = reinterpret_cast<const JPH::BroadPhaseLayerInterfaceMask*>(broadPhaseLayerInterface);
+	auto filter = new JPH::ObjectVsBroadPhaseLayerFilterMask(*joltBroadPhaseLayerInterface);
+    return reinterpret_cast<JPH_ObjectVsBroadPhaseLayerFilter*>(filter);
+}
 
-    auto filter = new JPH::ObjectVsBroadPhaseLayerFilterTable(*joltBroadPhaseLayerInterface, numBroadPhaseLayers, *joltObjectLayerPairFilterTable, numObjectLayers);
-    return reinterpret_cast<JPH_ObjectVsBroadPhaseLayerFilterTable*>(filter);
+JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilterTable_Create(
+	JPH_BroadPhaseLayerInterface* broadPhaseLayerInterface, uint32_t numBroadPhaseLayers,
+	JPH_ObjectLayerPairFilter* objectLayerPairFilter, uint32_t numObjectLayers)
+{
+	auto joltBroadPhaseLayerInterface = reinterpret_cast<JPH::BroadPhaseLayerInterface*>(broadPhaseLayerInterface);
+	auto joltObjectLayerPairFilter = reinterpret_cast<JPH::ObjectLayerPairFilter*>(objectLayerPairFilter);
+
+    auto filter = new JPH::ObjectVsBroadPhaseLayerFilterTable(*joltBroadPhaseLayerInterface, numBroadPhaseLayers, *joltObjectLayerPairFilter, numObjectLayers);
+    return reinterpret_cast<JPH_ObjectVsBroadPhaseLayerFilter*>(filter);
 }
 
 /* JPH_PhysicsSystem */
 struct JPH_PhysicsSystem final
 {
-	
 	JPH::BroadPhaseLayerInterface* broadPhaseLayerInterface = nullptr;
 	JPH::ObjectLayerPairFilter*	objectLayerPairFilter = nullptr;
 	JPH::ObjectVsBroadPhaseLayerFilter* objectVsBroadPhaseLayerFilter = nullptr;
@@ -378,9 +425,9 @@ JPH_PhysicsSystem* JPH_PhysicsSystem_Create(const JPH_PhysicsSystemSettings* set
 		return nullptr;
 
 	JPH_PhysicsSystem* system = new JPH_PhysicsSystem();
-	system->broadPhaseLayerInterface = reinterpret_cast<JPH::BroadPhaseLayerInterfaceTable*>(settings->broadPhaseLayerInterface);
-	system->objectLayerPairFilter = reinterpret_cast<JPH::ObjectLayerPairFilterTable*>(settings->objectLayerPairFilter);
-	system->objectVsBroadPhaseLayerFilter = reinterpret_cast<JPH::ObjectVsBroadPhaseLayerFilterTable*>(settings->objectVsBroadPhaseLayerFilter);
+	system->broadPhaseLayerInterface = reinterpret_cast<JPH::BroadPhaseLayerInterface*>(settings->broadPhaseLayerInterface);
+	system->objectLayerPairFilter = reinterpret_cast<JPH::ObjectLayerPairFilter*>(settings->objectLayerPairFilter);
+	system->objectVsBroadPhaseLayerFilter = reinterpret_cast<JPH::ObjectVsBroadPhaseLayerFilter*>(settings->objectVsBroadPhaseLayerFilter);
 
 	// Init the physics system
 	const uint maxBodies = settings->maxBodies ? settings->maxBodies : 10240;
@@ -1345,6 +1392,37 @@ JPH_Bool32 JPH_SliderConstraint_HasLimits(JPH_SliderConstraint* constraint)
     return reinterpret_cast<JPH::SliderConstraint*>(constraint)->HasLimits();
 }
 
+/* JPH_SwingTwistConstraintSettings */
+JPH_SwingTwistConstraintSettings* JPH_SwingTwistConstraintSettings_Create(void)
+{
+	auto settings = new JPH::SwingTwistConstraintSettings();
+    return reinterpret_cast<JPH_SwingTwistConstraintSettings*>(settings);
+}
+
+/* JPH_SwingTwistConstraint */
+float JPH_SwingTwistConstraint_GetNormalHalfConeAngle(JPH_SwingTwistConstraint* constraint)
+{
+	return reinterpret_cast<JPH::SwingTwistConstraint*>(constraint)->GetNormalHalfConeAngle();
+}
+
+/* JPH_SixDOFConstraintSettings */
+JPH_SixDOFConstraintSettings* JPH_SixDOFConstraintSettings_Create(void)
+{
+	auto settings = new JPH::SixDOFConstraintSettings();
+    return reinterpret_cast<JPH_SixDOFConstraintSettings*>(settings);
+}
+
+/* JPH_SixDOFConstraint */
+float JPH_SwingTwistConstraint_GetLimitsMin(JPH_SixDOFConstraint* constraint, JPH_SixDOFConstraintAxis axis)
+{
+	return reinterpret_cast<JPH::SixDOFConstraint*>(constraint)->GetLimitsMin(static_cast<JPH::SixDOFConstraint::EAxis>(axis));
+}
+
+float JPH_SwingTwistConstraint_GetLimitsMax(JPH_SixDOFConstraint* constraint, JPH_SixDOFConstraintAxis axis)
+{
+	return reinterpret_cast<JPH::SixDOFConstraint*>(constraint)->GetLimitsMax(static_cast<JPH::SixDOFConstraint::EAxis>(axis));
+}
+
 JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
 {
     auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
@@ -2283,6 +2361,41 @@ void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value)
     reinterpret_cast<JPH::Body*>(body)->SetIsSensor(!!value);
 }
 
+JPH_Bool32 JPH_Body_SensorDetectsStatic(const JPH_Body* body)
+{
+	return reinterpret_cast<const JPH::Body*>(body)->SensorDetectsStatic();
+}
+
+void JPH_Body_SetSensorDetectsStatic(JPH_Body* body, JPH_Bool32 value)
+{
+	reinterpret_cast<JPH::Body*>(body)->SetSensorDetectsStatic(!!value);
+}
+
+void JPH_Body_SetUseManifoldReduction(JPH_Body* body, JPH_Bool32 value)
+{
+	reinterpret_cast<JPH::Body*>(body)->SetUseManifoldReduction(!!value);
+}
+
+JPH_Bool32 JPH_Body_GetUseManifoldReduction(const JPH_Body* body)
+{
+	return reinterpret_cast<const JPH::Body*>(body)->GetUseManifoldReduction();
+}
+
+JPH_Bool32 JPH_Body_GetUseManifoldReductionWithBody(const JPH_Body* body, const JPH_Body* other)
+{
+	return reinterpret_cast<const JPH::Body*>(body)->GetUseManifoldReductionWithBody(*reinterpret_cast<const JPH::Body*>(other));
+}
+
+void JPH_Body_SetApplyGyroscopicForce(JPH_Body* body, JPH_Bool32 value)
+{
+	reinterpret_cast<JPH::Body*>(body)->SetApplyGyroscopicForce(!!value);
+}
+
+JPH_Bool32 JPH_Body_GetApplyGyroscopicForce(const JPH_Body* body)
+{
+	return reinterpret_cast<const JPH::Body*>(body)->GetApplyGyroscopicForce();
+}
+
 JPH_MotionProperties* JPH_Body_GetMotionProperties(JPH_Body* body)
 {
     return reinterpret_cast<JPH_MotionProperties*>(reinterpret_cast<JPH::Body*>(body)->GetMotionProperties());
@@ -2306,6 +2419,11 @@ JPH_Bool32 JPH_Body_GetAllowSleeping(JPH_Body* body)
 void JPH_Body_SetAllowSleeping(JPH_Body* body, JPH_Bool32 allowSleeping)
 {
     reinterpret_cast<JPH::Body*>(body)->SetAllowSleeping(!!allowSleeping);
+}
+
+void JPH_Body_ResetSleepTimer(JPH_Body* body)
+{
+	reinterpret_cast<JPH::Body*>(body)->ResetSleepTimer();
 }
 
 float JPH_Body_GetFriction(const JPH_Body* body)

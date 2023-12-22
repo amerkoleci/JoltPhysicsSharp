@@ -122,6 +122,28 @@ typedef enum JPH_AllowedDOFs {
     _JPH_AllowedDOFs_Force32 = 0x7FFFFFFF
 } JPH_AllowedDOFs;
 
+typedef enum JPH_MotorState {
+    JPH_MotorState_Off = 0,									
+    JPH_MotorState_Velocity = 1,								
+    JPH_MotorState_Position = 2,
+
+    _JPH_MotorState_Count,
+    _JPH_MotorState_Force32 = 0x7FFFFFFF
+} JPH_MotorState;
+
+typedef enum JPH_SixDOFConstraintAxis {
+    JPH_SixDOFConstraintAxis_TranslationX,
+	JPH_SixDOFConstraintAxis_TranslationY,
+	JPH_SixDOFConstraintAxis_TranslationZ,
+
+	JPH_SixDOFConstraintAxis_RotationX,
+	JPH_SixDOFConstraintAxis_RotationY,
+	JPH_SixDOFConstraintAxis_RotationZ,
+
+    _JPH_SixDOFConstraintAxis_Count,
+    _JPH_SixDOFConstraintAxis_Force32 = 0x7FFFFFFF
+} JPH_SixDOFConstraintAxis;
+
 typedef struct JPH_Vec3 {
     float x;
     float y;
@@ -206,9 +228,9 @@ typedef struct JPH_RayCastResult {
     JPH_SubShapeID subShapeID2;
 } JPH_RayCastResult;
 
-typedef struct JPH_BroadPhaseLayerInterfaceTable    JPH_BroadPhaseLayerInterfaceTable;
-typedef struct JPH_ObjectVsBroadPhaseLayerFilterTable   JPH_ObjectVsBroadPhaseLayerFilterTable;
-typedef struct JPH_ObjectLayerPairFilterTable       JPH_ObjectLayerPairFilterTable;
+typedef struct JPH_BroadPhaseLayerInterface			JPH_BroadPhaseLayerInterface;
+typedef struct JPH_ObjectVsBroadPhaseLayerFilter	JPH_ObjectVsBroadPhaseLayerFilter;
+typedef struct JPH_ObjectLayerPairFilter			JPH_ObjectLayerPairFilter;
 
 typedef struct JPH_BroadPhaseLayerFilter            JPH_BroadPhaseLayerFilter;
 typedef struct JPH_ObjectLayerFilter                JPH_ObjectLayerFilter;
@@ -253,12 +275,14 @@ typedef struct JPH_Body                         JPH_Body;
 
 typedef struct JPH_SpringSettings               JPH_SpringSettings;
 
-typedef struct JPH_ConstraintSettings           JPH_ConstraintSettings;
-typedef struct JPH_TwoBodyConstraintSettings    JPH_TwoBodyConstraintSettings;
-typedef struct JPH_DistanceConstraintSettings   JPH_DistanceConstraintSettings;
-typedef struct JPH_HingeConstraintSettings      JPH_HingeConstraintSettings;
-typedef struct JPH_SliderConstraintSettings     JPH_SliderConstraintSettings;
-typedef struct JPH_PointConstraintSettings      JPH_PointConstraintSettings;
+typedef struct JPH_ConstraintSettings				JPH_ConstraintSettings;
+typedef struct JPH_TwoBodyConstraintSettings		JPH_TwoBodyConstraintSettings;
+typedef struct JPH_DistanceConstraintSettings		JPH_DistanceConstraintSettings;
+typedef struct JPH_HingeConstraintSettings			JPH_HingeConstraintSettings;
+typedef struct JPH_SliderConstraintSettings			JPH_SliderConstraintSettings;
+typedef struct JPH_PointConstraintSettings			JPH_PointConstraintSettings;
+typedef struct JPH_SwingTwistConstraintSettings     JPH_SwingTwistConstraintSettings;
+typedef struct JPH_SixDOFConstraintSettings			JPH_SixDOFConstraintSettings;
 
 typedef struct JPH_Constraint                   JPH_Constraint;
 typedef struct JPH_TwoBodyConstraint            JPH_TwoBodyConstraint;
@@ -266,6 +290,8 @@ typedef struct JPH_DistanceConstraint           JPH_DistanceConstraint;
 typedef struct JPH_PointConstraint              JPH_PointConstraint;
 typedef struct JPH_HingeConstraint              JPH_HingeConstraint;
 typedef struct JPH_SliderConstraint             JPH_SliderConstraint;
+typedef struct JPH_SwingTwistConstraint         JPH_SwingTwistConstraint;
+typedef struct JPH_SixDOFConstraint				JPH_SixDOFConstraint;
 
 typedef struct JPH_CollideShapeResult           JPH_CollideShapeResult;
 typedef struct JPH_ContactListener              JPH_ContactListener;
@@ -294,19 +320,29 @@ JPH_CAPI JPH_Bool32 JPH_Init(uint32_t tempAllocatorSize);
 JPH_CAPI void JPH_Shutdown(void);
 JPH_CAPI void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler);
 
-/* JPH_BroadPhaseLayerInterfaceTable */
-JPH_CAPI JPH_BroadPhaseLayerInterfaceTable* JPH_BroadPhaseLayerInterfaceTable_Create(uint32_t numObjectLayers, uint32_t numBroadPhaseLayers);
-JPH_CAPI void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(JPH_BroadPhaseLayerInterfaceTable* bpInterface, JPH_ObjectLayer objectLayer, JPH_BroadPhaseLayer broadPhaseLayer);
+/* JPH_BroadPhaseLayerInterface */
+JPH_CAPI JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterfaceMask_Create(uint32_t numBroadPhaseLayers);
+JPH_CAPI void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(JPH_BroadPhaseLayerInterface* bpInterface, JPH_BroadPhaseLayer broadPhaseLayer, uint32_t groupsToInclude, uint32_t groupsToExclude);
+
+JPH_CAPI JPH_BroadPhaseLayerInterface* JPH_BroadPhaseLayerInterfaceTable_Create(uint32_t numObjectLayers, uint32_t numBroadPhaseLayers);
+JPH_CAPI void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(JPH_BroadPhaseLayerInterface* bpInterface, JPH_ObjectLayer objectLayer, JPH_BroadPhaseLayer broadPhaseLayer);
 
 /* JPH_ObjectLayerPairFilter */
-JPH_CAPI JPH_ObjectLayerPairFilterTable* JPH_ObjectLayerPairFilterTable_Create(uint32_t numObjectLayers);
-JPH_CAPI void JPH_ObjectLayerPairFilterTable_DisableCollision(JPH_ObjectLayerPairFilterTable* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
-JPH_CAPI void JPH_ObjectLayerPairFilterTable_EnableCollision(JPH_ObjectLayerPairFilterTable* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
+JPH_CAPI JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilterMask_Create(void);
+JPH_CAPI JPH_ObjectLayer JPH_ObjectLayerPairFilterMask_GetObjectLayer(uint32_t group, uint32_t mask);
+JPH_CAPI uint32_t JPH_ObjectLayerPairFilterMask_GetGroup(JPH_ObjectLayer layer);
+JPH_CAPI uint32_t JPH_ObjectLayerPairFilterMask_GetMask(JPH_ObjectLayer layer);
+
+JPH_CAPI JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilterTable_Create(uint32_t numObjectLayers);
+JPH_CAPI void JPH_ObjectLayerPairFilterTable_DisableCollision(JPH_ObjectLayerPairFilter* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
+JPH_CAPI void JPH_ObjectLayerPairFilterTable_EnableCollision(JPH_ObjectLayerPairFilter* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
 
 /* JPH_ObjectVsBroadPhaseLayerFilter */
-JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilterTable* JPH_ObjectVsBroadPhaseLayerFilterTable_Create(
-	JPH_BroadPhaseLayerInterfaceTable* broadPhaseLayerInterface, uint32_t numBroadPhaseLayers,
-	JPH_ObjectLayerPairFilterTable* objectLayerPairFilter, uint32_t numObjectLayers);
+JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilterMask_Create(const JPH_BroadPhaseLayerInterface* broadPhaseLayerInterface);
+
+JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilterTable_Create(
+	JPH_BroadPhaseLayerInterface* broadPhaseLayerInterface, uint32_t numBroadPhaseLayers,
+	JPH_ObjectLayerPairFilter* objectLayerPairFilter, uint32_t numObjectLayers);
 
 /* JPH_PhysicsSystem */
 typedef struct JPH_PhysicsSystemSettings {
@@ -314,9 +350,9 @@ typedef struct JPH_PhysicsSystemSettings {
 	uint32_t maxBodyPairs; /* 65536 */
 	uint32_t maxContactConstraints; /* 10240 */
 	uint32_t _padding;
-	JPH_BroadPhaseLayerInterfaceTable* broadPhaseLayerInterface;
-	JPH_ObjectLayerPairFilterTable*	objectLayerPairFilter;
-	JPH_ObjectVsBroadPhaseLayerFilterTable* objectVsBroadPhaseLayerFilter;
+	JPH_BroadPhaseLayerInterface* broadPhaseLayerInterface;
+	JPH_ObjectLayerPairFilter*	objectLayerPairFilter;
+	JPH_ObjectVsBroadPhaseLayerFilter* objectVsBroadPhaseLayerFilter;
 } JPH_PhysicsSystemSettings;
 
 JPH_CAPI JPH_PhysicsSystem* JPH_PhysicsSystem_Create(const JPH_PhysicsSystemSettings* settings);
@@ -537,6 +573,19 @@ JPH_CAPI float JPH_SliderConstraint_GetLimitsMin(JPH_SliderConstraint* constrain
 JPH_CAPI float JPH_SliderConstraint_GetLimitsMax(JPH_SliderConstraint* constraint);
 JPH_CAPI JPH_Bool32 JPH_SliderConstraint_HasLimits(JPH_SliderConstraint* constraint);
 
+/* JPH_SwingTwistConstraintSettings */
+JPH_CAPI JPH_SwingTwistConstraintSettings* JPH_SwingTwistConstraintSettings_Create(void);
+
+/* JPH_SwingTwistConstraint */
+JPH_CAPI float JPH_SwingTwistConstraint_GetNormalHalfConeAngle(JPH_SwingTwistConstraint* constraint);
+
+/* JPH_SixDOFConstraintSettings */
+JPH_CAPI JPH_SixDOFConstraintSettings* JPH_SixDOFConstraintSettings_Create(void);
+
+/* JPH_SixDOFConstraint */
+JPH_CAPI float JPH_SwingTwistConstraint_GetLimitsMin(JPH_SixDOFConstraint* constraint, JPH_SixDOFConstraintAxis axis);
+JPH_CAPI float JPH_SwingTwistConstraint_GetLimitsMax(JPH_SixDOFConstraint* constraint, JPH_SixDOFConstraintAxis axis);
+
 /* JPH_TwoBodyConstraint */
 JPH_CAPI JPH_Body* JPH_TwoBodyConstraint_GetBody1(JPH_TwoBodyConstraint* constraint);
 JPH_CAPI JPH_Body* JPH_TwoBodyConstraint_GetBody2(JPH_TwoBodyConstraint* constraint);
@@ -669,11 +718,23 @@ JPH_CAPI JPH_Bool32 JPH_Body_IsKinematic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsDynamic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsSensor(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value);
+JPH_CAPI JPH_Bool32 JPH_Body_SensorDetectsStatic(const JPH_Body* body);
+
+JPH_CAPI void JPH_Body_SetSensorDetectsStatic(JPH_Body* body, JPH_Bool32 value);
+JPH_CAPI void JPH_Body_SetUseManifoldReduction(JPH_Body* body, JPH_Bool32 value);
+JPH_CAPI JPH_Bool32 JPH_Body_GetUseManifoldReduction(const JPH_Body* body);
+JPH_CAPI JPH_Bool32 JPH_Body_GetUseManifoldReductionWithBody(const JPH_Body* body, const JPH_Body* other);
+
+JPH_CAPI void JPH_Body_SetApplyGyroscopicForce(JPH_Body* body, JPH_Bool32 value);
+JPH_CAPI JPH_Bool32 JPH_Body_GetApplyGyroscopicForce(const JPH_Body* body);
+
 JPH_CAPI JPH_MotionProperties* JPH_Body_GetMotionProperties(JPH_Body* body);
 JPH_CAPI JPH_MotionType JPH_Body_GetMotionType(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetMotionType(JPH_Body* body, JPH_MotionType motionType);
 JPH_CAPI JPH_Bool32 JPH_Body_GetAllowSleeping(JPH_Body* body);
 JPH_CAPI void JPH_Body_SetAllowSleeping(JPH_Body* body, JPH_Bool32 allowSleeping);
+JPH_CAPI void JPH_Body_ResetSleepTimer(JPH_Body* body);
+
 JPH_CAPI float JPH_Body_GetFriction(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetFriction(JPH_Body* body, float friction);
 JPH_CAPI float JPH_Body_GetRestitution(const JPH_Body* body);
