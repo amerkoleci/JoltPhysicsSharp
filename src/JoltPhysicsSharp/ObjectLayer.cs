@@ -5,6 +5,8 @@ namespace JoltPhysicsSharp;
 
 public readonly struct ObjectLayer : IEquatable<ObjectLayer>
 {
+    public const int Bits = 16; // Must be updated according to JPH_OBJECT_LAYER_BITS
+
     /// <summary>
     /// Constant value used to indicate an invalid object layer
     /// </summary>

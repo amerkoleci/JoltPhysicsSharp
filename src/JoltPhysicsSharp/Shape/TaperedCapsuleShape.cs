@@ -16,5 +16,5 @@ public sealed class TaperedCapsuleShapeSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="TaperedCapsuleShapeSettings" /> class.
     /// </summary>
-    ~TaperedCapsuleShapeSettings() => Dispose(isDisposing: false);
+    ~TaperedCapsuleShapeSettings() => Dispose(disposing: false);
 }

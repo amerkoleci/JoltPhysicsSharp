@@ -16,7 +16,7 @@ public sealed class BoxShapeSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="BoxShapeSettings" /> class.
     /// </summary>
-    ~BoxShapeSettings() => Dispose(isDisposing: false);
+    ~BoxShapeSettings() => Dispose(disposing: false);
 
     //public override Shape Create()
     //{

@@ -16,7 +16,7 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="PointConstraintSettings" /> class.
     /// </summary>
-    ~PointConstraintSettings() => Dispose(isDisposing: false);
+    ~PointConstraintSettings() => Dispose(disposing: false);
 
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {

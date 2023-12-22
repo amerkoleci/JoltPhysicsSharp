@@ -16,7 +16,7 @@ public sealed class HingeConstraintSettings : TwoBodyConstraintSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="HingeConstraintSettings" /> class.
     /// </summary>
-    ~HingeConstraintSettings() => Dispose(isDisposing: false);
+    ~HingeConstraintSettings() => Dispose(disposing: false);
 
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {

@@ -15,7 +15,7 @@ public sealed class SphereShapeSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="SphereShapeSettings" /> class.
     /// </summary>
-    ~SphereShapeSettings() => Dispose(isDisposing: false);
+    ~SphereShapeSettings() => Dispose(disposing: false);
 
     public float Radius
     {

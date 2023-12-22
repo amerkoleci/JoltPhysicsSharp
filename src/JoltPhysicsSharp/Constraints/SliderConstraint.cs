@@ -16,16 +16,16 @@ public sealed class SliderConstraintSettings : TwoBodyConstraintSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="SliderConstraintSettings" /> class.
     /// </summary>
-    ~SliderConstraintSettings() => Dispose(isDisposing: false);
+    ~SliderConstraintSettings() => Dispose(disposing: false);
 
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
         return new SliderConstraint(JPH_SliderConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
     }
 
-    public void SetSliderAxis(in Vector3 axis)
+    public unsafe void SetSliderAxis(Vector3 axis)
     {
-        JPH_SliderConstraintSettings_SetSliderAxis(Handle, in axis);
+        JPH_SliderConstraintSettings_SetSliderAxis(Handle, &axis);
     }
 }
 

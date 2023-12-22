@@ -15,7 +15,7 @@ public sealed class CylinderShapeSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="CylinderShapeSettings" /> class.
     /// </summary>
-    ~CylinderShapeSettings() => Dispose(isDisposing: false);
+    ~CylinderShapeSettings() => Dispose(disposing: false);
 }
 
 

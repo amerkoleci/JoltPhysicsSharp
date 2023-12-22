@@ -19,9 +19,9 @@ public readonly struct PhysicsSystemSettings
     public readonly int MaxBodies { get; init; } = 10240;
     public readonly int MaxBodyPairs { get; init; } = 65536;
     public readonly int MaxContactConstraints { get; init; } = 10240;
-    public ObjectLayerPairFilterTable? ObjectLayerPairFilter { get; init; }
-    public BroadPhaseLayerInterfaceTable? BroadPhaseLayerInterface { get; init; }
-    public ObjectVsBroadPhaseLayerFilterTable? ObjectVsBroadPhaseLayerFilter { get; init; }
+    public ObjectLayerPairFilter? ObjectLayerPairFilter { get; init; }
+    public BroadPhaseLayerInterface? BroadPhaseLayerInterface { get; init; }
+    public ObjectVsBroadPhaseLayerFilter? ObjectVsBroadPhaseLayerFilter { get; init; }
 
     public PhysicsSystemSettings()
     {

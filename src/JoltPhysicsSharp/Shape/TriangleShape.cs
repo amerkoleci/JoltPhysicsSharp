@@ -16,7 +16,7 @@ public sealed class TriangleShapeSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="TriangleShapeSettings" /> class.
     /// </summary>
-    ~TriangleShapeSettings() => Dispose(isDisposing: false);
+    ~TriangleShapeSettings() => Dispose(disposing: false);
 }
 
 //public sealed class TriangleShape : ConvexShape

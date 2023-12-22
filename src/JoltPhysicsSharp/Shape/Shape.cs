@@ -20,11 +20,11 @@ public abstract class ShapeSettings : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="ShapeSettings" /> class.
     /// </summary>
-    ~ShapeSettings() => Dispose(isDisposing: false);
+    ~ShapeSettings() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_ShapeSettings_Destroy(Handle);
         }

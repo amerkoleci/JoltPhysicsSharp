@@ -156,17 +156,44 @@ public static class Program
         }
 
         {
-            // We use only 2 layers: one for non-moving objects and one for moving objects
-            var objectLayerPairFilter = new ObjectLayerPairFilterTable(2);
-            objectLayerPairFilter.EnableCollision(Layers.NonMoving, Layers.Moving);
-            objectLayerPairFilter.EnableCollision(Layers.Moving, Layers.Moving);
+            ObjectLayerPairFilter objectLayerPairFilter;
+            BroadPhaseLayerInterface broadPhaseLayerInterface;
+            ObjectVsBroadPhaseLayerFilter objectVsBroadPhaseLayerFilter;
 
-            // We use a 1-to-1 mapping between object layers and broadphase layers
-            var broadPhaseLayerInterface = new BroadPhaseLayerInterfaceTable(2, 2);
-            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(Layers.NonMoving, BroadPhaseLayers.NonMoving);
-            broadPhaseLayerInterface.MapObjectToBroadPhaseLayer(Layers.Moving, BroadPhaseLayers.Moving);
+            bool useTable = true;
+            if (useTable)
+            {
+                // We use only 2 layers: one for non-moving objects and one for moving objects
+                ObjectLayerPairFilterTable objectLayerPairFilterTable = new(2);
+                objectLayerPairFilterTable.EnableCollision(Layers.NonMoving, Layers.Moving);
+                objectLayerPairFilterTable.EnableCollision(Layers.Moving, Layers.Moving);
 
-            var objectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterTable(broadPhaseLayerInterface, 2, objectLayerPairFilter, 2);
+                // We use a 1-to-1 mapping between object layers and broadphase layers
+                BroadPhaseLayerInterfaceTable broadPhaseLayerInterfaceTable = new(2, 2);
+                broadPhaseLayerInterfaceTable.MapObjectToBroadPhaseLayer(Layers.NonMoving, BroadPhaseLayers.NonMoving);
+                broadPhaseLayerInterfaceTable.MapObjectToBroadPhaseLayer(Layers.Moving, BroadPhaseLayers.Moving);
+
+                objectLayerPairFilter = objectLayerPairFilterTable;
+                broadPhaseLayerInterface = broadPhaseLayerInterfaceTable;
+                objectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterTable(broadPhaseLayerInterfaceTable, 2, objectLayerPairFilterTable, 2);
+            }
+            else
+            {
+                objectLayerPairFilter = new ObjectLayerPairFilterMask();
+
+                // Layer that objects can be in, determines which other objects it can collide with
+                // Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
+                // layers if you want. E.g. you could have a layer for high detail collision (which is not used by the physics simulation
+                // but only if you do collision testing).
+                const uint NUM_BROAD_PHASE_LAYERS = 2;
+
+                BroadPhaseLayerInterfaceMask bpInterface = new(NUM_BROAD_PHASE_LAYERS);
+                //bpInterface.ConfigureLayer(BroadPhaseLayers.NonMoving, GROUP_STATIC, 0); // Anything that has the static bit set goes into the static broadphase layer
+                //bpInterface.ConfigureLayer(BroadPhaseLayers.Moving, GROUP_FLOOR1 | GROUP_FLOOR2 | GROUP_FLOOR3, 0); // Anything that has one of the floor bits set goes into the dynamic broadphase layer
+
+                broadPhaseLayerInterface = bpInterface;
+                objectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterMask(bpInterface);
+            }
 
             PhysicsSystemSettings settings = new()
             {

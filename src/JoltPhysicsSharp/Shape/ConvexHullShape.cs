@@ -29,7 +29,7 @@ public sealed class ConvexHullShapeSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="ConvexHullShapeSettings" /> class.
     /// </summary>
-    ~ConvexHullShapeSettings() => Dispose(isDisposing: false);
+    ~ConvexHullShapeSettings() => Dispose(disposing: false);
 }
 
 public sealed class ConvexHullShape : ConvexShape

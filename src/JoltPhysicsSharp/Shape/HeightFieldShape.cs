@@ -29,7 +29,7 @@ public sealed class HeightFieldShapeSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="HeightFieldShapeSettings" /> class.
     /// </summary>
-    ~HeightFieldShapeSettings() => Dispose(isDisposing: false);
+    ~HeightFieldShapeSettings() => Dispose(disposing: false);
 
     public void Sanitize() => JPH_MeshShapeSettings_Sanitize(Handle);
 

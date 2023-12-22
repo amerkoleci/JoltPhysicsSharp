@@ -102,19 +102,41 @@ internal static unsafe partial class JoltApi
 
     //  BroadPhaseLayerInterface
     [LibraryImport(LibName)]
-    public static partial IntPtr JPH_BroadPhaseLayerInterfaceTable_Create(uint numObjectLayers, uint numBroadPhaseLayers);
+    public static partial nint JPH_BroadPhaseLayerInterfaceMask_Create( uint numBroadPhaseLayers);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(nint bpInterface, in BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude);
+
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BroadPhaseLayerInterfaceTable_Create(uint numObjectLayers, uint numBroadPhaseLayers);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(nint bpInterface, ObjectLayer objectLayer, BroadPhaseLayer broadPhaseLayer);
 
     //  ObjectVsBroadPhaseLayerFilter
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_ObjectVsBroadPhaseLayerFilterTable_Create(nint broadPhaseLayerInterface, uint numBroadPhaseLayers, nint objectLayerPairFilter, uint numObjectLayers);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ObjectVsBroadPhaseLayerFilterMask_Create(nint broadPhaseLayerInterface);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ObjectVsBroadPhaseLayerFilterTable_Create(nint broadPhaseLayerInterface, uint numBroadPhaseLayers, nint objectLayerPairFilter, uint numObjectLayers);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(nint handle);
 
-    //  ObjectLayerPairFilterTable
+    #region JPH_ObjectLayerPairFilter
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ObjectLayerPairFilterMask_Create();
+
+    [LibraryImport(LibName)]
+    public static partial ObjectLayer JPH_ObjectLayerPairFilterMask_GetObjectLayer(uint group, uint mask);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ObjectLayerPairFilterMask_GetGroup(in ObjectLayer layer);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ObjectLayerPairFilterMask_GetMask(in ObjectLayer layer);
+
     [LibraryImport(LibName)]
     public static partial nint JPH_ObjectLayerPairFilterTable_Create(uint numObjectLayers);
 
@@ -123,6 +145,10 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_ObjectLayerPairFilterTable_EnableCollision(nint objectFilter, ObjectLayer layer1, ObjectLayer layer2);
+    #endregion
+
+    //  ObjectLayerPairFilterTable
+
 
     //  BroadPhaseLayerFilter
     public struct JPH_BroadPhaseLayerFilter_Procs
@@ -469,14 +495,39 @@ internal static unsafe partial class JoltApi
     #endregion
 
     #region JPH_SliderConstraint
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_SliderConstraintSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SliderConstraintSettings_Create();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_SliderConstraintSettings_SetSliderAxis(IntPtr handle, in Vector3 value);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraintSettings_SetSliderAxis(IntPtr handle, Vector3* value);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_SliderConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SliderConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    #endregion
+
+    #region JPH_SwingTwistConstraint
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SwingTwistConstraintSettings_Create();
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SwingTwistConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SwingTwistConstraint_GetNormalHalfConeAngle(nint handle);
+    #endregion
+
+    #region JPH_SixDOFConstraint
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SixDOFConstraintSettings_Create();
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SixDOFConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SixDOFConstraint_GetLimitsMin(nint handle, uint axis);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SixDOFConstraint_GetLimitsMax(nint handle, uint axis);
     #endregion
 
     /* PhysicsSystem */
@@ -803,20 +854,41 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern Bool32 JPH_Body_IsKinematic(IntPtr handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern Bool32 JPH_Body_IsDynamic(IntPtr handle);
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Body_IsDynamic(IntPtr handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern Bool32 JPH_Body_IsSensor(IntPtr handle);
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Body_IsSensor(IntPtr handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_SetIsSensor(nint handle, Bool32 value);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_SetIsSensor(nint handle, Bool32 value);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_Body_GetMotionProperties(nint handle);
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Body_SensorDetectsStatic(IntPtr handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern MotionType JPH_Body_GetMotionType(nint handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_SetSensorDetectsStatic(nint handle, Bool32 value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_SetUseManifoldReduction(nint handle, Bool32 value);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Body_GetUseManifoldReduction(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Body_GetUseManifoldReductionWithBody(nint handle, nint other);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_SetApplyGyroscopicForce(nint handle, Bool32 value);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Body_GetApplyGyroscopicForce(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Body_GetMotionProperties(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial MotionType JPH_Body_GetMotionType(nint handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_SetMotionType(nint handle, MotionType motionType);
@@ -824,8 +896,11 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern Bool32 JPH_Body_GetAllowSleeping(nint handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_SetAllowSleeping(nint handle, Bool32 motionType);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_SetAllowSleeping(nint handle, Bool32 motionType);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_ResetSleepTimer(nint handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern float JPH_Body_GetFriction(IntPtr handle);

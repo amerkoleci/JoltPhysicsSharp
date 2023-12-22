@@ -16,7 +16,7 @@ public sealed class CapsuleShapeSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="CapsuleShapeSettings" /> class.
     /// </summary>
-    ~CapsuleShapeSettings() => Dispose(isDisposing: false);
+    ~CapsuleShapeSettings() => Dispose(disposing: false);
 }
 
 public sealed class CapsuleShape : ConvexShape

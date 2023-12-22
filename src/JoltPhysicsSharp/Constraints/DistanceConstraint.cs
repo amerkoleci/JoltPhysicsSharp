@@ -16,7 +16,7 @@ public class DistanceConstraintSettings : TwoBodyConstraintSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="DistanceConstraintSettings" /> class.
     /// </summary>
-    ~DistanceConstraintSettings() => Dispose(isDisposing: false);
+    ~DistanceConstraintSettings() => Dispose(disposing: false);
 
     public Vector3 Point1
     {

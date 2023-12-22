@@ -16,7 +16,7 @@ public abstract class TwoBodyConstraintSettings : ConvexShapeSettings
     /// <summary>
     /// Finalizes an instance of the <see cref="TwoBodyConstraintSettings" /> class.
     /// </summary>
-    ~TwoBodyConstraintSettings() => Dispose(isDisposing: false);
+    ~TwoBodyConstraintSettings() => Dispose(disposing: false);
 
     public abstract TwoBodyConstraint CreateConstraint(in Body body1, in Body body2);
 }

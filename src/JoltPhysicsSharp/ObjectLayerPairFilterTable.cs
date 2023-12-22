@@ -5,7 +5,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public sealed class ObjectLayerPairFilterTable : NativeObject
+public sealed class ObjectLayerPairFilterTable : ObjectLayerPairFilter
 {
     public ObjectLayerPairFilterTable(uint numObjectLayers)
         : base(JPH_ObjectLayerPairFilterTable_Create(numObjectLayers))

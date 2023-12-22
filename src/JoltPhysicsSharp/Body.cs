@@ -50,6 +50,24 @@ public readonly struct Body(IntPtr handle) : IEquatable<Body>
         set => JPH_Body_SetIsSensor(Handle, value);
     }
 
+    public bool SensorDetectsStatic
+    {
+        readonly get => JPH_Body_SensorDetectsStatic(Handle);
+        set => JPH_Body_SetSensorDetectsStatic(Handle, value);
+    }
+
+    public bool UseManifoldReduction
+    {
+        readonly get => JPH_Body_GetUseManifoldReduction(Handle);
+        set => JPH_Body_SetUseManifoldReduction(Handle, value);
+    }
+
+    public bool ApplyGyroscopicForce
+    {
+        readonly get => JPH_Body_GetApplyGyroscopicForce(Handle);
+        set => JPH_Body_SetApplyGyroscopicForce(Handle, value);
+    }
+
     public unsafe BoundingBox WorldSpaceBounds
     {
         get
@@ -129,6 +147,11 @@ public readonly struct Body(IntPtr handle) : IEquatable<Body>
             JPH_Body_GetCenterOfMassTransform(Handle, out Matrix4x4 value);
             return value;
         }
+    }
+
+    public bool GetUseManifoldReductionWithBody(in Body other)
+    {
+        return JPH_Body_GetUseManifoldReductionWithBody(Handle, other.Handle);
     }
 
     public void GetPosition(out Double3 result)
