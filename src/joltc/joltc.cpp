@@ -1399,6 +1399,14 @@ JPH_SwingTwistConstraintSettings* JPH_SwingTwistConstraintSettings_Create(void)
     return reinterpret_cast<JPH_SwingTwistConstraintSettings*>(settings);
 }
 
+JPH_SwingTwistConstraint* JPH_SwingTwistConstraintSettings_CreateConstraint(JPH_SwingTwistConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
+{
+	auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
+    auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
+    JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::SwingTwistConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    return reinterpret_cast<JPH_SwingTwistConstraint*>(static_cast<JPH::SwingTwistConstraint*>(constraint));
+}
+
 /* JPH_SwingTwistConstraint */
 float JPH_SwingTwistConstraint_GetNormalHalfConeAngle(JPH_SwingTwistConstraint* constraint)
 {
@@ -1410,6 +1418,14 @@ JPH_SixDOFConstraintSettings* JPH_SixDOFConstraintSettings_Create(void)
 {
 	auto settings = new JPH::SixDOFConstraintSettings();
     return reinterpret_cast<JPH_SixDOFConstraintSettings*>(settings);
+}
+
+JPH_SixDOFConstraint* JPH_SixDOFConstraintSettings_CreateConstraint(JPH_SixDOFConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
+{
+	auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
+    auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
+    JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::SixDOFConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    return reinterpret_cast<JPH_SixDOFConstraint*>(static_cast<JPH::SixDOFConstraint*>(constraint));
 }
 
 /* JPH_SixDOFConstraint */
