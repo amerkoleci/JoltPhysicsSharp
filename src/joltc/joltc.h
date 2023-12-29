@@ -720,9 +720,10 @@ JPH_CAPI JPH_Bool32 JPH_Body_IsKinematic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsDynamic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsSensor(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value);
-JPH_CAPI JPH_Bool32 JPH_Body_SensorDetectsStatic(const JPH_Body* body);
 
 JPH_CAPI void JPH_Body_SetSensorDetectsStatic(JPH_Body* body, JPH_Bool32 value);
+JPH_CAPI JPH_Bool32 JPH_Body_SensorDetectsStatic(const JPH_Body* body);
+
 JPH_CAPI void JPH_Body_SetUseManifoldReduction(JPH_Body* body, JPH_Bool32 value);
 JPH_CAPI JPH_Bool32 JPH_Body_GetUseManifoldReduction(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_GetUseManifoldReductionWithBody(const JPH_Body* body, const JPH_Body* other);

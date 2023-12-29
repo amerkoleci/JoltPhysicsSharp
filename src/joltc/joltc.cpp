@@ -2377,14 +2377,14 @@ void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value)
     reinterpret_cast<JPH::Body*>(body)->SetIsSensor(!!value);
 }
 
-JPH_Bool32 JPH_Body_SensorDetectsStatic(const JPH_Body* body)
-{
-	return reinterpret_cast<const JPH::Body*>(body)->SensorDetectsStatic();
-}
-
 void JPH_Body_SetSensorDetectsStatic(JPH_Body* body, JPH_Bool32 value)
 {
 	reinterpret_cast<JPH::Body*>(body)->SetSensorDetectsStatic(!!value);
+}
+
+JPH_Bool32 JPH_Body_SensorDetectsStatic(const JPH_Body* body)
+{
+	return reinterpret_cast<const JPH::Body*>(body)->SensorDetectsStatic();
 }
 
 void JPH_Body_SetUseManifoldReduction(JPH_Body* body, JPH_Bool32 value)
