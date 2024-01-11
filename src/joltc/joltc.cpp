@@ -631,7 +631,8 @@ void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings)
 {
     if (settings)
     {
-        delete reinterpret_cast<JPH::ShapeSettings*>(settings);
+        auto joltSettings = reinterpret_cast<JPH::ShapeSettings*>(settings);
+        joltSettings->Release();
     }
 }
 
@@ -650,6 +651,8 @@ void JPH_ConvexShape_SetDensity(JPH_ConvexShape* shape, float density)
 JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius)
 {
     auto settings = new JPH::BoxShapeSettings(ToVec3(halfExtent), convexRadius);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_BoxShapeSettings*>(settings);
 }
 
@@ -657,12 +660,18 @@ JPH_BoxShape* JPH_BoxShapeSettings_CreateShape(const JPH_BoxShapeSettings* setti
 {
 	const JPH::BoxShapeSettings* jolt_settings = reinterpret_cast<const JPH::BoxShapeSettings*>(settings);
     auto shape_res = jolt_settings->Create();
-    return reinterpret_cast<JPH_BoxShape*>(shape_res.Get().GetPtr());
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_BoxShape*>(shape);
 }
 
 JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius)
 {
     auto shape = new JPH::BoxShape(ToVec3(halfExtent), convexRadius);
+    shape->AddRef();
+
     return reinterpret_cast<JPH_BoxShape*>(shape);
 }
 
@@ -689,6 +698,8 @@ float JPH_BoxShape_GetConvexRadius(const JPH_BoxShape* shape)
 JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius)
 {
     auto settings = new JPH::SphereShapeSettings(radius);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_SphereShapeSettings*>(settings);
 }
 
@@ -696,7 +707,11 @@ JPH_SphereShape* JPH_SphereShapeSettings_CreateShape(const JPH_SphereShapeSettin
 {
 	const JPH::SphereShapeSettings* jolt_settings = reinterpret_cast<const JPH::SphereShapeSettings*>(settings);
     auto shape_res = jolt_settings->Create();
-    return reinterpret_cast<JPH_SphereShape*>(shape_res.Get().GetPtr());
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_SphereShape*>(shape);
 }
 
 float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings)
@@ -714,6 +729,8 @@ void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float 
 JPH_SphereShape* JPH_SphereShape_Create(float radius)
 {
     auto shape = new JPH::SphereShape(radius);
+    shape->AddRef();
+
     return reinterpret_cast<JPH_SphereShape*>(shape);
 }
 
@@ -727,6 +744,8 @@ float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape)
 JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, const JPH_Vec3* v2, const JPH_Vec3* v3, float convexRadius)
 {
     auto settings = new JPH::TriangleShapeSettings(ToVec3(v1), ToVec3(v2), ToVec3(v3), convexRadius);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_TriangleShapeSettings*>(settings);
 }
 
@@ -734,12 +753,16 @@ JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, 
 JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius)
 {
     auto settings = new JPH::CapsuleShapeSettings(halfHeightOfCylinder, radius);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_CapsuleShapeSettings*>(settings);
 }
 
 JPH_CapsuleShape* JPH_CapsuleShape_Create(float halfHeightOfCylinder, float radius)
 {
     auto shape = new JPH::CapsuleShape(halfHeightOfCylinder, radius, 0);
+    shape->AddRef();
+
     return reinterpret_cast<JPH_CapsuleShape*>(shape);
 }
 
@@ -759,12 +782,16 @@ float JPH_CapsuleShape_GetHalfHeightOfCylinder(const JPH_CapsuleShape* shape)
 JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius)
 {
     auto settings = new JPH::CylinderShapeSettings(halfHeight, radius, convexRadius);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_CylinderShapeSettings*>(settings);
 }
 
 JPH_CylinderShape* JPH_CylinderShape_Create(float halfHeight, float radius)
 {
     auto shape = new JPH::CylinderShape(halfHeight, radius, 0.f, 0);
+    shape->AddRef();
+
     return reinterpret_cast<JPH_CylinderShape*>(shape);
 }
 
@@ -802,6 +829,8 @@ JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* 
     }
 
     auto settings = new JPH::ConvexHullShapeSettings(joltPoints, maxConvexRadius);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_ConvexHullShapeSettings*>(settings);
 }
 
@@ -809,7 +838,11 @@ JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHul
 {
 	const JPH::ConvexHullShapeSettings* jolt_settings = reinterpret_cast<const JPH::ConvexHullShapeSettings*>(settings);
     auto shape_res = jolt_settings->Create();
-    return reinterpret_cast<JPH_ConvexHullShape*>(shape_res.Get().GetPtr());
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_ConvexHullShape*>(shape);
 }
 
 /* MeshShapeSettings */
@@ -824,6 +857,8 @@ JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangle
     }
 
     auto settings = new JPH::MeshShapeSettings(jolTriangles);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_MeshShapeSettings*>(settings);
 }
 
@@ -846,6 +881,8 @@ JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, u
     }
 
     auto settings = new JPH::MeshShapeSettings(joltVertices, joltTriangles);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_MeshShapeSettings*>(settings);
 }
 
@@ -860,13 +897,19 @@ JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* se
 {
     const JPH::MeshShapeSettings* jolt_settings = reinterpret_cast<const JPH::MeshShapeSettings*>(settings);
     auto shape_res = jolt_settings->Create();
-    return reinterpret_cast<JPH_MeshShape*>(shape_res.Get().GetPtr());
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_MeshShape*>(shape);
 }
 
 /* MeshShapeSettings */
 JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount)
 {
     auto settings = new JPH::HeightFieldShapeSettings(samples, ToVec3(offset), ToVec3(scale), sampleCount);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_HeightFieldShapeSettings*>(settings);
 }
 
@@ -894,6 +937,8 @@ uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFi
 JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius)
 {
     auto settings = new JPH::TaperedCapsuleShapeSettings(halfHeightOfTaperedCylinder, topRadius, bottomRadius);
+    settings->AddRef();
+
     return reinterpret_cast<JPH_TaperedCapsuleShapeSettings*>(settings);
 }
 
@@ -915,6 +960,8 @@ void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, co
 JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create()
 {
     auto settings = new JPH::StaticCompoundShapeSettings();
+    settings->AddRef();
+
     return reinterpret_cast<JPH_StaticCompoundShapeSettings*>(settings);
 }
 
@@ -922,6 +969,8 @@ JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create()
 JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create()
 {
     auto settings = new JPH::MutableCompoundShapeSettings();
+    settings->AddRef();
+
     return reinterpret_cast<JPH_MutableCompoundShapeSettings*>(settings);
 }
 
@@ -929,7 +978,11 @@ JPH_MutableCompoundShape* JPH_MutableCompoundShape_Create(const JPH_MutableCompo
 {
 	const JPH::MutableCompoundShapeSettings* jolt_settings = reinterpret_cast<const JPH::MutableCompoundShapeSettings*>(settings);
     auto shape_res = jolt_settings->Create();
-    return reinterpret_cast<JPH_MutableCompoundShape*>(shape_res.Get().GetPtr());
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_MutableCompoundShape*>(shape);
 }
 
 
@@ -938,7 +991,8 @@ void JPH_Shape_Destroy(JPH_Shape* shape)
 {
     if (shape)
     {
-        delete reinterpret_cast<JPH::Shape*>(shape);
+        auto joltShape = reinterpret_cast<JPH::Shape*>(shape);
+        joltShape->Release();
     }
 }
 
@@ -1099,7 +1153,8 @@ void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
 {
     if (settings)
     {
-        delete reinterpret_cast<JPH::ConstraintSettings*>(settings);
+        auto joltSettings = reinterpret_cast<JPH::ConstraintSettings*>(settings);
+        joltSettings->Release();
     }
 }
 
@@ -1127,7 +1182,8 @@ void JPH_Constraint_Destroy(JPH_Constraint* constraint)
 {
     if (constraint)
     {
-        delete reinterpret_cast<JPH::Constraint*>(constraint);
+        auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraint);
+        joltConstraint->Release();
     }
 }
 
@@ -1148,6 +1204,8 @@ float JPH_SpringSettings_GetFrequency(JPH_SpringSettings* settings)
 JPH_DistanceConstraintSettings* JPH_DistanceConstraintSettings_Create(void)
 {
     auto settings = new JPH::DistanceConstraintSettings();
+    settings->AddRef();
+
     return reinterpret_cast<JPH_DistanceConstraintSettings*>(settings);
 }
 
@@ -1194,6 +1252,8 @@ JPH_DistanceConstraint* JPH_DistanceConstraintSettings_CreateConstraint(JPH_Dist
     auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
     auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::DistanceConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
     return reinterpret_cast<JPH_DistanceConstraint*>(static_cast<JPH::DistanceConstraint*>(constraint));
 }
 
@@ -1202,6 +1262,8 @@ JPH_DistanceConstraint* JPH_DistanceConstraintSettings_CreateConstraint(JPH_Dist
 JPH_HingeConstraintSettings* JPH_HingeConstraintSettings_Create(void)
 {
     auto settings = new JPH::HingeConstraintSettings();
+    settings->AddRef();
+
     return reinterpret_cast<JPH_HingeConstraintSettings*>(settings);
 }
 
@@ -1298,6 +1360,8 @@ JPH_HingeConstraint* JPH_HingeConstraintSettings_CreateConstraint(JPH_HingeConst
     auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
     auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::HingeConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
     return reinterpret_cast<JPH_HingeConstraint*>(static_cast<JPH::HingeConstraint*>(constraint));
 }
 
@@ -1348,6 +1412,8 @@ void JPH_HingeConstraint_SetLimitsSpringSettings(JPH_HingeConstraint* constraint
 JPH_SliderConstraintSettings* JPH_SliderConstraintSettings_Create(void)
 {
     auto settings = new JPH::SliderConstraintSettings();
+    settings->AddRef();
+
     return reinterpret_cast<JPH_SliderConstraintSettings*>(settings);
 }
 
@@ -1396,6 +1462,8 @@ JPH_Bool32 JPH_SliderConstraint_HasLimits(JPH_SliderConstraint* constraint)
 JPH_SwingTwistConstraintSettings* JPH_SwingTwistConstraintSettings_Create(void)
 {
 	auto settings = new JPH::SwingTwistConstraintSettings();
+    settings->AddRef();
+
     return reinterpret_cast<JPH_SwingTwistConstraintSettings*>(settings);
 }
 
@@ -1404,6 +1472,8 @@ JPH_SwingTwistConstraint* JPH_SwingTwistConstraintSettings_CreateConstraint(JPH_
 	auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
     auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::SwingTwistConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
     return reinterpret_cast<JPH_SwingTwistConstraint*>(static_cast<JPH::SwingTwistConstraint*>(constraint));
 }
 
@@ -1417,6 +1487,8 @@ float JPH_SwingTwistConstraint_GetNormalHalfConeAngle(JPH_SwingTwistConstraint* 
 JPH_SixDOFConstraintSettings* JPH_SixDOFConstraintSettings_Create(void)
 {
 	auto settings = new JPH::SixDOFConstraintSettings();
+    settings->AddRef();
+
     return reinterpret_cast<JPH_SixDOFConstraintSettings*>(settings);
 }
 
@@ -1425,6 +1497,8 @@ JPH_SixDOFConstraint* JPH_SixDOFConstraintSettings_CreateConstraint(JPH_SixDOFCo
 	auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
     auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::SixDOFConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
     return reinterpret_cast<JPH_SixDOFConstraint*>(static_cast<JPH::SixDOFConstraint*>(constraint));
 }
 
@@ -1444,6 +1518,8 @@ JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderCo
     auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
     auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::SliderConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
     return reinterpret_cast<JPH_SliderConstraint*>(static_cast<JPH::SliderConstraint*>(constraint));
 }
 
@@ -1476,6 +1552,8 @@ void JPH_DistanceConstraint_SetLimitsSpringSettings(JPH_DistanceConstraint* cons
 JPH_PointConstraintSettings* JPH_PointConstraintSettings_Create(void)
 {
     auto settings = new JPH::PointConstraintSettings();
+    settings->AddRef();
+
     return reinterpret_cast<JPH_PointConstraintSettings*>(settings);
 }
 
@@ -1537,6 +1615,8 @@ JPH_PointConstraint* JPH_PointConstraintSettings_CreateConstraint(JPH_PointConst
     auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
     auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::PointConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
     return reinterpret_cast<JPH_PointConstraint*>(static_cast<JPH::PointConstraint*>(constraint));
 }
 
