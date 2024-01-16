@@ -27,6 +27,7 @@ __pragma(warning(push, 0))
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 #include <Jolt/Physics/Body/AllowedDOFs.h>
 #include <Jolt/Physics/Constraints/SixDOFConstraint.h>
+#include <Jolt/Physics/Character/CharacterBase.h>
 
 #ifdef _MSC_VER
 __pragma(warning(pop))
@@ -108,6 +109,12 @@ static_assert(JPH_SixDOFConstraintAxis_RotationX == (int)JPH::SixDOFConstraintSe
 static_assert(JPH_SixDOFConstraintAxis_RotationY == (int)JPH::SixDOFConstraintSettings::EAxis::RotationY);
 static_assert(JPH_SixDOFConstraintAxis_RotationZ == (int)JPH::SixDOFConstraintSettings::EAxis::RotationZ);
 
+// EGroundState
+static_assert(sizeof(JPH::CharacterBase::EGroundState) == sizeof(JPH_GroundState));
+static_assert(JPH_GroundState_OnGround == (int)JPH::CharacterBase::EGroundState::OnGround);
+static_assert(JPH_GroundState_OnSteepGround == (int)JPH::CharacterBase::EGroundState::OnSteepGround);
+static_assert(JPH_GroundState_NotSupported == (int)JPH::CharacterBase::EGroundState::NotSupported);
+static_assert(JPH_GroundState_InAir == (int)JPH::CharacterBase::EGroundState::InAir);
 
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));
