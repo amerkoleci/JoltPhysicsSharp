@@ -319,8 +319,22 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint JPH_StaticCompoundShapeSettings_Create();
 
+    /* MutableCompoundShape */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint JPH_MutableCompoundShapeSettings_Create();
+
+    /* RotatedTranslatedShape */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_RotatedTranslatedShapeSettings_Create(in Vector3 position, in Quaternion rotation, nint shapeSettings);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_RotatedTranslatedShapeSettings_Create2(in Vector3 position, in Quaternion rotation, nint shape);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_RotatedTranslatedShapeSettings_CreateShape(nint shapeSettings);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_RotatedTranslatedShape_Create(in Vector3 position, in Quaternion rotation, nint shape);
 
     /* Shape */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -1003,4 +1017,86 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyActivationListener_Destroy(IntPtr handle);
+
+    /* CharacterBaseSettings */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBaseSettings_Destroy(IntPtr handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBaseSettings_SetSupportingVolume(IntPtr handle, in Vector3 normal, float costant);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBaseSettings_SetMaxSlopeAngle(IntPtr handle, float maxSlopeAngle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBaseSettings_SetShape(IntPtr handle, IntPtr shape);
+
+    /* CharacterBase */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBase_Destroy(IntPtr handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern GroundState JPH_CharacterBase_GetGroundState(IntPtr handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool JPH_CharacterBase_IsSupported(IntPtr handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBase_GetGroundPosition(IntPtr handle, out Double3 position);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBase_GetGroundNormal(IntPtr handle, out Vector3 normal);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBase_GetGroundVelocity(IntPtr handle, out Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_CharacterBase_GetGroundBodyId(IntPtr handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint JPH_CharacterBase_GetGroundSubShapeId(IntPtr handle);
+
+    /* CharacterVirtualSettings */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_CharacterVirtualSettings_Create();
+
+    /* CharacterVirtual */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_CharacterVirtual_Create(IntPtr settings, in Double3 position, in Quaternion rotation, IntPtr physicsSystem);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterVirtual_GetLinearVelocity(IntPtr handle, out Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterVirtual_SetLinearVelocity(IntPtr handle, in Vector3 velocity);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterVirtual_GetPosition(IntPtr handle, out Double3 position);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterVirtual_SetPosition(IntPtr handle, in Double3 position);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterVirtual_GetRotation(IntPtr handle, out Quaternion rotation);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterVirtual_SetRotation(IntPtr handle, in Quaternion rotation);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterVirtual_ExtenedUpdate(IntPtr handle, float deltaTime,
+        IntPtr settings, ushort layer, IntPtr physicsSytem);
+
+    /* ExtendedUpdateSettings */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr JPH_ExtendedUpdateSettings_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ExtendedUpdateSettings_Destroy(IntPtr handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ExtendedUpdateSettings_SetStickToFloorStepDown(IntPtr handle, in Vector3 stickToFloorStepDown);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_ExtendedUpdateSettings_SetWalkStairsStepUp(IntPtr handle, in Vector3 walkStairsStepUp);
 }
