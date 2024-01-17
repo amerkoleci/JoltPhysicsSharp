@@ -2507,14 +2507,14 @@ void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value)
     reinterpret_cast<JPH::Body*>(body)->SetIsSensor(!!value);
 }
 
-void JPH_Body_SetSensorDetectsStatic(JPH_Body* body, JPH_Bool32 value)
+void JPH_Body_SetCollideKinematicVsNonDynamic(JPH_Body* body, JPH_Bool32 value)
 {
-	reinterpret_cast<JPH::Body*>(body)->SetSensorDetectsStatic(!!value);
+	reinterpret_cast<JPH::Body*>(body)->SetCollideKinematicVsNonDynamic(!!value);
 }
 
-JPH_Bool32 JPH_Body_SensorDetectsStatic(const JPH_Body* body)
+JPH_Bool32 JPH_Body_GetCollideKinematicVsNonDynamic(const JPH_Body* body)
 {
-	return reinterpret_cast<const JPH::Body*>(body)->SensorDetectsStatic();
+	return reinterpret_cast<const JPH::Body*>(body)->GetCollideKinematicVsNonDynamic();
 }
 
 void JPH_Body_SetUseManifoldReduction(JPH_Body* body, JPH_Bool32 value)
@@ -2964,15 +2964,26 @@ void JPH_CharacterVirtual_SetRotation(JPH_CharacterVirtual* character, const JPH
 }
 
 void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime, 
-    JPH_ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, JPH_PhysicsSystem* system)
+    const JPH_ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, JPH_PhysicsSystem* system)
 {
+	JPH_ASSERT(settings);
+
     auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    auto jolt_settings = reinterpret_cast<JPH::CharacterVirtual::ExtendedUpdateSettings*>(settings);
+
+	// Convert to Jolt
+    JPH::CharacterVirtual::ExtendedUpdateSettings jolt_settings = {};
+	jolt_settings.mStickToFloorStepDown = ToVec3(settings->stickToFloorStepDown);
+	jolt_settings.mWalkStairsStepUp = ToVec3(settings->walkStairsStepUp);
+	jolt_settings.mWalkStairsMinStepForward = settings->walkStairsMinStepForward;
+	jolt_settings.mWalkStairsStepForwardTest = settings->walkStairsStepForwardTest;
+	jolt_settings.mWalkStairsCosAngleForwardContact = settings->walkStairsCosAngleForwardContact;
+	jolt_settings.mWalkStairsStepDownExtra = ToVec3(settings->walkStairsStepDownExtra);
+
     auto jolt_object_layer = static_cast<JPH::ObjectLayer>(layer);
 
     jolt_character->ExtendedUpdate(deltaTime,
         system->physicsSystem->GetGravity(),
-        *jolt_settings,
+        jolt_settings,
         system->physicsSystem->GetDefaultBroadPhaseLayerFilter(jolt_object_layer),
         system->physicsSystem->GetDefaultLayerFilter(jolt_object_layer),
         {},
@@ -2993,33 +3004,6 @@ void JPH_CharacterVirtual_RefreshContacts(JPH_CharacterVirtual* character, JPH_O
         {},
         *s_TempAllocator
     );
-}
-
-/* ExtendedUpdateSettings */
-JPH_CAPI JPH_ExtendedUpdateSettings* JPH_ExtendedUpdateSettings_Create()
-{
-    auto jolt_settings = new JPH::CharacterVirtual::ExtendedUpdateSettings();
-    return reinterpret_cast<JPH_ExtendedUpdateSettings*>(jolt_settings);
-}
-
-void JPH_ExtendedUpdateSettings_Destroy(JPH_ExtendedUpdateSettings* settings)
-{
-    if (settings)
-    {
-        delete reinterpret_cast<JPH::CharacterVirtual::ExtendedUpdateSettings*>(settings);
-    }
-}
-
-void JPH_ExtendedUpdateSettings_SetStickToFloorStepDown(JPH_ExtendedUpdateSettings* settings, const JPH_Vec3* stickToFloorStepDown)
-{
-    auto jolt_settings = reinterpret_cast<JPH::CharacterVirtual::ExtendedUpdateSettings*>(settings);
-    jolt_settings->mStickToFloorStepDown = ToVec3(stickToFloorStepDown);
-}
-
-void JPH_ExtendedUpdateSettings_SetWalkStairsStepUp(JPH_ExtendedUpdateSettings* settings, const JPH_Vec3* walkStairsStepUp)
-{
-    auto jolt_settings = reinterpret_cast<JPH::CharacterVirtual::ExtendedUpdateSettings*>(settings);
-    jolt_settings->mWalkStairsStepUp = ToVec3(walkStairsStepUp);
 }
 
 #ifdef _MSC_VER

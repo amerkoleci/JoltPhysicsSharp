@@ -324,6 +324,16 @@ typedef struct JPH_BodyLockWrite
     JPH_Body* body;
 } JPH_BodyLockWrite;
 
+
+typedef struct JPH_ExtendedUpdateSettings  {
+	JPH_Vec3	stickToFloorStepDown;
+	JPH_Vec3	walkStairsStepUp;
+	float		walkStairsMinStepForward ;
+	float		walkStairsStepForwardTest;
+	float		walkStairsCosAngleForwardContact ;
+	JPH_Vec3	walkStairsStepDownExtra;	
+} JPH_ExtendedUpdateSettings;
+
 /* CharacterBase */
 typedef struct JPH_CharacterBaseSettings            JPH_CharacterBaseSettings;
 typedef struct JPH_CharacterBase                    JPH_CharacterBase;
@@ -331,7 +341,6 @@ typedef struct JPH_CharacterBase                    JPH_CharacterBase;
 /* CharacterVirtual */
 typedef struct JPH_CharacterVirtualSettings         JPH_CharacterVirtualSettings;
 typedef struct JPH_CharacterVirtual                 JPH_CharacterVirtual;
-typedef struct JPH_ExtendedUpdateSettings           JPH_ExtendedUpdateSettings;
 
 typedef JPH_Bool32(JPH_API_CALL* JPH_AssertFailureFunc)(const char* expression, const char* mssage, const char* file, uint32_t line);
 
@@ -749,8 +758,8 @@ JPH_CAPI JPH_Bool32 JPH_Body_IsDynamic(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsSensor(const JPH_Body* body);
 JPH_CAPI void JPH_Body_SetIsSensor(JPH_Body* body, JPH_Bool32 value);
 
-JPH_CAPI void JPH_Body_SetSensorDetectsStatic(JPH_Body* body, JPH_Bool32 value);
-JPH_CAPI JPH_Bool32 JPH_Body_SensorDetectsStatic(const JPH_Body* body);
+JPH_CAPI void JPH_Body_SetCollideKinematicVsNonDynamic(JPH_Body* body, JPH_Bool32 value);
+JPH_CAPI JPH_Bool32 JPH_Body_GetCollideKinematicVsNonDynamic(const JPH_Body* body);
 
 JPH_CAPI void JPH_Body_SetUseManifoldReduction(JPH_Body* body, JPH_Bool32 value);
 JPH_CAPI JPH_Bool32 JPH_Body_GetUseManifoldReduction(const JPH_Body* body);
@@ -888,13 +897,7 @@ JPH_CAPI void JPH_CharacterVirtual_SetPosition(JPH_CharacterVirtual* character, 
 JPH_CAPI void JPH_CharacterVirtual_GetRotation(JPH_CharacterVirtual* character, JPH_Quat* rotation);
 JPH_CAPI void JPH_CharacterVirtual_SetRotation(JPH_CharacterVirtual* character, const JPH_Quat* rotation);
 JPH_CAPI void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime,
-    JPH_ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, JPH_PhysicsSystem* system);
+	const JPH_ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, JPH_PhysicsSystem* system);
 JPH_CAPI void JPH_CharacterVirtual_RefreshContacts(JPH_CharacterVirtual* character, JPH_ObjectLayer layer, JPH_PhysicsSystem* system);
-
-/* ExtendedUpdateSettings */
-JPH_CAPI JPH_ExtendedUpdateSettings* JPH_ExtendedUpdateSettings_Create();
-JPH_CAPI void JPH_ExtendedUpdateSettings_Destroy(JPH_ExtendedUpdateSettings* settings);
-JPH_CAPI void JPH_ExtendedUpdateSettings_SetStickToFloorStepDown(JPH_ExtendedUpdateSettings* settings, const JPH_Vec3* stickToFloorStepDown);
-JPH_CAPI void JPH_ExtendedUpdateSettings_SetWalkStairsStepUp(JPH_ExtendedUpdateSettings* settings, const JPH_Vec3* walkStairsStepUp);
 
 #endif /* _JOLT_C_H */
