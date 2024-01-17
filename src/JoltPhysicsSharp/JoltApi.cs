@@ -102,7 +102,7 @@ internal static unsafe partial class JoltApi
 
     //  BroadPhaseLayerInterface
     [LibraryImport(LibName)]
-    public static partial nint JPH_BroadPhaseLayerInterfaceMask_Create( uint numBroadPhaseLayers);
+    public static partial nint JPH_BroadPhaseLayerInterfaceMask_Create(uint numBroadPhaseLayers);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(nint bpInterface, in BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude);
@@ -464,7 +464,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_PointConstraint_SetPoint1(IntPtr handle, ConstraintSpace space, in Double3 value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraint_SetPoint2(IntPtr handle, ConstraintSpace space, in Double3 value); 
+    public static extern void JPH_PointConstraint_SetPoint2(IntPtr handle, ConstraintSpace space, in Double3 value);
     #endregion
 
     #region JPH_DistanceConstraint
@@ -878,10 +878,10 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Body_SetIsSensor(nint handle, Bool32 value);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_SensorDetectsStatic(IntPtr handle);
+    public static partial void JPH_Body_SetCollideKinematicVsNonDynamic(nint handle, Bool32 value);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetSensorDetectsStatic(nint handle, Bool32 value);
+    public static partial Bool32 JPH_Body_GetCollideKinematicVsNonDynamic(nint handle);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Body_SetUseManifoldReduction(nint handle, Bool32 value);
@@ -1009,14 +1009,14 @@ internal static unsafe partial class JoltApi
         public delegate* unmanaged<IntPtr, uint, ulong, void> OnBodyDeactivated;
     }
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyActivationListener_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyActivationListener_Create();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyActivationListener_Destroy(IntPtr handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyActivationListener_Destroy(nint handle);
 
     /* CharacterBaseSettings */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -1058,8 +1058,8 @@ internal static unsafe partial class JoltApi
     public static extern uint JPH_CharacterBase_GetGroundSubShapeId(IntPtr handle);
 
     /* CharacterVirtualSettings */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_CharacterVirtualSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterVirtualSettings_Create();
 
     /* CharacterVirtual */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -1075,28 +1075,14 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_CharacterVirtual_GetPosition(IntPtr handle, out Double3 position);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_CharacterVirtual_SetPosition(IntPtr handle, in Double3 position);
+    public static extern void JPH_CharacterVirtual_SetPosition(nint handle, in Double3 position);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_CharacterVirtual_GetRotation(IntPtr handle, out Quaternion rotation);
+    public static extern void JPH_CharacterVirtual_GetRotation(nint handle, out Quaternion rotation);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_CharacterVirtual_SetRotation(IntPtr handle, in Quaternion rotation);
+    public static extern void JPH_CharacterVirtual_SetRotation(nint handle, in Quaternion rotation);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_CharacterVirtual_ExtenedUpdate(IntPtr handle, float deltaTime,
-        IntPtr settings, ushort layer, IntPtr physicsSytem);
-
-    /* ExtendedUpdateSettings */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_ExtendedUpdateSettings_Create();
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ExtendedUpdateSettings_Destroy(IntPtr handle);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ExtendedUpdateSettings_SetStickToFloorStepDown(IntPtr handle, in Vector3 stickToFloorStepDown);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ExtendedUpdateSettings_SetWalkStairsStepUp(IntPtr handle, in Vector3 walkStairsStepUp);
+    public static extern void JPH_CharacterVirtual_ExtendedUpdate(nint handle, float deltaTime, ExtendedUpdateSettings* settings, ushort layer, nint physicsSytem);
 }

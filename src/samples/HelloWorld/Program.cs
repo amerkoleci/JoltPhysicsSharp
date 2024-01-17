@@ -63,8 +63,10 @@ public static class Program
         ];
 
         const float cDensity = 1.5f;
-        ConvexHullShapeSettings settings = new ConvexHullShapeSettings(box);
-        settings.Density = cDensity;
+        ConvexHullShapeSettings settings = new ConvexHullShapeSettings(box)
+        {
+            Density = cDensity
+        };
 
         using ConvexHullShape shape = new(settings);
         Vector3 com = shape.CenterOfMass;

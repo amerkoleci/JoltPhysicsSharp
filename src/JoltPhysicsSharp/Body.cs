@@ -50,10 +50,10 @@ public readonly struct Body(IntPtr handle) : IEquatable<Body>
         set => JPH_Body_SetIsSensor(Handle, value);
     }
 
-    public bool SensorDetectsStatic
+    public bool CollideKinematicVsNonDynamic
     {
-        readonly get => JPH_Body_SensorDetectsStatic(Handle);
-        set => JPH_Body_SetSensorDetectsStatic(Handle, value);
+        readonly get => JPH_Body_GetCollideKinematicVsNonDynamic(Handle);
+        set => JPH_Body_SetCollideKinematicVsNonDynamic(Handle, value);
     }
 
     public bool UseManifoldReduction

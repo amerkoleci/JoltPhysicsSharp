@@ -5,30 +5,23 @@ using System.Numerics;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
-public class ExtendedUpdateSettings : NativeObject
+
+public readonly record struct ExtendedUpdateSettings
 {
     public ExtendedUpdateSettings()
-        : base(JPH_ExtendedUpdateSettings_Create())
     {
+        StickToFloorStepDown = new Vector3(0, -0.5f, 0);
+        WalkStairsStepUp = new Vector3(0, 0.4f, 0);
+        WalkStairsMinStepForward = 0.02f;
+        WalkStairsStepForwardTest = 0.15f;
+        WalkStairsCosAngleForwardContact  = MathF.Cos(MathUtil.DegreesToRadians(75.0f));
+        WalkStairsStepDownExtra = Vector3.Zero;
     }
 
-    ~ExtendedUpdateSettings() => Dispose(isDisposing: false);
-
-    protected override void Dispose(bool isDisposing)
-    {
-        if (isDisposing)
-        {
-            JPH_ExtendedUpdateSettings_Destroy(Handle);
-        }
-    }
-
-    public void SetStickToFloorStepDown(in Vector3 stickToFloorStepDown)
-    {
-        JPH_ExtendedUpdateSettings_SetStickToFloorStepDown(Handle, stickToFloorStepDown);
-    }
-
-    public void SetWalkStairsStepUp(in Vector3 walkStairsStepUp)
-    {
-        JPH_ExtendedUpdateSettings_SetWalkStairsStepUp(Handle, walkStairsStepUp);
-    }
+    public Vector3 StickToFloorStepDown { get; init; }
+    public Vector3 WalkStairsStepUp { get; init; }
+    public float WalkStairsMinStepForward { get; init; }
+    public float WalkStairsStepForwardTest { get; init; }
+    public float WalkStairsCosAngleForwardContact { get; init; }
+    public Vector3 WalkStairsStepDownExtra { get; init; }
 }

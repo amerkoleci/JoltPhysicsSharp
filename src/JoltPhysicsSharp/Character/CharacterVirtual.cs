@@ -44,12 +44,11 @@ public sealed class CharacterVirtual : CharacterBase
 
     public void SetRotation(in Quaternion rotation)
     {
-        JPH_CharacterVirtual_SetRotation(Handle, rotation);
+        JPH_CharacterVirtual_SetRotation(Handle, in rotation);
     }
 
-    public void ExtendedUpdate(float deltaTime, ExtendedUpdateSettings settings,
-        ObjectLayer layer, PhysicsSystem physicsSystem)
+    public unsafe void ExtendedUpdate(float deltaTime, ExtendedUpdateSettings settings, ObjectLayer layer, PhysicsSystem physicsSystem)
     {
-        JPH_CharacterVirtual_ExtenedUpdate(Handle, deltaTime, settings.Handle, layer.Value, physicsSystem.Handle);
+        JPH_CharacterVirtual_ExtendedUpdate(Handle, deltaTime, &settings, layer.Value, physicsSystem.Handle);
     }
 }
