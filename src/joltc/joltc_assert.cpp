@@ -109,12 +109,22 @@ static_assert(JPH_SixDOFConstraintAxis_RotationX == (int)JPH::SixDOFConstraintSe
 static_assert(JPH_SixDOFConstraintAxis_RotationY == (int)JPH::SixDOFConstraintSettings::EAxis::RotationY);
 static_assert(JPH_SixDOFConstraintAxis_RotationZ == (int)JPH::SixDOFConstraintSettings::EAxis::RotationZ);
 
-// EGroundState
+// JPH_GroundState
 static_assert(sizeof(JPH::CharacterBase::EGroundState) == sizeof(JPH_GroundState));
 static_assert(JPH_GroundState_OnGround == (int)JPH::CharacterBase::EGroundState::OnGround);
 static_assert(JPH_GroundState_OnSteepGround == (int)JPH::CharacterBase::EGroundState::OnSteepGround);
 static_assert(JPH_GroundState_NotSupported == (int)JPH::CharacterBase::EGroundState::NotSupported);
 static_assert(JPH_GroundState_InAir == (int)JPH::CharacterBase::EGroundState::InAir);
+
+// JPH_StateRecorderState
+static_assert(sizeof(JPH_StateRecorderState) == sizeof(uint32_t));
+static_assert(JPH_StateRecorderState_None == (int)JPH::EStateRecorderState::None);
+static_assert(JPH_StateRecorderState_Global == (int)JPH::EStateRecorderState::Global);
+static_assert(JPH_StateRecorderState_Bodies == (int)JPH::EStateRecorderState::Bodies);
+static_assert(JPH_StateRecorderState_Bodies == (int)JPH::EStateRecorderState::Bodies);
+static_assert(JPH_StateRecorderState_Contacts == (int)JPH::EStateRecorderState::Contacts);
+static_assert(JPH_StateRecorderState_Constraints == (int)JPH::EStateRecorderState::Constraints);
+static_assert(JPH_StateRecorderState_All == (int)JPH::EStateRecorderState::All);
 
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));

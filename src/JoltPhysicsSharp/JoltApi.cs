@@ -602,6 +602,12 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_RemoveConstraints(IntPtr handle, IntPtr* constraints, uint count);
 
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_SaveState(IntPtr handle, IntPtr recorder, StateRecorderState state);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_PhysicsSystem_RestoreState(IntPtr handle, IntPtr recorder);
+
 
     /* BodyInterface */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -1057,6 +1063,12 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_CharacterBase_GetGroundSubShapeId(IntPtr handle);
 
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBase_SaveState(IntPtr handle, IntPtr recorder);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_CharacterBase_RestoreState(IntPtr handle, IntPtr recorder);
+
     /* CharacterVirtualSettings */
     [LibraryImport(LibName)]
     public static partial nint JPH_CharacterVirtualSettings_Create();
@@ -1085,4 +1097,41 @@ internal static unsafe partial class JoltApi
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_CharacterVirtual_ExtendedUpdate(nint handle, float deltaTime, ExtendedUpdateSettings* settings, ushort layer, nint physicsSytem);
+
+    /* StateRecorder */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_StateRecorder_Create();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_StateRecorder_Destroy(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint JPH_StateRecorder_SetValidating(nint handle, Bool32 validating);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Bool32 JPH_StateRecorder_IsValidating(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_StateRecorder_Rewind(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_StateRecorder_Clear(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Bool32 JPH_StateRecorder_IsEOF(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Bool32 JPH_StateRecorder_IsFailed(nint handle);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Bool32 JPH_StateRecorder_IsEqual(nint handle, nint other);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_StateRecorder_WriteBytes(nint handle, nint data, ulong size);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void JPH_StateRecorder_ReadBytes(nint handle, nint data, ulong size);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern ulong JPH_StateRecorder_GetSize(nint handle);
 }
