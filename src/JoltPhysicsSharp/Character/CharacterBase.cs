@@ -62,4 +62,14 @@ public abstract class CharacterBase : NativeObject
     {
         return JPH_CharacterBase_GetGroundSubShapeId(Handle);
     }
+
+    public void SaveState(StateRecorder recorder)
+    {
+        JPH_CharacterBase_SaveState(Handle, recorder.Handle);
+    }
+
+    public void RestoreState(StateRecorder recorder)
+    {
+        JPH_CharacterBase_RestoreState(Handle, recorder.Handle);
+    }
 }
