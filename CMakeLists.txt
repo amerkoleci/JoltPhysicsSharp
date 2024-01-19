@@ -124,9 +124,9 @@ if (MSVC)
 	endif()
 
 	# Set compiler flags for various configurations
-	set(CMAKE_CXX_FLAGS_DEBUG "/GS /Od /Ob0 /RTC1")
-	set(CMAKE_CXX_FLAGS_RELEASE "/GS- /Gy /O2 /Oi /Ot")
-	set(CMAKE_CXX_FLAGS_DISTRIBUTION "/GS- /Gy /O2 /Oi /Ot")
+	set(CMAKE_CXX_FLAGS_DEBUG "/GS /Od /Ob0 /RTC1 /EHsc")
+	set(CMAKE_CXX_FLAGS_RELEASE "/GS- /Gy /O2 /Oi /Ot /EHsc")
+	set(CMAKE_CXX_FLAGS_DISTRIBUTION "/GS- /Gy /O2 /Oi /Ot /EHsc")
 	set(CMAKE_CXX_FLAGS_RELEASEASAN "-fsanitize=address /Od")
 	set(CMAKE_CXX_FLAGS_RELEASEUBSAN "-fsanitize=undefined,implicit-conversion,float-divide-by-zero,local-bounds -fno-sanitize-recover=all")
 	set(CMAKE_CXX_FLAGS_RELEASECOVERAGE "-O0 -DJPH_NO_FORCE_INLINE -fprofile-instr-generate -fcoverage-mapping")
