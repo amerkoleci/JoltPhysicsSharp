@@ -2862,7 +2862,7 @@ JPH_GroundState JPH_CharacterBase_GetGroundState(JPH_CharacterBase* character)
     return static_cast<JPH_GroundState>(jolt_character->GetGroundState());
 }
 
-bool JPH_CharacterBase_IsSupported(JPH_CharacterBase* character)
+JPH_Bool32 JPH_CharacterBase_IsSupported(JPH_CharacterBase* character)
 {
     auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
     return jolt_character->IsSupported();

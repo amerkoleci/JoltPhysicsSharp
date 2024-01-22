@@ -874,7 +874,7 @@ JPH_CAPI void JPH_CharacterBaseSettings_SetShape(JPH_CharacterBaseSettings* sett
 /* CharacterBase */
 JPH_CAPI void JPH_CharacterBase_Destroy(JPH_CharacterBase* character);
 JPH_CAPI JPH_GroundState JPH_CharacterBase_GetGroundState(JPH_CharacterBase* character);
-JPH_CAPI bool JPH_CharacterBase_IsSupported(JPH_CharacterBase* character);
+JPH_CAPI JPH_Bool32 JPH_CharacterBase_IsSupported(JPH_CharacterBase* character);
 JPH_CAPI void JPH_CharacterBase_GetGroundPosition(JPH_CharacterBase* character, JPH_RVec3* position);
 JPH_CAPI void JPH_CharacterBase_GetGroundNormal(JPH_CharacterBase* character, JPH_Vec3* normal);
 JPH_CAPI void JPH_CharacterBase_GetGroundVelocity(JPH_CharacterBase* character, JPH_Vec3* velocity);
