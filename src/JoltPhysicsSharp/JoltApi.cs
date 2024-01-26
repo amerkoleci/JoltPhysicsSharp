@@ -1038,9 +1038,8 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern GroundState JPH_CharacterBase_GetGroundState(IntPtr handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool JPH_CharacterBase_IsSupported(IntPtr handle);
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_CharacterBase_IsSupported(nint handle);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_CharacterBase_GetGroundPosition(IntPtr handle, out Double3 position);
