@@ -340,13 +340,13 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// Casts a <see cref="Double3"/> value to a <see cref="Vector3"/> one.
     /// </summary>
     /// <param name="xyz">The input <see cref="Double3"/> value to cast.</param>
-    public static implicit operator Vector3(Double3 xyz) => new((float)xyz.X, (float)xyz.Y, (float)xyz.Z);
+    public static implicit operator Vector3(in Double3 xyz) => new((float)xyz.X, (float)xyz.Y, (float)xyz.Z);
 
     /// <summary>
     /// Casts a <see cref="Vector3"/> value to a <see cref="Double3"/> one.
     /// </summary>
     /// <param name="xyz">The input <see cref="Vector3"/> value to cast.</param>
-    public static explicit operator Double3(Vector3 xyz) => new(xyz);
+    public static explicit operator Double3(in Vector3 xyz) => new(in xyz);
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is Double3 value && Equals(value);
