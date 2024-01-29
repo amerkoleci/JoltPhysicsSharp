@@ -352,7 +352,7 @@ The narrow phase queries are all handled through the [GJK](@ref GJKClosestPoint)
 Each Body is in an [ObjectLayer](@ref ObjectLayer). If two object layers don't collide, the bodies inside those layers cannot collide. You can define object layers in any way you like, it could be a simple number from 0 to N or it could be a bitmask. Jolt supports 16 or 32 bit ObjectLayers through the JPH_OBJECT_LAYER_BITS define and you're free to define as many as you like as they don't incur any overhead in the system.
 
 When constructing the PhysicsSystem you need to provide a number of filtering interfaces:
-* BroadPhaseLayerInterface: This class defines a mapping from ObjectLayer to BroadPhaseLayer through the BroadPhaseLayerInterface::GetBroadPhaseLayer function. Each Body can only be in 1 BroadPhaseLayer and in general there will be multiple ObjectLayers mapping to the same BroadPhaseLayer (because each broad phase layer comes at a cost). If there are multiple object layers in a single broad phase layer, they are stored in the same tree. When a query visits the tree it will visit all objects whose AABB overlaps with the query and only when the overlap is detected, the actual object layer will be checked. This means that you should carefully design which object layers end up in which broad phase layer, balancing the requirement of having few broad phase layers with the number of needless objects that are visited because multiple object layers share the same broad phase layer. You can define JPH_TRACK_BROADPHASE_STATS to let Jolt print out some statistics about the query patterns your application is using. In general it is wise to start with only 2 broad phase layers as listed in the \ref broad-phase section.
+* BroadPhaseLayerInterface: This class defines a mapping from ObjectLayer to BroadPhaseLayer through the BroadPhaseLayerInterface::GetBroadPhaseLayer function. Each Body can only be in 1 BroadPhaseLayer so an ObjectLayer maps to 1 BroadphaseLayer. In general there will be multiple ObjectLayers mapping to the same BroadPhaseLayer (because each broad phase layer comes at a cost). If there are multiple object layers in a single broad phase layer, they are stored in the same tree. When a query visits the tree it will visit all objects whose AABB overlaps with the query and only when the overlap is detected, the actual object layer will be checked. This means that you should carefully design which object layers end up in which broad phase layer, balancing the requirement of having few broad phase layers with the number of needless objects that are visited because multiple object layers share the same broad phase layer. You can define JPH_TRACK_BROADPHASE_STATS to let Jolt print out some statistics about the query patterns your application is using. In general it is wise to start with only 2 broad phase layers as listed in the \ref broad-phase section.
 * ObjectVsBroadPhaseLayerFilter: This class defines a ObjectVsBroadPhaseLayerFilter::ShouldCollide function that checks if an ObjectLayer collides with objects that reside in a particular BroadPhaseLayer. ObjectLayers can collide with as many BroadPhaseLayers as needed, so it is possible for a collision query to visit multiple broad phase trees.
 * ObjectLayerPairFilter: This class defines a ObjectLayerPairFilter::ShouldCollide function that checks if an ObjectLayer collides with another ObjectLayer.
 
@@ -410,6 +410,24 @@ Each body has a motion quality setting ([EMotionQuality](@ref EMotionQuality)). 
 Fast rotating long objects are also to be avoided, as the LinearCast motion quality will fully rotate the object at the beginning of the time step and from that orientation perform the CastShape, there is a chance that the object misses a collision because it rotated through it.
 
 ![Even with the LinearCast motion quality the blue object rotates through the green object in a single time step.](Images/LongAndThin.jpg)
+
+## Ghost Collisions {#ghost-collisions}
+
+A ghost collision can occur when a body slides over another body and hits an internal edge of that body. The most common case is where a body hits an edge of a triangle in a mesh shape but it can also happen on 2 box shapes as shown below.
+
+![A blue box sliding over 2 green boxes. Because the blue box can sink into the green box a little bit, it can hit the edge between the two boxes. This will cause the box to stop or jump up.](Images/GhostCollision.jpg)
+
+There are a couple of ways to avoid ghost collisions in Jolt. MeshShape and HeightFieldShape keep track of active edges during construction.
+
+![An inactive edge (concave) and an active edge (convex, angle > threshold angle).](Images/ActiveEdge.jpg)
+
+Whenever a body hits an inactive edge, the contact normal is the face normal. When it hits an active edge, it can be somewhere in between the connecting face normals so the movement of the body is impeded in the scenario below.
+
+![Contact normal (red) of hitting an active vs an inactive edge.](Images/ActiveVsInactiveContactNormal.jpg)
+
+By tweaking MeshShapeSettings::mActiveEdgeCosThresholdAngle or HeightFieldShapeSettings::mActiveEdgeCosThresholdAngle you can determine the angle at which an edge is considered an active edge. By default this is 5 degrees, making this bigger reduces the amount of ghost collisions but can create simulation artifacts if you hit the edge straight on.
+
+To further reduce ghost collisions, you can turn on BodyCreationSettings::mEnhancedInternalEdgeRemoval. When enabling this setting, additional checks will be made at run-time to detect if an edge is active or inactive based on all of the contact points between the two bodies. Beware that this algorithm only considers 2 bodies at a time, so if the two green boxes above belong to two different bodies, the ghost collision can still occur. Use a StaticCompoundShape to combine the boxes in a single body to allow the system to eliminate ghost collisions between the blue and the two green boxes. You can also use this functionality for your custom collision tests by making use of InternalEdgeRemovingCollector. 
 
 # Character Controllers {#character-controllers}
 
@@ -527,6 +545,10 @@ PhysicsSystems are not completely independent:
 * The custom memory allocation functions (e.g. Allocate), Trace and AssertFailed functions are shared.
 
 These functions / systems need to be registered in advance.
+
+# Debug Rendering {#debug-rendering}
+
+When the define JPH_DEBUG_RENDERER is defined (which by default is defined in Debug and Release but not Distribution), Jolt is able to render its internal state. To integrate this into your own application you must inherit from the DebugRenderer class and implement the pure virtual functions DebugRenderer::DrawLine, DebugRenderer::DrawTriangle, DebugRenderer::CreateTriangleBatch, DebugRenderer::DrawGeometry and DebugRenderer::DrawText3D. The CreateTriangleBatch is used to prepare a batch of triangles to be drawn by a single DrawGeometry call, which means that Jolt can render a complex scene much more efficiently than when each triangle in that scene would have been drawn through DrawTriangle. At run-time create an instance of your DebugRenderer which will internally assign itself to DebugRenderer::sInstance. Finally call for example PhysicsSystem::DrawBodies or PhysicsSystem::DrawConstraints to draw the state of the simulation. For an example implementation see [the DebugRenderer from the Samples application](https://github.com/jrouwe/JoltPhysics/blob/master/TestFramework/Renderer/DebugRendererImp.h).
 
 # The Simulation Step in Detail {#the-simulation-step-in-detail}
 

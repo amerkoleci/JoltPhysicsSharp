@@ -19,11 +19,14 @@ For breaking API changes see [this document](https://github.com/jrouwe/JoltPhysi
 * Added function to query the bounding box of all bodies in the physics system, see PhysicsSystem::GetBounds.
 * Renamed SensorDetectsStatic to CollideKinematicVsNonDynamic and made it work for non-sensors. This means that kinematic bodies can now get collision callbacks when they collide with other static / kinematic objects.
 * CharacterVirtual will now receive an OnContactAdded callback when it collides with a sensor (but will have no further interaction).
+* Added support for a vertex radius for soft bodies. This keeps the vertices a fixed distance away from the surface which can be used to avoid z-fighting while rendering the soft body.
+* Implemented enhanced internal edge removal algorithm. This should help reduce ghost collisions. See BodyCreationSettings::mEnhancedInternalEdgeRemoval.
 
 ### Improvements
 * Multithreading the SetupVelocityConstraints job. This was causing a bottleneck in the case that there are a lot of constraints but very few possible collisions.
 
 ### Bug fixes
+* Fixed a bug in cast sphere vs triangle that could return a false positive hit against a degenerate triangle.
 * Fixed bug in soft body vs tapered capsule. The calculations were slightly off causing a normal on the top or bottom sphere to be returned while the tapered part was actually closest.
 * Fixed bug where soft bodies would collide with sensors as if they were normal bodies.
 * Sensors will no longer use speculative contacts, so will no longer report contacts before an actual contact is detected.
