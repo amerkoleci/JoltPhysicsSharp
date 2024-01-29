@@ -230,10 +230,24 @@ typedef struct JPH_SubShapeIDPair {
 
 // NOTE: Needs to be kept in sync with JPH::RayCastResult
 typedef struct JPH_RayCastResult {
-    JPH_BodyID     bodyID; // JPC_BODY_ID_INVALID
-    float          fraction; // 1.0 + JPC_FLT_EPSILON
+    JPH_BodyID     bodyID;
+    float          fraction;
     JPH_SubShapeID subShapeID2;
 } JPH_RayCastResult;
+
+// NOTE: Needs to be kept in sync with JPH::ShapeCastResult
+typedef struct JPH_CollideShapeResult
+{
+    JPH_Vec4           contactPointOn1;
+    JPH_Vec4           contactPointOn2;
+    JPH_Vec4           penetrationAxis;
+    float              penetrationDepth;
+    JPH_SubShapeID     subShapeID1;
+    JPH_SubShapeID     subShapeID2;
+    JPH_BodyID         bodyID2;
+} JPH_CollideShapeResult;
+
+typedef JPH_CollideShapeResult JPH_ShapeCastResult;
 
 typedef struct JPH_BroadPhaseLayerInterface			JPH_BroadPhaseLayerInterface;
 typedef struct JPH_ObjectVsBroadPhaseLayerFilter	JPH_ObjectVsBroadPhaseLayerFilter;
@@ -272,6 +286,7 @@ typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
 typedef struct JPH_MeshShape                    JPH_MeshShape;
 typedef struct JPH_MutableCompoundShape         JPH_MutableCompoundShape;
 typedef struct JPH_ConvexHullShape              JPH_ConvexHullShape;
+typedef struct JPH_HeightFieldShape             JPH_HeightFieldShape;
 typedef struct JPH_RotatedTranslatedShape       JPH_RotatedTranslatedShape;
 
 typedef struct JPH_BodyCreationSettings         JPH_BodyCreationSettings;
@@ -302,6 +317,10 @@ typedef struct JPH_HingeConstraint              JPH_HingeConstraint;
 typedef struct JPH_SliderConstraint             JPH_SliderConstraint;
 typedef struct JPH_SwingTwistConstraint         JPH_SwingTwistConstraint;
 typedef struct JPH_SixDOFConstraint				JPH_SixDOFConstraint;
+
+typedef struct JPH_AllHit_CastRayCollector      JPH_AllHit_CastRayCollector;
+typedef struct JPH_AllHit_CastShapeCollector    JPH_AllHit_CastShapeCollector;
+typedef struct JPH_ShapeCastSettings            JPH_ShapeCastSettings;
 
 typedef struct JPH_CollideShapeResult           JPH_CollideShapeResult;
 typedef struct JPH_ContactListener              JPH_ContactListener;
@@ -364,6 +383,7 @@ JPH_CAPI uint32_t JPH_ObjectLayerPairFilterMask_GetMask(JPH_ObjectLayer layer);
 JPH_CAPI JPH_ObjectLayerPairFilter* JPH_ObjectLayerPairFilterTable_Create(uint32_t numObjectLayers);
 JPH_CAPI void JPH_ObjectLayerPairFilterTable_DisableCollision(JPH_ObjectLayerPairFilter* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
 JPH_CAPI void JPH_ObjectLayerPairFilterTable_EnableCollision(JPH_ObjectLayerPairFilter* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
+JPH_CAPI JPH_Bool32 JPH_ObjectLayerPairFilterTable_ShouldCollide(JPH_ObjectLayerPairFilter* objectFilter, JPH_ObjectLayer layer1, JPH_ObjectLayer layer2);
 
 /* JPH_ObjectVsBroadPhaseLayerFilter */
 JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilterMask_Create(const JPH_BroadPhaseLayerInterface* broadPhaseLayerInterface);
@@ -470,6 +490,7 @@ JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSet
 
 /* HeightFieldShape */
 JPH_CAPI JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount);
+JPH_CAPI JPH_HeightFieldShape* JPH_HeightFieldShapeSettings_CreateShape(JPH_HeightFieldShapeSettings* settings);
 JPH_CAPI void JPH_MeshShapeSettings_DetermineMinAndMaxSample(const JPH_HeightFieldShapeSettings* settings, float* pOutMinValue, float* pOutMaxValue, float* pOutQuantizationScale);
 JPH_CAPI uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFieldShapeSettings* settings, float maxError);
 
@@ -532,6 +553,7 @@ JPH_CAPI JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create();
 /* JPH_SpringSettings */
 JPH_CAPI JPH_SpringSettings* JPH_SpringSettings_Create(float frequency, float damping);
 JPH_CAPI float JPH_SpringSettings_GetFrequency(JPH_SpringSettings* settings);
+JPH_CAPI void JPH_SpringSettings_Destroy(JPH_SpringSettings* settings);
 
 /* JPH_ConstraintSettings */
 JPH_CAPI void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings);
@@ -604,6 +626,7 @@ JPH_CAPI void JPH_SliderConstraintSettings_GetSliderAxis(JPH_SliderConstraintSet
 JPH_CAPI JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2); // binding for SliderConstraintSettings::Create()
 
 /* JPH_SliderConstraint */
+JPH_CAPI JPH_SliderConstraintSettings* JPH_SliderConstraint_GetSettings(JPH_SliderConstraint* constraint);
 JPH_CAPI float JPH_SliderConstraint_GetCurrentPosition(JPH_SliderConstraint* constraint);
 JPH_CAPI void JPH_SliderConstraint_SetLimits(JPH_SliderConstraint* constraint, float inLimitsMin, float inLimitsMax);
 JPH_CAPI float JPH_SliderConstraint_GetLimitsMin(JPH_SliderConstraint* constraint);
@@ -737,19 +760,56 @@ JPH_CAPI float JPH_MotionProperties_GetInverseMassUnchecked(JPH_MotionProperties
 JPH_CAPI void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JPH_AllowedDOFs allowedDOFs, const JPH_MassProperties* massProperties);
 
 //--------------------------------------------------------------------------------------------------
+// JPH_MassProperties
+//--------------------------------------------------------------------------------------------------
+JPH_CAPI void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass);
+
+//--------------------------------------------------------------------------------------------------
 // JPH_NarrowPhaseQuery
 //--------------------------------------------------------------------------------------------------
 JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     const JPH_RVec3* origin, const JPH_Vec3* direction,
-    JPH_RayCastResult* hit, // *Must* be default initialized (see JPH_RayCastResult)
+    JPH_RayCastResult* hit,
     const void* broadPhaseLayerFilter, // Can be NULL (no filter)
     const void* objectLayerFilter, // Can be NULL (no filter)
     const void* bodyFilter); // Can be NULL (no filter)
+
+/* JPH_NarrowPhaseQuery */
+JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
+    const JPH_Shape* shape,
+    const JPH_RMatrix4x4* worldTransform, const JPH_Vec3* direction,
+    JPH_RVec3* baseOffset,
+    JPH_AllHit_CastShapeCollector* hit_collector);
+
+JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRayAll(const JPH_NarrowPhaseQuery* query,
+    const JPH_RVec3* origin, const JPH_Vec3* direction,
+    JPH_AllHit_CastRayCollector* hit_collector,
+    const void* broadPhaseLayerFilter, // Can be NULL (no filter)
+    const void* objectLayerFilter, // Can be NULL (no filter)
+    const void* bodyFilter); // Can be NULL (no filter)
+
+/* JPH_ShapeCastSettings */
+JPH_CAPI JPH_ShapeCastSettings* JPH_ShapeCastSettings_Create();
+JPH_CAPI void JPH_ShapeCastSettings_Destroy(JPH_ShapeCastSettings* settings);
+
+/* JPH_AllHit_CastRayCollector */
+JPH_CAPI JPH_AllHit_CastRayCollector* JPH_AllHit_CastRayCollector_Create();
+JPH_CAPI void JPH_AllHit_CastRayCollector_Destroy(JPH_AllHit_CastRayCollector* collector);
+JPH_CAPI void JPH_AllHit_CastRayCollector_Reset(JPH_AllHit_CastRayCollector* collector);
+JPH_CAPI JPH_RayCastResult* JPH_AllHit_CastRayCollector_GetHits(JPH_AllHit_CastRayCollector* collector, size_t * size);
+
+/* JPH_AllHit_CastShapeCollector */
+JPH_CAPI JPH_AllHit_CastShapeCollector* JPH_AllHit_CastShapeCollector_Create();
+JPH_CAPI void JPH_AllHit_CastShapeCollector_Destroy(JPH_AllHit_CastShapeCollector* collector);
+JPH_CAPI void JPH_AllHit_CastShapeCollector_Reset(JPH_AllHit_CastShapeCollector* collector);
+JPH_CAPI JPH_ShapeCastResult* JPH_AllHit_CastShapeCollector_GetHits(JPH_AllHit_CastShapeCollector* collector, size_t * size);
+JPH_CAPI JPH_BodyID JPH_AllHit_CastShapeCollector_GetBodyID2(JPH_AllHit_CastShapeCollector* collector, unsigned index);
 
 /* Body */
 JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
 JPH_CAPI JPH_BodyType JPH_Body_GetBodyType(const JPH_Body* body);
 JPH_CAPI void JPH_Body_GetWorldSpaceBounds(const JPH_Body* body, JPH_AABox* result);
+JPH_CAPI void JPH_Body_GetWorldSpaceSurfaceNormal(const JPH_Body* body, JPH_SubShapeID subShapeID, const JPH_RVec3* position, JPH_Vec3* normal);
 
 JPH_CAPI JPH_Bool32 JPH_Body_IsActive(const JPH_Body* body);
 JPH_CAPI JPH_Bool32 JPH_Body_IsStatic(const JPH_Body* body);
