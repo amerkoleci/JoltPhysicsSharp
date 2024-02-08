@@ -81,7 +81,7 @@ internal static unsafe partial class JoltApi
         }
         else
         {
-            if (NativeLibrary.TryLoad(LibName, assembly, searchPath, out nativeLibrary))
+            if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
                 return true;
             }
