@@ -22,7 +22,7 @@ jobs:
 
     - name: Get CMake
       uses: lukka/get-cmake@v3.28.0
-      
+
     - name: Configure win-x64
       run: cmake -S "." -B "build_win_64" -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE:String=Distribution
     - name: Build win-x64
@@ -31,7 +31,7 @@ jobs:
     - name: Configure win-x64 double
       run: cmake -S "." -B "build_win_64_double" -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
     - name: Build win-x64 double
-      run: cmake --build build_win_64_double --config Distribution      
+      run: cmake --build build_win_64_double --config Distribution
 
     - name: Configure win-arm64
       run: cmake -S "." -B "build_win_arm64" -G "Visual Studio 17 2022" -A ARM64 -DCMAKE_BUILD_TYPE:String=Distribution
@@ -69,7 +69,7 @@ jobs:
     - name: Build linux-x64
       run: cmake --build build_linux_64 --config Distribution --verbose --parallel
 
-    # Linux artifact 
+    # Linux artifact
     - name: package_linux
       run: |
         mkdir -p bin/linux-x64/native
@@ -87,16 +87,30 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@v3.28.0
 
-    - name: Configure osx-universal
-      run: cmake -S "." -B "build_osx" -G Ninja -DCMAKE_BUILD_TYPE=Distribution -D"CMAKE_OSX_ARCHITECTURES=x86_64;arm64"
-    - name: Build osx-universal
-      run: cmake --build build_osx --config Distribution --verbose --parallel
+    - name: Configure osx-x64
+      run: cmake -S "." -B "build_osx_64" -G Ninja -DCMAKE_BUILD_TYPE=Distribution -D"CMAKE_OSX_ARCHITECTURES=x64;"
+    - name: Build osx-x64
+      run: cmake --build build_osx_64 --config Distribution --verbose --parallel
+
+    - name: Configure osx-arm64
+      run: cmake -S "." -B "build_osx_arm64" -G Ninja -DCMAKE_BUILD_TYPE=Distribution -D"CMAKE_OSX_ARCHITECTURES=arm64;"
+    - name: Build osx-arm64
+      run: cmake --build build_osx_arm64 --config Distribution --verbose --parallel
+
+    - name: Configure osx-x86
+      run: cmake -S "." -B "build_osx_x86" -G Ninja -DCMAKE_BUILD_TYPE=Distribution -D"CMAKE_OSX_ARCHITECTURES=x86;"
+    - name: Build osx-x86
+      run: cmake --build build_osx_x86 --config Distribution --verbose --parallel
 
     # macOS artifacts
     - name: package_osx
       run: |
-        mkdir -p bin/osx-universal/native
-        mv build_osx/lib/libjoltc.dylib bin/osx-universal/native/libjoltc.dylib
+        mkdir -p bin/osx-x64/native
+        mkdir -p bin/osx-arm64/native
+        mkdir -p bin/osx-x86/native
+        mv build_osx_x64/lib/libjoltc.dylib bin/osx-universal/native/libjoltc.dylib
+        mv build_osx_arm64/lib/libjoltc.dylib bin/osx-universal/native/libjoltc.dylib
+        mv build_osx_x86/lib/libjoltc.dylib bin/osx-universal/native/libjoltc.dylib
     - uses: actions/upload-artifact@v3
       with:
         name: libs_osx

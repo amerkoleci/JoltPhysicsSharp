@@ -25,7 +25,17 @@
         <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/linux-x64/native/libjoltc.so" Link="libjoltc.so" Visible="False" CopyToOutputDirectory="PreserveNewest" />
       </ItemGroup>
     </When>
-    <When Condition="($([MSBuild]::IsOsPlatform('osx')) and '$(RuntimeIdentifier)'=='') or '$(RuntimeIdentifier)'=='osx-universal'">
+    <When Condition="($([MSBuild]::IsOsPlatform('osx')) and '$(RuntimeIdentifier)'=='') or '$(RuntimeIdentifier)'=='osx-x64'">
+      <ItemGroup>
+        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/osx-universal/native/libjoltc.dylib" Link="libjoltc.dylib" Visible="False" CopyToOutputDirectory="PreserveNewest" />
+      </ItemGroup>
+    </When>
+    <When Condition="($([MSBuild]::IsOsPlatform('osx')) and '$(RuntimeIdentifier)'=='') or '$(RuntimeIdentifier)'=='osx-arm64'">
+      <ItemGroup>
+        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/osx-universal/native/libjoltc.dylib" Link="libjoltc.dylib" Visible="False" CopyToOutputDirectory="PreserveNewest" />
+      </ItemGroup>
+    </When>
+    <When Condition="($([MSBuild]::IsOsPlatform('osx')) and '$(RuntimeIdentifier)'=='') or '$(RuntimeIdentifier)'=='osx-x86'">
       <ItemGroup>
         <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/osx-universal/native/libjoltc.dylib" Link="libjoltc.dylib" Visible="False" CopyToOutputDirectory="PreserveNewest" />
       </ItemGroup>
