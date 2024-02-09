@@ -105,9 +105,7 @@ jobs:
     # macOS artifacts
     - name: package_osx
       run: |
-        mkdir -p bin/osx-x64/native
-        mkdir -p bin/osx-arm64/native
-        mkdir -p bin/osx-x86/native
+        mkdir -p bin/osx-universal/native
         mv build_osx_x64/lib/libjoltc.dylib bin/osx-universal/native/libjoltc.dylib
         mv build_osx_arm64/lib/libjoltc.dylib bin/osx-universal/native/libjoltc.dylib
         mv build_osx_x86/lib/libjoltc.dylib bin/osx-universal/native/libjoltc.dylib
