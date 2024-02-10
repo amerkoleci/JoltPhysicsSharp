@@ -3102,11 +3102,12 @@ JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create()
 JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings, 
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
+	uint64_t userData,
     JPH_PhysicsSystem* system)
 {
     auto jolt_settings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
 
-    auto jolt_character = new JPH::CharacterVirtual(jolt_settings, ToRVec3(position), ToQuat(rotation), system->physicsSystem);
+    auto jolt_character = new JPH::CharacterVirtual(jolt_settings, ToRVec3(position), ToQuat(rotation), userData, system->physicsSystem);
     jolt_character->AddRef();
 
     return reinterpret_cast<JPH_CharacterVirtual*>(jolt_character);
