@@ -31,7 +31,7 @@ jobs:
     - name: Configure win-x64 double
       run: cmake -S "." -B "build_win_64_double" -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE:String=Distribution -DDOUBLE_PRECISION=ON
     - name: Build win-x64 double
-      run: cmake --build build_win_64_double --config Distribution      
+      run: cmake --build build_win_64_double --config Distribution
 
     - name: Configure win-arm64
       run: cmake -S "." -B "build_win_arm64" -G "Visual Studio 17 2022" -A ARM64 -DCMAKE_BUILD_TYPE:String=Distribution
@@ -65,15 +65,15 @@ jobs:
       uses: lukka/get-cmake@v3.28.0
 
     - name: Configure linux-x64
-      run: cmake -S "." -B "build_linux_64" -G Ninja -DCMAKE_BUILD_TYPE=Distribution
+      run: cmake -S "." -B "build_linux_x64" -G Ninja -DCMAKE_BUILD_TYPE=Distribution
     - name: Build linux-x64
-      run: cmake --build build_linux_64 --config Distribution --verbose --parallel
+      run: cmake --build build_linux_x64 --config Distribution --verbose --parallel
 
     # Linux artifact 
     - name: package_linux
       run: |
         mkdir -p bin/linux-x64/native
-        mv build_linux_64/lib/libjoltc.so bin/linux-x64/native/libjoltc.so
+        mv build_linux_x64/lib/libjoltc.so bin/linux-x64/native/libjoltc.so
     - uses: actions/upload-artifact@v3
       with:
         name: libs_linux
@@ -95,8 +95,8 @@ jobs:
     # macOS artifacts
     - name: package_osx
       run: |
-        mkdir -p bin/osx-universal/native
-        mv build_osx/lib/libjoltc.dylib bin/osx-universal/native/libjoltc.dylib
+        mkdir -p bin/osx/native
+        mv build_osx/lib/libjoltc.dylib bin/osx/native/libjoltc.dylib
     - uses: actions/upload-artifact@v3
       with:
         name: libs_osx
