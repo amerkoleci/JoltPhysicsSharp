@@ -8,8 +8,8 @@ namespace JoltPhysicsSharp;
 
 public sealed class CharacterVirtual : CharacterBase
 {
-    public CharacterVirtual(CharacterVirtualSettings settings, in Double3 position, in Quaternion rotation, PhysicsSystem physicsSystem)
-        : base(JPH_CharacterVirtual_Create(settings.Handle, position, rotation, physicsSystem.Handle))
+    public CharacterVirtual(CharacterVirtualSettings settings, in Double3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+        : base(JPH_CharacterVirtual_Create(settings.Handle, position, rotation, userData, physicsSystem.Handle))
     {
 
     }

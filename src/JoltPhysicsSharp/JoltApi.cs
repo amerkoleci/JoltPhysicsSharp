@@ -63,11 +63,15 @@ internal static unsafe partial class JoltApi
         }
         else if (OperatingSystem.IsLinux())
         {
-            dllName = DoublePrecision ? $"lib{LibDoubleName}.so" : $"lib{LibName}.so";
+            // We don't support double precision ATM
+            //dllName = DoublePrecision ? $"lib{LibDoubleName}.so" : $"lib{LibName}.so";
+            dllName = $"lib{LibName}.so";
         }
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
         {
-            dllName = DoublePrecision ? $"lib{LibDoubleName}.dylib" : $"lib{LibName}.dylib";
+            // We don't support double precision ATM
+            //dllName = DoublePrecision ? $"lib{LibDoubleName}.dylib" : $"lib{LibName}.dylib";
+            dllName = $"lib{LibName}.dylib";
         }
 
         if (isNuGetRuntimeLibrariesDirectoryPresent)
@@ -1062,7 +1066,7 @@ internal static unsafe partial class JoltApi
 
     /* CharacterVirtual */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_CharacterVirtual_Create(IntPtr settings, in Double3 position, in Quaternion rotation, IntPtr physicsSystem);
+    public static extern IntPtr JPH_CharacterVirtual_Create(IntPtr settings, in Double3 position, in Quaternion rotation, ulong userData, IntPtr physicsSystem);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_CharacterVirtual_GetLinearVelocity(IntPtr handle, out Vector3 velocity);
