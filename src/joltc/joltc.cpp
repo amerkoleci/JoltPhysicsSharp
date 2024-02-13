@@ -2510,6 +2510,8 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     );
     if (collector.HadHit())
         hit->fraction = collector.mHit.mFraction;
+		hit->bodyID = collector.mHit.mBodyID.GetIndexAndSequenceNumber();
+		hit->subShapeID2 = collector.mHit.mSubShapeID2.GetValue();
     return collector.HadHit();
 }
 
