@@ -128,7 +128,7 @@ jobs:
         run: ls -R
         working-directory: src/JoltPhysicsSharp/runtimes
       - name: Commit changes
-        uses: EndBug/add-and-commit@v9.1.4
+        uses: EndBug/add-and-commit@v9.1.3
         with:
           message: Updated native libs
           committer_name: GitHub Actions
