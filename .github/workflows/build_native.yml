@@ -51,7 +51,7 @@ jobs:
         mv build_win_64_double\bin\Distribution\joltc_double.dll bin/win-x64/native
         mv build_win_arm64\bin\Distribution\joltc.dll bin/win-arm64/native
         mv build_win_arm64_double\bin\Distribution\joltc_double.dll bin/win-arm64/native
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: libs_windows
         path: bin
@@ -74,7 +74,7 @@ jobs:
       run: |
         mkdir -p bin/linux-x64/native
         mv build_linux_x64/lib/libjoltc.so bin/linux-x64/native/libjoltc.so
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: libs_linux
         path: bin
@@ -97,7 +97,7 @@ jobs:
       run: |
         mkdir -p bin/osx/native
         mv build_osx/lib/libjoltc.dylib bin/osx/native/libjoltc.dylib
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: libs_osx
         path: bin
