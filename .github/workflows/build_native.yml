@@ -109,20 +109,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.0.0
-      - name: Download windows lib
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: libs_windows
-          path: src/JoltPhysicsSharp/runtimes
-      - name: Download ubuntu lib
-        uses: actions/download-artifact@v4
-        with:
-          name: libs_linux
-          path: src/JoltPhysicsSharp/runtimes
-      - name: Download macos lib
-        uses: actions/download-artifact@v4
-        with:
-          name: libs_osx
           path: src/JoltPhysicsSharp/runtimes
       - name: Display structure of downloaded files
         run: ls -R
