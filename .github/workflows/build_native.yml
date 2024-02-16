@@ -128,8 +128,14 @@ jobs:
         run: ls -R
         working-directory: src/JoltPhysicsSharp/runtimes
       - name: Commit changes
-        uses: EndBug/add-and-commit@v9.1.3
+        uses: EndBug/add-and-commit@v9.1.4
         with:
           message: Updated native libs
           committer_name: GitHub Actions
           committer_email: actions@github.com
+      - uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            libs_windows
+            libs_linux
+            libs_osx
