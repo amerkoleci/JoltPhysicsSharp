@@ -22,6 +22,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 
 if (MSVC)
     target_compile_options(${TARGET_NAME} PRIVATE /Wall /WX)
+    target_compile_options(${TARGET_NAME} PRIVATE /wd4710)
 else()
     target_compile_options(${TARGET_NAME} PRIVATE -Wall -Werror)
 endif()

@@ -50,6 +50,7 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Constraints/SixDOFConstraint.h"
 #include "Jolt/Physics/Character/CharacterBase.h"
 #include "Jolt/Physics/Character/CharacterVirtual.h"
+#include "Jolt/Physics/StateRecorderImpl.h"
 
 #ifdef _MSC_VER
 __pragma(warning(pop))
@@ -1920,6 +1921,24 @@ JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH
     system->physicsSystem->RemoveConstraints(joltConstraints.data(), (int)count);
 }
 
+void JPH_PhysicsSystem_SaveState(JPH_PhysicsSystem* system, JPH_StateRecorder* recorder, JPH_StateRecorderState state)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(recorder);
+
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorder*>(recorder);
+    system->physicsSystem->SaveState(*jolt_recorder, static_cast<JPH::EStateRecorderState>(state));
+}
+
+void JPH_PhysicsSystem_RestoreState(JPH_PhysicsSystem* system, JPH_StateRecorder* recorder)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(recorder);
+
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorder*>(recorder); 
+    system->physicsSystem->RestoreState(*jolt_recorder);
+}
+
 JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
 {
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
@@ -3091,6 +3110,22 @@ JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* characte
     return jolt_character->GetGroundSubShapeID().GetValue();
 }
 
+void JPH_CharacterBase_SaveState(JPH_CharacterBase* character, JPH_StateRecorder* recorder)
+{
+    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorder*>(recorder);
+
+    jolt_character->SaveState(*jolt_recorder);
+}
+
+void JPH_CharacterBase_RestoreState(JPH_CharacterBase* character, JPH_StateRecorder* recorder)
+{
+    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorder*>(recorder);
+
+    jolt_character->RestoreState(*jolt_recorder);
+}
+
 /* CharacterVirtualSettings */
 JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create()
 {
@@ -3195,6 +3230,82 @@ void JPH_CharacterVirtual_RefreshContacts(JPH_CharacterVirtual* character, JPH_O
         {},
         *s_TempAllocator
     );
+}
+
+/* StateRecorder */
+JPH_StateRecorder* JPH_StateRecorder_Create()
+{
+    auto jolt_recorder = new JPH::StateRecorderImpl();
+    return reinterpret_cast<JPH_StateRecorder*>(jolt_recorder);
+}
+
+void JPH_StateRecorder_Destroy(JPH_StateRecorder* recorder)
+{
+    if (recorder)
+    {
+        delete reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    }
+}
+
+void JPH_StateRecorder_SetValidating(JPH_StateRecorder* recorder, JPH_Bool32 validating)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    jolt_recorder->SetValidating(!!validating);
+}
+
+JPH_Bool32 JPH_StateRecorder_IsValidating(JPH_StateRecorder* recorder)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    return jolt_recorder->IsValidating();
+}
+
+void JPH_StateRecorder_Rewind(JPH_StateRecorder* recorder)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    jolt_recorder->Rewind();
+}
+
+void JPH_StateRecorder_Clear(JPH_StateRecorder* recorder)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    jolt_recorder->Clear();
+}
+
+JPH_Bool32 JPH_StateRecorder_IsEOF(JPH_StateRecorder* recorder)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    return jolt_recorder->IsEOF();
+}
+
+JPH_Bool32 JPH_StateRecorder_IsFailed(JPH_StateRecorder* recorder)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    return jolt_recorder->IsFailed();
+}
+
+JPH_Bool32 JPH_StateRecorder_IsEqual(JPH_StateRecorder* recorder, JPH_StateRecorder* other)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    auto jolt_other = reinterpret_cast<JPH::StateRecorderImpl*>(other);
+    return jolt_recorder->IsEqual(*jolt_other);
+}
+
+void JPH_StateRecorder_WriteBytes(JPH_StateRecorder* recorder, const void* data, size_t size)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    jolt_recorder->WriteBytes(data, size);
+}
+
+void JPH_StateRecorder_ReadBytes(JPH_StateRecorder* recorder, void* data, size_t size)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    jolt_recorder->ReadBytes(data, size);
+}
+
+size_t JPH_StateRecorder_GetSize(JPH_StateRecorder* recorder)
+{
+    auto jolt_recorder = reinterpret_cast<JPH::StateRecorderImpl*>(recorder);
+    return jolt_recorder->GetData().size();
 }
 
 #ifdef _MSC_VER

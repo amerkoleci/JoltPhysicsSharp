@@ -151,6 +151,16 @@ typedef enum JPH_SixDOFConstraintAxis {
     _JPH_SixDOFConstraintAxis_Force32 = 0x7FFFFFFF
 } JPH_SixDOFConstraintAxis;
 
+typedef enum JPH_StateRecorderState
+{
+    JPH_StateRecorderState_None = 0,
+    JPH_StateRecorderState_Global = 1,
+    JPH_StateRecorderState_Bodies = 2,
+    JPH_StateRecorderState_Contacts = 4,
+    JPH_StateRecorderState_Constraints = 8,
+    JPH_StateRecorderState_All = JPH_StateRecorderState_Global | JPH_StateRecorderState_Bodies | JPH_StateRecorderState_Contacts | JPH_StateRecorderState_Constraints
+} JPH_StateRecorderState;
+
 typedef struct JPH_Vec3 {
     float x;
     float y;
@@ -329,6 +339,8 @@ typedef struct JPH_BodyActivationListener       JPH_BodyActivationListener;
 
 typedef struct JPH_SharedMutex                  JPH_SharedMutex;
 
+typedef struct JPH_StateRecorder                JPH_StateRecorder;
+
 typedef struct JPH_BodyLockRead
 {
     const JPH_BodyLockInterface* lockInterface;
@@ -433,6 +445,9 @@ JPH_CAPI void JPH_PhysicsSystem_RemoveConstraint(JPH_PhysicsSystem* system, JPH_
 
 JPH_CAPI void JPH_PhysicsSystem_AddConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count);
 JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH_Constraint** constraints, uint32_t count);
+
+JPH_CAPI void JPH_PhysicsSystem_SaveState(JPH_PhysicsSystem* system, JPH_StateRecorder* recorder, JPH_StateRecorderState state);
+JPH_CAPI void JPH_PhysicsSystem_RestoreState(JPH_PhysicsSystem* system, JPH_StateRecorder* recorder);
 
 /* Math */
 JPH_CAPI void JPH_Quaternion_FromTo(const JPH_Vec3* from, const JPH_Vec3* to, JPH_Quat* quat);
@@ -940,6 +955,8 @@ JPH_CAPI void JPH_CharacterBase_GetGroundNormal(JPH_CharacterBase* character, JP
 JPH_CAPI void JPH_CharacterBase_GetGroundVelocity(JPH_CharacterBase* character, JPH_Vec3* velocity);
 JPH_CAPI JPH_BodyID JPH_CharacterBase_GetGroundBodyId(JPH_CharacterBase* character);
 JPH_CAPI JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* character);
+JPH_CAPI void JPH_CharacterBase_SaveState(JPH_CharacterBase* character, JPH_StateRecorder* recorder);
+JPH_CAPI void JPH_CharacterBase_RestoreState(JPH_CharacterBase* character, JPH_StateRecorder* recorder);
 
 /* CharacterVirtualSettings */
 JPH_CAPI JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create();
@@ -959,5 +976,19 @@ JPH_CAPI void JPH_CharacterVirtual_SetRotation(JPH_CharacterVirtual* character, 
 JPH_CAPI void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime,
 	const JPH_ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, JPH_PhysicsSystem* system);
 JPH_CAPI void JPH_CharacterVirtual_RefreshContacts(JPH_CharacterVirtual* character, JPH_ObjectLayer layer, JPH_PhysicsSystem* system);
+
+/* StateRecorder */
+JPH_CAPI JPH_StateRecorder* JPH_StateRecorder_Create();
+JPH_CAPI void JPH_StateRecorder_Destroy(JPH_StateRecorder* recorder);
+JPH_CAPI void JPH_StateRecorder_SetValidating(JPH_StateRecorder* recorder, JPH_Bool32 validating);
+JPH_CAPI JPH_Bool32 JPH_StateRecorder_IsValidating(JPH_StateRecorder* recorder);
+JPH_CAPI void JPH_StateRecorder_Rewind(JPH_StateRecorder* recorder);
+JPH_CAPI void JPH_StateRecorder_Clear(JPH_StateRecorder* recorder);
+JPH_CAPI JPH_Bool32 JPH_StateRecorder_IsEOF(JPH_StateRecorder* recorder);
+JPH_CAPI JPH_Bool32 JPH_StateRecorder_IsFailed(JPH_StateRecorder* recorder);
+JPH_CAPI JPH_Bool32 JPH_StateRecorder_IsEqual(JPH_StateRecorder* recorder, JPH_StateRecorder* other);
+JPH_CAPI void JPH_StateRecorder_WriteBytes(JPH_StateRecorder* recorder, const void* data, size_t size);
+JPH_CAPI void JPH_StateRecorder_ReadBytes(JPH_StateRecorder* recorder, void* data, size_t size);
+JPH_CAPI size_t JPH_StateRecorder_GetSize(JPH_StateRecorder* recorder);
 
 #endif /* _JOLT_C_H */
