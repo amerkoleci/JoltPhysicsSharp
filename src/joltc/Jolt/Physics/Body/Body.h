@@ -131,7 +131,7 @@ public:
 	CollisionGroup &		GetCollisionGroup()												{ return mCollisionGroup; }
 	void					SetCollisionGroup(const CollisionGroup &inGroup)				{ mCollisionGroup = inGroup; }
 
-	/// If this body can go to sleep. Note that disabling sleeping on a sleeping object wil not wake it up.
+	/// If this body can go to sleep. Note that disabling sleeping on a sleeping object will not wake it up.
 	bool					GetAllowSleeping() const										{ return mMotionProperties->mAllowSleeping; }
 	void					SetAllowSleeping(bool inAllow);
 
@@ -191,6 +191,9 @@ public:
 	// Reset the total accumulated torque, not that this will be done automatically after every time step.
 	JPH_INLINE void			ResetTorque()													{ JPH_ASSERT(IsDynamic()); return mMotionProperties->ResetTorque(); }
 
+	// Reset the current velocity and accumulated force and torque.
+	JPH_INLINE void			ResetMotion()													{ JPH_ASSERT(!IsStatic()); return mMotionProperties->ResetMotion(); }
+
 	/// Get inverse inertia tensor in world space
 	inline Mat44			GetInverseInertia() const;
 
@@ -207,13 +210,13 @@ public:
 	void					MoveKinematic(RVec3Arg inTargetPosition, QuatArg inTargetRotation, float inDeltaTime);
 
 	/// Applies an impulse to the body that simulates fluid buoyancy and drag
-	/// @param inSurfacePosition Position on the fluid surface in world space
+	/// @param inSurfacePosition Position of the fluid surface in world space
 	/// @param inSurfaceNormal Normal of the fluid surface (should point up)
 	/// @param inBuoyancy The buoyancy factor for the body. 1 = neutral body, < 1 sinks, > 1 floats. Note that we don't use the fluid density since it is harder to configure than a simple number between [0, 2]
 	/// @param inLinearDrag Linear drag factor that slows down the body when in the fluid (approx. 0.5)
 	/// @param inAngularDrag Angular drag factor that slows down rotation when the body is in the fluid (approx. 0.01)
 	/// @param inFluidVelocity The average velocity of the fluid (in m/s) in which the body resides
-	/// @param inGravity The graviy vector (pointing down)
+	/// @param inGravity The gravity vector (pointing down)
 	/// @param inDeltaTime Delta time of the next simulation step (in s)
 	/// @return true if an impulse was applied, false if the body was not in the fluid
 	bool					ApplyBuoyancyImpulse(RVec3Arg inSurfacePosition, Vec3Arg inSurfaceNormal, float inBuoyancy, float inLinearDrag, float inAngularDrag, Vec3Arg inFluidVelocity, Vec3Arg inGravity, float inDeltaTime);
@@ -305,7 +308,7 @@ public:
 	/// Function to update body's position (should only be called by the BodyInterface since it also requires updating the broadphase)
 	void					SetPositionAndRotationInternal(RVec3Arg inPosition, QuatArg inRotation, bool inResetSleepTimer = true);
 
-	/// Updates the center of mass and optionally mass propertes after shifting the center of mass or changes to the shape (should only be called by the BodyInterface since it also requires updating the broadphase)
+	/// Updates the center of mass and optionally mass properties after shifting the center of mass or changes to the shape (should only be called by the BodyInterface since it also requires updating the broadphase)
 	/// @param inPreviousCenterOfMass Center of mass of the shape before the alterations
 	/// @param inUpdateMassProperties When true, the mass and inertia tensor is recalculated
 	void					UpdateCenterOfMassInternal(Vec3Arg inPreviousCenterOfMass, bool inUpdateMassProperties);
