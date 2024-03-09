@@ -501,10 +501,10 @@ JPH_CAPI JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create
 JPH_CAPI void JPH_CompoundShapeSettings_AddShape(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_ShapeSettings* shape, uint32_t userData);
 JPH_CAPI void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape, uint32_t userData);
 
-JPH_CAPI JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create();
+JPH_CAPI JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create(void);
 
 /* MutableCompoundShape */
-JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create();
+JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create(void);
 JPH_CAPI JPH_MutableCompoundShape* JPH_MutableCompoundShape_Create(const JPH_MutableCompoundShapeSettings* settings);
 
 /* RotatedTranslatedShape */
@@ -521,7 +521,7 @@ JPH_CAPI void JPH_Shape_GetCenterOfMass(JPH_Shape* shape, JPH_Vec3* result);
 JPH_CAPI float JPH_Shape_GetInnerRadius(JPH_Shape* shape);
 
 /* JPH_BodyCreationSettings */
-JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create();
+JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create(void);
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(JPH_ShapeSettings* settings,
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
@@ -547,7 +547,7 @@ JPH_CAPI JPH_AllowedDOFs JPH_BodyCreationSettings_GetAllowedDOFs(JPH_BodyCreatio
 JPH_CAPI void JPH_BodyCreationSettings_SetAllowedDOFs(JPH_BodyCreationSettings* settings, JPH_AllowedDOFs value);
 
 /* JPH_SoftBodyCreationSettings */
-JPH_CAPI JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create();
+JPH_CAPI JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create(void);
 //JPH_CAPI void JPH_SoftBodyCreationSettings_Destroy(JPH_SoftBodyCreationSettings* settings);
 
 /* JPH_SpringSettings */
@@ -789,17 +789,17 @@ JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRayAll(const JPH_NarrowPhaseQuery* 
     const void* bodyFilter); // Can be NULL (no filter)
 
 /* JPH_ShapeCastSettings */
-JPH_CAPI JPH_ShapeCastSettings* JPH_ShapeCastSettings_Create();
+JPH_CAPI JPH_ShapeCastSettings* JPH_ShapeCastSettings_Create(void);
 JPH_CAPI void JPH_ShapeCastSettings_Destroy(JPH_ShapeCastSettings* settings);
 
 /* JPH_AllHit_CastRayCollector */
-JPH_CAPI JPH_AllHit_CastRayCollector* JPH_AllHit_CastRayCollector_Create();
+JPH_CAPI JPH_AllHit_CastRayCollector* JPH_AllHit_CastRayCollector_Create(void);
 JPH_CAPI void JPH_AllHit_CastRayCollector_Destroy(JPH_AllHit_CastRayCollector* collector);
 JPH_CAPI void JPH_AllHit_CastRayCollector_Reset(JPH_AllHit_CastRayCollector* collector);
 JPH_CAPI JPH_RayCastResult* JPH_AllHit_CastRayCollector_GetHits(JPH_AllHit_CastRayCollector* collector, size_t * size);
 
 /* JPH_AllHit_CastShapeCollector */
-JPH_CAPI JPH_AllHit_CastShapeCollector* JPH_AllHit_CastShapeCollector_Create();
+JPH_CAPI JPH_AllHit_CastShapeCollector* JPH_AllHit_CastShapeCollector_Create(void);
 JPH_CAPI void JPH_AllHit_CastShapeCollector_Destroy(JPH_AllHit_CastShapeCollector* collector);
 JPH_CAPI void JPH_AllHit_CastShapeCollector_Reset(JPH_AllHit_CastShapeCollector* collector);
 JPH_CAPI JPH_ShapeCastResult* JPH_AllHit_CastShapeCollector_GetHits(JPH_AllHit_CastShapeCollector* collector, size_t * size);
@@ -868,7 +868,7 @@ typedef struct JPH_BroadPhaseLayerFilter_Procs {
 } JPH_BroadPhaseLayerFilter_Procs;
 
 JPH_CAPI void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter_Procs procs);
-JPH_CAPI JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create();
+JPH_CAPI JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create(void);
 JPH_CAPI void JPH_BroadPhaseLayerFilter_Destroy(JPH_BroadPhaseLayerFilter* filter);
 
 /* JPH_ObjectLayerFilter */
@@ -877,7 +877,7 @@ typedef struct JPH_ObjectLayerFilter_Procs {
 } JPH_ObjectLayerFilter_Procs;
 
 JPH_CAPI void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter_Procs procs);
-JPH_CAPI JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create();
+JPH_CAPI JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create(void);
 JPH_CAPI void JPH_ObjectLayerFilter_Destroy(JPH_ObjectLayerFilter* filter);
 
 /* JPH_BodyFilter */
@@ -887,7 +887,7 @@ typedef struct JPH_BodyFilter_Procs {
 } JPH_BodyFilter_Procs;
 
 JPH_CAPI void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs);
-JPH_CAPI JPH_BodyFilter* JPH_BodyFilter_Create();
+JPH_CAPI JPH_BodyFilter* JPH_BodyFilter_Create(void);
 JPH_CAPI void JPH_BodyFilter_Destroy(JPH_BodyFilter* filter);
 
 /* Contact listener */
@@ -912,7 +912,7 @@ typedef struct JPH_ContactListener_Procs {
 } JPH_ContactListener_Procs;
 
 JPH_CAPI void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs);
-JPH_CAPI JPH_ContactListener* JPH_ContactListener_Create();
+JPH_CAPI JPH_ContactListener* JPH_ContactListener_Create(void);
 JPH_CAPI void JPH_ContactListener_Destroy(JPH_ContactListener* listener);
 
 /* BodyActivationListener */
@@ -922,7 +922,7 @@ typedef struct JPH_BodyActivationListener_Procs {
 } JPH_BodyActivationListener_Procs;
 
 JPH_CAPI void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
-JPH_CAPI JPH_BodyActivationListener* JPH_BodyActivationListener_Create();
+JPH_CAPI JPH_BodyActivationListener* JPH_BodyActivationListener_Create(void);
 JPH_CAPI void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener);
 
 /* CharacterBaseSettings */
@@ -942,7 +942,7 @@ JPH_CAPI JPH_BodyID JPH_CharacterBase_GetGroundBodyId(JPH_CharacterBase* charact
 JPH_CAPI JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* character);
 
 /* CharacterVirtualSettings */
-JPH_CAPI JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create();
+JPH_CAPI JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void);
 
 /* CharacterVirtual */
 JPH_CAPI JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings, 

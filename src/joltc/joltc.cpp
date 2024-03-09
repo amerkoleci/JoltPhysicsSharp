@@ -559,7 +559,7 @@ void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter_Procs procs)
     g_BroadPhaseLayerFilter_Procs = procs;
 }
 
-JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create()
+JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create(void)
 {
     auto filter = new ManagedBroadPhaseLayerFilter();
     return reinterpret_cast<JPH_BroadPhaseLayerFilter*>(filter);
@@ -600,7 +600,7 @@ void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter_Procs procs)
     g_ObjectLayerFilter_Procs = procs;
 }
 
-JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create()
+JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create(void)
 {
     auto filter = new ManagedObjectLayerFilter();
     return reinterpret_cast<JPH_ObjectLayerFilter*>(filter);
@@ -647,7 +647,7 @@ void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs)
     g_BodyFilter_Procs = procs;
 }
 
-JPH_BodyFilter* JPH_BodyFilter_Create()
+JPH_BodyFilter* JPH_BodyFilter_Create(void)
 {
     auto filter = new ManagedBodyFilter();
     return reinterpret_cast<JPH_BodyFilter*>(filter);
@@ -1005,7 +1005,7 @@ void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, co
     joltSettings->AddShape(ToVec3(position), ToQuat(rotation), joltShape, userData);
 }
 
-JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create()
+JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create(void)
 {
     auto settings = new JPH::StaticCompoundShapeSettings();
     settings->AddRef();
@@ -1014,7 +1014,7 @@ JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create()
 }
 
 /* MutableCompoundShape */
-JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create()
+JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create(void)
 {
     auto settings = new JPH::MutableCompoundShapeSettings();
     settings->AddRef();
@@ -1115,7 +1115,7 @@ float JPH_Shape_GetInnerRadius(JPH_Shape* shape)
 }
 
 /* JPH_BodyCreationSettings */
-JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create()
+JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create(void)
 {
     auto bodyCreationSettings = new JPH::BodyCreationSettings();
     return reinterpret_cast<JPH_BodyCreationSettings*>(bodyCreationSettings);
@@ -1221,7 +1221,7 @@ void JPH_BodyCreationSettings_SetAllowedDOFs(JPH_BodyCreationSettings* settings,
 }
 
 /* JPH_SoftBodyCreationSettings */
-JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create()
+JPH_SoftBodyCreationSettings* JPH_SoftBodyCreationSettings_Create(void)
 {
     auto bodyCreationSettings = new JPH::SoftBodyCreationSettings();
     return reinterpret_cast<JPH_SoftBodyCreationSettings*>(bodyCreationSettings);
@@ -2515,7 +2515,7 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     return collector.HadHit();
 }
 
-JPH_AllHit_CastRayCollector* JPH_AllHit_CastRayCollector_Create()
+JPH_AllHit_CastRayCollector* JPH_AllHit_CastRayCollector_Create(void)
 {
     auto joltCollector = new AllHitCollisionCollector<CastRayCollector>();
     return reinterpret_cast<JPH_AllHit_CastRayCollector*>(joltCollector);
@@ -2569,7 +2569,7 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastRayAll(const JPH_NarrowPhaseQuery* query,
     return !joltCollector.mHits.empty();
 }
 
-JPH_AllHit_CastShapeCollector* JPH_AllHit_CastShapeCollector_Create()
+JPH_AllHit_CastShapeCollector* JPH_AllHit_CastShapeCollector_Create(void)
 {
     auto joltCollector = new AllHitCollisionCollector<CastShapeCollector>();
     return reinterpret_cast<JPH_AllHit_CastShapeCollector*>(joltCollector);
@@ -2947,7 +2947,7 @@ void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs)
     g_ContactListener_Procs = procs;
 }
 
-JPH_ContactListener* JPH_ContactListener_Create()
+JPH_ContactListener* JPH_ContactListener_Create(void)
 {
     auto impl = new ManagedContactListener();
     return reinterpret_cast<JPH_ContactListener*>(impl);
@@ -2991,7 +2991,7 @@ void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs)
     g_BodyActivationListener_Procs = procs;
 }
 
-JPH_BodyActivationListener* JPH_BodyActivationListener_Create()
+JPH_BodyActivationListener* JPH_BodyActivationListener_Create(void)
 {
     auto impl = new ManagedBodyActivationListener();
     return reinterpret_cast<JPH_BodyActivationListener*>(impl);
@@ -3092,7 +3092,7 @@ JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* characte
 }
 
 /* CharacterVirtualSettings */
-JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create()
+JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void)
 {
     auto settings = new JPH::CharacterVirtualSettings();
     settings->AddRef();
