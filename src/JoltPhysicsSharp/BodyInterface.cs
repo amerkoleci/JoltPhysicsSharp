@@ -238,16 +238,26 @@ public readonly struct BodyInterface : IEquatable<BodyInterface>
         return new ObjectLayer(JPH_BodyInterface_GetObjectLayer(Handle, bodyId));
     }
 
-    public Matrix4x4 GetWorldTransform(in BodyID bodyID)
+    public RMatrix4x4 GetWorldTransform(in BodyID bodyID)
     {
-        JPH_BodyInterface_GetWorldTransform(Handle, bodyID, out Matrix4x4 result);
+        JPH_BodyInterface_GetWorldTransform(Handle, bodyID, out RMatrix4x4 result);
         return result;
     }
 
-    public Matrix4x4 GetCenterOfMassTransform(in BodyID bodyId)
+    public void GetWorldTransform(in BodyID bodyID, out RMatrix4x4 transform)
     {
-        JPH_BodyInterface_GetCenterOfMassTransform(Handle, bodyId, out Matrix4x4 result);
+        JPH_BodyInterface_GetWorldTransform(Handle, bodyID, out transform);
+    }
+
+    public RMatrix4x4 GetCenterOfMassTransform(in BodyID bodyId)
+    {
+        JPH_BodyInterface_GetCenterOfMassTransform(Handle, bodyId, out RMatrix4x4 result);
         return result;
+    }
+
+    public void GetCenterOfMassTransform(in BodyID bodyID, out RMatrix4x4 transform)
+    {
+        JPH_BodyInterface_GetCenterOfMassTransform(Handle, bodyID, out transform);
     }
 
     public void MoveKinematic(in BodyID bodyId, in Double3 targetPosition, in Quaternion targetRotation, float deltaTime)

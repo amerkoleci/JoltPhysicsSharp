@@ -259,6 +259,8 @@ public static class Program
                 // Output current position and velocity of the sphere
                 Vector3 position = bodyInterface.GetCenterOfMassPosition(sphereID);
                 Vector3 velocity = bodyInterface.GetLinearVelocity(sphereID);
+                RMatrix4x4 transform = bodyInterface.GetWorldTransform(sphereID);
+                Double3 translation = bodyInterface.GetWorldTransform(sphereID).Translation;
                 Console.WriteLine($"Step {step} : Position = ({position}), Velocity = ({velocity})");
 
                 // If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the simulation stable. Do 1 collision step per 1 / 60th of a second (round up).

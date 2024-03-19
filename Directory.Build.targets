@@ -6,12 +6,4 @@
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
-  <!-- Settings that are only set for libraries -->
-  <PropertyGroup Condition=" '$(OutputType)' == 'Library' AND $(TargetFramework.StartsWith('netstandard')) != 'True' AND $(TargetFramework.StartsWith('net4')) != 'True' ">
-    <IsTrimmable>true</IsTrimmable>
-    <EnableAotAnalyzer>true</EnableAotAnalyzer>
-    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
-    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-  </PropertyGroup>
-
 </Project>

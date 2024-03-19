@@ -731,11 +731,11 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern ushort JPH_BodyInterface_GetObjectLayer(IntPtr handle, uint bodyId);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_GetWorldTransform(IntPtr handle, uint bodyId, out Matrix4x4 result); // RMatrix4x4
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_GetWorldTransform(IntPtr handle, uint bodyId, out RMatrix4x4 result); // RMatrix4x4
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_GetCenterOfMassTransform(IntPtr handle, uint bodyId, out Matrix4x4 result); // RMatrix4x4
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_GetCenterOfMassTransform(IntPtr handle, uint bodyId, out RMatrix4x4 result); // RMatrix4x4
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_MoveKinematic(IntPtr handle, uint bodyId, in Double3 targetPosition, in Quaternion targetRotation, float deltaTime);
@@ -853,7 +853,14 @@ internal static unsafe partial class JoltApi
         IntPtr objectLayerFilter,
         IntPtr bodyFilter);
 
-    /* Body */
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern Bool32 JPH_NarrowPhaseQuery_CastShape(nint query,
+        nint shape,
+        in RMatrix4x4 worldTransform, in Vector3 direction, in Double3 baseOffset,
+        /*JPH_AllHit_CastShapeCollector*/ IntPtr hit_collector
+        );
+
+/* Body */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_Body_GetID(IntPtr body);
 

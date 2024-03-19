@@ -23,12 +23,12 @@ public abstract class BaseTest : IDisposable
 
     protected static void CHECK_APPROX_EQUAL(float inLHS, float inRHS, float inTolerance = 1.0e-6f)
     {
-        Assert.True(MathF.Abs(inRHS - inLHS) <= inTolerance);
+        Assert.That(MathF.Abs(inRHS - inLHS) <= inTolerance, Is.True);
     }
 
     private static void CHECK_APPROX_EQUAL(in Vector3 inLHS, in Vector3 inRHS, float inTolerance = 1.0e-6f)
     {
-        Assert.True(IsClose(inLHS, inRHS, inTolerance * inTolerance));
+        Assert.That(IsClose(inLHS, inRHS, inTolerance * inTolerance), Is.True);
     }
 
     private static bool IsClose(in Vector3 inV1, in Vector3 inV2, float inMaxDistSq = 1.0e-12f)
