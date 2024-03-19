@@ -26,6 +26,13 @@ enum class EPathRotationConstraintType
 };
 
 /// Path constraint settings, used to constrain the degrees of freedom between two bodies to a path
+///
+/// The requirements of the path are that:
+/// * Tangent, normal and bi-normal form an orthonormal basis with: tangent cross bi-normal = normal
+/// * The path points along the tangent vector
+/// * The path is continuous so doesn't contain any sharp corners
+///
+/// The reason for all this is that the constraint acts like a slider constraint with the sliding axis being the tangent vector (the assumption here is that delta time will be small enough so that the path is linear for that delta time).
 class JPH_EXPORT PathConstraintSettings final : public TwoBodyConstraintSettings
 {
 public:
@@ -76,6 +83,7 @@ public:
 	virtual EConstraintSubType		GetSubType() const override								{ return EConstraintSubType::Path; }
 	virtual void					NotifyShapeChanged(const BodyID &inBodyID, Vec3Arg inDeltaCOM) override;
 	virtual void					SetupVelocityConstraint(float inDeltaTime) override;
+	virtual void					ResetWarmStart() override;
 	virtual void					WarmStartVelocityConstraint(float inWarmStartImpulseRatio) override;
 	virtual bool					SolveVelocityConstraint(float inDeltaTime) override;
 	virtual bool					SolvePositionConstraint(float inDeltaTime, float inBaumgarte) override;

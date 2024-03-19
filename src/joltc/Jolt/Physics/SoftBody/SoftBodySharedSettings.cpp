@@ -59,7 +59,14 @@ JPH_IMPLEMENT_SERIALIZABLE_NON_VIRTUAL(SoftBodySharedSettings::Skinned)
 	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings::Skinned, mVertex)
 	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings::Skinned, mWeights)
 	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings::Skinned, mMaxDistance)
-	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings::Skinned, mBackStop)
+	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings::Skinned, mBackStopDistance)
+	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings::Skinned, mBackStopRadius)
+}
+
+JPH_IMPLEMENT_SERIALIZABLE_NON_VIRTUAL(SoftBodySharedSettings::LRA)
+{
+	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings::LRA, mVertex)
+	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings::LRA, mMaxDistance)
 }
 
 JPH_IMPLEMENT_SERIALIZABLE_NON_VIRTUAL(SoftBodySharedSettings)
@@ -71,8 +78,100 @@ JPH_IMPLEMENT_SERIALIZABLE_NON_VIRTUAL(SoftBodySharedSettings)
 	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings, mVolumeConstraints)
 	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings, mSkinnedConstraints)
 	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings, mInvBindMatrices)
+	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings, mLRAConstraints)
 	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings, mMaterials)
 	JPH_ADD_ATTRIBUTE(SoftBodySharedSettings, mVertexRadius)
+}
+
+void SoftBodySharedSettings::CreateEdges(float inCompliance, float inAngleTolerance)
+{
+	struct EdgeHelper
+	{
+		uint32	mVertex[2];
+		uint32	mEdgeIdx;
+	};
+
+	// Create list of all edges
+	Array<EdgeHelper> edges;
+	edges.reserve(mFaces.size() * 3);
+	for (const Face &f : mFaces)
+		for (int i = 0; i < 3; ++i)
+		{
+			uint32 v0 = f.mVertex[i];
+			uint32 v1 = f.mVertex[(i + 1) % 3];
+
+			EdgeHelper e;
+			e.mVertex[0] = min(v0, v1);
+			e.mVertex[1] = max(v0, v1);
+			e.mEdgeIdx = uint32(&f - mFaces.data()) * 3 + i;
+			edges.push_back(e);
+		}
+
+	// Sort the edges
+	QuickSort(edges.begin(), edges.end(), [](const EdgeHelper &inLHS, const EdgeHelper &inRHS) { return inLHS.mVertex[0] < inRHS.mVertex[0] || (inLHS.mVertex[0] == inRHS.mVertex[0] && inLHS.mVertex[1] < inRHS.mVertex[1]); });
+
+	// Only add edges if one of the vertices is movable
+	auto add_edge = [this, inCompliance](uint32 inVtx1, uint32 inVtx2) {
+		if (mVertices[inVtx1].mInvMass > 0.0f || mVertices[inVtx2].mInvMass > 0.0f)
+		{
+			Edge temp_edge;
+			temp_edge.mVertex[0] = inVtx1;
+			temp_edge.mVertex[1] = inVtx2;
+			temp_edge.mCompliance = inCompliance;
+			temp_edge.mRestLength = (Vec3(mVertices[inVtx2].mPosition) - Vec3(mVertices[inVtx1].mPosition)).Length();
+			JPH_ASSERT(temp_edge.mRestLength > 0.0f);
+			mEdgeConstraints.push_back(temp_edge);
+		}
+	};
+
+	// Create the constraints
+	float sq_sin_tolerance = Square(Sin(inAngleTolerance));
+	float sq_cos_tolerance = Square(Cos(inAngleTolerance));
+	mEdgeConstraints.clear();
+	mEdgeConstraints.reserve(edges.size());
+	for (Array<EdgeHelper>::size_type i = 0; i < edges.size(); ++i)
+	{
+		const EdgeHelper &e0 = edges[i];
+
+		// Create a regular edge constraint
+		add_edge(e0.mVertex[0], e0.mVertex[1]);
+
+		// Test if there are any shared edges
+		for (Array<EdgeHelper>::size_type j = i + 1; j < edges.size(); ++j)
+		{
+			const EdgeHelper &e1 = edges[j];
+			if (e0.mVertex[0] == e1.mVertex[0] && e0.mVertex[1] == e1.mVertex[1])
+			{
+				// Faces should be roughly in a plane
+				const Face &f0 = mFaces[e0.mEdgeIdx / 3];
+				const Face &f1 = mFaces[e1.mEdgeIdx / 3];
+				Vec3 n0 = (Vec3(mVertices[f0.mVertex[2]].mPosition) - Vec3(mVertices[f0.mVertex[0]].mPosition)).Cross(Vec3(mVertices[f0.mVertex[1]].mPosition) - Vec3(mVertices[f0.mVertex[0]].mPosition));
+				Vec3 n1 = (Vec3(mVertices[f1.mVertex[2]].mPosition) - Vec3(mVertices[f1.mVertex[0]].mPosition)).Cross(Vec3(mVertices[f1.mVertex[1]].mPosition) - Vec3(mVertices[f1.mVertex[0]].mPosition));
+				if (Square(n0.Dot(n1)) > sq_cos_tolerance * n0.LengthSq() * n1.LengthSq())
+				{
+					// Get opposing vertices
+					uint32 v0 = f0.mVertex[(e0.mEdgeIdx + 2) % 3];
+					uint32 v1 = f1.mVertex[(e1.mEdgeIdx + 2) % 3];
+
+					// Faces should approximately form a quad
+					Vec3 e0_dir = Vec3(mVertices[v0].mPosition) - Vec3(mVertices[e0.mVertex[0]].mPosition);
+					Vec3 e1_dir = Vec3(mVertices[v1].mPosition) - Vec3(mVertices[e0.mVertex[0]].mPosition);
+					if (Square(e0_dir.Dot(e1_dir)) < sq_sin_tolerance * e0_dir.LengthSq() * e1_dir.LengthSq())
+					{
+						// Shear constraint
+						add_edge(min(v0, v1), max(v0, v1));
+					}
+				}
+			}
+			else
+			{
+				// Start iterating from the first non-shared edge
+				i = j - 1;
+				break;
+			}
+		}
+	}
+	mEdgeConstraints.shrink_to_fit();
 }
 
 void SoftBodySharedSettings::CalculateEdgeLengths()
@@ -81,6 +180,15 @@ void SoftBodySharedSettings::CalculateEdgeLengths()
 	{
 		e.mRestLength = (Vec3(mVertices[e.mVertex[1]].mPosition) - Vec3(mVertices[e.mVertex[0]].mPosition)).Length();
 		JPH_ASSERT(e.mRestLength > 0.0f);
+	}
+}
+
+void SoftBodySharedSettings::CalculateLRALengths()
+{
+	for (LRA &l : mLRAConstraints)
+	{
+		l.mMaxDistance = (Vec3(mVertices[l.mVertex[1]].mPosition) - Vec3(mVertices[l.mVertex[0]].mPosition)).Length();
+		JPH_ASSERT(l.mMaxDistance > 0.0f);
 	}
 }
 
@@ -208,6 +316,23 @@ void SoftBodySharedSettings::Optimize(OptimizationResults &outResults)
 		mEdgeGroupEndIndices.push_back((uint)mEdgeConstraints.size());
 }
 
+Ref<SoftBodySharedSettings> SoftBodySharedSettings::Clone() const
+{
+	Ref<SoftBodySharedSettings> clone = new SoftBodySharedSettings;
+	clone->mVertices = mVertices;
+	clone->mFaces = mFaces;
+	clone->mEdgeConstraints = mEdgeConstraints;
+	clone->mEdgeGroupEndIndices = mEdgeGroupEndIndices;
+	clone->mVolumeConstraints = mVolumeConstraints;
+	clone->mSkinnedConstraints = mSkinnedConstraints;
+	clone->mSkinnedConstraintNormals = mSkinnedConstraintNormals;
+	clone->mInvBindMatrices = mInvBindMatrices;
+	clone->mLRAConstraints = mLRAConstraints;
+	clone->mMaterials = mMaterials;
+	clone->mVertexRadius = mVertexRadius;
+	return clone;
+}
+
 void SoftBodySharedSettings::SaveBinaryState(StreamOut &inStream) const
 {
 	inStream.Write(mVertices);
@@ -217,15 +342,14 @@ void SoftBodySharedSettings::SaveBinaryState(StreamOut &inStream) const
 	inStream.Write(mVolumeConstraints);
 	inStream.Write(mSkinnedConstraints);
 	inStream.Write(mSkinnedConstraintNormals);
+	inStream.Write(mLRAConstraints);
 	inStream.Write(mVertexRadius);
 
 	// Can't write mInvBindMatrices directly because the class contains padding
-	inStream.Write(uint32(mInvBindMatrices.size()));
-	for (const InvBind &ib : mInvBindMatrices)
-	{
-		inStream.Write(ib.mJointIndex);
-		inStream.Write(ib.mInvBind);
-	}
+	inStream.Write(mInvBindMatrices, [](const InvBind &inElement, StreamOut &inS) {
+		inS.Write(inElement.mJointIndex);
+		inS.Write(inElement.mInvBind);
+	});
 }
 
 void SoftBodySharedSettings::RestoreBinaryState(StreamIn &inStream)
@@ -237,16 +361,13 @@ void SoftBodySharedSettings::RestoreBinaryState(StreamIn &inStream)
 	inStream.Read(mVolumeConstraints);
 	inStream.Read(mSkinnedConstraints);
 	inStream.Read(mSkinnedConstraintNormals);
+	inStream.Read(mLRAConstraints);
 	inStream.Read(mVertexRadius);
 
-	uint32 num_inv_bind_matrices = 0;
-	inStream.Read(num_inv_bind_matrices);
-	mInvBindMatrices.resize(num_inv_bind_matrices);
-	for (InvBind &ib : mInvBindMatrices)
-	{
-		inStream.Read(ib.mJointIndex);
-		inStream.Read(ib.mInvBind);
-	}
+	inStream.Read(mInvBindMatrices, [](StreamIn &inS, InvBind &outElement) {
+		inS.Read(outElement.mJointIndex);
+		inS.Read(outElement.mInvBind);
+	});
 }
 
 void SoftBodySharedSettings::SaveWithMaterials(StreamOut &inStream, SharedSettingsToIDMap &ioSettingsMap, MaterialToIDMap &ioMaterialMap) const
