@@ -230,6 +230,16 @@ public sealed class PhysicsSystem : NativeObject
         }
     }
 
+    public void SaveState(StateRecorder recorder, StateRecorderState state)
+    {
+        JPH_PhysicsSystem_SaveState(Handle, recorder.Handle, state);
+    }
+
+    public void RestoreState(StateRecorder recorder)
+    {
+        JPH_PhysicsSystem_RestoreState(Handle, recorder.Handle);
+    }
+
     #region ContactListener
     [UnmanagedCallersOnly]
     private static unsafe uint OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Double3* baseOffset, IntPtr collisionResult)

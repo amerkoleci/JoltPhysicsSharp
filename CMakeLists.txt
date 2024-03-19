@@ -118,10 +118,10 @@ if (MSVC)
 	# Set compiler flag for disabling RTTI
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
 
-	if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM")
+	# if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM")
 		# On ARM the exception handling flag is missing which causes warnings
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-	endif()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+	# endif()
 
 	# Set compiler flags for various configurations
 	set(CMAKE_CXX_FLAGS_DEBUG "/GS /Od /Ob0 /RTC1")
