@@ -75,6 +75,7 @@ option(TRACK_NARROWPHASE_STATS "Track Narrowphase Stats" OFF)
 
 include(CMakeDependentOption)
 include(GNUInstallDirs)
+include(CMake/CPM.cmake)
 
 # Ability to toggle between the static and DLL versions of the MSVC runtime library
 # Windows Store only supports the DLL version
@@ -231,21 +232,22 @@ set(CMAKE_EXE_LINKER_FLAGS_DISTRIBUTION "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 set(PHYSICS_REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/joltc)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Disable shared library when building Jolt" FORCE)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/src/joltc/Jolt/Jolt.cmake)
+CPMAddPackage(
+    NAME JoltPhysics
+    GITHUB_REPOSITORY jrouwe/JoltPhysics
+    GIT_TAG de3517e9ce5790eec2111370d74bd3b21873437a
+    SOURCE_SUBDIR Build
+    OPTIONS
+        "DOUBLE_PRECISION ${DOUBLE_PRECISION}"
+        "GENERATE_DEBUG_SYMBOLS ${GENERATE_DEBUG_SYMBOLS}"
+        "INTERPROCEDURAL_OPTIMIZATION ${SET_INTERPROCEDURAL_OPTIMIZATION}"
+        "ENABLE_ALL_WARNINGS ${ENABLE_ALL_WARNINGS}"
+        "USE_STATIC_MSVC_RUNTIME_LIBRARY ${USE_STATIC_MSVC_RUNTIME_LIBRARY}"
+)
 if (XCODE)
 	# Ensure that we enable SSE4.2 for the x86_64 build, XCode builds multiple architectures
-	set_property(TARGET Jolt PROPERTY XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=x86_64] "$(inherited) -msse4.2 -mpopcnt") 
+	set_property(TARGET Jolt PROPERTY XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=x86_64] "$(inherited) -msse4.2 -mpopcnt")
 endif()
-
-# Install Jolt library and includes
-install(TARGETS Jolt DESTINATION lib)
-foreach(SRC_FILE ${JOLT_PHYSICS_SRC_FILES})
-	string(REPLACE ${PHYSICS_REPO_ROOT} "" RELATIVE_SRC_FILE ${SRC_FILE})
-	get_filename_component(DESTINATION_PATH ${RELATIVE_SRC_FILE} DIRECTORY)
-	if (NOT RELATIVE_SRC_FILE MATCHES "\.cpp")
-		install(FILES ${SRC_FILE} DESTINATION include/${DESTINATION_PATH})
-	endif()
-endforeach()
 
 # Options
 if (IOS OR EMSCRIPTEN)
