@@ -254,6 +254,7 @@ if (IOS OR EMSCRIPTEN)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "Always Disable shared library on (IOS, WEB)" FORCE)
 else()
     set(BUILD_SHARED_LIBS ON CACHE BOOL "Always build shared library" FORCE)
+	set_property(TARGET Jolt PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
 add_subdirectory(src/joltc)
