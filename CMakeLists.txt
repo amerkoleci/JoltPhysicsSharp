@@ -235,7 +235,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Disable shared library when building Jolt"
 CPMAddPackage(
     NAME JoltPhysics
     GITHUB_REPOSITORY jrouwe/JoltPhysics
-    GIT_TAG de3517e9ce5790eec2111370d74bd3b21873437a
+    GIT_TAG 0191c72d5f6a66217df02c0f6ad5d1c63134b4d4
     SOURCE_SUBDIR Build
     OPTIONS
         "DOUBLE_PRECISION ${DOUBLE_PRECISION}"
