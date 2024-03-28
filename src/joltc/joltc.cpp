@@ -1033,6 +1033,31 @@ JPH_MutableCompoundShape* JPH_MutableCompoundShape_Create(const JPH_MutableCompo
     return reinterpret_cast<JPH_MutableCompoundShape*>(shape);
 }
 
+uint32_t JPH_MutableCompoundShape_AddShape(JPH_MutableCompoundShape* shape, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* child, uint32_t userData) {
+    auto joltShape = reinterpret_cast<JPH::MutableCompoundShape*>(shape);
+    auto joltChild = reinterpret_cast<const JPH::Shape*>(child);
+    return joltShape->AddShape(ToVec3(position), ToQuat(rotation), joltChild, userData);
+}
+
+void JPH_MutableCompoundShape_RemoveShape(JPH_MutableCompoundShape* shape, uint32_t index) {
+    reinterpret_cast<JPH::MutableCompoundShape*>(shape)->RemoveShape(index);
+}
+
+void JPH_MutableCompoundShape_ModifyShape(JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation) {
+    auto joltShape = reinterpret_cast<JPH::MutableCompoundShape*>(shape);
+    joltShape->ModifyShape(index, ToVec3(position), ToQuat(rotation));
+}
+
+void JPH_MutableCompoundShape_ModifyShape2(JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* newShape) {
+    auto joltShape = reinterpret_cast<JPH::MutableCompoundShape*>(shape);
+    auto joltNewShape = reinterpret_cast<const JPH::Shape*>(newShape);
+    joltShape->ModifyShape(index, ToVec3(position), ToQuat(rotation), joltNewShape);
+}
+
+void JPH_MutableCompoundShape_AdjustCenterOfMass(JPH_MutableCompoundShape* shape) {
+    reinterpret_cast<JPH::MutableCompoundShape*>(shape)->AdjustCenterOfMass();
+}
+
 /* RotatedTranslatedShape */
 JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_ShapeSettings* shapeSettings)
 {
@@ -1083,6 +1108,16 @@ void JPH_Shape_Destroy(JPH_Shape* shape)
         auto joltShape = reinterpret_cast<JPH::Shape*>(shape);
         joltShape->Release();
     }
+}
+
+void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData)
+{
+    reinterpret_cast<JPH::Shape*>(shape)->SetUserData(userData);
+}
+
+uint64_t JPH_Shape_GetUserData(JPH_Shape* shape)
+{
+    return reinterpret_cast<JPH::Shape*>(shape)->GetUserData();
 }
 
 void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result)

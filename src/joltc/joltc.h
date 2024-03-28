@@ -506,6 +506,11 @@ JPH_CAPI JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create
 /* MutableCompoundShape */
 JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create(void);
 JPH_CAPI JPH_MutableCompoundShape* JPH_MutableCompoundShape_Create(const JPH_MutableCompoundShapeSettings* settings);
+JPH_CAPI uint32_t JPH_MutableCompoundShape_AddShape(const JPH_MutableCompoundShape* shape, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* child, uint32_t userData);
+JPH_CAPI void JPH_MutableCompoundShape_RemoveShape(const JPH_MutableCompoundShape* shape, uint32_t index);
+JPH_CAPI void JPH_MutableCompoundShape_ModifyShape(const JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation);
+JPH_CAPI void JPH_MutableCompoundShape_ModifyShape2(const JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* newShape);
+JPH_CAPI void JPH_MutableCompoundShape_AdjustCenterOfMass(const JPH_MutableCompoundShape* shape);
 
 /* RotatedTranslatedShape */
 JPH_CAPI JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_ShapeSettings* shapeSettings);
@@ -515,6 +520,8 @@ JPH_CAPI JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
+JPH_CAPI void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData);
+JPH_CAPI uint64_t JPH_Shape_GetUserData(JPH_Shape* shape);
 JPH_CAPI void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result);
 JPH_CAPI void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* result);
 JPH_CAPI void JPH_Shape_GetCenterOfMass(JPH_Shape* shape, JPH_Vec3* result);
