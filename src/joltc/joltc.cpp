@@ -1033,6 +1033,16 @@ JPH_MutableCompoundShape* JPH_MutableCompoundShape_Create(const JPH_MutableCompo
     return reinterpret_cast<JPH_MutableCompoundShape*>(shape);
 }
 
+uint32_t JPH_MutableCompoundShape_AddShape(JPH_MutableCompoundShape* shape, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* child, uint32_t userData) {
+    auto joltShape = reinterpret_cast<JPH::MutableCompoundShape*>(shape);
+    auto joltChild = reinterpret_cast<const JPH::Shape*>(child);
+    return joltShape->AddShape(ToVec3(position), ToQuat(rotation), joltChild, userData);
+}
+
+void JPH_MutableCompoundShape_RemoveShape(JPH_MutableCompoundShape* shape, uint32_t index) {
+    reinterpret_cast<JPH::MutableCompoundShape*>(shape)->RemoveShape(index);
+}
+
 /* RotatedTranslatedShape */
 JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_ShapeSettings* shapeSettings)
 {
