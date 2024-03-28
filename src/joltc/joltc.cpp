@@ -1085,6 +1085,16 @@ void JPH_Shape_Destroy(JPH_Shape* shape)
     }
 }
 
+void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData)
+{
+    reinterpret_cast<JPH::Shape*>(shape)->SetUserData(userData);
+}
+
+uint64_t JPH_Shape_GetUserData(JPH_Shape* shape)
+{
+    return reinterpret_cast<JPH::Shape*>(shape)->GetUserData();
+}
+
 void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result)
 {
 	JPH_ASSERT(shape);
