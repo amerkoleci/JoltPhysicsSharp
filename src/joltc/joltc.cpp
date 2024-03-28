@@ -1043,6 +1043,21 @@ void JPH_MutableCompoundShape_RemoveShape(JPH_MutableCompoundShape* shape, uint3
     reinterpret_cast<JPH::MutableCompoundShape*>(shape)->RemoveShape(index);
 }
 
+void JPH_MutableCompoundShape_ModifyShape(JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation) {
+    auto joltShape = reinterpret_cast<JPH::MutableCompoundShape*>(shape);
+    joltShape->ModifyShape(index, ToVec3(position), ToQuat(rotation));
+}
+
+void JPH_MutableCompoundShape_ModifyShape2(JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* newShape) {
+    auto joltShape = reinterpret_cast<JPH::MutableCompoundShape*>(shape);
+    auto joltNewShape = reinterpret_cast<const JPH::Shape*>(newShape);
+    joltShape->ModifyShape(index, ToVec3(position), ToQuat(rotation), joltNewShape);
+}
+
+void JPH_MutableCompoundShape_AdjustCenterOfMass(JPH_MutableCompoundShape* shape) {
+    reinterpret_cast<JPH::MutableCompoundShape*>(shape)->AdjustCenterOfMass();
+}
+
 /* RotatedTranslatedShape */
 JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_ShapeSettings* shapeSettings)
 {
