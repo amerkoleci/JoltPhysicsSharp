@@ -164,19 +164,6 @@ typedef struct JPH_Vec4 {
     float w;
 } JPH_Vec4;
 
-typedef struct JPH_Matrix4x4 {
-    float m11, m12, m13, m14;
-    float m21, m22, m23, m24;
-    float m31, m32, m33, m34;
-    float m41, m42, m43, m44;
-} JPH_Matrix4x4;
-
-typedef struct JPH_RVec3 {
-    double x;
-    double y;
-    double z;
-} JPH_RVec3;
-
 typedef struct JPH_Quat {
     float x;
     float y;
@@ -184,12 +171,30 @@ typedef struct JPH_Quat {
     float w;
 } JPH_Quat;
 
+typedef struct JPH_Matrix4x4 {
+    float m11, m12, m13, m14;
+    float m21, m22, m23, m24;
+    float m31, m32, m33, m34;
+    float m41, m42, m43, m44;
+} JPH_Matrix4x4;
+
+#if defined(JPH_DOUBLE_PRECISION)
+typedef struct JPH_RVec3 {
+    double x;
+    double y;
+    double z;
+} JPH_RVec3;
+
 typedef struct JPH_RMatrix4x4 {
     float m11, m12, m13, m14;
     float m21, m22, m23, m24;
     float m31, m32, m33, m34;
     double m41, m42, m43, m44;
 } JPH_RMatrix4x4;
+#else
+typedef JPH_Vec3 JPH_RVec3;
+typedef JPH_Matrix4x4 JPH_RMatrix4x4;
+#endif
 
 typedef struct JPH_AABox {
     JPH_Vec3 min;
