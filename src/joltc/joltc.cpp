@@ -2499,10 +2499,14 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
         objectLayerFilter ? *static_cast<const JPH::ObjectLayerFilter*>(objectLayerFilter) : object_layer_filter,
         bodyFilter ? *static_cast<const JPH::BodyFilter*>(bodyFilter) : body_filter
     );
+
     if (collector.HadHit())
-        hit->fraction = collector.mHit.mFraction;
+    {
+		hit->fraction = collector.mHit.mFraction;
 		hit->bodyID = collector.mHit.mBodyID.GetIndexAndSequenceNumber();
 		hit->subShapeID2 = collector.mHit.mSubShapeID2.GetValue();
+	}
+
     return collector.HadHit();
 }
 
@@ -2620,8 +2624,7 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
     auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
     auto joltBaseOffset = ToJolt(baseOffset);
 
-    joltQuery->CastShape(
-        shape_cast, settings, joltBaseOffset, joltCollector);
+    joltQuery->CastShape(shape_cast, settings, joltBaseOffset, joltCollector);
     return joltCollector.HadHit();
 }
 

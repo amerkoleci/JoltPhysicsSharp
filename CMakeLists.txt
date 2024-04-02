@@ -19,6 +19,16 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version")
 set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build architectures for OS X")
 
+# Determine if engine is built as a subproject (using add_subdirectory)
+# or if it is the master project.
+if (NOT DEFINED JPH_MASTER_PROJECT)
+    set(JPH_MASTER_PROJECT OFF)
+    if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+        set(JPH_MASTER_PROJECT ON)
+        message(STATUS "CMake version: ${CMAKE_VERSION}")
+    endif ()
+endif ()
+
 # When turning this option on, the library will be compiled using doubles for positions. This allows for much bigger worlds.
 option(DOUBLE_PRECISION "Use double precision math" OFF)
 
@@ -72,6 +82,8 @@ option(TRACK_BROADPHASE_STATS "Track Broadphase Stats" OFF)
 
 # Setting to periodically trace narrowphase stats to help determine which collision queries could be optimized
 option(TRACK_NARROWPHASE_STATS "Track Narrowphase Stats" OFF)
+
+option(JPH_SAMPLES "Build samples" ${JPH_MASTER_PROJECT})
 
 include(CMakeDependentOption)
 include(GNUInstallDirs)
@@ -258,7 +270,10 @@ else()
 endif()
 
 add_subdirectory(src/joltc)
-# add_subdirectory(src/samples/HelloWorldNative)
+
+if (JPH_SAMPLES)
+	add_subdirectory(src/samples/HelloWorldNative)
+endif ()
 
 if (CMAKE_GENERATOR_PLATFORM)
     message(STATUS "CMAKE_GENERATOR_PLATFORM: ${CMAKE_GENERATOR_PLATFORM}")
