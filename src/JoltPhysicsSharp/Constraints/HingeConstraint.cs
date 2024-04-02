@@ -23,11 +23,11 @@ public sealed class HingeConstraintSettings : TwoBodyConstraintSettings
         return new PointConstraint(JPH_HingeConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
     }
 
-    public Double3 Point1
+    public Vector3 Point1
     {
         get
         {
-            JPH_HingeConstraintSettings_GetPoint1(Handle, out Double3 value);
+            JPH_HingeConstraintSettings_GetPoint1(Handle, out Vector3 value);
             return value;
         }
         set
@@ -36,11 +36,11 @@ public sealed class HingeConstraintSettings : TwoBodyConstraintSettings
         }
     }
 
-    public Double3 Point2
+    public Vector3 Point2
     {
         get
         {
-            JPH_HingeConstraintSettings_GetPoint2(Handle, out Double3 value);
+            JPH_HingeConstraintSettings_GetPoint2(Handle, out Vector3 value);
             return value;
         }
         set
@@ -49,12 +49,12 @@ public sealed class HingeConstraintSettings : TwoBodyConstraintSettings
         }
     }
 
-    public void GetPoint1(out Double3 value)
+    public void GetPoint1(out Vector3 value)
     {
         JPH_HingeConstraintSettings_GetPoint1(Handle, out value);
     }
 
-    public void GetPoint2(out Double3 value)
+    public void GetPoint2(out Vector3 value)
     {
         JPH_HingeConstraintSettings_GetPoint2(Handle, out value);
     }

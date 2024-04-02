@@ -2,11 +2,12 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public readonly struct Body(IntPtr handle) : IEquatable<Body>
+public readonly unsafe struct Body(IntPtr handle) : IEquatable<Body>
 {
     public IntPtr Handle { get; } = handle; public bool IsNull => Handle == IntPtr.Zero;
     public static Body Null => new(IntPtr.Zero);
@@ -104,12 +105,29 @@ public readonly struct Body(IntPtr handle) : IEquatable<Body>
         set => JPH_Body_SetRestitution(Handle, value);
     }
 
-    public Double3 Position
+    public Vector3 Position
     {
         get
         {
-            JPH_Body_GetPosition(Handle, out Double3 value);
-            return value;
+            if (DoublePrecision)
+                throw new InvalidOperationException($"Double precision is enabled: use {nameof(RPosition)}");
+
+            Vector3 result;
+            JPH_Body_GetPosition(Handle, &result);
+            return result;
+        }
+    }
+
+    public Double3 RPosition
+    {
+        get
+        {
+            if (!DoublePrecision)
+                throw new InvalidOperationException($"Double precision is disabled: use {nameof(Position)}");
+
+            Double3 result;
+            JPH_Body_GetPositionDouble(Handle, &result);
+            return result;
         }
     }
 
@@ -117,34 +135,34 @@ public readonly struct Body(IntPtr handle) : IEquatable<Body>
     {
         get
         {
-            JPH_Body_GetRotation(Handle, out Quaternion value);
+            Quaternion value;
+            JPH_Body_GetRotation(Handle, &value);
             return value;
         }
     }
 
-    public Double3 CenterOfMassPosition
+    public Vector3 CenterOfMassPosition
     {
         get
         {
-            JPH_Body_GetCenterOfMassPosition(Handle, out Double3 value);
+            if (DoublePrecision)
+                throw new InvalidOperationException($"Double precision is enabled: use {nameof(RCenterOfMassPosition)}");
+
+            Vector3 value;
+            JPH_Body_GetCenterOfMassPosition(Handle, &value);
             return value;
         }
     }
 
-    public Matrix4x4 WorldTransform
+    public Double3 RCenterOfMassPosition
     {
         get
         {
-            JPH_Body_GetWorldTransform(Handle, out Matrix4x4 value);
-            return value;
-        }
-    }
+            if (!DoublePrecision)
+                throw new InvalidOperationException($"Double precision is disabled: use {nameof(CenterOfMassPosition)}");
 
-    public Matrix4x4 CenterOfMassTransform
-    {
-        get
-        {
-            JPH_Body_GetCenterOfMassTransform(Handle, out Matrix4x4 value);
+            Double3 value;
+            JPH_Body_GetCenterOfMassPositionDouble(Handle, &value);
             return value;
         }
     }
@@ -154,30 +172,152 @@ public readonly struct Body(IntPtr handle) : IEquatable<Body>
         return JPH_Body_GetUseManifoldReductionWithBody(Handle, other.Handle);
     }
 
-    public void GetPosition(out Double3 result)
+    public void GetPosition(out Vector3 result)
     {
-        JPH_Body_GetPosition(Handle, out result);
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRPosition)}");
+
+        Unsafe.SkipInit(out result);
+        fixed (Vector3* resultPtr = &result)
+        {
+            JPH_Body_GetPosition(Handle, resultPtr);
+        }
+    }
+
+    public void GetRPosition(out Double3 result)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPosition)}");
+
+        Unsafe.SkipInit(out result);
+        fixed (Double3* resultPtr = &result)
+        {
+            JPH_Body_GetPositionDouble(Handle, resultPtr);
+        }
     }
 
     public void GetRotation(out Quaternion result)
     {
-        JPH_Body_GetRotation(Handle, out result);
+        Unsafe.SkipInit(out result);
+        fixed (Quaternion* resultPtr = &result)
+            JPH_Body_GetRotation(Handle, resultPtr);
     }
 
-    public void GetCenterOfMassPosition(out Double3 result)
+    public void GetCenterOfMassPosition(out Vector3 result)
     {
-        JPH_Body_GetCenterOfMassPosition(Handle, out result);
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassPosition)}");
+
+        Unsafe.SkipInit(out result);
+        fixed (Vector3* resultPtr = &result)
+        {
+            JPH_Body_GetCenterOfMassPosition(Handle, resultPtr);
+        }
     }
 
-    public void GetWorldTransform(out Matrix4x4 result)
+    public void GetRCenterOfMassPosition(out Double3 result)
     {
-        JPH_Body_GetWorldTransform(Handle, out result);
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassPosition)}");
+
+        Unsafe.SkipInit(out result);
+        fixed (Double3* resultPtr = &result)
+        {
+            JPH_Body_GetCenterOfMassPositionDouble(Handle, resultPtr);
+        }
     }
 
-    public void GetCenterOfMassTransform(out Matrix4x4 result)
+    #region GetWorldTransform
+    public unsafe Matrix4x4 GetWorldTransform()
     {
-        JPH_Body_GetCenterOfMassTransform(Handle, out result);
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldTransform)}");
+
+        Matrix4x4 result;
+        JPH_Body_GetWorldTransform(Handle, &result);
+        return result;
     }
+
+    public unsafe void GetWorldTransform(out Matrix4x4 result)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldTransform)}");
+
+        Unsafe.SkipInit(out result);
+        fixed (Matrix4x4* resultPtr = &result)
+        {
+            JPH_Body_GetWorldTransform(Handle, resultPtr);
+        }
+    }
+
+    public unsafe RMatrix4x4 GetRWorldTransform()
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldTransform)}");
+
+        RMatrix4x4 result;
+        JPH_Body_GetWorldTransformDouble(Handle, &result);
+        return result;
+    }
+
+    public unsafe void GetRWorldTransform(out RMatrix4x4 result)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldTransform)}");
+
+        Unsafe.SkipInit(out result);
+        fixed (RMatrix4x4* resultPtr = &result)
+        {
+            JPH_Body_GetWorldTransformDouble(Handle, resultPtr);
+        }
+    }
+    #endregion
+
+    #region GetCenterOfMassTransform
+    public unsafe Matrix4x4 GetCenterOfMassTransform()
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassTransform)}");
+
+        Matrix4x4 result;
+        JPH_Body_GetCenterOfMassTransform(Handle, &result);
+        return result;
+    }
+
+    public unsafe void GetCenterOfMassTransform(out Matrix4x4 result)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassTransform)}");
+
+        Unsafe.SkipInit(out result);
+        fixed (Matrix4x4* resultPtr = &result)
+        {
+            JPH_Body_GetCenterOfMassTransform(Handle, resultPtr);
+        }
+    }
+
+    public unsafe RMatrix4x4 GetRCenterOfMassTransform()
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassTransform)}");
+
+        RMatrix4x4 result;
+        JPH_Body_GetCenterOfMassTransformDouble(Handle, &result);
+        return result;
+    }
+
+    public unsafe void GetRCenterOfMassTransform(out RMatrix4x4 result)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassTransform)}");
+
+        Unsafe.SkipInit(out result);
+        fixed (RMatrix4x4* resultPtr = &result)
+        {
+            JPH_Body_GetCenterOfMassTransformDouble(Handle, resultPtr);
+        }
+    }
+    #endregion
 
     public Vector3 GetLinearVelocity()
     {
@@ -233,19 +373,62 @@ public readonly struct Body(IntPtr handle) : IEquatable<Body>
         JPH_Body_GetAccumulatedTorque(Handle, out torque);
     }
 
+    public void GetWorldSpaceSurfaceNormal(uint subShapeID, in Vector3 position, out Vector3 normal)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceSurfaceNormal)}");
+
+        Unsafe.SkipInit(out normal);
+        fixed (Vector3* positionPtr = &position)
+        fixed (Vector3* normalPtr = &normal)
+        {
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID, positionPtr, normalPtr);
+        }
+    }
+
+    public void GetRWorldSpaceSurfaceNormal(uint subShapeID, in Double3 position, out Vector3 normal)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldSpaceSurfaceNormal)}");
+
+        Unsafe.SkipInit(out normal);
+        fixed (Double3* positionPtr = &position)
+        fixed (Vector3* normalPtr = &normal)
+        {
+            JPH_Body_GetWorldSpaceSurfaceNormalDouble(Handle, subShapeID, positionPtr, normalPtr);
+        }
+    }
+
     public void AddForce(in Vector3 force)
     {
-        JPH_Body_AddForce(Handle, force);
+        fixed (Vector3* forcePtr = &force)
+            JPH_Body_AddForce(Handle, forcePtr);
+    }
+
+    public void AddForceAtPosition(in Vector3 force, in Vector3 position)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(AddForceAtPosition)}");
+
+        fixed (Vector3* forcePtr = &force)
+        fixed (Vector3* positionPtr = &position)
+            JPH_Body_AddForceAtPosition(Handle, forcePtr, positionPtr);
     }
 
     public void AddForceAtPosition(in Vector3 force, in Double3 position)
     {
-        JPH_Body_AddForceAtPosition(Handle, force, position);
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(AddForceAtPosition)}");
+
+        fixed (Vector3* forcePtr = &force)
+        fixed (Double3* positionPtr = &position)
+            JPH_Body_AddForceAtPositionDouble(Handle, forcePtr, positionPtr);
     }
 
     public void AddTorque(in Vector3 torque)
     {
-        JPH_Body_AddTorque(Handle, torque);
+        fixed (Vector3* torquePtr = &torque)
+            JPH_Body_AddTorque(Handle, torquePtr);
     }
 
     public void AddImpulse(in Vector3 impulse)
@@ -253,9 +436,24 @@ public readonly struct Body(IntPtr handle) : IEquatable<Body>
         JPH_Body_AddImpulse(Handle, impulse);
     }
 
+    public void AddImpulseAtPosition(in Vector3 impulse, in Vector3 position)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(AddImpulseAtPosition)}");
+
+        fixed (Vector3* impulsePtr = &impulse)
+        fixed (Vector3* positionPtr = &position)
+            JPH_Body_AddImpulseAtPosition(Handle, impulsePtr, positionPtr);
+    }
+
     public void AddImpulseAtPosition(in Vector3 impulse, in Double3 position)
     {
-        JPH_Body_AddImpulseAtPosition(Handle, in impulse, in position);
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(AddImpulseAtPosition)}");
+
+        fixed (Vector3* impulsePtr = &impulse)
+        fixed (Double3* positionPtr = &position)
+            JPH_Body_AddImpulseAtPositionDouble(Handle, impulsePtr, positionPtr);
     }
 
     public void AddAngularImpulse(in Vector3 angularImpulse)

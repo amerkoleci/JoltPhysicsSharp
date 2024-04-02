@@ -2,6 +2,7 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
@@ -25,10 +26,45 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     /// <inheritdoc/>
     public override int GetHashCode() => Handle.GetHashCode();
 
-    public bool CastRay(in Double3 origin, in Vector3 direction, ref RayCastResult hit, BroadPhaseLayerFilter broadPhaseFilter,
-        ObjectLayerFilter objectLayerFilter, BodyFilter bodyFilter)
+    public unsafe bool CastRay(
+        in Vector3 origin,
+        in Vector3 direction,
+        out RayCastResult hit,
+        BroadPhaseLayerFilter broadPhaseFilter,
+        ObjectLayerFilter objectLayerFilter,
+        BodyFilter bodyFilter)
     {
-        Bool32 result = JPH_NarrowPhaseQuery_CastRay(Handle, origin, direction, ref hit, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
-        return result;
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(CastRay)}");
+
+        Unsafe.SkipInit(out hit);
+        fixed (Vector3* originPtr = &origin)
+        fixed (Vector3* directionPtr = &direction)
+        fixed (RayCastResult* hitPtr = &hit)
+        {
+            Bool32 result = JPH_NarrowPhaseQuery_CastRay(Handle, originPtr, directionPtr, hitPtr, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
+            return result;
+        }
+    }
+
+    public unsafe bool CastRay(
+        in Double3 origin,
+        in Vector3 direction,
+        out RayCastResult hit,
+        BroadPhaseLayerFilter broadPhaseFilter,
+        ObjectLayerFilter objectLayerFilter,
+        BodyFilter bodyFilter)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(CastRay)}");
+
+        Unsafe.SkipInit(out hit);
+        fixed (Double3* originPtr = &origin)
+        fixed (Vector3* directionPtr = &direction)
+        fixed (RayCastResult* hitPtr = &hit)
+        {
+            Bool32 result = JPH_NarrowPhaseQuery_CastRayDouble(Handle, originPtr, directionPtr, hitPtr, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
+            return result;
+        }
     }
 }

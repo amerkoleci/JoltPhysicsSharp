@@ -2,6 +2,7 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -152,7 +153,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
 
     public readonly double this[int index] => GetElement(this, index);
 
-    public void Deconstruct(out double x, out double y, out double z)
+    public readonly void Deconstruct(out double x, out double y, out double z)
     {
         x = X;
         y = Y;
@@ -330,33 +331,15 @@ public struct Double3 : IEquatable<Double3>, IFormattable
         );
     }
 
-    /// <summary>
-    /// Creates a new <see cref="Double3"/> value with the same value for all its components.
-    /// </summary>
-    /// <param name="x">The value to use for the components of the new <see cref="Double3"/> instance.</param>
-    public static implicit operator Double3(double x) => new(x, x, x);
-
-    /// <summary>
-    /// Casts a <see cref="Double3"/> value to a <see cref="Vector3"/> one.
-    /// </summary>
-    /// <param name="xyz">The input <see cref="Double3"/> value to cast.</param>
-    public static implicit operator Vector3(in Double3 xyz) => new((float)xyz.X, (float)xyz.Y, (float)xyz.Z);
-
-    /// <summary>
-    /// Casts a <see cref="Vector3"/> value to a <see cref="Double3"/> one.
-    /// </summary>
-    /// <param name="xyz">The input <see cref="Vector3"/> value to cast.</param>
-    public static explicit operator Double3(in Vector3 xyz) => new(in xyz);
-
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is Double3 value && Equals(value);
+    public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is Double3 value && Equals(value);
 
     /// <summary>
     /// Determines whether the specified <see cref="Double3"/> is equal to this instance.
     /// </summary>
     /// <param name="other">The <see cref="Double3"/> to compare with this instance.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Double3 other)
+    public readonly bool Equals(Double3 other)
     {
         return X == other.X
             && Y == other.Y
@@ -386,13 +369,13 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     public static bool operator !=(Double3 left, Double3 right) => !left.Equals(right);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => HashCode.Combine(X, Y, Z);
+    public override readonly int GetHashCode() => HashCode.Combine(X, Y, Z);
 
     /// <inheritdoc />
-    public override string ToString() => ToString(format: null, formatProvider: null);
+    public override readonly string ToString() => ToString(format: null, formatProvider: null);
 
     /// <inheritdoc />
-    public string ToString(string? format, IFormatProvider? formatProvider)
+    public readonly string ToString(string? format, IFormatProvider? formatProvider)
         => $"{nameof(Double3)} {{ {nameof(X)} = {X.ToString(format, formatProvider)}, {nameof(Y)} = {Y.ToString(format, formatProvider)}, {nameof(Z)} = {Z.ToString(format, formatProvider)} }}";
 
     internal static double GetElement(Double3 vector, int index)

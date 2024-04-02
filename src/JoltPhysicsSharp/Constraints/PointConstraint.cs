@@ -29,11 +29,11 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
         set => JPH_PointConstraintSettings_SetSpace(Handle, value);
     }
 
-    public Double3 Point1
+    public Vector3 Point1
     {
         get
         {
-            JPH_PointConstraintSettings_GetPoint1(Handle, out Double3 value);
+            JPH_PointConstraintSettings_GetPoint1(Handle, out Vector3 value);
             return value;
         }
         set
@@ -42,11 +42,11 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
         }
     }
 
-    public Double3 Point2
+    public Vector3 Point2
     {
         get
         {
-            JPH_PointConstraintSettings_GetPoint2(Handle, out Double3 value);
+            JPH_PointConstraintSettings_GetPoint2(Handle, out Vector3 value);
             return value;
         }
         set
@@ -55,12 +55,12 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
         }
     }
 
-    public void GetPoint1(out Double3 value)
+    public void GetPoint1(out Vector3 value)
     {
         JPH_PointConstraintSettings_GetPoint1(Handle, out value);
     }
 
-    public void GetPoint2(out Double3 value)
+    public void GetPoint2(out Vector3 value)
     {
         JPH_PointConstraintSettings_GetPoint2(Handle, out value);
     }
@@ -78,12 +78,12 @@ public sealed class PointConstraint : TwoBodyConstraint
     /// </summary>
     ~PointConstraint() => Dispose(isDisposing: false);
 
-    public void SetPoint1(ConstraintSpace space, in Double3 value)
+    public void SetPoint1(ConstraintSpace space, in Vector3 value)
     {
         JPH_PointConstraint_SetPoint1(Handle, space, in value);
     }
 
-    public void SetPoint2(ConstraintSpace space, in Double3 value)
+    public void SetPoint2(ConstraintSpace space, in Vector3 value)
     {
         JPH_PointConstraint_SetPoint2(Handle, space, in value);
     }

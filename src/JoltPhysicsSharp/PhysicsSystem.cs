@@ -8,7 +8,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, IntPtr collisionResult);
+public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, nint collisionResult);
 public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2);
 public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2);
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
@@ -30,24 +30,39 @@ public readonly struct PhysicsSystemSettings
 
 public sealed class PhysicsSystem : NativeObject
 {
-    private static readonly Dictionary<IntPtr, PhysicsSystem> s_contactListeners = new();
-    private static readonly Dictionary<IntPtr, PhysicsSystem> s_bodyActivationListenerListeners = new();
+    private static readonly Dictionary<nint, PhysicsSystem> s_contactListeners = [];
+    private static readonly Dictionary<nint, PhysicsSystem> s_bodyActivationListenerListeners = [];
     private static readonly JPH_ContactListener_Procs s_contactListener_Procs;
+    private static readonly JPH_ContactListener_ProcsDouble s_contactListener_ProcsDouble;
     private static readonly JPH_BodyActivationListener_Procs s_BodyActivationListener_Procs;
 
-    private readonly IntPtr contactListenerHandle;
-    private readonly IntPtr bodyActivationListenerHandle;
+    private readonly nint _contactListenerHandle;
+    private readonly nint _bodyActivationListenerHandle;
 
     static unsafe PhysicsSystem()
     {
-        s_contactListener_Procs = new JPH_ContactListener_Procs
+        if (!DoublePrecision)
         {
-            OnContactValidate = &OnContactValidateCallback,
-            OnContactAdded = &OnContactAddedCallback,
-            OnContactPersisted = &OnContactPersistedCallback,
-            OnContactRemoved = &OnContactRemovedCallback
-        };
-        JPH_ContactListener_SetProcs(s_contactListener_Procs);
+            s_contactListener_Procs = new JPH_ContactListener_Procs
+            {
+                OnContactValidate = &OnContactValidateCallback,
+                OnContactAdded = &OnContactAddedCallback,
+                OnContactPersisted = &OnContactPersistedCallback,
+                OnContactRemoved = &OnContactRemovedCallback
+            };
+            JPH_ContactListener_SetProcs(s_contactListener_Procs);
+        }
+        else
+        {
+            s_contactListener_ProcsDouble = new JPH_ContactListener_ProcsDouble
+            {
+                OnContactValidate = &OnContactValidateCallbackDouble,
+                OnContactAdded = &OnContactAddedCallback,
+                OnContactPersisted = &OnContactPersistedCallback,
+                OnContactRemoved = &OnContactRemovedCallback
+            };
+            JPH_ContactListener_SetProcsDouble(s_contactListener_ProcsDouble);
+        }
 
         s_BodyActivationListener_Procs = new JPH_BodyActivationListener_Procs
         {
@@ -63,23 +78,25 @@ public sealed class PhysicsSystem : NativeObject
         ArgumentNullException.ThrowIfNull(settings.BroadPhaseLayerInterface, nameof(settings.BroadPhaseLayerInterface));
         ArgumentNullException.ThrowIfNull(settings.ObjectVsBroadPhaseLayerFilter, nameof(settings.ObjectVsBroadPhaseLayerFilter));
 
-        NativePhysicsSystemSettings nativeSettings = new();
-        nativeSettings.maxBodies = settings.MaxBodies;
-        nativeSettings.maxBodyPairs = settings.MaxBodyPairs;
-        nativeSettings.maxContactConstraints = settings.MaxContactConstraints;
-        nativeSettings.broadPhaseLayerInterface = settings.BroadPhaseLayerInterface.Handle;
-        nativeSettings.objectLayerPairFilter = settings.ObjectLayerPairFilter.Handle;
-        nativeSettings.objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter.Handle;
+        NativePhysicsSystemSettings nativeSettings = new()
+        {
+            maxBodies = settings.MaxBodies,
+            maxBodyPairs = settings.MaxBodyPairs,
+            maxContactConstraints = settings.MaxContactConstraints,
+            broadPhaseLayerInterface = settings.BroadPhaseLayerInterface.Handle,
+            objectLayerPairFilter = settings.ObjectLayerPairFilter.Handle,
+            objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter.Handle
+        };
         Handle = JPH_PhysicsSystem_Create(&nativeSettings);
 
-        contactListenerHandle = JPH_ContactListener_Create();
-        s_contactListeners.Add(contactListenerHandle, this);
+        _contactListenerHandle = JPH_ContactListener_Create();
+        s_contactListeners.Add(_contactListenerHandle, this);
 
-        bodyActivationListenerHandle = JPH_BodyActivationListener_Create();
-        s_bodyActivationListenerListeners.Add(bodyActivationListenerHandle, this);
+        _bodyActivationListenerHandle = JPH_BodyActivationListener_Create();
+        s_bodyActivationListenerListeners.Add(_bodyActivationListenerHandle, this);
 
-        JPH_PhysicsSystem_SetContactListener(Handle, contactListenerHandle);
-        JPH_PhysicsSystem_SetBodyActivationListener(Handle, bodyActivationListenerHandle);
+        JPH_PhysicsSystem_SetContactListener(Handle, _contactListenerHandle);
+        JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
     }
 
     /// <summary>
@@ -91,11 +108,11 @@ public sealed class PhysicsSystem : NativeObject
     {
         if (isDisposing)
         {
-            s_contactListeners.Remove(contactListenerHandle);
-            JPH_ContactListener_Destroy(contactListenerHandle);
+            s_contactListeners.Remove(_contactListenerHandle);
+            JPH_ContactListener_Destroy(_contactListenerHandle);
 
-            s_bodyActivationListenerListeners.Remove(bodyActivationListenerHandle);
-            JPH_BodyActivationListener_Destroy(bodyActivationListenerHandle);
+            s_bodyActivationListenerListeners.Remove(_bodyActivationListenerHandle);
+            JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
 
             JPH_PhysicsSystem_Destroy(Handle);
         }
@@ -232,7 +249,20 @@ public sealed class PhysicsSystem : NativeObject
 
     #region ContactListener
     [UnmanagedCallersOnly]
-    private static unsafe uint OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Double3* baseOffset, IntPtr collisionResult)
+    private static unsafe uint OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Vector3* baseOffset, IntPtr collisionResult)
+    {
+        PhysicsSystem listener = s_contactListeners[listenerPtr];
+
+        if (listener.OnContactValidate != null)
+        {
+            return (uint)listener.OnContactValidate(listener, new Body(body1), new Body(body2), new Double3(*baseOffset), collisionResult);
+        }
+
+        return (uint)ValidateResult.AcceptAllContactsForThisBodyPair;
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe uint OnContactValidateCallbackDouble(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Double3* baseOffset, IntPtr collisionResult)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
 
@@ -245,21 +275,21 @@ public sealed class PhysicsSystem : NativeObject
     }
 
     [UnmanagedCallersOnly]
-    private static void OnContactAddedCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2)
+    private static void OnContactAddedCallback(nint listenerPtr, nint body1, nint body2)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactAdded?.Invoke(listener, new Body(body1), new Body(body2));
     }
 
     [UnmanagedCallersOnly]
-    private static void OnContactPersistedCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2)
+    private static void OnContactPersistedCallback(nint listenerPtr, nint body1, nint body2)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactPersisted?.Invoke(listener, new Body(body1), new Body(body2));
     }
 
     [UnmanagedCallersOnly]
-    private unsafe static void OnContactRemovedCallback(IntPtr listenerPtr, SubShapeIDPair* subShapePair)
+    private unsafe static void OnContactRemovedCallback(nint listenerPtr, SubShapeIDPair* subShapePair)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
         listener.OnContactRemoved?.Invoke(listener, ref Unsafe.AsRef<SubShapeIDPair>(subShapePair));
@@ -268,14 +298,14 @@ public sealed class PhysicsSystem : NativeObject
 
     #region BodyActivationListener
     [UnmanagedCallersOnly]
-    private static void OnBodyActivatedCallback(IntPtr listenerPtr, uint bodyID, ulong bodyUserData)
+    private static void OnBodyActivatedCallback(nint listenerPtr, uint bodyID, ulong bodyUserData)
     {
         PhysicsSystem listener = s_bodyActivationListenerListeners[listenerPtr];
         listener.OnBodyActivated?.Invoke(listener, bodyID, bodyUserData);
     }
 
     [UnmanagedCallersOnly]
-    private static void OnBodyDeactivatedCallback(IntPtr listenerPtr, uint bodyID, ulong bodyUserData)
+    private static void OnBodyDeactivatedCallback(nint listenerPtr, uint bodyID, ulong bodyUserData)
     {
         PhysicsSystem listener = s_bodyActivationListenerListeners[listenerPtr];
         listener.OnBodyDeactivated?.Invoke(listener, bodyID, bodyUserData);
