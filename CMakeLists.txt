@@ -258,7 +258,7 @@ else()
 endif()
 
 add_subdirectory(src/joltc)
-add_subdirectory(src/samples/HelloWorldNative)
+# add_subdirectory(src/samples/HelloWorldNative)
 
 if (CMAKE_GENERATOR_PLATFORM)
     message(STATUS "CMAKE_GENERATOR_PLATFORM: ${CMAKE_GENERATOR_PLATFORM}")
