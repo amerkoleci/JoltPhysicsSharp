@@ -109,13 +109,13 @@ typedef enum JPH_MotionQuality {
 } JPH_MotionQuality;
 
 typedef enum JPH_AllowedDOFs {
-    JPH_AllowedDOFs_All = 0b111111,									
-    JPH_AllowedDOFs_TranslationX = 0b000001,								
-    JPH_AllowedDOFs_TranslationY = 0b000010,								
-    JPH_AllowedDOFs_TranslationZ = 0b000100,								
-    JPH_AllowedDOFs_RotationX = 0b001000,									
-    JPH_AllowedDOFs_RotationY = 0b010000,									
-    JPH_AllowedDOFs_RotationZ = 0b100000,									
+    JPH_AllowedDOFs_All = 0b111111,
+    JPH_AllowedDOFs_TranslationX = 0b000001,
+    JPH_AllowedDOFs_TranslationY = 0b000010,
+    JPH_AllowedDOFs_TranslationZ = 0b000100,
+    JPH_AllowedDOFs_RotationX = 0b001000,
+    JPH_AllowedDOFs_RotationY = 0b010000,
+    JPH_AllowedDOFs_RotationZ = 0b100000,
     JPH_AllowedDOFs_Plane2D = JPH_AllowedDOFs_TranslationX | JPH_AllowedDOFs_TranslationY | JPH_AllowedDOFs_RotationZ,
 
     _JPH_AllowedDOFs_Count,
@@ -130,8 +130,8 @@ typedef enum JPH_GroundState {
 } JPH_GroundState;
 
 typedef enum JPH_MotorState {
-    JPH_MotorState_Off = 0,									
-    JPH_MotorState_Velocity = 1,								
+    JPH_MotorState_Off = 0,
+    JPH_MotorState_Velocity = 1,
     JPH_MotorState_Position = 2,
 
     _JPH_MotorState_Count,
@@ -355,7 +355,7 @@ typedef struct JPH_ExtendedUpdateSettings  {
 	float		walkStairsMinStepForward ;
 	float		walkStairsStepForwardTest;
 	float		walkStairsCosAngleForwardContact ;
-	JPH_Vec3	walkStairsStepDownExtra;	
+	JPH_Vec3	walkStairsStepDownExtra;
 } JPH_ExtendedUpdateSettings;
 
 /* CharacterBase */
@@ -451,7 +451,7 @@ JPH_CAPI void JPH_ConvexShape_SetDensity(JPH_ConvexShape* shape, float inDensity
 
 /* BoxShape */
 JPH_CAPI JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius);
-JPH_CAPI JPH_BoxShape* JPH_BoxShapeSettings_CreateShape(const JPH_BoxShapeSettings* settings); 
+JPH_CAPI JPH_BoxShape* JPH_BoxShapeSettings_CreateShape(const JPH_BoxShapeSettings* settings);
 JPH_CAPI JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius);
 JPH_CAPI void JPH_BoxShape_GetHalfExtent(const JPH_BoxShape* shape, JPH_Vec3* halfExtent);
 JPH_CAPI float JPH_BoxShape_GetVolume(const JPH_BoxShape* shape);
@@ -459,7 +459,7 @@ JPH_CAPI float JPH_BoxShape_GetConvexRadius(const JPH_BoxShape* shape);
 
 /* SphereShapeSettings */
 JPH_CAPI JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius);
-JPH_CAPI JPH_SphereShape* JPH_SphereShapeSettings_CreateShape(const JPH_SphereShapeSettings* settings); 
+JPH_CAPI JPH_SphereShape* JPH_SphereShapeSettings_CreateShape(const JPH_SphereShapeSettings* settings);
 JPH_CAPI float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings);
 JPH_CAPI void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float radius);
 JPH_CAPI JPH_SphereShape* JPH_SphereShape_Create(float radius);
@@ -491,7 +491,7 @@ JPH_CAPI JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount);
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, uint32_t verticesCount, const JPH_IndexedTriangle* triangles, uint32_t triangleCount);
 JPH_CAPI void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings);
-JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* settings); 
+JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* settings);
 
 /* HeightFieldShape */
 JPH_CAPI JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount);
@@ -957,7 +957,7 @@ JPH_CAPI JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase*
 JPH_CAPI JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void);
 
 /* CharacterVirtual */
-JPH_CAPI JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings, 
+JPH_CAPI JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings,
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_PhysicsSystem* system);

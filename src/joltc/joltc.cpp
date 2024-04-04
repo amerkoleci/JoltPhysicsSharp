@@ -2477,7 +2477,7 @@ void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* lockInterfac
 //--------------------------------------------------------------------------------------------------
 JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     const JPH_RVec3* origin, const JPH_Vec3* direction,
-    JPH_RayCastResult* hit, 
+    JPH_RayCastResult* hit,
     const void* broadPhaseLayerFilter, // Can be NULL (no filter)
     const void* objectLayerFilter, // Can be NULL (no filter)
     const void* bodyFilter)
@@ -3092,7 +3092,7 @@ JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void)
 }
 
 /* CharacterVirtual */
-JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings, 
+JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings,
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
 	uint64_t userData,
@@ -3145,7 +3145,7 @@ void JPH_CharacterVirtual_SetRotation(JPH_CharacterVirtual* character, const JPH
     jolt_character->SetRotation(ToJolt(rotation));
 }
 
-void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime, 
+void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime,
     const JPH_ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, JPH_PhysicsSystem* system)
 {
 	JPH_ASSERT(settings);
