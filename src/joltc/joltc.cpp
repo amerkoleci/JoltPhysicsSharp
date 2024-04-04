@@ -2646,6 +2646,12 @@ JPH_BodyID JPH_AllHit_CastShapeCollector_GetBodyID2(JPH_AllHit_CastShapeCollecto
     return joltCollector->mHits[index].mBodyID2.GetIndexAndSequenceNumber();
 }
 
+JPH_BodyID JPH_AllHit_CastShapeCollector_GetSubShapeID2(JPH_AllHit_CastShapeCollector* collector, unsigned index)
+{
+    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
+    JPH_ASSERT(index < joltCollector->mHits.size());
+    return joltCollector->mHits[index].mSubShapeID2.GetValue();
+}
 
 JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
     const JPH_Shape* shape,
