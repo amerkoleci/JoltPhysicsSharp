@@ -265,32 +265,33 @@ typedef struct JPH_BodyFilter                       JPH_BodyFilter;
 typedef struct JPH_PhysicsSystem                    JPH_PhysicsSystem;
 
 typedef struct JPH_ShapeSettings                    JPH_ShapeSettings;
-typedef struct JPH_BoxShapeSettings                 JPH_BoxShapeSettings;
+typedef struct JPH_ConvexShapeSettings			    JPH_ConvexShapeSettings;
 typedef struct JPH_SphereShapeSettings              JPH_SphereShapeSettings;
+typedef struct JPH_BoxShapeSettings                 JPH_BoxShapeSettings;
 typedef struct JPH_TriangleShapeSettings            JPH_TriangleShapeSettings;
 typedef struct JPH_CapsuleShapeSettings             JPH_CapsuleShapeSettings;
-typedef struct JPH_CylinderShapeSettings            JPH_CylinderShapeSettings;
-typedef struct JPH_ConvexShapeSettings			    JPH_ConvexShapeSettings;
-typedef struct JPH_ConvexHullShapeSettings          JPH_ConvexHullShapeSettings;
-typedef struct JPH_MeshShapeSettings                JPH_MeshShapeSettings;
-typedef struct JPH_HeightFieldShapeSettings         JPH_HeightFieldShapeSettings;
 typedef struct JPH_TaperedCapsuleShapeSettings      JPH_TaperedCapsuleShapeSettings;
+typedef struct JPH_CylinderShapeSettings            JPH_CylinderShapeSettings;
+typedef struct JPH_ConvexHullShapeSettings          JPH_ConvexHullShapeSettings;
 typedef struct JPH_CompoundShapeSettings            JPH_CompoundShapeSettings;
 typedef struct JPH_StaticCompoundShapeSettings      JPH_StaticCompoundShapeSettings;
 typedef struct JPH_MutableCompoundShapeSettings     JPH_MutableCompoundShapeSettings;
+typedef struct JPH_MeshShapeSettings                JPH_MeshShapeSettings;
+typedef struct JPH_HeightFieldShapeSettings         JPH_HeightFieldShapeSettings;
 typedef struct JPH_RotatedTranslatedShapeSettings   JPH_RotatedTranslatedShapeSettings;
 
 
 typedef struct JPH_Shape                        JPH_Shape;
 typedef struct JPH_ConvexShape                  JPH_ConvexShape;
-typedef struct JPH_BoxShape                     JPH_BoxShape;
 typedef struct JPH_SphereShape                  JPH_SphereShape;
-typedef struct JPH_CylinderShape                JPH_CylinderShape;
+typedef struct JPH_BoxShape                     JPH_BoxShape;
 typedef struct JPH_CapsuleShape                 JPH_CapsuleShape;
-typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
-typedef struct JPH_MeshShape                    JPH_MeshShape;
-typedef struct JPH_MutableCompoundShape         JPH_MutableCompoundShape;
+typedef struct JPH_CylinderShape                JPH_CylinderShape;
 typedef struct JPH_ConvexHullShape              JPH_ConvexHullShape;
+typedef struct JPH_CompoundShape                JPH_CompoundShape;
+typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
+typedef struct JPH_MutableCompoundShape         JPH_MutableCompoundShape;
+typedef struct JPH_MeshShape                    JPH_MeshShape;
 typedef struct JPH_HeightFieldShape             JPH_HeightFieldShape;
 typedef struct JPH_RotatedTranslatedShape       JPH_RotatedTranslatedShape;
 
