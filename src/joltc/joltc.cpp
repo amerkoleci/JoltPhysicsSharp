@@ -961,6 +961,24 @@ void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, co
     joltSettings->AddShape(ToJolt(position), ToJolt(rotation), joltShape, userData);
 }
 
+uint32_t JPH_CompoundShape_GetNumSubShapes(const JPH_CompoundShape* shape)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::CompoundShape*>(shape);
+	return joltShape->GetNumSubShapes();
+}
+
+void JPH_CompoundShape_GetSubShape(const JPH_CompoundShape* shape, uint32_t index, const JPH_Shape** subShape, JPH_Vec3* positionCOM, JPH_Quat* rotation, uint32_t* userData)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::CompoundShape*>(shape);
+	const JPH::CompoundShape::SubShape& sub = joltShape->GetSubShape(index);
+	if (subShape) *subShape = reinterpret_cast<const JPH_Shape*>(sub.mShape.GetPtr());
+	if (positionCOM) FromJolt(sub.GetPositionCOM(), positionCOM);
+	if (rotation) FromJolt(sub.GetRotation(), rotation);
+	if (userData) *userData = sub.mUserData;
+}
+
 JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create(void)
 {
     auto settings = new JPH::StaticCompoundShapeSettings();
