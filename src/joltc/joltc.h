@@ -92,6 +92,39 @@ typedef enum JPH_ValidateResult {
     _JPH_ValidateResult_Force32 = 0x7fffffff
 } JPH_ValidateResult;
 
+typedef enum JPH_ShapeType {
+	JPH_ShapeType_Convex = 0,
+	JPH_ShapeType_Compound = 1,
+	JPH_ShapeType_Decorated = 2,
+	JPH_ShapeType_Mesh = 3,
+	JPH_ShapeType_HeightField = 4,
+	JPH_ShapeType_SoftBody = 5,
+
+    _JPH_ShapeType_Count,
+    _JPH_ShapeType_Force32 = 0x7fffffff
+} JPH_ShapeType;
+
+typedef enum JPH_ShapeSubType {
+	JPH_ShapeSubType_Sphere = 0,
+	JPH_ShapeSubType_Box = 1,
+	JPH_ShapeSubType_Triangle = 2,
+	JPH_ShapeSubType_Capsule = 3,
+	JPH_ShapeSubType_TaperedCapsule = 4,
+	JPH_ShapeSubType_Cylinder = 5,
+	JPH_ShapeSubType_ConvexHull = 6,
+	JPH_ShapeSubType_StaticCompound = 7,
+	JPH_ShapeSubType_MutableCompound = 8,
+	JPH_ShapeSubType_RotatedTranslated = 9,
+	JPH_ShapeSubType_Scaled = 10,
+	JPH_ShapeSubType_OffsetCenterOfMass = 11,
+	JPH_ShapeSubType_Mesh = 12,
+	JPH_ShapeSubType_HeightField = 13,
+	JPH_ShapeSubType_SoftBody = 14,
+
+    _JPH_ShapeSubType_Count,
+    _JPH_ShapeSubType_Force32 = 0x7fffffff
+} JPH_ShapeSubType;
+
 typedef enum JPH_ConstraintSpace {
     JPH_ConstraintSpace_LocalToBodyCOM = 0,
     JPH_ConstraintSpace_WorldSpace = 1,
@@ -529,6 +562,8 @@ JPH_CAPI JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
+JPH_CAPI JPH_ShapeType JPH_Shape_GetType(const JPH_Shape* shape);
+JPH_CAPI JPH_ShapeSubType JPH_Shape_GetSubType(const JPH_Shape* shape);
 JPH_CAPI void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData);
 JPH_CAPI uint64_t JPH_Shape_GetUserData(const JPH_Shape* shape);
 JPH_CAPI void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result);

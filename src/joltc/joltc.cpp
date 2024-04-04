@@ -1084,6 +1084,16 @@ void JPH_Shape_Destroy(JPH_Shape* shape)
     }
 }
 
+JPH_ShapeType JPH_Shape_GetType(const JPH_Shape* shape)
+{
+	return static_cast<JPH_ShapeType>(reinterpret_cast<const JPH::Shape*>(shape)->GetType());
+}
+
+JPH_ShapeSubType JPH_Shape_GetSubType(const JPH_Shape* shape)
+{
+	return static_cast<JPH_ShapeSubType>(reinterpret_cast<const JPH::Shape*>(shape)->GetSubType());
+}
+
 void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData)
 {
     reinterpret_cast<JPH::Shape*>(shape)->SetUserData(userData);
