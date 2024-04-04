@@ -979,6 +979,18 @@ void JPH_CompoundShape_GetSubShape(const JPH_CompoundShape* shape, uint32_t inde
 	if (userData) *userData = sub.mUserData;
 }
 
+uint32_t JPH_CompoundShape_GetSubShapeIndexFromID(const JPH_CompoundShape* shape, JPH_SubShapeID id, JPH_SubShapeID* remainder)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::CompoundShape*>(shape);
+	auto joltSubShapeID = JPH::SubShapeID();
+	joltSubShapeID.SetValue(id);
+	JPH::SubShapeID joltRemainder = JPH::SubShapeID();
+	uint32_t index = joltShape->GetSubShapeIndexFromID(joltSubShapeID, joltRemainder);
+	*remainder = joltRemainder.GetValue();
+	return index;
+}
+
 /* StaticCompoundShape */
 JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create(void)
 {
