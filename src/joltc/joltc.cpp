@@ -979,12 +979,24 @@ void JPH_CompoundShape_GetSubShape(const JPH_CompoundShape* shape, uint32_t inde
 	if (userData) *userData = sub.mUserData;
 }
 
+/* StaticCompoundShape */
 JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create(void)
 {
     auto settings = new JPH::StaticCompoundShapeSettings();
     settings->AddRef();
 
     return reinterpret_cast<JPH_StaticCompoundShapeSettings*>(settings);
+}
+
+JPH_StaticCompoundShape* JPH_StaticCompoundShape_Create(const JPH_StaticCompoundShapeSettings* settings)
+{
+	const JPH::StaticCompoundShapeSettings* jolt_settings = reinterpret_cast<const JPH::StaticCompoundShapeSettings*>(settings);
+    auto shape_res = jolt_settings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_StaticCompoundShape*>(shape);
 }
 
 /* MutableCompoundShape */

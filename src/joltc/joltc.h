@@ -544,6 +544,7 @@ JPH_CAPI void JPH_CompoundShape_GetSubShape(const JPH_CompoundShape* shape, uint
 
 /* StaticCompoundShape */
 JPH_CAPI JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create(void);
+JPH_CAPI JPH_StaticCompoundShape* JPH_StaticCompoundShape_Create(const JPH_StaticCompoundShapeSettings* settings);
 
 /* MutableCompoundShape */
 JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create(void);
