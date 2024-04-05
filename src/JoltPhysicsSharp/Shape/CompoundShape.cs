@@ -6,21 +6,31 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public abstract class CompoundShapeShapeSettings : ShapeSettings
+public abstract unsafe class CompoundShapeShapeSettings : ShapeSettings
 {
     protected CompoundShapeShapeSettings(nint handle)
         : base(handle)
     {
     }
 
+    public uint NumSubShapes => JPH_CompoundShape_GetNumSubShapes(Handle);
+
     public void AddShape(in Vector3 position, in Quaternion rotation, ShapeSettings shapeSettings, uint userData = 0u)
     {
-        JPH_CompoundShapeSettings_AddShape(Handle, in position, in rotation, shapeSettings.Handle, userData);
+        fixed (Vector3* positionPtr = &position)
+        fixed (Quaternion* rotationPtr = &rotation)
+        {
+            JPH_CompoundShapeSettings_AddShape(Handle, positionPtr, rotationPtr, shapeSettings.Handle, userData);
+        }
     }
 
     public void AddShape(in Vector3 position, in Quaternion rotation, Shape shape, uint userData = 0u)
     {
-        JPH_CompoundShapeSettings_AddShape2(Handle, in position, in rotation, shape.Handle, userData);
+        fixed (Vector3* positionPtr = &position)
+        fixed (Quaternion* rotationPtr = &rotation)
+        {
+            JPH_CompoundShapeSettings_AddShape2(Handle, positionPtr, rotationPtr, shape.Handle, userData);
+        }
     }
 }
 

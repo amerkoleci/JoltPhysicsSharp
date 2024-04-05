@@ -205,11 +205,6 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_ShapeSettings_Destroy(nint shape);
 
     /* ConvexShape */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern float JPH_ConvexShapeSettings_GetDensity(nint shape);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ConvexShapeSettings_SetDensity(nint shape, float value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern float JPH_ConvexShape_GetDensity(nint shape);
@@ -280,18 +275,24 @@ internal static unsafe partial class JoltApi
     public static extern float JPH_CylinderShape_GetHalfHeight(nint handle);
 
     /* ConvexHullShape */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_ConvexHullShapeSettings_CreateShape(nint settings);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ConvexHullShapeSettings_Create(Vector3* points, int pointsCount, float maxConvexRadius);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_ConvexHullShapeSettings_Create(Vector3* points, int pointsCount, float maxConvexRadius);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ConvexHullShapeSettings_CreateShape(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_ConvexShapeSettings_GetDensity(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConvexShapeSettings_SetDensity(nint shape, float value);
 
     /* MeshShape  */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_MeshShapeSettings_Create(Triangle* triangle, int triangleCount);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_MeshShapeSettings_Create(Triangle* triangle, int triangleCount);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_MeshShapeSettings_Create2(Vector3* vertices, int verticesCount, IndexedTriangle* triangles, int triangleCount);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_MeshShapeSettings_Create2(Vector3* vertices, int verticesCount, IndexedTriangle* triangles, int triangleCount);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_MeshShapeSettings_Sanitize(IntPtr shape);
@@ -314,38 +315,56 @@ internal static unsafe partial class JoltApi
     public static extern IntPtr JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius);
 
     /* CompoundShape */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_CompoundShapeSettings_AddShape(nint handle, in Vector3 position, in Quaternion rotation, nint shapeSettings, uint userData);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CompoundShapeSettings_AddShape(nint handle, Vector3* position, Quaternion* rotation, nint shapeSettings, uint userData);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_CompoundShapeSettings_AddShape2(nint handle, in Vector3 position, in Quaternion rotation, nint shape, uint userData);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CompoundShapeSettings_AddShape2(nint handle, Vector3* position, Quaternion* rotation, nint shape, uint userData);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_StaticCompoundShapeSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial uint JPH_CompoundShape_GetNumSubShapes(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_StaticCompoundShapeSettings_Create();
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_StaticCompoundShape_Create(nint settings);
 
     /* MutableCompoundShape */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_MutableCompoundShapeSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_MutableCompoundShapeSettings_Create();
 
     /* RotatedTranslatedShape */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_RotatedTranslatedShapeSettings_Create(in Vector3 position, in Quaternion rotation, nint shapeSettings);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RotatedTranslatedShapeSettings_Create(Vector3* position, Quaternion* rotation, nint shapeSettings);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_RotatedTranslatedShapeSettings_Create2(in Vector3 position, in Quaternion rotation, nint shape);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RotatedTranslatedShapeSettings_Create2(Vector3* position, Quaternion* rotation, nint shape);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_RotatedTranslatedShapeSettings_CreateShape(nint shapeSettings);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RotatedTranslatedShapeSettings_CreateShape(nint settings);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_RotatedTranslatedShape_Create(in Vector3 position, in Quaternion rotation, nint shape);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RotatedTranslatedShape_Create(Vector3 *position, Quaternion* rotation, nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RotatedTranslatedShape_GetPosition(nint shape, Vector3* position);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RotatedTranslatedShape_GetRotation(nint shape, Quaternion* rotation);
 
     /* Shape */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Shape_Destroy(IntPtr shape);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_Destroy(nint shape);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Shape_GetLocalBounds(IntPtr shape, BoundingBox* box);
+    [LibraryImport(LibName)]
+    public static partial ShapeType JPH_Shape_GetType(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial ShapeSubType JPH_Shape_GetSubType(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetLocalBounds(IntPtr shape, BoundingBox* box);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Shape_GetMassProperties(nint shape, out MassProperties properties);
@@ -735,13 +754,16 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_SetPositionRotationAndVelocity(IntPtr handle, uint bodyID, Vector3* position, Quaternion* rotation, Vector3* linearVelocity, Vector3* angularVelocity);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPositionRotationAndVelocity))]
-    public static partial void JPH_BodyInterface_SetPositionRotationAndVelocityDouble(IntPtr handle, uint bodyID, Double3* position, Quaternion* rotation, Vector3* linearVelocity, Vector3* angularVelocity);
-
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyInterface_SetShape(IntPtr handle, uint bodyId, IntPtr shape, Bool32 updateMassProperties, Activation activationMode);
+    public static partial void JPH_BodyInterface_SetPositionRotationAndVelocityDouble(nint handle, uint bodyID, Double3* position, Quaternion* rotation, Vector3* linearVelocity, Vector3* angularVelocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_NotifyShapeChanged(IntPtr handle, uint bodyId, Vector3* previousCenterOfMass, Bool32 updateMassProperties, Activation activationMode);
+    public static partial nint JPH_BodyInterface_GetShape(nint handle, uint bodyId);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetShape(nint handle, uint bodyId, nint shape, Bool32 updateMassProperties, Activation activationMode);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_NotifyShapeChanged(nint handle, uint bodyId, Vector3* previousCenterOfMass, Bool32 updateMassProperties, Activation activationMode);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_ActivateBody(IntPtr handle, uint bodyId);
@@ -792,7 +814,7 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyInterface_GetAngularVelocity(IntPtr handle, uint bodyId, out Vector3 angularVelocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_GetPointVelocity(IntPtr handle, uint bodyId, in /*RVec3*/Vector3* point, Vector3* velocity); 
+    public static partial void JPH_BodyInterface_GetPointVelocity(IntPtr handle, uint bodyId, in /*RVec3*/Vector3* point, Vector3* velocity);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyInterface_AddForce(IntPtr handle, uint bodyId, in Vector3 force);
@@ -1020,17 +1042,17 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName, EntryPoint = nameof(JPH_Body_GetCenterOfMassTransform))]
     public static partial void JPH_Body_GetCenterOfMassTransformDouble(IntPtr handle, RMatrix4x4* result);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_GetLinearVelocity(IntPtr handle, out Vector3 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_GetLinearVelocity(IntPtr handle, Vector3* result);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_SetLinearVelocity(IntPtr handle, in Vector3 velocity);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_SetLinearVelocity(IntPtr handle, Vector3* velocity);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_GetAngularVelocity(IntPtr handle, out Vector3 velocity);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_GetAngularVelocity(IntPtr handle, Vector3* velocity);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_SetAngularVelocity(IntPtr handle, in Vector3 velocity);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_SetAngularVelocity(IntPtr handle, Vector3* velocity);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Body_AddForce(IntPtr handle, Vector3* velocity);
@@ -1044,11 +1066,11 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_Body_AddTorque(IntPtr handle, Vector3* value);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_GetAccumulatedForce(IntPtr handle, out Vector3 force);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_GetAccumulatedForce(IntPtr handle, Vector3* force);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Body_GetAccumulatedTorque(IntPtr handle, out Vector3 force);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_GetAccumulatedTorque(IntPtr handle, Vector3* force);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_Body_AddImpulse(IntPtr handle, in Vector3 impulse);

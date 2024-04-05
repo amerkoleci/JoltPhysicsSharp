@@ -19,4 +19,9 @@ public sealed class StaticCompoundShape : CompoundShape
         : base(handle)
     {
     }
+
+    public StaticCompoundShape(StaticCompoundShapeSettings settings)
+        : base(JPH_StaticCompoundShape_Create(settings.Handle))
+    {
+    }
 }

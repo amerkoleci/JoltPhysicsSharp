@@ -14,6 +14,10 @@ public abstract class DecoratedShapeSettings : ShapeSettings
 
 public abstract class DecoratedShape : Shape
 {
+    protected DecoratedShape()
+    {
+    }
+
     internal DecoratedShape(nint handle)
         : base(handle)
     {

@@ -33,11 +33,9 @@ public static class Program
 
     private static Body CreateFloor(in BodyInterface bodyInterface, float size = 200.0f)
     {
-        float scale = WorldScale;
-
         Body floor = bodyInterface.CreateBody(new BodyCreationSettings(
-            new BoxShapeSettings(scale * new Vector3(0.5f * size, 1.0f, 0.5f * size), 0.0f),
-            scale * new Vector3(0.0f, -1.0f, 0.0f),
+            new BoxShapeSettings(WorldScale * new Vector3(0.5f * size, 1.0f, 0.5f * size), 0.0f),
+            WorldScale * new Vector3(0.0f, -1.0f, 0.0f),
             Quaternion.Identity,
             MotionType.Static,
             Layers.NonMoving)
@@ -230,7 +228,8 @@ public static class Program
             // Add it to the world
             bodyInterface.AddBody(floor, Activation.DontActivate);
 
-            BodyCreationSettings spherSettings = new(new SphereShape(0.5f), new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
+            SphereShape sphereShape = new(0.5f);
+            BodyCreationSettings spherSettings = new(sphereShape, new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
             BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, Activation.Activate);
 
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.

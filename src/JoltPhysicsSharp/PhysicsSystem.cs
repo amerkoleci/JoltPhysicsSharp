@@ -249,7 +249,7 @@ public sealed class PhysicsSystem : NativeObject
 
     #region ContactListener
     [UnmanagedCallersOnly]
-    private static unsafe uint OnContactValidateCallback(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Vector3* baseOffset, IntPtr collisionResult)
+    private static unsafe uint OnContactValidateCallback(nint listenerPtr, nint body1, nint body2, Vector3* baseOffset, nint collisionResult)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
 
@@ -262,7 +262,7 @@ public sealed class PhysicsSystem : NativeObject
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe uint OnContactValidateCallbackDouble(IntPtr listenerPtr, IntPtr body1, IntPtr body2, Double3* baseOffset, IntPtr collisionResult)
+    private static unsafe uint OnContactValidateCallbackDouble(nint listenerPtr, nint body1, nint body2, Double3* baseOffset, nint collisionResult)
     {
         PhysicsSystem listener = s_contactListeners[listenerPtr];
 

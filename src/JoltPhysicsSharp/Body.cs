@@ -321,56 +321,74 @@ public readonly unsafe struct Body(IntPtr handle) : IEquatable<Body>
 
     public Vector3 GetLinearVelocity()
     {
-        JPH_Body_GetLinearVelocity(Handle, out Vector3 velocity);
+        Vector3 velocity;
+        JPH_Body_GetLinearVelocity(Handle, &velocity);
         return velocity;
     }
 
     public void GetLinearVelocity(out Vector3 velocity)
     {
-        JPH_Body_GetLinearVelocity(Handle, out velocity);
+        Unsafe.SkipInit(out velocity);
+
+        fixed (Vector3* velocityPtr = &velocity)
+            JPH_Body_GetLinearVelocity(Handle, velocityPtr);
     }
 
     public void SetLinearVelocity(in Vector3 velocity)
     {
-        JPH_Body_SetLinearVelocity(Handle, velocity);
+        fixed (Vector3* velocityPtr = &velocity)
+            JPH_Body_SetLinearVelocity(Handle, velocityPtr);
     }
 
     public Vector3 GetAngularVelocity()
     {
-        JPH_Body_GetAngularVelocity(Handle, out Vector3 velocity);
+        Vector3 velocity;
+        JPH_Body_GetAngularVelocity(Handle, &velocity);
         return velocity;
     }
 
     public void GetAngularVelocity(out Vector3 velocity)
     {
-        JPH_Body_GetAngularVelocity(Handle, out velocity);
+        Unsafe.SkipInit(out velocity);
+
+        fixed (Vector3* velocityPtr = &velocity)
+            JPH_Body_GetAngularVelocity(Handle, velocityPtr);
     }
 
     public void SetAngularVelocity(in Vector3 velocity)
     {
-        JPH_Body_SetAngularVelocity(Handle, velocity);
+        fixed (Vector3* velocityPtr = &velocity)
+            JPH_Body_SetAngularVelocity(Handle, velocityPtr);
     }
 
     public Vector3 GetAccumulatedForce()
     {
-        JPH_Body_GetAccumulatedForce(Handle, out Vector3 force);
+        Vector3 force;
+        JPH_Body_GetAccumulatedForce(Handle, &force);
         return force;
     }
 
     public void GetAccumulatedForce(out Vector3 force)
     {
-        JPH_Body_GetAccumulatedForce(Handle, out force);
+        Unsafe.SkipInit(out force);
+
+        fixed (Vector3* forcePtr = &force)
+            JPH_Body_GetAccumulatedForce(Handle, forcePtr);
     }
 
     public Vector3 GetAccumulatedTorque()
     {
-        JPH_Body_GetAccumulatedTorque(Handle, out Vector3 torque);
+        Vector3 torque;
+        JPH_Body_GetAccumulatedTorque(Handle, &torque);
         return torque;
     }
 
     public void GetAccumulatedTorque(out Vector3 torque)
     {
-        JPH_Body_GetAccumulatedTorque(Handle, out torque);
+        Unsafe.SkipInit(out torque);
+
+        fixed (Vector3* torquePtr = &torque)
+            JPH_Body_GetAccumulatedTorque(Handle, torquePtr);
     }
 
     public void GetWorldSpaceSurfaceNormal(uint subShapeID, in Vector3 position, out Vector3 normal)
@@ -379,6 +397,7 @@ public readonly unsafe struct Body(IntPtr handle) : IEquatable<Body>
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceSurfaceNormal)}");
 
         Unsafe.SkipInit(out normal);
+
         fixed (Vector3* positionPtr = &position)
         fixed (Vector3* normalPtr = &normal)
         {

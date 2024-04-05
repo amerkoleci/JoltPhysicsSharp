@@ -3,7 +3,7 @@
 
 namespace JoltPhysicsSharp;
 
-public readonly struct BodyID : IEquatable<BodyID>
+public readonly struct BodyID(uint id) : IEquatable<BodyID>
 {
     /// <summary>
     /// The value for an invalid body ID
@@ -25,12 +25,7 @@ public readonly struct BodyID : IEquatable<BodyID>
     /// </summary>
 	public const byte MaxSequenceNumber = 0xff;
 
-    public BodyID(uint id)
-    {
-        ID = id;
-    }
-
-    public uint ID { get; }
+    public uint ID { get; } = id;
     public bool IsValid => ID != InvalidBodyID;
     public bool IsInvalid => ID == InvalidBodyID;
 

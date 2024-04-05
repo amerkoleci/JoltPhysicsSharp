@@ -36,6 +36,10 @@ public abstract class ShapeSettings : NativeObject
 
 public abstract class Shape : NativeObject
 {
+    protected Shape()
+    {
+    }
+
     protected Shape(nint handle)
         : base(handle)
     {
@@ -53,6 +57,9 @@ public abstract class Shape : NativeObject
             JPH_Shape_Destroy(Handle);
         }
     }
+
+    public ShapeType Type => JPH_Shape_GetType(Handle);
+    public ShapeSubType SubType => JPH_Shape_GetSubType(Handle);
 
     public unsafe BoundingBox LocalBounds
     {

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
@@ -9,7 +8,7 @@ namespace JoltPhysicsSharp;
 
 public abstract class BodyFilter : NativeObject
 {
-    private static readonly Dictionary<IntPtr, BodyFilter> s_listeners = new();
+    private static readonly Dictionary<IntPtr, BodyFilter> s_listeners = [];
     private static readonly JPH_BodyFilter_Procs s_bodyFilter_Procs;
 
     static unsafe BodyFilter()
@@ -47,14 +46,14 @@ public abstract class BodyFilter : NativeObject
     protected abstract bool ShouldCollideLocked(Body body);
     
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, BodyID bodyID)
+    private static Bool32 ShouldCollideCallback(nint listenerPtr, BodyID bodyID)
     {
         BodyFilter listener = s_listeners[listenerPtr];
         return listener.ShouldCollide(bodyID);
     }
 
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideLockedCallback(IntPtr listenerPtr, IntPtr body)
+    private static Bool32 ShouldCollideLockedCallback(nint listenerPtr, nint body)
     {
         BodyFilter listener = s_listeners[listenerPtr];
         return listener.ShouldCollideLocked(body);
