@@ -1098,6 +1098,22 @@ JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH_Vec3* po
     return reinterpret_cast<JPH_RotatedTranslatedShape*>(rotatedTranslatedShape);
 }
 
+void JPH_RotatedTranslatedShape_GetPosition(const JPH_RotatedTranslatedShape* shape, JPH_Vec3* position)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::RotatedTranslatedShape*>(shape);
+	JPH::Vec3 joltVector = joltShape->GetPosition();
+	FromJolt(joltVector, position);
+}
+
+void JPH_RotatedTranslatedShape_GetRotation(const JPH_RotatedTranslatedShape* shape, JPH_Quat* rotation)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::RotatedTranslatedShape*>(shape);
+	JPH::Quat joltQuat = joltShape->GetRotation();
+	FromJolt(joltQuat, rotation);
+}
+
 /* Shape */
 void JPH_Shape_Destroy(JPH_Shape* shape)
 {
