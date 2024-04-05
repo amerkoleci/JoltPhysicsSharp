@@ -805,16 +805,6 @@ float JPH_CylinderShape_GetHalfHeight(const JPH_CylinderShape* shape)
 }
 
 /* ConvexHullShape */
-float JPH_ConvexShapeSettings_GetDensity(const JPH_ConvexShapeSettings* shape)
-{
-	return reinterpret_cast<const JPH::ConvexShapeSettings*>(shape)->mDensity;
-}
-
-void JPH_ConvexShapeSettings_SetDensity(JPH_ConvexShapeSettings* shape, float value)
-{
-    reinterpret_cast<JPH::ConvexShapeSettings*>(shape)->SetDensity(value);
-}
-
 JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* points, uint32_t pointsCount, float maxConvexRadius)
 {
     Array<Vec3> joltPoints;
@@ -840,6 +830,16 @@ JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHul
     shape->AddRef();
 
     return reinterpret_cast<JPH_ConvexHullShape*>(shape);
+}
+
+float JPH_ConvexShapeSettings_GetDensity(const JPH_ConvexShapeSettings* shape)
+{
+	return reinterpret_cast<const JPH::ConvexShapeSettings*>(shape)->mDensity;
+}
+
+void JPH_ConvexShapeSettings_SetDensity(JPH_ConvexShapeSettings* shape, float value)
+{
+    reinterpret_cast<JPH::ConvexShapeSettings*>(shape)->SetDensity(value);
 }
 
 /* MeshShapeSettings */
@@ -901,26 +901,6 @@ JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* se
     return reinterpret_cast<JPH_MeshShape*>(shape);
 }
 
-void JPH_MeshShapeSettings_DetermineMinAndMaxSample(const JPH_HeightFieldShapeSettings* settings, float* pOutMinValue, float* pOutMaxValue, float* pOutQuantizationScale)
-{
-    auto joltSettings = reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings);
-    float outMinValue, outMaxValue, outQuantizationScale;
-    joltSettings->DetermineMinAndMaxSample(outMinValue, outMaxValue, outQuantizationScale);
-    if (pOutMinValue)
-        *pOutMinValue = outMinValue;
-    if (pOutMaxValue)
-        *pOutMaxValue = outMaxValue;
-    if (pOutQuantizationScale)
-        *pOutQuantizationScale = outQuantizationScale;
-}
-
-uint32_t JPH_MeshShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFieldShapeSettings* settings, float maxError)
-{
-    JPH_ASSERT(settings != nullptr);
-
-    return reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings)->CalculateBitsPerSampleForError(maxError);
-}
-
 /* HeightFieldShapeSettings */
 JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount)
 {
@@ -935,6 +915,26 @@ JPH_HeightFieldShape* JPH_HeightFieldShapeSettings_CreateShape(JPH_HeightFieldSh
     auto shape_res = reinterpret_cast<JPH::HeightFieldShapeSettings*>(settings)->Create();
     static auto res = shape_res.Get();
     return reinterpret_cast<JPH_HeightFieldShape*>(res.GetPtr());
+}
+
+void JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(const JPH_HeightFieldShapeSettings* settings, float* pOutMinValue, float* pOutMaxValue, float* pOutQuantizationScale)
+{
+    auto joltSettings = reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings);
+    float outMinValue, outMaxValue, outQuantizationScale;
+    joltSettings->DetermineMinAndMaxSample(outMinValue, outMaxValue, outQuantizationScale);
+    if (pOutMinValue)
+        *pOutMinValue = outMinValue;
+    if (pOutMaxValue)
+        *pOutMaxValue = outMaxValue;
+    if (pOutQuantizationScale)
+        *pOutQuantizationScale = outQuantizationScale;
+}
+
+uint32_t JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(const JPH_HeightFieldShapeSettings* settings, float maxError)
+{
+    JPH_ASSERT(settings != nullptr);
+
+    return reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings)->CalculateBitsPerSampleForError(maxError);
 }
 
 /* TaperedCapsuleShapeSettings */

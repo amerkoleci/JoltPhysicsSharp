@@ -81,6 +81,10 @@ static_assert(JPH_ShapeType_Decorated == (int)JPH::EShapeType::Decorated);
 static_assert(JPH_ShapeType_Mesh == (int)JPH::EShapeType::Mesh);
 static_assert(JPH_ShapeType_HeightField == (int)JPH::EShapeType::HeightField);
 static_assert(JPH_ShapeType_SoftBody == (int)JPH::EShapeType::SoftBody);
+static_assert(JPH_ShapeType_User1 == (int)JPH::EShapeType::User1);
+static_assert(JPH_ShapeType_User2 == (int)JPH::EShapeType::User2);
+static_assert(JPH_ShapeType_User3 == (int)JPH::EShapeType::User3);
+static_assert(JPH_ShapeType_User4 == (int)JPH::EShapeType::User4);
 
 // EShapeSubType
 static_assert(JPH_ShapeSubType_Sphere == (int)JPH::EShapeSubType::Sphere);
