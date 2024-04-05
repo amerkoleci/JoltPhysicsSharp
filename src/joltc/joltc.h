@@ -92,6 +92,39 @@ typedef enum JPH_ValidateResult {
     _JPH_ValidateResult_Force32 = 0x7fffffff
 } JPH_ValidateResult;
 
+typedef enum JPH_ShapeType {
+	JPH_ShapeType_Convex = 0,
+	JPH_ShapeType_Compound = 1,
+	JPH_ShapeType_Decorated = 2,
+	JPH_ShapeType_Mesh = 3,
+	JPH_ShapeType_HeightField = 4,
+	JPH_ShapeType_SoftBody = 5,
+
+    _JPH_ShapeType_Count,
+    _JPH_ShapeType_Force32 = 0x7fffffff
+} JPH_ShapeType;
+
+typedef enum JPH_ShapeSubType {
+	JPH_ShapeSubType_Sphere = 0,
+	JPH_ShapeSubType_Box = 1,
+	JPH_ShapeSubType_Triangle = 2,
+	JPH_ShapeSubType_Capsule = 3,
+	JPH_ShapeSubType_TaperedCapsule = 4,
+	JPH_ShapeSubType_Cylinder = 5,
+	JPH_ShapeSubType_ConvexHull = 6,
+	JPH_ShapeSubType_StaticCompound = 7,
+	JPH_ShapeSubType_MutableCompound = 8,
+	JPH_ShapeSubType_RotatedTranslated = 9,
+	JPH_ShapeSubType_Scaled = 10,
+	JPH_ShapeSubType_OffsetCenterOfMass = 11,
+	JPH_ShapeSubType_Mesh = 12,
+	JPH_ShapeSubType_HeightField = 13,
+	JPH_ShapeSubType_SoftBody = 14,
+
+    _JPH_ShapeSubType_Count,
+    _JPH_ShapeSubType_Force32 = 0x7fffffff
+} JPH_ShapeSubType;
+
 typedef enum JPH_ConstraintSpace {
     JPH_ConstraintSpace_LocalToBodyCOM = 0,
     JPH_ConstraintSpace_WorldSpace = 1,
@@ -109,13 +142,13 @@ typedef enum JPH_MotionQuality {
 } JPH_MotionQuality;
 
 typedef enum JPH_AllowedDOFs {
-    JPH_AllowedDOFs_All = 0b111111,									
-    JPH_AllowedDOFs_TranslationX = 0b000001,								
-    JPH_AllowedDOFs_TranslationY = 0b000010,								
-    JPH_AllowedDOFs_TranslationZ = 0b000100,								
-    JPH_AllowedDOFs_RotationX = 0b001000,									
-    JPH_AllowedDOFs_RotationY = 0b010000,									
-    JPH_AllowedDOFs_RotationZ = 0b100000,									
+    JPH_AllowedDOFs_All = 0b111111,
+    JPH_AllowedDOFs_TranslationX = 0b000001,
+    JPH_AllowedDOFs_TranslationY = 0b000010,
+    JPH_AllowedDOFs_TranslationZ = 0b000100,
+    JPH_AllowedDOFs_RotationX = 0b001000,
+    JPH_AllowedDOFs_RotationY = 0b010000,
+    JPH_AllowedDOFs_RotationZ = 0b100000,
     JPH_AllowedDOFs_Plane2D = JPH_AllowedDOFs_TranslationX | JPH_AllowedDOFs_TranslationY | JPH_AllowedDOFs_RotationZ,
 
     _JPH_AllowedDOFs_Count,
@@ -130,8 +163,8 @@ typedef enum JPH_GroundState {
 } JPH_GroundState;
 
 typedef enum JPH_MotorState {
-    JPH_MotorState_Off = 0,									
-    JPH_MotorState_Velocity = 1,								
+    JPH_MotorState_Off = 0,
+    JPH_MotorState_Velocity = 1,
     JPH_MotorState_Position = 2,
 
     _JPH_MotorState_Count,
@@ -265,32 +298,33 @@ typedef struct JPH_BodyFilter                       JPH_BodyFilter;
 typedef struct JPH_PhysicsSystem                    JPH_PhysicsSystem;
 
 typedef struct JPH_ShapeSettings                    JPH_ShapeSettings;
-typedef struct JPH_BoxShapeSettings                 JPH_BoxShapeSettings;
+typedef struct JPH_ConvexShapeSettings			    JPH_ConvexShapeSettings;
 typedef struct JPH_SphereShapeSettings              JPH_SphereShapeSettings;
+typedef struct JPH_BoxShapeSettings                 JPH_BoxShapeSettings;
 typedef struct JPH_TriangleShapeSettings            JPH_TriangleShapeSettings;
 typedef struct JPH_CapsuleShapeSettings             JPH_CapsuleShapeSettings;
-typedef struct JPH_CylinderShapeSettings            JPH_CylinderShapeSettings;
-typedef struct JPH_ConvexShapeSettings			    JPH_ConvexShapeSettings;
-typedef struct JPH_ConvexHullShapeSettings          JPH_ConvexHullShapeSettings;
-typedef struct JPH_MeshShapeSettings                JPH_MeshShapeSettings;
-typedef struct JPH_HeightFieldShapeSettings         JPH_HeightFieldShapeSettings;
 typedef struct JPH_TaperedCapsuleShapeSettings      JPH_TaperedCapsuleShapeSettings;
+typedef struct JPH_CylinderShapeSettings            JPH_CylinderShapeSettings;
+typedef struct JPH_ConvexHullShapeSettings          JPH_ConvexHullShapeSettings;
 typedef struct JPH_CompoundShapeSettings            JPH_CompoundShapeSettings;
 typedef struct JPH_StaticCompoundShapeSettings      JPH_StaticCompoundShapeSettings;
 typedef struct JPH_MutableCompoundShapeSettings     JPH_MutableCompoundShapeSettings;
+typedef struct JPH_MeshShapeSettings                JPH_MeshShapeSettings;
+typedef struct JPH_HeightFieldShapeSettings         JPH_HeightFieldShapeSettings;
 typedef struct JPH_RotatedTranslatedShapeSettings   JPH_RotatedTranslatedShapeSettings;
 
 
 typedef struct JPH_Shape                        JPH_Shape;
 typedef struct JPH_ConvexShape                  JPH_ConvexShape;
-typedef struct JPH_BoxShape                     JPH_BoxShape;
 typedef struct JPH_SphereShape                  JPH_SphereShape;
-typedef struct JPH_CylinderShape                JPH_CylinderShape;
+typedef struct JPH_BoxShape                     JPH_BoxShape;
 typedef struct JPH_CapsuleShape                 JPH_CapsuleShape;
-typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
-typedef struct JPH_MeshShape                    JPH_MeshShape;
-typedef struct JPH_MutableCompoundShape         JPH_MutableCompoundShape;
+typedef struct JPH_CylinderShape                JPH_CylinderShape;
 typedef struct JPH_ConvexHullShape              JPH_ConvexHullShape;
+typedef struct JPH_CompoundShape                JPH_CompoundShape;
+typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
+typedef struct JPH_MutableCompoundShape         JPH_MutableCompoundShape;
+typedef struct JPH_MeshShape                    JPH_MeshShape;
 typedef struct JPH_HeightFieldShape             JPH_HeightFieldShape;
 typedef struct JPH_RotatedTranslatedShape       JPH_RotatedTranslatedShape;
 
@@ -355,7 +389,7 @@ typedef struct JPH_ExtendedUpdateSettings  {
 	float		walkStairsMinStepForward ;
 	float		walkStairsStepForwardTest;
 	float		walkStairsCosAngleForwardContact ;
-	JPH_Vec3	walkStairsStepDownExtra;	
+	JPH_Vec3	walkStairsStepDownExtra;
 } JPH_ExtendedUpdateSettings;
 
 /* CharacterBase */
@@ -451,7 +485,7 @@ JPH_CAPI void JPH_ConvexShape_SetDensity(JPH_ConvexShape* shape, float inDensity
 
 /* BoxShape */
 JPH_CAPI JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius);
-JPH_CAPI JPH_BoxShape* JPH_BoxShapeSettings_CreateShape(const JPH_BoxShapeSettings* settings); 
+JPH_CAPI JPH_BoxShape* JPH_BoxShapeSettings_CreateShape(const JPH_BoxShapeSettings* settings);
 JPH_CAPI JPH_BoxShape* JPH_BoxShape_Create(const JPH_Vec3* halfExtent, float convexRadius);
 JPH_CAPI void JPH_BoxShape_GetHalfExtent(const JPH_BoxShape* shape, JPH_Vec3* halfExtent);
 JPH_CAPI float JPH_BoxShape_GetVolume(const JPH_BoxShape* shape);
@@ -459,7 +493,7 @@ JPH_CAPI float JPH_BoxShape_GetConvexRadius(const JPH_BoxShape* shape);
 
 /* SphereShapeSettings */
 JPH_CAPI JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius);
-JPH_CAPI JPH_SphereShape* JPH_SphereShapeSettings_CreateShape(const JPH_SphereShapeSettings* settings); 
+JPH_CAPI JPH_SphereShape* JPH_SphereShapeSettings_CreateShape(const JPH_SphereShapeSettings* settings);
 JPH_CAPI float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings);
 JPH_CAPI void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float radius);
 JPH_CAPI JPH_SphereShape* JPH_SphereShape_Create(float radius);
@@ -491,7 +525,7 @@ JPH_CAPI JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount);
 JPH_CAPI JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create2(const JPH_Vec3* vertices, uint32_t verticesCount, const JPH_IndexedTriangle* triangles, uint32_t triangleCount);
 JPH_CAPI void JPH_MeshShapeSettings_Sanitize(JPH_MeshShapeSettings* settings);
-JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* settings); 
+JPH_CAPI JPH_MeshShape* JPH_MeshShapeSettings_CreateShape(const JPH_MeshShapeSettings* settings);
 
 /* HeightFieldShape */
 JPH_CAPI JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* samples, const JPH_Vec3* offset, const JPH_Vec3* scale, uint32_t sampleCount);
@@ -505,28 +539,37 @@ JPH_CAPI JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create
 /* CompoundShape */
 JPH_CAPI void JPH_CompoundShapeSettings_AddShape(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_ShapeSettings* shape, uint32_t userData);
 JPH_CAPI void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape, uint32_t userData);
+JPH_CAPI uint32_t JPH_CompoundShape_GetNumSubShapes(const JPH_CompoundShape* shape);
+JPH_CAPI void JPH_CompoundShape_GetSubShape(const JPH_CompoundShape* shape, uint32_t index, const JPH_Shape** subShape, JPH_Vec3* positionCOM, JPH_Quat* rotation, uint32_t* userData);
+JPH_CAPI uint32_t JPH_CompoundShape_GetSubShapeIndexFromID(const JPH_CompoundShape* shape, JPH_SubShapeID id, JPH_SubShapeID* remainder);
 
+/* StaticCompoundShape */
 JPH_CAPI JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create(void);
+JPH_CAPI JPH_StaticCompoundShape* JPH_StaticCompoundShape_Create(const JPH_StaticCompoundShapeSettings* settings);
 
 /* MutableCompoundShape */
 JPH_CAPI JPH_MutableCompoundShapeSettings* JPH_MutableCompoundShapeSettings_Create(void);
 JPH_CAPI JPH_MutableCompoundShape* JPH_MutableCompoundShape_Create(const JPH_MutableCompoundShapeSettings* settings);
-JPH_CAPI uint32_t JPH_MutableCompoundShape_AddShape(const JPH_MutableCompoundShape* shape, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* child, uint32_t userData);
-JPH_CAPI void JPH_MutableCompoundShape_RemoveShape(const JPH_MutableCompoundShape* shape, uint32_t index);
-JPH_CAPI void JPH_MutableCompoundShape_ModifyShape(const JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation);
-JPH_CAPI void JPH_MutableCompoundShape_ModifyShape2(const JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* newShape);
-JPH_CAPI void JPH_MutableCompoundShape_AdjustCenterOfMass(const JPH_MutableCompoundShape* shape);
+JPH_CAPI uint32_t JPH_MutableCompoundShape_AddShape(JPH_MutableCompoundShape* shape, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* child, uint32_t userData);
+JPH_CAPI void JPH_MutableCompoundShape_RemoveShape(JPH_MutableCompoundShape* shape, uint32_t index);
+JPH_CAPI void JPH_MutableCompoundShape_ModifyShape(JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation);
+JPH_CAPI void JPH_MutableCompoundShape_ModifyShape2(JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* newShape);
+JPH_CAPI void JPH_MutableCompoundShape_AdjustCenterOfMass(JPH_MutableCompoundShape* shape);
 
 /* RotatedTranslatedShape */
 JPH_CAPI JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_ShapeSettings* shapeSettings);
 JPH_CAPI JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create2(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_Shape* shape);
 JPH_CAPI JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShapeSettings_CreateShape(const JPH_RotatedTranslatedShapeSettings* settings);
 JPH_CAPI JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_Shape* shape);
+JPH_CAPI void JPH_RotatedTranslatedShape_GetPosition(const JPH_RotatedTranslatedShape* shape, JPH_Vec3* position);
+JPH_CAPI void JPH_RotatedTranslatedShape_GetRotation(const JPH_RotatedTranslatedShape* shape, JPH_Quat* rotation);
 
 /* Shape */
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
+JPH_CAPI JPH_ShapeType JPH_Shape_GetType(const JPH_Shape* shape);
+JPH_CAPI JPH_ShapeSubType JPH_Shape_GetSubType(const JPH_Shape* shape);
 JPH_CAPI void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData);
-JPH_CAPI uint64_t JPH_Shape_GetUserData(JPH_Shape* shape);
+JPH_CAPI uint64_t JPH_Shape_GetUserData(const JPH_Shape* shape);
 JPH_CAPI void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result);
 JPH_CAPI void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* result);
 JPH_CAPI void JPH_Shape_GetCenterOfMass(JPH_Shape* shape, JPH_Vec3* result);
@@ -707,6 +750,7 @@ JPH_CAPI void JPH_BodyInterface_SetPositionAndRotation(JPH_BodyInterface* interf
 JPH_CAPI void JPH_BodyInterface_SetPositionAndRotationWhenChanged(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_Activation activationMode);
 JPH_CAPI void JPH_BodyInterface_SetPositionRotationAndVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_Vec3* linearVelocity, JPH_Vec3* angularVelocity);
 
+JPH_CAPI const JPH_Shape* JPH_BodyInterface_GetShape(JPH_BodyInterface* interface, JPH_BodyID bodyId);
 JPH_CAPI void JPH_BodyInterface_SetShape(JPH_BodyInterface* interface, JPH_BodyID bodyId, const JPH_Shape* shape, JPH_Bool32 updateMassProperties, JPH_Activation activationMode);
 JPH_CAPI void JPH_BodyInterface_NotifyShapeChanged(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Vec3* previousCenterOfMass, JPH_Bool32 updateMassProperties, JPH_Activation activationMode);
 
@@ -816,6 +860,7 @@ JPH_CAPI void JPH_AllHit_CastShapeCollector_Destroy(JPH_AllHit_CastShapeCollecto
 JPH_CAPI void JPH_AllHit_CastShapeCollector_Reset(JPH_AllHit_CastShapeCollector* collector);
 JPH_CAPI JPH_ShapeCastResult* JPH_AllHit_CastShapeCollector_GetHits(JPH_AllHit_CastShapeCollector* collector, size_t * size);
 JPH_CAPI JPH_BodyID JPH_AllHit_CastShapeCollector_GetBodyID2(JPH_AllHit_CastShapeCollector* collector, unsigned index);
+JPH_CAPI JPH_SubShapeID JPH_AllHit_CastShapeCollector_GetSubShapeID2(JPH_AllHit_CastShapeCollector* collector, unsigned index);
 
 /* Body */
 JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
@@ -957,7 +1002,7 @@ JPH_CAPI JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase*
 JPH_CAPI JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void);
 
 /* CharacterVirtual */
-JPH_CAPI JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings, 
+JPH_CAPI JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings,
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_PhysicsSystem* system);

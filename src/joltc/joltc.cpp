@@ -961,12 +961,54 @@ void JPH_CompoundShapeSettings_AddShape2(JPH_CompoundShapeSettings* settings, co
     joltSettings->AddShape(ToJolt(position), ToJolt(rotation), joltShape, userData);
 }
 
+uint32_t JPH_CompoundShape_GetNumSubShapes(const JPH_CompoundShape* shape)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::CompoundShape*>(shape);
+	return joltShape->GetNumSubShapes();
+}
+
+void JPH_CompoundShape_GetSubShape(const JPH_CompoundShape* shape, uint32_t index, const JPH_Shape** subShape, JPH_Vec3* positionCOM, JPH_Quat* rotation, uint32_t* userData)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::CompoundShape*>(shape);
+	const JPH::CompoundShape::SubShape& sub = joltShape->GetSubShape(index);
+	if (subShape) *subShape = reinterpret_cast<const JPH_Shape*>(sub.mShape.GetPtr());
+	if (positionCOM) FromJolt(sub.GetPositionCOM(), positionCOM);
+	if (rotation) FromJolt(sub.GetRotation(), rotation);
+	if (userData) *userData = sub.mUserData;
+}
+
+uint32_t JPH_CompoundShape_GetSubShapeIndexFromID(const JPH_CompoundShape* shape, JPH_SubShapeID id, JPH_SubShapeID* remainder)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::CompoundShape*>(shape);
+	auto joltSubShapeID = JPH::SubShapeID();
+	joltSubShapeID.SetValue(id);
+	JPH::SubShapeID joltRemainder = JPH::SubShapeID();
+	uint32_t index = joltShape->GetSubShapeIndexFromID(joltSubShapeID, joltRemainder);
+	*remainder = joltRemainder.GetValue();
+	return index;
+}
+
+/* StaticCompoundShape */
 JPH_StaticCompoundShapeSettings* JPH_StaticCompoundShapeSettings_Create(void)
 {
     auto settings = new JPH::StaticCompoundShapeSettings();
     settings->AddRef();
 
     return reinterpret_cast<JPH_StaticCompoundShapeSettings*>(settings);
+}
+
+JPH_StaticCompoundShape* JPH_StaticCompoundShape_Create(const JPH_StaticCompoundShapeSettings* settings)
+{
+	const JPH::StaticCompoundShapeSettings* jolt_settings = reinterpret_cast<const JPH::StaticCompoundShapeSettings*>(settings);
+    auto shape_res = jolt_settings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_StaticCompoundShape*>(shape);
 }
 
 /* MutableCompoundShape */
@@ -1056,6 +1098,22 @@ JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH_Vec3* po
     return reinterpret_cast<JPH_RotatedTranslatedShape*>(rotatedTranslatedShape);
 }
 
+void JPH_RotatedTranslatedShape_GetPosition(const JPH_RotatedTranslatedShape* shape, JPH_Vec3* position)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::RotatedTranslatedShape*>(shape);
+	JPH::Vec3 joltVector = joltShape->GetPosition();
+	FromJolt(joltVector, position);
+}
+
+void JPH_RotatedTranslatedShape_GetRotation(const JPH_RotatedTranslatedShape* shape, JPH_Quat* rotation)
+{
+	JPH_ASSERT(shape);
+	auto joltShape = reinterpret_cast<const JPH::RotatedTranslatedShape*>(shape);
+	JPH::Quat joltQuat = joltShape->GetRotation();
+	FromJolt(joltQuat, rotation);
+}
+
 /* Shape */
 void JPH_Shape_Destroy(JPH_Shape* shape)
 {
@@ -1066,14 +1124,24 @@ void JPH_Shape_Destroy(JPH_Shape* shape)
     }
 }
 
+JPH_ShapeType JPH_Shape_GetType(const JPH_Shape* shape)
+{
+	return static_cast<JPH_ShapeType>(reinterpret_cast<const JPH::Shape*>(shape)->GetType());
+}
+
+JPH_ShapeSubType JPH_Shape_GetSubType(const JPH_Shape* shape)
+{
+	return static_cast<JPH_ShapeSubType>(reinterpret_cast<const JPH::Shape*>(shape)->GetSubType());
+}
+
 void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData)
 {
     reinterpret_cast<JPH::Shape*>(shape)->SetUserData(userData);
 }
 
-uint64_t JPH_Shape_GetUserData(JPH_Shape* shape)
+uint64_t JPH_Shape_GetUserData(const JPH_Shape* shape)
 {
-    return reinterpret_cast<JPH::Shape*>(shape)->GetUserData();
+    return reinterpret_cast<const JPH::Shape*>(shape)->GetUserData();
 }
 
 void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result)
@@ -2179,15 +2247,23 @@ void JPH_BodyInterface_SetPositionRotationAndVelocity(JPH_BodyInterface* interfa
     joltBodyInterface->SetPositionRotationAndVelocity(JPH::BodyID(bodyId), ToJolt(position), ToJolt(rotation), ToJolt(linearVelocity), ToJolt(angularVelocity));
 }
 
+const JPH_Shape* JPH_BodyInterface_GetShape(JPH_BodyInterface* interface, JPH_BodyID bodyId)
+{
+	JPH_ASSERT(interface);
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	const JPH::Shape* shape = joltBodyInterface->GetShape(JPH::BodyID(bodyId)).GetPtr();
+	return reinterpret_cast<const JPH_Shape*>(shape);
+}
+
 void JPH_BodyInterface_SetShape(JPH_BodyInterface* interface, JPH_BodyID bodyId, const JPH_Shape* shape, JPH_Bool32 updateMassProperties, JPH_Activation activationMode)
 {
     JPH_ASSERT(interface);
-    auto jolyBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
 
     auto jphShape = reinterpret_cast<const JPH::Shape*>(shape);
 
     // !! is to make ms compiler happy.
-    jolyBodyInterface->SetShape(JPH::BodyID(bodyId), jphShape, !!updateMassProperties, static_cast<JPH::EActivation>(activationMode));
+    joltBodyInterface->SetShape(JPH::BodyID(bodyId), jphShape, !!updateMassProperties, static_cast<JPH::EActivation>(activationMode));
 }
 
 void JPH_BodyInterface_NotifyShapeChanged(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_Vec3* previousCenterOfMass, JPH_Bool32 updateMassProperties, JPH_Activation activationMode)
@@ -2477,7 +2553,7 @@ void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* lockInterfac
 //--------------------------------------------------------------------------------------------------
 JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     const JPH_RVec3* origin, const JPH_Vec3* direction,
-    JPH_RayCastResult* hit, 
+    JPH_RayCastResult* hit,
     const void* broadPhaseLayerFilter, // Can be NULL (no filter)
     const void* objectLayerFilter, // Can be NULL (no filter)
     const void* bodyFilter)
@@ -2598,6 +2674,12 @@ JPH_BodyID JPH_AllHit_CastShapeCollector_GetBodyID2(JPH_AllHit_CastShapeCollecto
     return joltCollector->mHits[index].mBodyID2.GetIndexAndSequenceNumber();
 }
 
+JPH_BodyID JPH_AllHit_CastShapeCollector_GetSubShapeID2(JPH_AllHit_CastShapeCollector* collector, unsigned index)
+{
+    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
+    JPH_ASSERT(index < joltCollector->mHits.size());
+    return joltCollector->mHits[index].mSubShapeID2.GetValue();
+}
 
 JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
     const JPH_Shape* shape,
@@ -3095,7 +3177,7 @@ JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void)
 }
 
 /* CharacterVirtual */
-JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings, 
+JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings,
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
 	uint64_t userData,
@@ -3148,7 +3230,7 @@ void JPH_CharacterVirtual_SetRotation(JPH_CharacterVirtual* character, const JPH
     jolt_character->SetRotation(ToJolt(rotation));
 }
 
-void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime, 
+void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime,
     const JPH_ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, JPH_PhysicsSystem* system)
 {
 	JPH_ASSERT(settings);
