@@ -74,6 +74,31 @@ static_assert(JPH_ValidateResult_AcceptContact == (int)JPH::ValidateResult::Acce
 static_assert(JPH_ValidateResult_RejectContact == (int)JPH::ValidateResult::RejectContact);
 static_assert(JPH_ValidateResult_RejectAllContactsForThisBodyPair == (int)JPH::ValidateResult::RejectAllContactsForThisBodyPair);
 
+// EShapeType
+static_assert(JPH_ShapeType_Convex == (int)JPH::EShapeType::Convex);
+static_assert(JPH_ShapeType_Compound == (int)JPH::EShapeType::Compound);
+static_assert(JPH_ShapeType_Decorated == (int)JPH::EShapeType::Decorated);
+static_assert(JPH_ShapeType_Mesh == (int)JPH::EShapeType::Mesh);
+static_assert(JPH_ShapeType_HeightField == (int)JPH::EShapeType::HeightField);
+static_assert(JPH_ShapeType_SoftBody == (int)JPH::EShapeType::SoftBody);
+
+// EShapeSubType
+static_assert(JPH_ShapeSubType_Sphere == (int)JPH::EShapeSubType::Sphere);
+static_assert(JPH_ShapeSubType_Box == (int)JPH::EShapeSubType::Box);
+static_assert(JPH_ShapeSubType_Triangle == (int)JPH::EShapeSubType::Triangle);
+static_assert(JPH_ShapeSubType_Capsule == (int)JPH::EShapeSubType::Capsule);
+static_assert(JPH_ShapeSubType_TaperedCapsule == (int)JPH::EShapeSubType::TaperedCapsule);
+static_assert(JPH_ShapeSubType_Cylinder == (int)JPH::EShapeSubType::Cylinder);
+static_assert(JPH_ShapeSubType_ConvexHull == (int)JPH::EShapeSubType::ConvexHull);
+static_assert(JPH_ShapeSubType_StaticCompound == (int)JPH::EShapeSubType::StaticCompound);
+static_assert(JPH_ShapeSubType_MutableCompound == (int)JPH::EShapeSubType::MutableCompound);
+static_assert(JPH_ShapeSubType_RotatedTranslated == (int)JPH::EShapeSubType::RotatedTranslated);
+static_assert(JPH_ShapeSubType_Scaled == (int)JPH::EShapeSubType::Scaled);
+static_assert(JPH_ShapeSubType_OffsetCenterOfMass == (int)JPH::EShapeSubType::OffsetCenterOfMass);
+static_assert(JPH_ShapeSubType_Mesh == (int)JPH::EShapeSubType::Mesh);
+static_assert(JPH_ShapeSubType_HeightField == (int)JPH::EShapeSubType::HeightField);
+static_assert(JPH_ShapeSubType_SoftBody == (int)JPH::EShapeSubType::SoftBody);
+
 // EActivation
 static_assert(sizeof(JPH::EConstraintSpace) == sizeof(JPH_ConstraintSpace));
 static_assert(JPH_ConstraintSpace_LocalToBodyCOM == (int)JPH::EConstraintSpace::LocalToBodyCOM);
