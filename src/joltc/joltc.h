@@ -572,12 +572,16 @@ JPH_CAPI void JPH_RotatedTranslatedShape_GetRotation(const JPH_RotatedTranslated
 JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
 JPH_CAPI JPH_ShapeType JPH_Shape_GetType(const JPH_Shape* shape);
 JPH_CAPI JPH_ShapeSubType JPH_Shape_GetSubType(const JPH_Shape* shape);
-JPH_CAPI void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData);
 JPH_CAPI uint64_t JPH_Shape_GetUserData(const JPH_Shape* shape);
-JPH_CAPI void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result);
+JPH_CAPI void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData);
+JPH_CAPI JPH_Bool32 JPH_Shape_MustBeStatic(const JPH_Shape* shape);
+JPH_CAPI void JPH_Shape_GetCenterOfMass(const JPH_Shape* shape, JPH_Vec3* result);
+JPH_CAPI void JPH_Shape_GetLocalBounds(const JPH_Shape* shape, JPH_AABox* result);
+JPH_CAPI void JPH_Shape_GetWorldSpaceBounds(const JPH_Shape* shape, JPH_RMatrix4x4* centerOfMassTransform, JPH_Vec3* scale, JPH_AABox* result);
+JPH_CAPI float JPH_Shape_GetInnerRadius(const JPH_Shape* shape);
 JPH_CAPI void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* result);
-JPH_CAPI void JPH_Shape_GetCenterOfMass(JPH_Shape* shape, JPH_Vec3* result);
-JPH_CAPI float JPH_Shape_GetInnerRadius(JPH_Shape* shape);
+JPH_CAPI void JPH_Shape_GetSurfaceNormal(const JPH_Shape* shape, JPH_SubShapeID subShapeID, JPH_Vec3* localPosition, JPH_Vec3* normal);
+JPH_CAPI float JPH_Shape_GetVolume(const JPH_Shape* shape);
 
 /* JPH_BodyCreationSettings */
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create(void);

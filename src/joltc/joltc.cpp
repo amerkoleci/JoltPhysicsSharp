@@ -1134,24 +1134,50 @@ JPH_ShapeSubType JPH_Shape_GetSubType(const JPH_Shape* shape)
 	return static_cast<JPH_ShapeSubType>(reinterpret_cast<const JPH::Shape*>(shape)->GetSubType());
 }
 
-void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData)
-{
-    reinterpret_cast<JPH::Shape*>(shape)->SetUserData(userData);
-}
-
 uint64_t JPH_Shape_GetUserData(const JPH_Shape* shape)
 {
     return reinterpret_cast<const JPH::Shape*>(shape)->GetUserData();
 }
 
-void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result)
+void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData)
+{
+    reinterpret_cast<JPH::Shape*>(shape)->SetUserData(userData);
+}
+
+JPH_Bool32 JPH_Shape_MustBeStatic(const JPH_Shape* shape)
+{
+	return reinterpret_cast<const JPH::Shape*>(shape)->MustBeStatic();
+}
+
+void JPH_Shape_GetCenterOfMass(const JPH_Shape* shape, JPH_Vec3* result)
+{
+	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+	auto joltVector = joltShape->GetCenterOfMass();
+	FromJolt(joltVector, result);
+}
+
+void JPH_Shape_GetLocalBounds(const JPH_Shape* shape, JPH_AABox* result)
 {
 	JPH_ASSERT(shape);
 	JPH_ASSERT(result);
 
-    auto bounds = reinterpret_cast<JPH::Shape*>(shape)->GetLocalBounds();
+    auto bounds = reinterpret_cast<const JPH::Shape*>(shape)->GetLocalBounds();
 	FromJolt(bounds.mMin, &result->min);
 	FromJolt(bounds.mMax, &result->max);
+}
+
+void JPH_Shape_GetWorldSpaceBounds(const JPH_Shape* shape, JPH_RMatrix4x4* centerOfMassTransform, JPH_Vec3* scale, JPH_AABox* result)
+{
+	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+	auto bounds = joltShape->GetWorldSpaceBounds(ToJolt(*centerOfMassTransform), ToJolt(scale));
+	FromJolt(bounds.mMin, &result->min);
+	FromJolt(bounds.mMax, &result->max);
+}
+
+float JPH_Shape_GetInnerRadius(const JPH_Shape* shape)
+{
+	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+	return joltShape->GetInnerRadius();
 }
 
 void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* result)
@@ -1160,17 +1186,18 @@ void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* res
 	FromJolt(joltShape->GetMassProperties(), result);
 }
 
-void JPH_Shape_GetCenterOfMass(JPH_Shape* shape, JPH_Vec3* result)
+void JPH_Shape_GetSurfaceNormal(const JPH_Shape* shape, JPH_SubShapeID subShapeID, JPH_Vec3* localPosition, JPH_Vec3* normal)
 {
-	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
-	auto joltVector = joltShape->GetCenterOfMass();
-	FromJolt(joltVector, result);
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    auto joltSubShapeID = JPH::SubShapeID();
+    joltSubShapeID.SetValue(subShapeID);
+    Vec3 joltNormal = joltShape->GetSurfaceNormal(joltSubShapeID, ToJolt(localPosition));
+    FromJolt(joltNormal, normal);
 }
 
-float JPH_Shape_GetInnerRadius(JPH_Shape* shape)
+float JPH_Shape_GetVolume(const JPH_Shape* shape)
 {
-	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
-	return joltShape->GetInnerRadius();
+	return reinterpret_cast<const JPH::Shape*>(shape)->GetVolume();
 }
 
 /* JPH_BodyCreationSettings */
