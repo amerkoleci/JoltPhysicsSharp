@@ -1953,7 +1953,7 @@ uint32_t JPH_PhysicsSystem_GetNumConstraints(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
-	return system->physicsSystem->GetConstraints().size();
+	return (uint32_t) system->physicsSystem->GetConstraints().size();
 }
 
 void JPH_PhysicsSystem_SetGravity(JPH_PhysicsSystem* system, const JPH_Vec3* value)
