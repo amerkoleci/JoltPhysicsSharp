@@ -625,6 +625,8 @@ JPH_CAPI void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings);
 JPH_CAPI JPH_ConstraintSettings* JPH_Constraint_GetConstraintSettings(JPH_Constraint* constraint);
 JPH_CAPI JPH_Bool32 JPH_Constraint_GetEnabled(JPH_Constraint* constraint);
 JPH_CAPI void JPH_Constraint_SetEnabled(JPH_Constraint* constraint, JPH_Bool32 enabled);
+JPH_CAPI uint64_t JPH_Constraint_GetUserData(const JPH_Constraint* constraint);
+JPH_CAPI void JPH_Constraint_SetUserData(JPH_Constraint* constraint, uint64_t userData);
 JPH_CAPI void JPH_Constraint_Destroy(JPH_Constraint* constraint);
 
 /* JPH_DistanceConstraintSettings */

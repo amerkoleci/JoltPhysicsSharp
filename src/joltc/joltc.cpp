@@ -1353,6 +1353,16 @@ void JPH_Constraint_SetEnabled(JPH_Constraint* constraint, JPH_Bool32 enabled)
     joltConstraint->SetEnabled(!!enabled);
 }
 
+uint64_t JPH_Constraint_GetUserData(const JPH_Constraint* constraint)
+{
+    return reinterpret_cast<const JPH::Constraint*>(constraint)->GetUserData();
+}
+
+void JPH_Constraint_SetUserData(JPH_Constraint* constraint, uint64_t userData)
+{
+    reinterpret_cast<JPH::Constraint*>(constraint)->SetUserData(userData);
+}
+
 void JPH_Constraint_Destroy(JPH_Constraint* constraint)
 {
     if (constraint)
