@@ -1949,6 +1949,13 @@ uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system)
     return system->physicsSystem->GetMaxBodies();
 }
 
+uint32_t JPH_PhysicsSystem_GetNumConstraints(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+	return system->physicsSystem->GetConstraints().size();
+}
+
 void JPH_PhysicsSystem_SetGravity(JPH_PhysicsSystem* system, const JPH_Vec3* value)
 {
     JPH_ASSERT(system);
@@ -2014,6 +2021,32 @@ JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH
     }
 
     system->physicsSystem->RemoveConstraints(joltConstraints.data(), (int)count);
+}
+
+JPH_CAPI void JPH_PhysicsSystem_GetBodies(const JPH_PhysicsSystem* system, JPH_BodyID* ids, uint32_t count)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(ids);
+	JPH_ASSERT(count <= JPH_PhysicsSystem_GetNumBodies(system));
+
+	JPH::BodyIDVector bodies;
+	system->physicsSystem->GetBodies(bodies);
+
+	for (uint32_t i = 0; i < count; i++) {
+		ids[i] = bodies[i].GetIndexAndSequenceNumber();
+	}
+}
+
+JPH_CAPI void JPH_PhysicsSystem_GetConstraints(const JPH_PhysicsSystem* system, const JPH_Constraint** constraints, uint32_t count)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(constraints);
+
+	JPH::Constraints list = system->physicsSystem->GetConstraints();
+
+	for (uint32_t i = 0; i < count && i < list.size(); i++) {
+		constraints[i] = reinterpret_cast<JPH_Constraint*>(list[i].GetPtr());
+	}
 }
 
 JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
