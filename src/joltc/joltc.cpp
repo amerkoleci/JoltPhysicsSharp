@@ -644,6 +644,16 @@ void JPH_ConvexShape_SetDensity(JPH_ConvexShape* shape, float density)
     reinterpret_cast<JPH::ConvexShape*>(shape)->SetDensity(density);
 }
 
+float JPH_ConvexShapeSettings_GetDensity(const JPH_ConvexShapeSettings* shape)
+{
+	return reinterpret_cast<const JPH::ConvexShapeSettings*>(shape)->mDensity;
+}
+
+void JPH_ConvexShapeSettings_SetDensity(JPH_ConvexShapeSettings* shape, float value)
+{
+	reinterpret_cast<JPH::ConvexShapeSettings*>(shape)->SetDensity(value);
+}
+
 /* BoxShape */
 JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius)
 {
@@ -830,16 +840,6 @@ JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHul
     shape->AddRef();
 
     return reinterpret_cast<JPH_ConvexHullShape*>(shape);
-}
-
-float JPH_ConvexShapeSettings_GetDensity(const JPH_ConvexShapeSettings* shape)
-{
-	return reinterpret_cast<const JPH::ConvexShapeSettings*>(shape)->mDensity;
-}
-
-void JPH_ConvexShapeSettings_SetDensity(JPH_ConvexShapeSettings* shape, float value)
-{
-    reinterpret_cast<JPH::ConvexShapeSettings*>(shape)->SetDensity(value);
 }
 
 /* MeshShapeSettings */
