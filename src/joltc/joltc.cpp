@@ -644,6 +644,16 @@ void JPH_ConvexShape_SetDensity(JPH_ConvexShape* shape, float density)
     reinterpret_cast<JPH::ConvexShape*>(shape)->SetDensity(density);
 }
 
+float JPH_ConvexShapeSettings_GetDensity(const JPH_ConvexShapeSettings* shape)
+{
+	return reinterpret_cast<const JPH::ConvexShapeSettings*>(shape)->mDensity;
+}
+
+void JPH_ConvexShapeSettings_SetDensity(JPH_ConvexShapeSettings* shape, float value)
+{
+	reinterpret_cast<JPH::ConvexShapeSettings*>(shape)->SetDensity(value);
+}
+
 /* BoxShape */
 JPH_BoxShapeSettings* JPH_BoxShapeSettings_Create(const JPH_Vec3* halfExtent, float convexRadius)
 {
@@ -830,16 +840,6 @@ JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHul
     shape->AddRef();
 
     return reinterpret_cast<JPH_ConvexHullShape*>(shape);
-}
-
-float JPH_ConvexShapeSettings_GetDensity(const JPH_ConvexShapeSettings* shape)
-{
-	return reinterpret_cast<const JPH::ConvexShapeSettings*>(shape)->mDensity;
-}
-
-void JPH_ConvexShapeSettings_SetDensity(JPH_ConvexShapeSettings* shape, float value)
-{
-    reinterpret_cast<JPH::ConvexShapeSettings*>(shape)->SetDensity(value);
 }
 
 /* MeshShapeSettings */
@@ -1134,24 +1134,50 @@ JPH_ShapeSubType JPH_Shape_GetSubType(const JPH_Shape* shape)
 	return static_cast<JPH_ShapeSubType>(reinterpret_cast<const JPH::Shape*>(shape)->GetSubType());
 }
 
-void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData)
-{
-    reinterpret_cast<JPH::Shape*>(shape)->SetUserData(userData);
-}
-
 uint64_t JPH_Shape_GetUserData(const JPH_Shape* shape)
 {
     return reinterpret_cast<const JPH::Shape*>(shape)->GetUserData();
 }
 
-void JPH_Shape_GetLocalBounds(JPH_Shape* shape, JPH_AABox* result)
+void JPH_Shape_SetUserData(JPH_Shape* shape, uint64_t userData)
+{
+    reinterpret_cast<JPH::Shape*>(shape)->SetUserData(userData);
+}
+
+JPH_Bool32 JPH_Shape_MustBeStatic(const JPH_Shape* shape)
+{
+	return reinterpret_cast<const JPH::Shape*>(shape)->MustBeStatic();
+}
+
+void JPH_Shape_GetCenterOfMass(const JPH_Shape* shape, JPH_Vec3* result)
+{
+	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+	auto joltVector = joltShape->GetCenterOfMass();
+	FromJolt(joltVector, result);
+}
+
+void JPH_Shape_GetLocalBounds(const JPH_Shape* shape, JPH_AABox* result)
 {
 	JPH_ASSERT(shape);
 	JPH_ASSERT(result);
 
-    auto bounds = reinterpret_cast<JPH::Shape*>(shape)->GetLocalBounds();
+    auto bounds = reinterpret_cast<const JPH::Shape*>(shape)->GetLocalBounds();
 	FromJolt(bounds.mMin, &result->min);
 	FromJolt(bounds.mMax, &result->max);
+}
+
+void JPH_Shape_GetWorldSpaceBounds(const JPH_Shape* shape, JPH_RMatrix4x4* centerOfMassTransform, JPH_Vec3* scale, JPH_AABox* result)
+{
+	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+	auto bounds = joltShape->GetWorldSpaceBounds(ToJolt(*centerOfMassTransform), ToJolt(scale));
+	FromJolt(bounds.mMin, &result->min);
+	FromJolt(bounds.mMax, &result->max);
+}
+
+float JPH_Shape_GetInnerRadius(const JPH_Shape* shape)
+{
+	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+	return joltShape->GetInnerRadius();
 }
 
 void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* result)
@@ -1160,17 +1186,18 @@ void JPH_Shape_GetMassProperties(const JPH_Shape* shape, JPH_MassProperties* res
 	FromJolt(joltShape->GetMassProperties(), result);
 }
 
-void JPH_Shape_GetCenterOfMass(JPH_Shape* shape, JPH_Vec3* result)
+void JPH_Shape_GetSurfaceNormal(const JPH_Shape* shape, JPH_SubShapeID subShapeID, JPH_Vec3* localPosition, JPH_Vec3* normal)
 {
-	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
-	auto joltVector = joltShape->GetCenterOfMass();
-	FromJolt(joltVector, result);
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    auto joltSubShapeID = JPH::SubShapeID();
+    joltSubShapeID.SetValue(subShapeID);
+    Vec3 joltNormal = joltShape->GetSurfaceNormal(joltSubShapeID, ToJolt(localPosition));
+    FromJolt(joltNormal, normal);
 }
 
-float JPH_Shape_GetInnerRadius(JPH_Shape* shape)
+float JPH_Shape_GetVolume(const JPH_Shape* shape)
 {
-	auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
-	return joltShape->GetInnerRadius();
+	return reinterpret_cast<const JPH::Shape*>(shape)->GetVolume();
 }
 
 /* JPH_BodyCreationSettings */
@@ -1324,6 +1351,16 @@ void JPH_Constraint_SetEnabled(JPH_Constraint* constraint, JPH_Bool32 enabled)
 {
     auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
     joltConstraint->SetEnabled(!!enabled);
+}
+
+uint64_t JPH_Constraint_GetUserData(const JPH_Constraint* constraint)
+{
+    return reinterpret_cast<const JPH::Constraint*>(constraint)->GetUserData();
+}
+
+void JPH_Constraint_SetUserData(JPH_Constraint* constraint, uint64_t userData)
+{
+    reinterpret_cast<JPH::Constraint*>(constraint)->SetUserData(userData);
 }
 
 void JPH_Constraint_Destroy(JPH_Constraint* constraint)
@@ -1912,6 +1949,13 @@ uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system)
     return system->physicsSystem->GetMaxBodies();
 }
 
+uint32_t JPH_PhysicsSystem_GetNumConstraints(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+	return (uint32_t) system->physicsSystem->GetConstraints().size();
+}
+
 void JPH_PhysicsSystem_SetGravity(JPH_PhysicsSystem* system, const JPH_Vec3* value)
 {
     JPH_ASSERT(system);
@@ -1977,6 +2021,32 @@ JPH_CAPI void JPH_PhysicsSystem_RemoveConstraints(JPH_PhysicsSystem* system, JPH
     }
 
     system->physicsSystem->RemoveConstraints(joltConstraints.data(), (int)count);
+}
+
+JPH_CAPI void JPH_PhysicsSystem_GetBodies(const JPH_PhysicsSystem* system, JPH_BodyID* ids, uint32_t count)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(ids);
+	JPH_ASSERT(count <= JPH_PhysicsSystem_GetNumBodies(system));
+
+	JPH::BodyIDVector bodies;
+	system->physicsSystem->GetBodies(bodies);
+
+	for (uint32_t i = 0; i < count; i++) {
+		ids[i] = bodies[i].GetIndexAndSequenceNumber();
+	}
+}
+
+JPH_CAPI void JPH_PhysicsSystem_GetConstraints(const JPH_PhysicsSystem* system, const JPH_Constraint** constraints, uint32_t count)
+{
+    JPH_ASSERT(system);
+    JPH_ASSERT(constraints);
+
+	JPH::Constraints list = system->physicsSystem->GetConstraints();
+
+	for (uint32_t i = 0; i < count && i < list.size(); i++) {
+		constraints[i] = reinterpret_cast<JPH_Constraint*>(list[i].GetPtr());
+	}
 }
 
 JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings)
