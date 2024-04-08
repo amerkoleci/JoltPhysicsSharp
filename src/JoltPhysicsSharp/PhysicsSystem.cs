@@ -121,6 +121,7 @@ public sealed class PhysicsSystem : NativeObject
     public uint BodiesCount => JPH_PhysicsSystem_GetNumBodies(Handle);
     public uint GetNumActiveBodies(BodyType type) => JPH_PhysicsSystem_GetNumActiveBodies(Handle, type);
     public uint MaxBodies => JPH_PhysicsSystem_GetMaxBodies(Handle);
+    public uint NumConstraints => JPH_PhysicsSystem_GetNumConstraints(Handle);
 
     #region Events
     /// <summary>

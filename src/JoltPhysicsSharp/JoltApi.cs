@@ -345,7 +345,7 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_RotatedTranslatedShapeSettings_CreateShape(nint settings);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_RotatedTranslatedShape_Create(Vector3 *position, Quaternion* rotation, nint shape);
+    public static partial nint JPH_RotatedTranslatedShape_Create(Vector3* position, Quaternion* rotation, nint shape);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_RotatedTranslatedShape_GetPosition(nint shape, Vector3* position);
@@ -364,27 +364,48 @@ internal static unsafe partial class JoltApi
     public static partial ShapeSubType JPH_Shape_GetSubType(nint shape);
 
     [LibraryImport(LibName)]
+    public static partial ulong JPH_Shape_GetUserData(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_SetUserData(nint shape, ulong userData);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Shape_MustBeStatic(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetCenterOfMass(nint handle, Vector3* result);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_Shape_GetLocalBounds(IntPtr shape, BoundingBox* box);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Shape_GetMassProperties(nint shape, out MassProperties properties);
+    [LibraryImport(LibName)]
+    public static partial float JPH_Shape_GetInnerRadius(nint handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Shape_GetCenterOfMass(nint handle, out Vector3 result);
+    [LibraryImport(LibName)]
+    public static partial float JPH_Shape_GetVolume(nint handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern float JPH_Shape_GetInnerRadius(nint handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetMassProperties(nint shape, MassProperties* properties);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, Matrix4x4* centerOfMassTransform, Vector3* scale, BoundingBox* result);
+
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_Shape_GetWorldSpaceBounds))]
+    public static partial void JPH_Shape_GetWorldSpaceBoundsDouble(nint shape, RMatrix4x4* centerOfMassTransform, Vector3* scale, BoundingBox* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetSurfaceNormal(nint shape, SubShapeID subShapeID, Vector3* localPosition, Vector3* normal);
 
     /* SphereShape */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_SphereShape_Create(float radius);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SphereShape_Create(float radius);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern float JPH_SphereShape_GetRadius(IntPtr shape);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SphereShape_GetRadius(nint shape);
 
     /* BodyCreationSettings */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_BodyCreationSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyCreationSettings_Create();
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create2))]
     public static partial nint JPH_BodyCreationSettings_Create2(nint shapeSettings, Vector3* position, Quaternion* rotation, MotionType motionType, ushort objectLayer);
@@ -434,20 +455,26 @@ internal static unsafe partial class JoltApi
 
     #region JPH_Constraint
     /* JPH_Constraint */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ConstraintSettings_Destroy(IntPtr handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConstraintSettings_Destroy(nint handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Constraint_Destroy(IntPtr constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_Destroy(nint constraint);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_Constraint_GetConstraintSettings(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Constraint_GetConstraintSettings(nint constraint);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern Bool32 JPH_Constraint_GetEnabled(IntPtr constraint);
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_Constraint_GetEnabled(nint constraint);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_Constraint_SetEnabled(IntPtr constraint, Bool32 value);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_SetEnabled(nint constraint, Bool32 value);
+
+    [LibraryImport(LibName)]
+    public static partial ulong JPH_Constraint_GetUserData(nint constraint);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_SetUserData(nint constraint, ulong value);
     #endregion
 
     #region JPH_TwoBodyConstraint
@@ -610,8 +637,11 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint JPH_PhysicsSystem_GetNumActiveBodies(IntPtr system, BodyType type);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern uint JPH_PhysicsSystem_GetMaxBodies(IntPtr system);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_PhysicsSystem_GetMaxBodies(nint system);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_PhysicsSystem_GetNumConstraints(nint system);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_GetGravity(IntPtr handle, out Vector3 velocity);
@@ -628,9 +658,14 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PhysicsSystem_AddConstraints(IntPtr handle, IntPtr* constraints, uint count);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PhysicsSystem_RemoveConstraints(IntPtr handle, IntPtr* constraints, uint count);
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_RemoveConstraints(IntPtr handle, IntPtr* constraints, uint count);
 
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_GetBodies(IntPtr handle, BodyID* ids, uint count);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_GetConstraints(IntPtr handle, IntPtr* constraints, uint count);
 
     /* BodyInterface */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -941,10 +976,10 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Body_GetWorldSpaceBounds(IntPtr body, BoundingBox* box);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_Body_GetWorldSpaceSurfaceNormal))]
-    public static partial void JPH_Body_GetWorldSpaceSurfaceNormal(nint body, /*SubShapeID*/uint subShapeID, Vector3* position, Vector3* normal);
+    public static partial void JPH_Body_GetWorldSpaceSurfaceNormal(nint body, SubShapeID subShapeID, Vector3* position, Vector3* normal);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_Body_GetWorldSpaceSurfaceNormal))]
-    public static partial void JPH_Body_GetWorldSpaceSurfaceNormalDouble(nint body, /*SubShapeID*/uint subShapeID, Double3* position, Vector3* normal);
+    public static partial void JPH_Body_GetWorldSpaceSurfaceNormalDouble(nint body, SubShapeID subShapeID, Double3* position, Vector3* normal);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern Bool32 JPH_Body_IsActive(IntPtr handle);

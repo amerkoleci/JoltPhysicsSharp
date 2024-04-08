@@ -55,6 +55,6 @@ public sealed class BoxShape : ConvexShape
         JPH_BoxShape_GetHalfExtent(Handle, out halfExtent);
     }
 
-    public float Volume => JPH_BoxShape_GetVolume(Handle);
+    public new float Volume => JPH_BoxShape_GetVolume(Handle);
     public float ConvexRadius => JPH_BoxShape_GetConvexRadius(Handle);
 }

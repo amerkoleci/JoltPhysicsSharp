@@ -61,4 +61,10 @@ public abstract class Constraint : NativeObject
         get => JPH_Constraint_GetEnabled(Handle);
         set => JPH_Constraint_SetEnabled(Handle, value);
     }
+
+    public ulong UserData
+    {
+        get => JPH_Constraint_GetUserData(Handle);
+        set => JPH_Constraint_SetUserData(Handle, value);
+    }
 }

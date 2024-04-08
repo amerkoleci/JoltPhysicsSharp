@@ -391,7 +391,7 @@ public readonly unsafe struct Body(IntPtr handle) : IEquatable<Body>
             JPH_Body_GetAccumulatedTorque(Handle, torquePtr);
     }
 
-    public void GetWorldSpaceSurfaceNormal(uint subShapeID, in Vector3 position, out Vector3 normal)
+    public void GetWorldSpaceSurfaceNormal(SubShapeID subShapeID, in Vector3 position, out Vector3 normal)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceSurfaceNormal)}");
@@ -405,7 +405,7 @@ public readonly unsafe struct Body(IntPtr handle) : IEquatable<Body>
         }
     }
 
-    public void GetRWorldSpaceSurfaceNormal(uint subShapeID, in Double3 position, out Vector3 normal)
+    public void GetRWorldSpaceSurfaceNormal(SubShapeID subShapeID, in Double3 position, out Vector3 normal)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldSpaceSurfaceNormal)}");
