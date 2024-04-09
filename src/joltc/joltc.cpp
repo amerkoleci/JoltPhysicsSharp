@@ -912,9 +912,13 @@ JPH_HeightFieldShapeSettings* JPH_HeightFieldShapeSettings_Create(const float* s
 
 JPH_HeightFieldShape* JPH_HeightFieldShapeSettings_CreateShape(JPH_HeightFieldShapeSettings* settings)
 {
-    auto shape_res = reinterpret_cast<JPH::HeightFieldShapeSettings*>(settings)->Create();
-    static auto res = shape_res.Get();
-    return reinterpret_cast<JPH_HeightFieldShape*>(res.GetPtr());
+    const JPH::HeightFieldShapeSettings* jolt_settings = reinterpret_cast<const JPH::HeightFieldShapeSettings*>(settings);
+    auto shape_res = jolt_settings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_HeightFieldShape*>(shape);
 }
 
 void JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(const JPH_HeightFieldShapeSettings* settings, float* pOutMinValue, float* pOutMaxValue, float* pOutQuantizationScale)
