@@ -21,6 +21,7 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterTable.h"
 #include "Jolt/Physics/Collision/ObjectLayerPairFilterTable.h"
 #include "Jolt/Physics/Collision/CastResult.h"
+#include "Jolt/Physics/Collision/CollidePointResult.h"
 #include "Jolt/Physics/Collision/CollideShape.h"
 #include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
@@ -40,6 +41,7 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Body/BodyActivationListener.h"
 #include "Jolt/Physics/SoftBody/SoftBodyCreationSettings.h"
 #include "Jolt/Physics/Collision/RayCast.h"
+#include "Jolt/Physics/Collision/BroadPhase/BroadPhaseQuery.h"
 #include "Jolt/Physics/Collision/NarrowPhaseQuery.h"
 #include "Jolt/Physics/Constraints/SpringSettings.h"
 #include "Jolt/Physics/Constraints/FixedConstraint.h"
@@ -512,13 +514,13 @@ JPH_BodyInterface* JPH_PhysicsSystem_GetBodyInterfaceNoLock(JPH_PhysicsSystem* s
     return reinterpret_cast<JPH_BodyInterface*>(&system->physicsSystem->GetBodyInterfaceNoLock());
 }
 
-const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterface(const JPH_PhysicsSystem* system)
+const JPH_BodyLockInterface* JPH_PhysicsSystem_GetBodyLockInterface(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
     return reinterpret_cast<const JPH_BodyLockInterface*>(&system->physicsSystem->GetBodyLockInterface());
 }
-const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const JPH_PhysicsSystem* system)
+const JPH_BodyLockInterface* JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
@@ -526,6 +528,12 @@ const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const 
 }
 
 /* JPH_BroadPhaseLayerFilter */
+static const JPH::BroadPhaseLayerFilter& ToJolt(JPH_BroadPhaseLayerFilter* bpFilter)
+{
+    JPH::BroadPhaseLayerFilter fallback;
+    return bpFilter ? *reinterpret_cast<JPH::BroadPhaseLayerFilter*>(bpFilter) : fallback;
+}
+
 class ManagedBroadPhaseLayerFilter final : public JPH::BroadPhaseLayerFilter
 {
 public:
@@ -572,6 +580,12 @@ void JPH_BroadPhaseLayerFilter_Destroy(JPH_BroadPhaseLayerFilter* filter)
 }
 
 /* JPH_ObjectLayerFilter */
+static const JPH::ObjectLayerFilter& ToJolt(JPH_ObjectLayerFilter* opFilter)
+{
+    JPH::ObjectLayerFilter fallback;
+    return opFilter ? *reinterpret_cast<JPH::ObjectLayerFilter*>(opFilter) : fallback;
+}
+
 class ManagedObjectLayerFilter final : public JPH::ObjectLayerFilter
 {
 public:
@@ -618,6 +632,12 @@ void JPH_ObjectLayerFilter_Destroy(JPH_ObjectLayerFilter* filter)
 }
 
 /* JPH_BodyFilter */
+static const JPH::BodyFilter& ToJolt(JPH_BodyFilter* bodyFilter)
+{
+    JPH::BodyFilter fallback;
+    return bodyFilter ? *reinterpret_cast<JPH::BodyFilter*>(bodyFilter) : fallback;
+}
+
 class ManagedBodyFilter final : public JPH::BodyFilter
 {
 public:
@@ -2291,13 +2311,20 @@ void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JP
         ToJolt(massProperties));
 }
 
-const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system)
+const JPH_BroadPhaseQuery* JPH_PhysicsSystem_GetBroadPhaseQuery(const JPH_PhysicsSystem* system)
+{
+    JPH_ASSERT(system);
+
+    return reinterpret_cast<const JPH_BroadPhaseQuery*>(&system->physicsSystem->GetBroadPhaseQuery());
+}
+
+const JPH_NarrowPhaseQuery* JPH_PhysicsSystem_GetNarrowPhaseQuery(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
     return reinterpret_cast<const JPH_NarrowPhaseQuery*>(&system->physicsSystem->GetNarrowPhaseQuery());
 }
-const JPH_NarrowPhaseQuery* JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(const JPH_PhysicsSystem* system)
+const JPH_NarrowPhaseQuery* JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
 
@@ -3018,145 +3045,290 @@ void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* lockInterfac
 }
 
 //--------------------------------------------------------------------------------------------------
+// JPH_BroadPhaseQuery
+//--------------------------------------------------------------------------------------------------
+class RayCastBodyCollectorCallback : public RayCastBodyCollector
+{
+public:
+    RayCastBodyCollectorCallback(JPH_RayCastBodyCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const BroadPhaseCastResult& result)
+    {
+        JPH_BroadPhaseCastResult hit;
+        hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit.fraction = result.mFraction;
+        proc(userData, &hit);
+        hadHit = true;
+    }
+
+    bool hadHit = false;
+    JPH_RayCastBodyCollector* proc;
+    void* userData;
+};
+
+class CollideShapeBodyCollectorCallback : public CollideShapeBodyCollector
+{
+public:
+    CollideShapeBodyCollectorCallback(JPH_CollideShapeBodyCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const BodyID& result)
+    {
+        proc(userData, result.GetIndexAndSequenceNumber());
+        hadHit = true;
+    }
+
+    bool hadHit = false;
+    JPH_CollideShapeBodyCollector* proc;
+    void* userData;
+};
+
+JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CastRay(const JPH_BroadPhaseQuery* query,
+    const JPH_Vec3* origin, const JPH_Vec3* direction,
+    JPH_RayCastBodyCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter)
+{
+    JPH_ASSERT(query && origin && direction && callback);
+    auto joltQuery = reinterpret_cast<const JPH::BroadPhaseQuery*>(query);
+    JPH::RayCast ray(ToJolt(origin), ToJolt(direction));
+    RayCastBodyCollectorCallback collector(callback, userData);
+    joltQuery->CastRay(ray, collector, ToJolt(broadPhaseLayerFilter), ToJolt(objectLayerFilter));
+    return collector.hadHit;
+}
+
+JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CollideAABox(const JPH_BroadPhaseQuery* query,
+    const JPH_AABox* box, JPH_CollideShapeBodyCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter)
+{
+    JPH_ASSERT(query && box && callback);
+    auto joltQuery = reinterpret_cast<const JPH::BroadPhaseQuery*>(query);
+    JPH::AABox joltBox(ToJolt(&box->min), ToJolt(&box->max));
+    CollideShapeBodyCollectorCallback collector(callback, userData);
+    joltQuery->CollideAABox(joltBox, collector, ToJolt(broadPhaseLayerFilter), ToJolt(objectLayerFilter));
+    return collector.hadHit;
+}
+
+JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CollideSphere(const JPH_BroadPhaseQuery* query,
+    const JPH_Vec3* center, float radius, JPH_CollideShapeBodyCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter)
+{
+    JPH_ASSERT(query && center && callback);
+    auto joltQuery = reinterpret_cast<const JPH::BroadPhaseQuery*>(query);
+    CollideShapeBodyCollectorCallback collector(callback, userData);
+    joltQuery->CollideSphere(ToJolt(center), radius, collector, ToJolt(broadPhaseLayerFilter), ToJolt(objectLayerFilter));
+    return collector.hadHit;
+}
+
+JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CollidePoint(const JPH_BroadPhaseQuery* query,
+    const JPH_Vec3* point, JPH_CollideShapeBodyCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter)
+{
+    JPH_ASSERT(query && point && callback);
+    auto joltQuery = reinterpret_cast<const JPH::BroadPhaseQuery*>(query);
+    CollideShapeBodyCollectorCallback collector(callback, userData);
+    joltQuery->CollidePoint(ToJolt(point), collector, ToJolt(broadPhaseLayerFilter), ToJolt(objectLayerFilter));
+    return collector.hadHit;
+}
+
+//--------------------------------------------------------------------------------------------------
 // JPH_NarrowPhaseQuery
 //--------------------------------------------------------------------------------------------------
+class CastRayCollectorCallback : public CastRayCollector
+{
+public:
+    CastRayCollectorCallback(JPH_CastRayCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const RayCastResult& result)
+    {
+        JPH_RayCastResult hit;
+        hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit.fraction = result.mFraction;
+        hit.subShapeID2 = result.mSubShapeID2.GetValue();
+        proc(userData, &hit);
+        hadHit = true;
+    }
+
+    bool hadHit = false;
+    JPH_CastRayCollector* proc;
+    void* userData;
+};
+
+class CollidePointCollectorCallback : public CollidePointCollector
+{
+public:
+    CollidePointCollectorCallback(JPH_CollidePointCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const CollidePointResult& result)
+    {
+        JPH_CollidePointResult hit;
+        hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit.subShapeID2 = result.mSubShapeID2.GetValue();
+        proc(userData, &hit);
+        hadHit = true;
+    }
+
+    bool hadHit = false;
+    JPH_CollidePointCollector* proc;
+    void* userData;
+};
+
+class CollideShapeCollectorCallback : public CollideShapeCollector
+{
+public:
+    CollideShapeCollectorCallback(JPH_CollideShapeCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const CollideShapeResult& result)
+    {
+        JPH_CollideShapeResult hit;
+        FromJolt(result.mContactPointOn1, &hit.contactPointOn1);
+        FromJolt(result.mContactPointOn2, &hit.contactPointOn2);
+        FromJolt(result.mPenetrationAxis, &hit.penetrationAxis);
+        hit.penetrationDepth = result.mPenetrationDepth;
+        hit.subShapeID1 = result.mSubShapeID1.GetValue();
+        hit.subShapeID2 = result.mSubShapeID2.GetValue();
+        hit.bodyID2 = result.mBodyID2.GetIndexAndSequenceNumber();
+        proc(userData, &hit);
+        hadHit = true;
+    }
+
+    bool hadHit = false;
+    JPH_CollideShapeCollector* proc;
+    void* userData;
+};
+
+class CastShapeCollectorCallback : public CastShapeCollector
+{
+public:
+    CastShapeCollectorCallback(JPH_CastShapeCollector* proc, void* userData) : proc(proc), userData(userData) {}
+
+    virtual void AddHit(const ShapeCastResult& result)
+    {
+        JPH_ShapeCastResult hit;
+        FromJolt(result.mContactPointOn1, &hit.contactPointOn1);
+        FromJolt(result.mContactPointOn2, &hit.contactPointOn2);
+        FromJolt(result.mPenetrationAxis, &hit.penetrationAxis);
+        hit.penetrationDepth = result.mPenetrationDepth;
+        hit.subShapeID1 = result.mSubShapeID1.GetValue();
+        hit.subShapeID2 = result.mSubShapeID2.GetValue();
+        hit.bodyID2 = result.mBodyID2.GetIndexAndSequenceNumber();
+        hit.fraction = result.mFraction;
+        hit.isBackFaceHit = result.mIsBackFaceHit;
+        proc(userData, &hit);
+        hadHit = true;
+    }
+
+    bool hadHit = false;
+    JPH_CastShapeCollector* proc;
+    void* userData;
+};
+
 JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     const JPH_RVec3* origin, const JPH_Vec3* direction,
     JPH_RayCastResult* hit,
-    const void* broadPhaseLayerFilter, // Can be NULL (no filter)
-    const void* objectLayerFilter, // Can be NULL (no filter)
-    const void* bodyFilter)
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter,
+    JPH_BodyFilter* bodyFilter)
 {
     JPH_ASSERT(query && origin && direction && hit);
     auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
-    JPH::RRayCast ray(ToJolt(origin), ToJolt(direction));
-    const JPH::BroadPhaseLayerFilter broad_phase_layer_filter{};
-    const JPH::ObjectLayerFilter object_layer_filter{};
-    const JPH::BodyFilter body_filter{};
 
-    ClosestHitCollisionCollector<CastRayCollector> collector;
+    JPH::RRayCast ray(ToJolt(origin), ToJolt(direction));
+    RayCastResult result;
+
+    bool hadHit = joltQuery->CastRay(
+        ray,
+        result,
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
+    );
+
+    if (hadHit)
+    {
+        hit->fraction = result.mFraction;
+        hit->bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit->subShapeID2 = result.mSubShapeID2.GetValue();
+    }
+
+    return hadHit;
+}
+
+JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRay2(const JPH_NarrowPhaseQuery* query,
+    const JPH_RVec3* origin, const JPH_Vec3* direction,
+    JPH_CastRayCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter,
+    JPH_BodyFilter* bodyFilter)
+{
+    JPH_ASSERT(query && origin && direction && callback);
+    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
+
+    JPH::RRayCast ray(ToJolt(origin), ToJolt(direction));
     RayCastSettings ray_settings;
+    CastRayCollectorCallback collector(callback, userData);
+
     joltQuery->CastRay(
         ray,
         ray_settings,
         collector,
-        broadPhaseLayerFilter ? *static_cast<const JPH::BroadPhaseLayerFilter*>(broadPhaseLayerFilter) : broad_phase_layer_filter,
-        objectLayerFilter ? *static_cast<const JPH::ObjectLayerFilter*>(objectLayerFilter) : object_layer_filter,
-        bodyFilter ? *static_cast<const JPH::BodyFilter*>(bodyFilter) : body_filter
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
     );
 
-    if (collector.HadHit())
-    {
-		hit->fraction = collector.mHit.mFraction;
-		hit->bodyID = collector.mHit.mBodyID.GetIndexAndSequenceNumber();
-		hit->subShapeID2 = collector.mHit.mSubShapeID2.GetValue();
-	}
-
-    return collector.HadHit();
+    return collector.hadHit;
 }
 
-JPH_AllHit_CastRayCollector* JPH_AllHit_CastRayCollector_Create(void)
+JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CollideShape(const JPH_NarrowPhaseQuery* query,
+    const JPH_Shape* shape, const JPH_Vec3* scale, const JPH_RMatrix4x4* centerOfMassTransform,
+    JPH_RVec3* baseOffset,
+    JPH_CollideShapeCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter,
+    JPH_BodyFilter* bodyFilter)
 {
-    auto joltCollector = new AllHitCollisionCollector<CastRayCollector>();
-    return reinterpret_cast<JPH_AllHit_CastRayCollector*>(joltCollector);
-}
-
-void JPH_AllHit_CastRayCollector_Destroy(JPH_AllHit_CastRayCollector* collector)
-{
-    if (collector)
-    {
-        delete reinterpret_cast<AllHitCollisionCollector<CastRayCollector>*>(collector);
-    }
-}
-
-void JPH_AllHit_CastRayCollector_Reset(JPH_AllHit_CastRayCollector* collector)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastRayCollector>*>(collector);
-    joltCollector->Reset();
-}
-
-JPH_RayCastResult* JPH_AllHit_CastRayCollector_GetHits(JPH_AllHit_CastRayCollector* collector, size_t * size)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastRayCollector>*>(collector);
-    *size = joltCollector->mHits.size();
-    return reinterpret_cast<JPH_RayCastResult*>(joltCollector->mHits.data());
-}
-
-JPH_Bool32 JPH_NarrowPhaseQuery_CastRayAll(const JPH_NarrowPhaseQuery* query,
-    const JPH_RVec3* origin, const JPH_Vec3* direction,
-    JPH_AllHit_CastRayCollector* hit_collector,
-    const void* broadPhaseLayerFilter, // Can be NULL (no filter)
-    const void* objectLayerFilter, // Can be NULL (no filter)
-    const void* bodyFilter) // Can be NULL (no filter)
-{
-    JPH_ASSERT(query && origin && direction && hit_collector);
+    JPH_ASSERT(query && shape && scale && centerOfMassTransform && callback);
     auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
-    JPH::RRayCast ray(ToJolt(origin), ToJolt(direction));
-    const JPH::BroadPhaseLayerFilter broad_phase_layer_filter{};
-    const JPH::ObjectLayerFilter object_layer_filter{};
-    const JPH::BodyFilter body_filter{};
-    AllHitCollisionCollector<CastRayCollector>& joltCollector = *reinterpret_cast<AllHitCollisionCollector<CastRayCollector>*>(hit_collector);
-    RayCastSettings ray_settings;
-    joltQuery->CastRay(
-        ray,
-        ray_settings,
-        joltCollector,
-        broadPhaseLayerFilter ? *static_cast<const JPH::BroadPhaseLayerFilter*>(broadPhaseLayerFilter) : broad_phase_layer_filter,
-        objectLayerFilter ? *static_cast<const JPH::ObjectLayerFilter*>(objectLayerFilter) : object_layer_filter,
-        bodyFilter ? *static_cast<const JPH::BodyFilter*>(bodyFilter) : body_filter
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    auto joltScale = ToJolt(scale);
+    auto joltTransform = ToJolt(*centerOfMassTransform);
+
+    CollideShapeSettings settings;
+    settings.mActiveEdgeMode = EActiveEdgeMode::CollideWithAll;
+
+    auto joltBaseOffset = ToJolt(baseOffset);
+
+    CollideShapeCollectorCallback collector(callback, userData);
+
+    joltQuery->CollideShape(
+        joltShape,
+        joltScale,
+        joltTransform,
+        settings,
+        joltBaseOffset,
+        collector,
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
     );
-    joltCollector.Sort();
-    return !joltCollector.mHits.empty();
+
+    return collector.hadHit;
 }
 
-JPH_AllHit_CastShapeCollector* JPH_AllHit_CastShapeCollector_Create(void)
-{
-    auto joltCollector = new AllHitCollisionCollector<CastShapeCollector>();
-    return reinterpret_cast<JPH_AllHit_CastShapeCollector*>(joltCollector);
-}
-
-void JPH_AllHit_CastShapeCollector_Destroy(JPH_AllHit_CastShapeCollector* collector)
-{
-    if (collector)
-    {
-        delete reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    }
-}
-
-void JPH_AllHit_CastShapeCollector_Reset(JPH_AllHit_CastShapeCollector* collector)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    joltCollector->Reset();
-}
-
-JPH_ShapeCastResult* JPH_AllHit_CastShapeCollector_GetHits(JPH_AllHit_CastShapeCollector* collector, size_t * size)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    *size = joltCollector->mHits.size();
-    return reinterpret_cast<JPH_ShapeCastResult*>(joltCollector->mHits.data());
-}
-
-JPH_BodyID JPH_AllHit_CastShapeCollector_GetBodyID2(JPH_AllHit_CastShapeCollector* collector, unsigned index)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    JPH_ASSERT(index < joltCollector->mHits.size());
-    return joltCollector->mHits[index].mBodyID2.GetIndexAndSequenceNumber();
-}
-
-JPH_BodyID JPH_AllHit_CastShapeCollector_GetSubShapeID2(JPH_AllHit_CastShapeCollector* collector, unsigned index)
-{
-    auto joltCollector = reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(collector);
-    JPH_ASSERT(index < joltCollector->mHits.size());
-    return joltCollector->mHits[index].mSubShapeID2.GetValue();
-}
-
-JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
+JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
     const JPH_Shape* shape,
     const JPH_RMatrix4x4* worldTransform, const JPH_Vec3* direction,
     JPH_RVec3* baseOffset,
-    JPH_AllHit_CastShapeCollector* hit_collector)
+    JPH_CastShapeCollector* callback, void* userData,
+    JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+    JPH_ObjectLayerFilter* objectLayerFilter,
+    JPH_BodyFilter* bodyFilter)
 {
-    JPH_ASSERT(query && worldTransform && direction && hit_collector);
+    JPH_ASSERT(query && shape && worldTransform && direction && callback);
+    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
     auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
 
     RShapeCast shape_cast = RShapeCast::sFromWorldTransform(
@@ -3170,13 +3342,20 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
     settings.mBackFaceModeTriangles = EBackFaceMode::CollideWithBackFaces;
     settings.mBackFaceModeConvex = EBackFaceMode::CollideWithBackFaces;
 
-    AllHitCollisionCollector<CastShapeCollector>& joltCollector = *reinterpret_cast<AllHitCollisionCollector<CastShapeCollector>*>(hit_collector);
-
-    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
     auto joltBaseOffset = ToJolt(baseOffset);
+    CastShapeCollectorCallback collector(callback, userData);
 
-    joltQuery->CastShape(shape_cast, settings, joltBaseOffset, joltCollector);
-    return joltCollector.HadHit();
+    joltQuery->CastShape(
+        shape_cast,
+        settings,
+        joltBaseOffset,
+        collector,
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
+    );
+
+    return collector.hadHit;
 }
 
 /* Body */
