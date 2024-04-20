@@ -1345,6 +1345,16 @@ JPH_ConstraintSettings* JPH_Constraint_GetConstraintSettings(JPH_Constraint* con
     return reinterpret_cast<JPH_ConstraintSettings*>(settings);
 }
 
+JPH_ConstraintType JPH_Constraint_GetType(const JPH_Constraint* constraint)
+{
+	return static_cast<JPH_ConstraintType>(reinterpret_cast<const JPH::Constraint*>(constraint)->GetType());
+}
+
+JPH_ConstraintSubType JPH_Constraint_GetSubType(const JPH_Constraint* constraint)
+{
+	return static_cast<JPH_ConstraintSubType>(reinterpret_cast<const JPH::Constraint*>(constraint)->GetSubType());
+}
+
 JPH_Bool32 JPH_Constraint_GetEnabled(JPH_Constraint* constraint)
 {
     auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
@@ -1604,6 +1614,37 @@ void JPH_HingeConstraint_SetLimitsSpringSettings(JPH_HingeConstraint* constraint
     reinterpret_cast<JPH::HingeConstraint*>(constraint)->SetLimitsSpringSettings(*reinterpret_cast<JPH::SpringSettings*>(settings));
 }
 
+void JPH_HingeConstraint_GetTotalLambdaPosition(const JPH_HingeConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::HingeConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaPosition();
+	FromJolt(lambda, result);
+}
+
+void JPH_HingeConstraint_GetTotalLambdaRotation(const JPH_HingeConstraint* constraint, float* x, float* y)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::HingeConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaRotation();
+	*x = lambda[0];
+	*y = lambda[1];
+}
+
+float JPH_HingeConstraint_GetTotalLambdaRotationLimits(const JPH_HingeConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::HingeConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaRotationLimits();
+}
+
+float JPH_HingeConstraint_GetTotalLambdaMotor(const JPH_HingeConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::HingeConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaMotor();
+}
+
 /* JPH_SliderConstraintSettings */
 
 JPH_SliderConstraintSettings* JPH_SliderConstraintSettings_Create(void)
@@ -1662,6 +1703,37 @@ JPH_Bool32 JPH_SliderConstraint_HasLimits(JPH_SliderConstraint* constraint)
     return reinterpret_cast<JPH::SliderConstraint*>(constraint)->HasLimits();
 }
 
+void JPH_SliderConstraint_GetTotalLambdaPosition(const JPH_SliderConstraint* constraint, float* x, float* y)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SliderConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaPosition();
+	*x = lambda[0];
+	*y = lambda[1];
+}
+
+float JPH_SliderConstraint_GetTotalLambdaPositionLimits(const JPH_SliderConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SliderConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaPositionLimits();
+}
+
+void JPH_SliderConstraint_GetTotalLambdaRotation(const JPH_SliderConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SliderConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaRotation();
+	FromJolt(lambda, result);
+}
+
+float JPH_SliderConstraint_GetTotalLambdaMotor(const JPH_SliderConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SliderConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaMotor();
+}
+
 /* JPH_SwingTwistConstraintSettings */
 JPH_SwingTwistConstraintSettings* JPH_SwingTwistConstraintSettings_Create(void)
 {
@@ -1685,6 +1757,43 @@ JPH_SwingTwistConstraint* JPH_SwingTwistConstraintSettings_CreateConstraint(JPH_
 float JPH_SwingTwistConstraint_GetNormalHalfConeAngle(JPH_SwingTwistConstraint* constraint)
 {
 	return reinterpret_cast<JPH::SwingTwistConstraint*>(constraint)->GetNormalHalfConeAngle();
+}
+
+void JPH_SwingTwistConstraint_GetTotalLambdaPosition(const JPH_SwingTwistConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SwingTwistConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaPosition();
+	FromJolt(lambda, result);
+}
+
+float JPH_SwingTwistConstraint_GetTotalLambdaTwist(const JPH_SwingTwistConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SwingTwistConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaTwist();
+}
+
+float JPH_SwingTwistConstraint_GetTotalLambdaSwingY(const JPH_SwingTwistConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SwingTwistConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaSwingY();
+}
+
+float JPH_SwingTwistConstraint_GetTotalLambdaSwingZ(const JPH_SwingTwistConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SwingTwistConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaSwingZ();
+}
+
+void JPH_SwingTwistConstraint_GetTotalLambdaMotor(const JPH_SwingTwistConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SwingTwistConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaMotor();
+	FromJolt(lambda, result);
 }
 
 /* JPH_SixDOFConstraintSettings */
@@ -1715,6 +1824,38 @@ float JPH_SixDOFConstraint_GetLimitsMin(JPH_SixDOFConstraint* constraint, JPH_Si
 float JPH_SixDOFConstraint_GetLimitsMax(JPH_SixDOFConstraint* constraint, JPH_SixDOFConstraintAxis axis)
 {
 	return reinterpret_cast<JPH::SixDOFConstraint*>(constraint)->GetLimitsMax(static_cast<JPH::SixDOFConstraint::EAxis>(axis));
+}
+
+void JPH_SixDOFConstraint_GetTotalLambdaPosition(const JPH_SixDOFConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SixDOFConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaPosition();
+	FromJolt(lambda, result);
+}
+
+void JPH_SixDOFConstraint_GetTotalLambdaRotation(const JPH_SixDOFConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SixDOFConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaRotation();
+	FromJolt(lambda, result);
+}
+
+void JPH_SixDOFConstraint_GetTotalLambdaMotorTranslation(const JPH_SixDOFConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SixDOFConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaMotorTranslation();
+	FromJolt(lambda, result);
+}
+
+void JPH_SixDOFConstraint_GetTotalLambdaMotorRotation(const JPH_SixDOFConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::SixDOFConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaMotorRotation();
+	FromJolt(lambda, result);
 }
 
 JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
@@ -1750,6 +1891,13 @@ JPH_SpringSettings* JPH_DistanceConstraint_GetLimitsSpringSettings(JPH_DistanceC
 void JPH_DistanceConstraint_SetLimitsSpringSettings(JPH_DistanceConstraint* constraint, JPH_SpringSettings* settings)
 {
     reinterpret_cast<JPH::DistanceConstraint*>(constraint)->SetLimitsSpringSettings(*reinterpret_cast<JPH::SpringSettings*>(settings));
+}
+
+float JPH_DistanceConstraint_GetTotalLambdaPosition(const JPH_DistanceConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::DistanceConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaPosition();
 }
 
 /* JPH_PointConstraintSettings */
@@ -1839,6 +1987,13 @@ void JPH_PointConstraint_SetPoint2(JPH_PointConstraint* constraint, JPH_Constrai
     joltConstraint->SetPoint2(static_cast<JPH::EConstraintSpace>(space), ToJolt(value));
 }
 
+void JPH_PointConstraint_GetTotalLambdaPosition(const JPH_PointConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::PointConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaPosition();
+	FromJolt(lambda, result);
+}
 
 /* JPH_TwoBodyConstraint */
 JPH_Body* JPH_TwoBodyConstraint_GetBody1(JPH_TwoBodyConstraint* constraint)
