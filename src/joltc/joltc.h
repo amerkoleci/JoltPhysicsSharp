@@ -378,6 +378,7 @@ typedef struct JPH_SpringSettings               JPH_SpringSettings;
 
 typedef struct JPH_ConstraintSettings				JPH_ConstraintSettings;
 typedef struct JPH_TwoBodyConstraintSettings		JPH_TwoBodyConstraintSettings;
+typedef struct JPH_FixedConstraintSettings			JPH_FixedConstraintSettings;
 typedef struct JPH_DistanceConstraintSettings		JPH_DistanceConstraintSettings;
 typedef struct JPH_HingeConstraintSettings			JPH_HingeConstraintSettings;
 typedef struct JPH_SliderConstraintSettings			JPH_SliderConstraintSettings;
@@ -387,6 +388,7 @@ typedef struct JPH_SixDOFConstraintSettings			JPH_SixDOFConstraintSettings;
 
 typedef struct JPH_Constraint                   JPH_Constraint;
 typedef struct JPH_TwoBodyConstraint            JPH_TwoBodyConstraint;
+typedef struct JPH_FixedConstraint              JPH_FixedConstraint;
 typedef struct JPH_DistanceConstraint           JPH_DistanceConstraint;
 typedef struct JPH_PointConstraint              JPH_PointConstraint;
 typedef struct JPH_HingeConstraint              JPH_HingeConstraint;
@@ -666,6 +668,24 @@ JPH_CAPI void JPH_Constraint_SetEnabled(JPH_Constraint* constraint, JPH_Bool32 e
 JPH_CAPI uint64_t JPH_Constraint_GetUserData(const JPH_Constraint* constraint);
 JPH_CAPI void JPH_Constraint_SetUserData(JPH_Constraint* constraint, uint64_t userData);
 JPH_CAPI void JPH_Constraint_Destroy(JPH_Constraint* constraint);
+
+/* JPH_FixedConstraintSettings */
+JPH_CAPI JPH_FixedConstraintSettings* JPH_FixedConstraintSettings_Create(void);
+JPH_CAPI JPH_ConstraintSpace JPH_FixedConstraintSettings_GetSpace(JPH_PointConstraintSettings* settings);
+JPH_CAPI void JPH_FixedConstraintSettings_SetSpace(JPH_FixedConstraintSettings* settings, JPH_ConstraintSpace space);
+JPH_CAPI void JPH_FixedConstraintSettings_GetPoint1(JPH_FixedConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_FixedConstraintSettings_SetPoint1(JPH_FixedConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI void JPH_FixedConstraintSettings_GetPoint2(JPH_FixedConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_FixedConstraintSettings_SetPoint2(JPH_FixedConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI void JPH_FixedConstraintSettings_GetAxisX1(JPH_FixedConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_FixedConstraintSettings_SetAxisY1(JPH_FixedConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI void JPH_FixedConstraintSettings_GetAxisX2(JPH_FixedConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_FixedConstraintSettings_SetAxisY2(JPH_FixedConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI JPH_FixedConstraint* JPH_FixedConstraintSettings_CreateConstraint(JPH_FixedConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2);
+
+/* JPH_FixedConstraint */
+JPH_CAPI void JPH_FixedConstraint_GetTotalLambdaPosition(const JPH_FixedConstraint* constraint, JPH_Vec3* result);
+JPH_CAPI void JPH_FixedConstraint_GetTotalLambdaRotation(const JPH_FixedConstraint* constraint, JPH_Vec3* result);
 
 /* JPH_DistanceConstraintSettings */
 JPH_CAPI JPH_DistanceConstraintSettings* JPH_DistanceConstraintSettings_Create(void);
