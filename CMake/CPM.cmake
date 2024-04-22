@@ -42,7 +42,7 @@ if(NOT COMMAND cpm_message)
   endfunction()
 endif()
 
-set(CURRENT_CPM_VERSION 0.38.7)
+set(CURRENT_CPM_VERSION 0.39.0)
 
 get_filename_component(CPM_CURRENT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}" REALPATH)
 if(CPM_DIRECTORY)
@@ -300,12 +300,6 @@ function(CPMFindPackage)
     return()
   endif()
 
-  cpm_check_if_package_already_added(${CPM_ARGS_NAME} "${CPM_ARGS_VERSION}")
-  if(CPM_PACKAGE_ALREADY_ADDED)
-    cpm_export_variables(${CPM_ARGS_NAME})
-    return()
-  endif()
-
   cpm_find_package(${CPM_ARGS_NAME} "${CPM_ARGS_VERSION}" ${CPM_ARGS_FIND_PACKAGE_ARGUMENTS})
 
   if(NOT CPM_PACKAGE_FOUND)
@@ -540,6 +534,7 @@ function(CPMAddPackage)
       GIT_SHALLOW
       EXCLUDE_FROM_ALL
       SOURCE_SUBDIR
+      CUSTOM_CACHE_KEY
   )
 
   set(multiValueArgs URL OPTIONS DOWNLOAD_COMMAND)
@@ -710,7 +705,10 @@ function(CPMAddPackage)
     string(TOLOWER ${CPM_ARGS_NAME} lower_case_name)
     set(origin_parameters ${CPM_ARGS_UNPARSED_ARGUMENTS})
     list(SORT origin_parameters)
-    if(CPM_USE_NAMED_CACHE_DIRECTORIES)
+    if(CPM_ARGS_CUSTOM_CACHE_KEY)
+      # Application set a custom unique directory name
+      set(download_directory ${CPM_SOURCE_CACHE}/${lower_case_name}/${CPM_ARGS_CUSTOM_CACHE_KEY})
+    elseif(CPM_USE_NAMED_CACHE_DIRECTORIES)
       string(SHA1 origin_hash "${origin_parameters};NEW_CACHE_STRUCTURE_TAG")
       set(download_directory ${CPM_SOURCE_CACHE}/${lower_case_name}/${origin_hash}/${CPM_ARGS_NAME})
     else()

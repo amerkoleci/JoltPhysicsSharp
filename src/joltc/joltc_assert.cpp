@@ -103,6 +103,30 @@ static_assert(JPH_ShapeSubType_Mesh == (int)JPH::EShapeSubType::Mesh);
 static_assert(JPH_ShapeSubType_HeightField == (int)JPH::EShapeSubType::HeightField);
 static_assert(JPH_ShapeSubType_SoftBody == (int)JPH::EShapeSubType::SoftBody);
 
+// EConstraintType
+static_assert(JPH_ConstraintType_Constraint == (int)JPH::EConstraintType::Constraint);
+static_assert(JPH_ConstraintType_TwoBodyConstraint == (int)JPH::EConstraintType::TwoBodyConstraint);
+
+// EConstraintSubType
+static_assert(JPH_ConstraintSubType_Fixed == (int)JPH::EConstraintSubType::Fixed);
+static_assert(JPH_ConstraintSubType_Point == (int)JPH::EConstraintSubType::Point);
+static_assert(JPH_ConstraintSubType_Hinge == (int)JPH::EConstraintSubType::Hinge);
+static_assert(JPH_ConstraintSubType_Slider == (int)JPH::EConstraintSubType::Slider);
+static_assert(JPH_ConstraintSubType_Distance == (int)JPH::EConstraintSubType::Distance);
+static_assert(JPH_ConstraintSubType_Cone == (int)JPH::EConstraintSubType::Cone);
+static_assert(JPH_ConstraintSubType_SwingTwist == (int)JPH::EConstraintSubType::SwingTwist);
+static_assert(JPH_ConstraintSubType_SixDOF == (int)JPH::EConstraintSubType::SixDOF);
+static_assert(JPH_ConstraintSubType_Path  == (int)JPH::EConstraintSubType::Path);
+static_assert(JPH_ConstraintSubType_Vehicle == (int)JPH::EConstraintSubType::Vehicle);
+static_assert(JPH_ConstraintSubType_RackAndPinion == (int)JPH::EConstraintSubType::RackAndPinion);
+static_assert(JPH_ConstraintSubType_Gear == (int)JPH::EConstraintSubType::Gear);
+static_assert(JPH_ConstraintSubType_Pulley == (int)JPH::EConstraintSubType::Pulley);
+
+static_assert(JPH_ConstraintSubType_User1 == (int)JPH::EConstraintSubType::User1);
+static_assert(JPH_ConstraintSubType_User2 == (int)JPH::EConstraintSubType::User2);
+static_assert(JPH_ConstraintSubType_User3 == (int)JPH::EConstraintSubType::User3);
+static_assert(JPH_ConstraintSubType_User4 == (int)JPH::EConstraintSubType::User4);
+
 // EActivation
 static_assert(sizeof(JPH::EConstraintSpace) == sizeof(JPH_ConstraintSpace));
 static_assert(JPH_ConstraintSpace_LocalToBodyCOM == (int)JPH::EConstraintSpace::LocalToBodyCOM);
