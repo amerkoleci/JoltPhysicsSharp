@@ -1008,64 +1008,64 @@ JPH_CAPI uint64_t JPH_Body_GetUserData(JPH_Body* body);
 
 /* JPH_BroadPhaseLayerFilter_Procs */
 typedef struct JPH_BroadPhaseLayerFilter_Procs {
-    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_BroadPhaseLayerFilter* filter, JPH_BroadPhaseLayer layer);
+    JPH_Bool32(JPH_API_CALL* ShouldCollide)(void* arg, JPH_BroadPhaseLayer layer);
 } JPH_BroadPhaseLayerFilter_Procs;
 
-JPH_CAPI void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter_Procs procs);
+JPH_CAPI void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter* filter, JPH_BroadPhaseLayerFilter_Procs procs, void* arg);
 JPH_CAPI JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create(void);
 JPH_CAPI void JPH_BroadPhaseLayerFilter_Destroy(JPH_BroadPhaseLayerFilter* filter);
 
 /* JPH_ObjectLayerFilter */
 typedef struct JPH_ObjectLayerFilter_Procs {
-    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_ObjectLayerFilter *filter, JPH_ObjectLayer layer);
+    JPH_Bool32(JPH_API_CALL* ShouldCollide)(void* arg, JPH_ObjectLayer layer);
 } JPH_ObjectLayerFilter_Procs;
 
-JPH_CAPI void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter_Procs procs);
+JPH_CAPI void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter* filter, JPH_ObjectLayerFilter_Procs procs, void* arg);
 JPH_CAPI JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create(void);
 JPH_CAPI void JPH_ObjectLayerFilter_Destroy(JPH_ObjectLayerFilter* filter);
 
 /* JPH_BodyFilter */
 typedef struct JPH_BodyFilter_Procs {
-    JPH_Bool32(JPH_API_CALL* ShouldCollide)(const JPH_BodyFilter* filter, JPH_BodyID bodyID);
-    JPH_Bool32(JPH_API_CALL* ShouldCollideLocked)(const JPH_BodyFilter* filter, const JPH_Body *bodyID);
+    JPH_Bool32(JPH_API_CALL* ShouldCollide)(void* arg, JPH_BodyID bodyID);
+    JPH_Bool32(JPH_API_CALL* ShouldCollideLocked)(void* arg, const JPH_Body *bodyID);
 } JPH_BodyFilter_Procs;
 
-JPH_CAPI void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs);
+JPH_CAPI void JPH_BodyFilter_SetProcs(JPH_BodyFilter* filter, JPH_BodyFilter_Procs procs, void* arg);
 JPH_CAPI JPH_BodyFilter* JPH_BodyFilter_Create(void);
 JPH_CAPI void JPH_BodyFilter_Destroy(JPH_BodyFilter* filter);
 
 /* Contact listener */
 typedef struct JPH_ContactListener_Procs {
-    JPH_ValidateResult (JPH_API_CALL *OnContactValidate)(JPH_ContactListener* listener,
+    JPH_ValidateResult (JPH_API_CALL *OnContactValidate)(void* arg,
         const JPH_Body* body1,
         const JPH_Body* body2,
         const JPH_RVec3* baseOffset,
         const JPH_CollideShapeResult* collisionResult);
 
-    void(JPH_API_CALL* OnContactAdded)(JPH_ContactListener* listener,
+    void(JPH_API_CALL* OnContactAdded)(void* arg,
         const JPH_Body* body1,
         const JPH_Body* body2);
 
-    void(JPH_API_CALL* OnContactPersisted)(JPH_ContactListener* listener,
+    void(JPH_API_CALL* OnContactPersisted)(void* arg,
         const JPH_Body* body1,
         const JPH_Body* body2);
 
-    void(JPH_API_CALL* OnContactRemoved)(JPH_ContactListener* listener,
+    void(JPH_API_CALL* OnContactRemoved)(void* arg,
         const JPH_SubShapeIDPair* subShapePair
         );
 } JPH_ContactListener_Procs;
 
-JPH_CAPI void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs);
+JPH_CAPI void JPH_ContactListener_SetProcs(JPH_ContactListener* listener, JPH_ContactListener_Procs procs, void* arg);
 JPH_CAPI JPH_ContactListener* JPH_ContactListener_Create(void);
 JPH_CAPI void JPH_ContactListener_Destroy(JPH_ContactListener* listener);
 
 /* BodyActivationListener */
 typedef struct JPH_BodyActivationListener_Procs {
-    void(JPH_API_CALL* OnBodyActivated)(JPH_BodyActivationListener* listener, JPH_BodyID bodyID, uint64_t bodyUserData);
-    void(JPH_API_CALL* OnBodyDeactivated)(JPH_BodyActivationListener* listener, JPH_BodyID bodyID, uint64_t bodyUserData);
+    void(JPH_API_CALL* OnBodyActivated)(void* arg, JPH_BodyID bodyID, uint64_t bodyUserData);
+    void(JPH_API_CALL* OnBodyDeactivated)(void* arg, JPH_BodyID bodyID, uint64_t bodyUserData);
 } JPH_BodyActivationListener_Procs;
 
-JPH_CAPI void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
+JPH_CAPI void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener* listener, JPH_BodyActivationListener_Procs procs, void* arg);
 JPH_CAPI JPH_BodyActivationListener* JPH_BodyActivationListener_Create(void);
 JPH_CAPI void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener);
 
