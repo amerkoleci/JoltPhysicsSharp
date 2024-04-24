@@ -490,8 +490,6 @@ const JPH_BodyLockInterface* JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(const 
 }
 
 /* JPH_BroadPhaseLayerFilter */
-static JPH_BroadPhaseLayerFilter_Procs g_BroadPhaseLayerFilter_Procs;
-
 class ManagedBroadPhaseLayerFilter final : public JPH::BroadPhaseLayerFilter
 {
 public:
@@ -504,16 +502,25 @@ public:
 
     bool ShouldCollide(BroadPhaseLayer inLayer) const override
     {
-        return g_BroadPhaseLayerFilter_Procs.ShouldCollide(
-            reinterpret_cast<const JPH_BroadPhaseLayerFilter*>(this),
-            static_cast<JPH_BroadPhaseLayer>(inLayer)
-        ) == 1;
+        if (mProcs.ShouldCollide) {
+            return mProcs.ShouldCollide(
+                mArg,
+                static_cast<JPH_BroadPhaseLayer>(inLayer)
+            ) == 1;
+        }
+
+        return true;
     }
+
+    JPH_BroadPhaseLayerFilter_Procs mProcs = {};
+    void* mArg;
 };
 
-void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter_Procs procs)
+void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter* filter, JPH_BroadPhaseLayerFilter_Procs procs, void* arg)
 {
-    g_BroadPhaseLayerFilter_Procs = procs;
+    auto managedFilter = reinterpret_cast<ManagedBroadPhaseLayerFilter*>(filter);
+    managedFilter->mProcs = procs;
+    managedFilter->mArg = arg;
 }
 
 JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create(void)
@@ -531,8 +538,6 @@ void JPH_BroadPhaseLayerFilter_Destroy(JPH_BroadPhaseLayerFilter* filter)
 }
 
 /* JPH_ObjectLayerFilter */
-static JPH_ObjectLayerFilter_Procs g_ObjectLayerFilter_Procs;
-
 class ManagedObjectLayerFilter final : public JPH::ObjectLayerFilter
 {
 public:
@@ -545,16 +550,23 @@ public:
 
     bool ShouldCollide(ObjectLayer inLayer) const override
     {
-        return g_ObjectLayerFilter_Procs.ShouldCollide(
-            reinterpret_cast<const JPH_ObjectLayerFilter*>(this),
-            static_cast<JPH_ObjectLayer>(inLayer)
-        ) == 1;
+        if (mProcs.ShouldCollide)
+        {
+            return mProcs.ShouldCollide(mArg, static_cast<JPH_ObjectLayer>(inLayer)) == 1;
+        }
+
+        return true;
     }
+
+    JPH_ObjectLayerFilter_Procs mProcs = {};
+    void* mArg;
 };
 
-void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter_Procs procs)
+void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter* filter, JPH_ObjectLayerFilter_Procs procs, void* arg)
 {
-    g_ObjectLayerFilter_Procs = procs;
+    auto managedFilter = reinterpret_cast<ManagedObjectLayerFilter*>(filter);
+    managedFilter->mProcs = procs;
+    managedFilter->mArg = arg;
 }
 
 JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create(void)
@@ -572,8 +584,6 @@ void JPH_ObjectLayerFilter_Destroy(JPH_ObjectLayerFilter* filter)
 }
 
 /* JPH_BodyFilter */
-static JPH_BodyFilter_Procs g_BodyFilter_Procs;
-
 class ManagedBodyFilter final : public JPH::BodyFilter
 {
 public:
@@ -586,22 +596,37 @@ public:
 
     bool ShouldCollide(const BodyID &bodyID) const override
     {
-        return !!g_BodyFilter_Procs.ShouldCollide(
-            reinterpret_cast<const JPH_BodyFilter*>(this),
-            (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
+        if (mProcs.ShouldCollide)
+        {
+            return !!mProcs.ShouldCollide(
+                mArg,
+                (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
+        }
+
+        return true;
     }
 
     bool ShouldCollideLocked(const Body& body) const override
     {
-        return !!g_BodyFilter_Procs.ShouldCollideLocked(
-            reinterpret_cast<const JPH_BodyFilter*>(this),
-            reinterpret_cast<const JPH_Body *>(&body));
+        if (mProcs.ShouldCollideLocked)
+        {
+            return !!mProcs.ShouldCollideLocked(
+                mArg,
+                reinterpret_cast<const JPH_Body *>(&body));
+        }
+
+        return true;
     }
+
+    JPH_BodyFilter_Procs mProcs = {};
+    void* mArg;
 };
 
-void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs)
+void JPH_BodyFilter_SetProcs(JPH_BodyFilter* filter, JPH_BodyFilter_Procs procs, void* arg)
 {
-    g_BodyFilter_Procs = procs;
+    auto managedFilter = reinterpret_cast<ManagedBodyFilter*>(filter);
+    managedFilter->mProcs = procs;
+    managedFilter->mArg = arg;
 }
 
 JPH_BodyFilter* JPH_BodyFilter_Create(void)
@@ -2233,6 +2258,13 @@ void JPH_PhysicsSystem_SetBodyActivationListener(JPH_PhysicsSystem* system, JPH_
     system->physicsSystem->SetBodyActivationListener(joltListener);
 }
 
+JPH_Bool32 JPH_PhysicsSystem_WereBodiesInContact(const JPH_PhysicsSystem* system, JPH_BodyID body1, JPH_BodyID body2)
+{
+	JPH_ASSERT(system);
+
+	return system->physicsSystem->WereBodiesInContact(JPH::BodyID(body1), JPH::BodyID(body2));
+}
+
 uint32_t JPH_PhysicsSystem_GetNumBodies(const JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
@@ -3338,8 +3370,6 @@ uint64_t JPH_Body_GetUserData(JPH_Body* body)
 }
 
 /* Contact Listener */
-static JPH_ContactListener_Procs g_ContactListener_Procs;
-
 class ManagedContactListener final : public JPH::ContactListener
 {
 public:
@@ -3349,15 +3379,20 @@ public:
         JPH_RVec3 baseOffset;
         FromJolt(inBaseOffset, &baseOffset);
 
-        JPH_ValidateResult result = g_ContactListener_Procs.OnContactValidate(
-            reinterpret_cast<JPH_ContactListener*>(this),
-            reinterpret_cast<const JPH_Body*>(&inBody1),
-            reinterpret_cast<const JPH_Body*>(&inBody2),
-            &baseOffset,
-            nullptr
-        );
+        if (mProcs.OnContactValidate)
+        {
+            JPH_ValidateResult result = mProcs.OnContactValidate(
+                mArg,
+                reinterpret_cast<const JPH_Body*>(&inBody1),
+                reinterpret_cast<const JPH_Body*>(&inBody2),
+                &baseOffset,
+                nullptr
+            );
 
-        return (JPH::ValidateResult)result;
+            return (JPH::ValidateResult)result;
+        }
+
+        return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
     }
 
     void OnContactAdded(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
@@ -3365,11 +3400,14 @@ public:
         JPH_UNUSED(inManifold);
         JPH_UNUSED(ioSettings);
 
-        g_ContactListener_Procs.OnContactAdded(
-            reinterpret_cast<JPH_ContactListener*>(this),
-            reinterpret_cast<const JPH_Body*>(&inBody1),
-            reinterpret_cast<const JPH_Body*>(&inBody2)
-        );
+        if (mProcs.OnContactAdded)
+        {
+            mProcs.OnContactAdded(
+                mArg,
+                reinterpret_cast<const JPH_Body*>(&inBody1),
+                reinterpret_cast<const JPH_Body*>(&inBody2)
+            );
+        }
     }
 
     void OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) override
@@ -3377,25 +3415,36 @@ public:
         JPH_UNUSED(inManifold);
         JPH_UNUSED(ioSettings);
 
-        g_ContactListener_Procs.OnContactPersisted(
-            reinterpret_cast<JPH_ContactListener*>(this),
-            reinterpret_cast<const JPH_Body*>(&inBody1),
-            reinterpret_cast<const JPH_Body*>(&inBody2)
-        );
+        if (mProcs.OnContactPersisted)
+        {
+            mProcs.OnContactPersisted(
+                mArg,
+                reinterpret_cast<const JPH_Body*>(&inBody1),
+                reinterpret_cast<const JPH_Body*>(&inBody2)
+            );
+        }
     }
 
     void OnContactRemoved(const SubShapeIDPair& inSubShapePair) override
     {
-        g_ContactListener_Procs.OnContactRemoved(
-            reinterpret_cast<JPH_ContactListener*>(this),
-            reinterpret_cast<const JPH_SubShapeIDPair*>(&inSubShapePair)
-        );
+        if (mProcs.OnContactRemoved)
+        {
+            mProcs.OnContactRemoved(
+                mArg,
+                reinterpret_cast<const JPH_SubShapeIDPair*>(&inSubShapePair)
+            );
+        }
     }
+
+    JPH_ContactListener_Procs mProcs;
+    void* mArg;
 };
 
-void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs)
+void JPH_ContactListener_SetProcs(JPH_ContactListener* listener, JPH_ContactListener_Procs procs, void* arg)
 {
-    g_ContactListener_Procs = procs;
+    auto managedListener = reinterpret_cast<ManagedContactListener*>(listener);
+    managedListener->mProcs = procs;
+    managedListener->mArg = arg;
 }
 
 JPH_ContactListener* JPH_ContactListener_Create(void)
@@ -3413,33 +3462,42 @@ void JPH_ContactListener_Destroy(JPH_ContactListener* listener)
 }
 
 /* BodyActivationListener */
-static JPH_BodyActivationListener_Procs g_BodyActivationListener_Procs;
-
 class ManagedBodyActivationListener final : public JPH::BodyActivationListener
 {
 public:
     void OnBodyActivated(const BodyID& inBodyID, uint64 inBodyUserData) override
     {
-        g_BodyActivationListener_Procs.OnBodyActivated(
-            reinterpret_cast<JPH_BodyActivationListener*>(this),
-            inBodyID.GetIndexAndSequenceNumber(),
-            inBodyUserData
-        );
+        if (mProcs.OnBodyDeactivated)
+        {
+            mProcs.OnBodyActivated(
+                mArg,
+                inBodyID.GetIndexAndSequenceNumber(),
+                inBodyUserData
+            );
+        }
     }
 
     void OnBodyDeactivated(const BodyID& inBodyID, uint64 inBodyUserData) override
     {
-        g_BodyActivationListener_Procs.OnBodyDeactivated(
-            reinterpret_cast<JPH_BodyActivationListener*>(this),
-            inBodyID.GetIndexAndSequenceNumber(),
-            inBodyUserData
-        );
+        if (mProcs.OnBodyDeactivated)
+        {
+            mProcs.OnBodyDeactivated(
+                mArg,
+                inBodyID.GetIndexAndSequenceNumber(),
+                inBodyUserData
+            );
+        }
     }
+
+    JPH_BodyActivationListener_Procs mProcs = {};
+    void* mArg;
 };
 
-void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs)
+void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener* listener, JPH_BodyActivationListener_Procs procs, void* arg)
 {
-    g_BodyActivationListener_Procs = procs;
+    auto managedListener = reinterpret_cast<ManagedBodyActivationListener*>(listener);
+    managedListener->mProcs = procs;
+    managedListener->mArg = arg;
 }
 
 JPH_BodyActivationListener* JPH_BodyActivationListener_Create(void)
