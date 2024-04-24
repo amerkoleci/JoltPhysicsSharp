@@ -8,23 +8,18 @@ namespace JoltPhysicsSharp;
 
 public abstract class BodyFilter : NativeObject
 {
-    private static readonly Dictionary<IntPtr, BodyFilter> s_listeners = [];
-    private static readonly JPH_BodyFilter_Procs s_bodyFilter_Procs;
-
-    static unsafe BodyFilter()
-    {
-        s_bodyFilter_Procs = new JPH_BodyFilter_Procs
-        {
-            ShouldCollide = &ShouldCollideCallback,
-            ShouldCollideLocked = &ShouldCollideLockedCallback,
-        };
-        JPH_BodyFilter_SetProcs(s_bodyFilter_Procs);
-    }
+    private readonly JPH_BodyFilter_Procs _bodyFilter_Procs;
 
     public BodyFilter()
         : base(JPH_BodyFilter_Create())
     {
-        s_listeners.Add(Handle, this);
+        nint context = DelegateProxies.CreateUserData(this, true);
+        _bodyFilter_Procs = new JPH_BodyFilter_Procs
+        {
+            ShouldCollide = &ShouldCollideCallback,
+            ShouldCollideLocked = &ShouldCollideLockedCallback,
+        };
+        JPH_BodyFilter_SetProcs(Handle, _bodyFilter_Procs, context);
     }
 
     /// <summary>
@@ -36,26 +31,24 @@ public abstract class BodyFilter : NativeObject
     {
         if (isDisposing)
         {
-            s_listeners.Remove(Handle);
-
             JPH_BodyFilter_Destroy(Handle);
         }
     }
 
     protected abstract bool ShouldCollide(BodyID bodyID);
     protected abstract bool ShouldCollideLocked(Body body);
-    
+
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideCallback(nint listenerPtr, BodyID bodyID)
+    private static Bool32 ShouldCollideCallback(nint context, BodyID bodyID)
     {
-        BodyFilter listener = s_listeners[listenerPtr];
+        BodyFilter listener = DelegateProxies.GetUserData<BodyFilter>(context, out _);
         return listener.ShouldCollide(bodyID);
     }
 
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideLockedCallback(nint listenerPtr, nint body)
+    private static Bool32 ShouldCollideLockedCallback(nint context, nint body)
     {
-        BodyFilter listener = s_listeners[listenerPtr];
+        BodyFilter listener = DelegateProxies.GetUserData<BodyFilter>(context, out _);
         return listener.ShouldCollideLocked(body);
     }
 }

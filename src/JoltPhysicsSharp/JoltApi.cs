@@ -161,7 +161,7 @@ internal static unsafe partial class JoltApi
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter_Procs procs);
+    public static extern void JPH_BroadPhaseLayerFilter_SetProcs(nint filter, JPH_BroadPhaseLayerFilter_Procs procs, nint userData);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint JPH_BroadPhaseLayerFilter_Create();
@@ -176,13 +176,13 @@ internal static unsafe partial class JoltApi
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter_Procs procs);
+    public static extern void JPH_ObjectLayerFilter_SetProcs(nint filter, JPH_ObjectLayerFilter_Procs procs, nint userData);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_ObjectLayerFilter_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ObjectLayerFilter_Create();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ObjectLayerFilter_Destroy(nint handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ObjectLayerFilter_Destroy(nint handle);
 
     //  BodyFilter
     public struct JPH_BodyFilter_Procs
@@ -192,13 +192,13 @@ internal static unsafe partial class JoltApi
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyFilter_SetProcs(JPH_BodyFilter_Procs procs);
+    public static extern void JPH_BodyFilter_SetProcs(nint filter, JPH_BodyFilter_Procs procs, nint userData);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_BodyFilter_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyFilter_Create();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_BodyFilter_Destroy(nint handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyFilter_Destroy(nint handle);
 
     /* ShapeSettings */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -1142,10 +1142,10 @@ internal static unsafe partial class JoltApi
         public delegate* unmanaged<nint, SubShapeIDPair*, void> OnContactRemoved;
     }
     [DllImport(LibName, EntryPoint = nameof(JPH_ContactListener_SetProcs), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ContactListener_SetProcs(JPH_ContactListener_Procs procs);
+    public static extern void JPH_ContactListener_SetProcs(nint listener, JPH_ContactListener_Procs procs, nint userData);
 
     [DllImport(LibName, EntryPoint = nameof(JPH_ContactListener_SetProcs), CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_ContactListener_SetProcsDouble(JPH_ContactListener_ProcsDouble procs);
+    public static extern void JPH_ContactListener_SetProcsDouble(nint listener, JPH_ContactListener_ProcsDouble procs, nint userData);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr JPH_ContactListener_Create();
@@ -1161,7 +1161,7 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener_Procs procs);
+    public static partial void JPH_BodyActivationListener_SetProcs(nint listener, JPH_BodyActivationListener_Procs procs, nint userData);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_BodyActivationListener_Create();

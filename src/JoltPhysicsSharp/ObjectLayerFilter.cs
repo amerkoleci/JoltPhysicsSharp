@@ -8,22 +8,17 @@ namespace JoltPhysicsSharp;
 
 public abstract class ObjectLayerFilter : NativeObject
 {
-    private static readonly Dictionary<IntPtr, ObjectLayerFilter> s_listeners = new();
-    private static readonly JPH_ObjectLayerFilter_Procs s_objectLayerFilter_Procs;
-
-    static unsafe ObjectLayerFilter()
-    {
-        s_objectLayerFilter_Procs = new JPH_ObjectLayerFilter_Procs
-        {
-            ShouldCollide = &ShouldCollideCallback,
-        };
-        JPH_ObjectLayerFilter_SetProcs(s_objectLayerFilter_Procs);
-    }
+    private readonly JPH_ObjectLayerFilter_Procs _objectLayerFilter_Procs;
 
     public ObjectLayerFilter()
         : base(JPH_ObjectLayerFilter_Create())
     {
-        s_listeners.Add(Handle, this);
+        nint context = DelegateProxies.CreateUserData(this, true);
+        _objectLayerFilter_Procs = new JPH_ObjectLayerFilter_Procs
+        {
+            ShouldCollide = &ShouldCollideCallback,
+        };
+        JPH_ObjectLayerFilter_SetProcs(Handle, _objectLayerFilter_Procs, context);
     }
 
     /// <summary>
@@ -35,8 +30,6 @@ public abstract class ObjectLayerFilter : NativeObject
     {
         if (isDisposing)
         {
-            s_listeners.Remove(Handle);
-
             JPH_ObjectLayerFilter_Destroy(Handle);
         }
     }
@@ -44,9 +37,9 @@ public abstract class ObjectLayerFilter : NativeObject
     protected abstract bool ShouldCollide(ObjectLayer layer);
 
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideCallback(IntPtr listenerPtr, ObjectLayer layer)
+    private static Bool32 ShouldCollideCallback(IntPtr context, ObjectLayer layer)
     {
-        ObjectLayerFilter listener = s_listeners[listenerPtr];
+        ObjectLayerFilter listener = DelegateProxies.GetUserData<ObjectLayerFilter>(context, out _);
         return listener.ShouldCollide(layer);
     }
 }
