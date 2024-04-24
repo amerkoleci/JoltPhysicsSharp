@@ -502,25 +502,23 @@ public:
 
     bool ShouldCollide(BroadPhaseLayer inLayer) const override
     {
-        if (mProcs.ShouldCollide) {
-            return mProcs.ShouldCollide(
-                mArg,
-                static_cast<JPH_BroadPhaseLayer>(inLayer)
-            ) == 1;
+        if (procs.ShouldCollide)
+		{
+            return procs.ShouldCollide(userData, static_cast<JPH_BroadPhaseLayer>(inLayer)) == 1;
         }
 
         return true;
     }
 
-    JPH_BroadPhaseLayerFilter_Procs mProcs = {};
-    void* mArg;
+    JPH_BroadPhaseLayerFilter_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter* filter, JPH_BroadPhaseLayerFilter_Procs procs, void* arg)
+void JPH_BroadPhaseLayerFilter_SetProcs(JPH_BroadPhaseLayerFilter* filter, JPH_BroadPhaseLayerFilter_Procs procs, void* userData)
 {
     auto managedFilter = reinterpret_cast<ManagedBroadPhaseLayerFilter*>(filter);
-    managedFilter->mProcs = procs;
-    managedFilter->mArg = arg;
+    managedFilter->procs = procs;
+    managedFilter->userData = userData;
 }
 
 JPH_BroadPhaseLayerFilter* JPH_BroadPhaseLayerFilter_Create(void)
@@ -550,23 +548,23 @@ public:
 
     bool ShouldCollide(ObjectLayer inLayer) const override
     {
-        if (mProcs.ShouldCollide)
+        if (procs.ShouldCollide)
         {
-            return mProcs.ShouldCollide(mArg, static_cast<JPH_ObjectLayer>(inLayer)) == 1;
+            return procs.ShouldCollide(userData, static_cast<JPH_ObjectLayer>(inLayer)) == 1;
         }
 
         return true;
     }
 
-    JPH_ObjectLayerFilter_Procs mProcs = {};
-    void* mArg;
+    JPH_ObjectLayerFilter_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter* filter, JPH_ObjectLayerFilter_Procs procs, void* arg)
+void JPH_ObjectLayerFilter_SetProcs(JPH_ObjectLayerFilter* filter, JPH_ObjectLayerFilter_Procs procs, void* userData)
 {
     auto managedFilter = reinterpret_cast<ManagedObjectLayerFilter*>(filter);
-    managedFilter->mProcs = procs;
-    managedFilter->mArg = arg;
+    managedFilter->procs = procs;
+    managedFilter->userData = userData;
 }
 
 JPH_ObjectLayerFilter* JPH_ObjectLayerFilter_Create(void)
@@ -596,11 +594,9 @@ public:
 
     bool ShouldCollide(const BodyID &bodyID) const override
     {
-        if (mProcs.ShouldCollide)
+        if (procs.ShouldCollide)
         {
-            return !!mProcs.ShouldCollide(
-                mArg,
-                (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
+            return !!procs.ShouldCollide(userData, (JPH_BodyID)bodyID.GetIndexAndSequenceNumber());
         }
 
         return true;
@@ -608,25 +604,23 @@ public:
 
     bool ShouldCollideLocked(const Body& body) const override
     {
-        if (mProcs.ShouldCollideLocked)
+        if (procs.ShouldCollideLocked)
         {
-            return !!mProcs.ShouldCollideLocked(
-                mArg,
-                reinterpret_cast<const JPH_Body *>(&body));
+            return !!procs.ShouldCollideLocked(userData, reinterpret_cast<const JPH_Body *>(&body));
         }
 
         return true;
     }
 
-    JPH_BodyFilter_Procs mProcs = {};
-    void* mArg;
+    JPH_BodyFilter_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_BodyFilter_SetProcs(JPH_BodyFilter* filter, JPH_BodyFilter_Procs procs, void* arg)
+void JPH_BodyFilter_SetProcs(JPH_BodyFilter* filter, JPH_BodyFilter_Procs procs, void* userData)
 {
     auto managedFilter = reinterpret_cast<ManagedBodyFilter*>(filter);
-    managedFilter->mProcs = procs;
-    managedFilter->mArg = arg;
+    managedFilter->procs = procs;
+    managedFilter->userData = userData;
 }
 
 JPH_BodyFilter* JPH_BodyFilter_Create(void)
@@ -3379,10 +3373,10 @@ public:
         JPH_RVec3 baseOffset;
         FromJolt(inBaseOffset, &baseOffset);
 
-        if (mProcs.OnContactValidate)
+        if (procs.OnContactValidate)
         {
-            JPH_ValidateResult result = mProcs.OnContactValidate(
-                mArg,
+            JPH_ValidateResult result = procs.OnContactValidate(
+                userData,
                 reinterpret_cast<const JPH_Body*>(&inBody1),
                 reinterpret_cast<const JPH_Body*>(&inBody2),
                 &baseOffset,
@@ -3400,10 +3394,10 @@ public:
         JPH_UNUSED(inManifold);
         JPH_UNUSED(ioSettings);
 
-        if (mProcs.OnContactAdded)
+        if (procs.OnContactAdded)
         {
-            mProcs.OnContactAdded(
-                mArg,
+            procs.OnContactAdded(
+                userData,
                 reinterpret_cast<const JPH_Body*>(&inBody1),
                 reinterpret_cast<const JPH_Body*>(&inBody2)
             );
@@ -3415,10 +3409,10 @@ public:
         JPH_UNUSED(inManifold);
         JPH_UNUSED(ioSettings);
 
-        if (mProcs.OnContactPersisted)
+        if (procs.OnContactPersisted)
         {
-            mProcs.OnContactPersisted(
-                mArg,
+            procs.OnContactPersisted(
+                userData,
                 reinterpret_cast<const JPH_Body*>(&inBody1),
                 reinterpret_cast<const JPH_Body*>(&inBody2)
             );
@@ -3427,24 +3421,24 @@ public:
 
     void OnContactRemoved(const SubShapeIDPair& inSubShapePair) override
     {
-        if (mProcs.OnContactRemoved)
+        if (procs.OnContactRemoved)
         {
-            mProcs.OnContactRemoved(
-                mArg,
+            procs.OnContactRemoved(
+                userData,
                 reinterpret_cast<const JPH_SubShapeIDPair*>(&inSubShapePair)
             );
         }
     }
 
-    JPH_ContactListener_Procs mProcs;
-    void* mArg;
+    JPH_ContactListener_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_ContactListener_SetProcs(JPH_ContactListener* listener, JPH_ContactListener_Procs procs, void* arg)
+void JPH_ContactListener_SetProcs(JPH_ContactListener* listener, JPH_ContactListener_Procs procs, void* userData)
 {
     auto managedListener = reinterpret_cast<ManagedContactListener*>(listener);
-    managedListener->mProcs = procs;
-    managedListener->mArg = arg;
+    managedListener->procs = procs;
+    managedListener->userData = userData;
 }
 
 JPH_ContactListener* JPH_ContactListener_Create(void)
@@ -3467,10 +3461,10 @@ class ManagedBodyActivationListener final : public JPH::BodyActivationListener
 public:
     void OnBodyActivated(const BodyID& inBodyID, uint64 inBodyUserData) override
     {
-        if (mProcs.OnBodyDeactivated)
+        if (procs.OnBodyDeactivated)
         {
-            mProcs.OnBodyActivated(
-                mArg,
+            procs.OnBodyActivated(
+                userData,
                 inBodyID.GetIndexAndSequenceNumber(),
                 inBodyUserData
             );
@@ -3479,25 +3473,25 @@ public:
 
     void OnBodyDeactivated(const BodyID& inBodyID, uint64 inBodyUserData) override
     {
-        if (mProcs.OnBodyDeactivated)
+        if (procs.OnBodyDeactivated)
         {
-            mProcs.OnBodyDeactivated(
-                mArg,
+            procs.OnBodyDeactivated(
+                userData,
                 inBodyID.GetIndexAndSequenceNumber(),
                 inBodyUserData
             );
         }
     }
 
-    JPH_BodyActivationListener_Procs mProcs = {};
-    void* mArg;
+    JPH_BodyActivationListener_Procs procs = {};
+    void* userData = nullptr;
 };
 
-void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener* listener, JPH_BodyActivationListener_Procs procs, void* arg)
+void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener* listener, JPH_BodyActivationListener_Procs procs, void* userData)
 {
     auto managedListener = reinterpret_cast<ManagedBodyActivationListener*>(listener);
-    managedListener->mProcs = procs;
-    managedListener->mArg = arg;
+    managedListener->procs = procs;
+    managedListener->userData = userData;
 }
 
 JPH_BodyActivationListener* JPH_BodyActivationListener_Create(void)
