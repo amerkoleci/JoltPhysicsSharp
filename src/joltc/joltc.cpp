@@ -59,6 +59,7 @@ __pragma(warning(pop))
 #ifdef _MSC_VER
 #	pragma warning(push)
 #	pragma warning(disable : 5045) // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+#	pragma warning(disable : 4711) // Informational warning for automatic inlining
 #endif
 
 #include <iostream>
