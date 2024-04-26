@@ -59,7 +59,6 @@ __pragma(warning(pop))
 #ifdef _MSC_VER
 #	pragma warning(push)
 #	pragma warning(disable : 5045) // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
-#	pragma warning(disable : 4711) // Informational warning for automatic inlining
 #endif
 
 #include <iostream>
@@ -102,14 +101,14 @@ static bool AssertFailedImpl(const char* inExpression, const char* inMessage, co
 #endif // JPH_ENABLE_ASSERTS
 
 // From Jolt conversion methods
-static void FromJolt(const JPH::Vec3& vec, JPH_Vec3* result)
+static inline void FromJolt(const JPH::Vec3& vec, JPH_Vec3* result)
 {
     result->x = vec.GetX();
     result->y = vec.GetY();
     result->z = vec.GetZ();
 }
 
-static void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
+static inline void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
 {
     result->x = quat.GetX();
     result->y = quat.GetY();
@@ -117,7 +116,7 @@ static void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
     result->w = quat.GetW();
 }
 
-static void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
+static inline void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 {
     JPH::Vec4 column0 = matrix.GetColumn4(0);
     JPH::Vec4 column1 = matrix.GetColumn4(1);
@@ -146,14 +145,14 @@ static void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 }
 
 #if defined(JPH_DOUBLE_PRECISION)
-static void FromJolt(const JPH::RVec3& vec, JPH_RVec3* result)
+static inline void FromJolt(const JPH::RVec3& vec, JPH_RVec3* result)
 {
     result->x = vec.GetX();
     result->y = vec.GetY();
     result->z = vec.GetZ();
 }
 
-static void FromJolt(const JPH::DMat44& matrix, JPH_RMatrix4x4* result)
+static inline void FromJolt(const JPH::DMat44& matrix, JPH_RMatrix4x4* result)
 {
     JPH::Vec4 column0 = matrix.GetColumn4(0);
     JPH::Vec4 column1 = matrix.GetColumn4(1);
@@ -182,18 +181,39 @@ static void FromJolt(const JPH::DMat44& matrix, JPH_RMatrix4x4* result)
 }
 #endif /* defined(JPH_DOUBLE_PRECISION) */
 
+static inline void FromJolt(const JPH::MassProperties& jolt, JPH_MassProperties* result)
+{
+	result->mass = jolt.mMass;
+	FromJolt(jolt.mInertia, &result->inertia);
+}
+
+static inline void FromJolt(const JPH::SpringSettings& jolt, JPH_SpringSettings* result)
+{
+    result->frequency = jolt.mFrequency;
+    result->damping = jolt.mDamping;
+}
+
+static inline void FromJolt(const JPH::MotorSettings& jolt, JPH_MotorSettings* result)
+{
+    FromJolt(jolt.mSpringSettings, &result->springSettings);
+    result->minForceLimit = jolt.mMinForceLimit;
+    result->maxForceLimit = jolt.mMaxForceLimit;
+    result->minTorqueLimit = jolt.mMaxTorqueLimit;
+    result->maxTorqueLimit = jolt.mMaxTorqueLimit;
+}
+
 // To Jolt conversion methods
-static JPH::Vec3 ToJolt(const JPH_Vec3* vec)
+static inline JPH::Vec3 ToJolt(const JPH_Vec3* vec)
 {
     return JPH::Vec3(vec->x, vec->y, vec->z);
 }
 
-static JPH::Quat ToJolt(const JPH_Quat* quat)
+static inline JPH::Quat ToJolt(const JPH_Quat* quat)
 {
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
 }
 
-static JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
+static inline JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
 {
     JPH::Mat44 result{};
     result.SetColumn4(0, JPH::Vec4(matrix.m11, matrix.m12, matrix.m13, matrix.m14));
@@ -203,18 +223,18 @@ static JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
     return result;
 }
 
-static JPH::Float3 ToJoltFloat3(const JPH_Vec3& vec)
+static inline JPH::Float3 ToJoltFloat3(const JPH_Vec3& vec)
 {
     return JPH::Float3(vec.x, vec.y, vec.z);
 }
 
 #if defined(JPH_DOUBLE_PRECISION)
-static JPH::RVec3 ToJolt(const JPH_RVec3* vec)
+static inline JPH::RVec3 ToJolt(const JPH_RVec3* vec)
 {
     return JPH::RVec3(vec->x, vec->y, vec->z);
 }
 
-static JPH::RMat44 ToJolt(const JPH_RMatrix4x4& matrix)
+static inline JPH::RMat44 ToJolt(const JPH_RMatrix4x4& matrix)
 {
     JPH::RMat44 result{};
     result.SetColumn4(0, JPH::Vec4(matrix.m11, matrix.m12, matrix.m13, matrix.m14));
@@ -225,13 +245,7 @@ static JPH::RMat44 ToJolt(const JPH_RMatrix4x4& matrix)
 }
 #endif /* defined(JPH_DOUBLE_PRECISION) */
 
-static void FromJolt(const JPH::MassProperties& jolt, JPH_MassProperties* result)
-{
-	result->mass = jolt.mMass;
-	FromJolt(jolt.mInertia, &result->inertia);
-}
-
-static JPH::MassProperties ToJolt(const JPH_MassProperties* properties)
+static inline JPH::MassProperties ToJolt(const JPH_MassProperties* properties)
 {
 	JPH::MassProperties result{};
 	result.mMass = properties->mass;
@@ -239,18 +253,7 @@ static JPH::MassProperties ToJolt(const JPH_MassProperties* properties)
 	return result;
 }
 
-void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
-{
-    reinterpret_cast<JPH::MassProperties*>(properties)->ScaleToMass(mass);
-}
-
-static void FromJolt(const JPH::SpringSettings& jolt, JPH_SpringSettings* result)
-{
-    result->frequency = jolt.mFrequency;
-    result->damping = jolt.mDamping;
-}
-
-static JPH::SpringSettings ToJolt(const JPH_SpringSettings* settings)
+static inline JPH::SpringSettings ToJolt(const JPH_SpringSettings* settings)
 {
     JPH::SpringSettings result{};
     result.mFrequency = settings->frequency;
@@ -258,16 +261,7 @@ static JPH::SpringSettings ToJolt(const JPH_SpringSettings* settings)
     return result;
 }
 
-static void FromJolt(const JPH::MotorSettings& jolt, JPH_MotorSettings* result)
-{
-    FromJolt(jolt.mSpringSettings, &result->springSettings);
-    result->minForceLimit = jolt.mMinForceLimit;
-    result->maxForceLimit = jolt.mMaxForceLimit;
-    result->minTorqueLimit = jolt.mMaxTorqueLimit;
-    result->maxTorqueLimit = jolt.mMaxTorqueLimit;
-}
-
-static JPH::MotorSettings ToJolt(const JPH_MotorSettings* settings)
+static inline JPH::MotorSettings ToJolt(const JPH_MotorSettings* settings)
 {
     JPH::MotorSettings result{};
     result.mSpringSettings = ToJolt(&settings->springSettings);
@@ -276,6 +270,11 @@ static JPH::MotorSettings ToJolt(const JPH_MotorSettings* settings)
     result.mMinTorqueLimit = settings->minTorqueLimit;
     result.mMaxTorqueLimit = settings->maxTorqueLimit;
     return result;
+}
+
+void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
+{
+    reinterpret_cast<JPH::MassProperties*>(properties)->ScaleToMass(mass);
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
