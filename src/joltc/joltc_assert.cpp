@@ -162,6 +162,11 @@ static_assert(JPH_SixDOFConstraintAxis_RotationX == (int)JPH::SixDOFConstraintSe
 static_assert(JPH_SixDOFConstraintAxis_RotationY == (int)JPH::SixDOFConstraintSettings::EAxis::RotationY);
 static_assert(JPH_SixDOFConstraintAxis_RotationZ == (int)JPH::SixDOFConstraintSettings::EAxis::RotationZ);
 
+// JPH_SpringMode
+static_assert(sizeof(JPH_SpringMode) == sizeof(uint32_t));
+static_assert(JPH_SpringMode_FrequencyAndDamping == (int)JPH::ESpringMode::FrequencyAndDamping);
+static_assert(JPH_SpringMode_StiffnessAndDamping == (int)JPH::ESpringMode::StiffnessAndDamping);
+
 // EGroundState
 static_assert(sizeof(JPH::CharacterBase::EGroundState) == sizeof(JPH_GroundState));
 static_assert(JPH_GroundState_OnGround == (int)JPH::CharacterBase::EGroundState::OnGround);
