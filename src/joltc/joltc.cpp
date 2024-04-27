@@ -484,6 +484,69 @@ void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system)
     }
 }
 
+void JPH_PhysicsSystem_SetPhysicsSettings(JPH_PhysicsSystem* system, JPH_PhysicsSettings* settings)
+{
+	JPH::PhysicsSettings joltSettings;
+	joltSettings.mMaxInFlightBodyPairs = settings->maxInFlightBodyPairs;
+	joltSettings.mStepListenersBatchSize = settings->stepListenersBatchSize;
+	joltSettings.mStepListenerBatchesPerJob = settings->stepListenerBatchesPerJob;
+	joltSettings.mBaumgarte = settings->baumgarte;
+	joltSettings.mSpeculativeContactDistance = settings->speculativeContactDistance;
+	joltSettings.mPenetrationSlop = settings->penetrationSlop;
+	joltSettings.mLinearCastThreshold = settings->linearCastThreshold;
+	joltSettings.mLinearCastMaxPenetration = settings->linearCastMaxPenetration;
+	joltSettings.mManifoldToleranceSq = settings->manifoldToleranceSq;
+	joltSettings.mMaxPenetrationDistance = settings->maxPenetrationDistance;
+	joltSettings.mBodyPairCacheMaxDeltaPositionSq = settings->bodyPairCacheMaxDeltaPositionSq;
+	joltSettings.mBodyPairCacheCosMaxDeltaRotationDiv2 = settings->bodyPairCacheCosMaxDeltaRotationDiv2;
+	joltSettings.mContactNormalCosMaxDeltaRotation = settings->contactNormalCosMaxDeltaRotation;
+	joltSettings.mContactPointPreserveLambdaMaxDistSq = settings->contactPointPreserveLambdaMaxDistSq;
+	joltSettings.mNumVelocitySteps = settings->numVelocitySteps;
+	joltSettings.mNumPositionSteps = settings->numPositionSteps;
+	joltSettings.mMinVelocityForRestitution = settings->minVelocityForRestitution;
+	joltSettings.mTimeBeforeSleep = settings->timeBeforeSleep;
+	joltSettings.mPointVelocitySleepThreshold = settings->pointVelocitySleepThreshold;
+	joltSettings.mDeterministicSimulation = settings->deterministicSimulation;
+	joltSettings.mConstraintWarmStart = settings->constraintWarmStart;
+	joltSettings.mUseBodyPairContactCache = settings->useBodyPairContactCache;
+	joltSettings.mUseManifoldReduction = settings->useManifoldReduction;
+	joltSettings.mUseLargeIslandSplitter = settings->useLargeIslandSplitter;
+	joltSettings.mAllowSleeping = settings->allowSleeping;
+	joltSettings.mCheckActiveEdges = settings->checkActiveEdges;
+	system->physicsSystem->SetPhysicsSettings(joltSettings);
+}
+
+void JPH_PhysicsSystem_GetPhysicsSettings(JPH_PhysicsSystem* system, JPH_PhysicsSettings* result)
+{
+	auto joltSettings = system->physicsSystem->GetPhysicsSettings();
+	result->maxInFlightBodyPairs = joltSettings.mMaxInFlightBodyPairs;
+	result->stepListenersBatchSize = joltSettings.mStepListenersBatchSize;
+	result->stepListenerBatchesPerJob = joltSettings.mStepListenerBatchesPerJob;
+	result->baumgarte = joltSettings.mBaumgarte;
+	result->speculativeContactDistance = joltSettings.mSpeculativeContactDistance;
+	result->penetrationSlop = joltSettings.mPenetrationSlop;
+	result->linearCastThreshold = joltSettings.mLinearCastThreshold;
+	result->linearCastMaxPenetration = joltSettings.mLinearCastMaxPenetration;
+	result->manifoldToleranceSq = joltSettings.mManifoldToleranceSq;
+	result->maxPenetrationDistance = joltSettings.mMaxPenetrationDistance;
+	result->bodyPairCacheMaxDeltaPositionSq = joltSettings.mBodyPairCacheMaxDeltaPositionSq;
+	result->bodyPairCacheCosMaxDeltaRotationDiv2 = joltSettings.mBodyPairCacheCosMaxDeltaRotationDiv2;
+	result->contactNormalCosMaxDeltaRotation = joltSettings.mContactNormalCosMaxDeltaRotation;
+	result->contactPointPreserveLambdaMaxDistSq = joltSettings.mContactPointPreserveLambdaMaxDistSq;
+	result->numVelocitySteps = joltSettings.mNumVelocitySteps;
+	result->numPositionSteps = joltSettings.mNumPositionSteps;
+	result->minVelocityForRestitution = joltSettings.mMinVelocityForRestitution;
+	result->timeBeforeSleep = joltSettings.mTimeBeforeSleep;
+	result->pointVelocitySleepThreshold = joltSettings.mPointVelocitySleepThreshold;
+	result->deterministicSimulation = joltSettings.mDeterministicSimulation;
+	result->constraintWarmStart = joltSettings.mConstraintWarmStart;
+	result->useBodyPairContactCache = joltSettings.mUseBodyPairContactCache;
+	result->useManifoldReduction = joltSettings.mUseManifoldReduction;
+	result->useLargeIslandSplitter = joltSettings.mUseLargeIslandSplitter;
+	result->allowSleeping = joltSettings.mAllowSleeping;
+	result->checkActiveEdges = joltSettings.mCheckActiveEdges;
+}
+
 void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system)
 {
     JPH_ASSERT(system);
