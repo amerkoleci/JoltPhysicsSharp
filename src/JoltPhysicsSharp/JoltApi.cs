@@ -892,10 +892,10 @@ internal static unsafe partial class JoltApi
 
     /* BodyLockInterface */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPC_PhysicsSystem_GetBodyLockInterface(nint system);
+    public static extern nint JPH_PhysicsSystem_GetBodyLockInterface(nint system);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPC_PhysicsSystem_GetBodyLockInterfaceNoLock(nint system);
+    public static extern nint JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(nint system);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyLockInterface_LockRead(nint lockInterface, uint bodyID, out BodyLockRead @lock);
@@ -930,10 +930,10 @@ internal static unsafe partial class JoltApi
 
     /* BodyLockInterface */
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPC_PhysicsSystem_GetNarrowPhaseQuery(nint system);
+    public static extern nint JPH_PhysicsSystem_GetNarrowPhaseQuery(nint system);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPC_PhysicsSystem_GetNarrowPhaseQueryNoLock(nint system);
+    public static extern nint JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(nint system);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay))]
     public static partial Bool32 JPH_NarrowPhaseQuery_CastRay(nint system,
