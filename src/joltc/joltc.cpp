@@ -3057,7 +3057,9 @@ public:
         JPH_BroadPhaseCastResult hit;
         hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
         hit.fraction = result.mFraction;
-        proc(userData, &hit);
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
         hadHit = true;
     }
 
@@ -3147,7 +3149,9 @@ public:
         hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
         hit.fraction = result.mFraction;
         hit.subShapeID2 = result.mSubShapeID2.GetValue();
-        proc(userData, &hit);
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
         hadHit = true;
     }
 
@@ -3166,7 +3170,9 @@ public:
         JPH_CollidePointResult hit;
         hit.bodyID = result.mBodyID.GetIndexAndSequenceNumber();
         hit.subShapeID2 = result.mSubShapeID2.GetValue();
-        proc(userData, &hit);
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
         hadHit = true;
     }
 
@@ -3190,7 +3196,9 @@ public:
         hit.subShapeID1 = result.mSubShapeID1.GetValue();
         hit.subShapeID2 = result.mSubShapeID2.GetValue();
         hit.bodyID2 = result.mBodyID2.GetIndexAndSequenceNumber();
-        proc(userData, &hit);
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
         hadHit = true;
     }
 
@@ -3216,7 +3224,9 @@ public:
         hit.bodyID2 = result.mBodyID2.GetIndexAndSequenceNumber();
         hit.fraction = result.mFraction;
         hit.isBackFaceHit = result.mIsBackFaceHit;
-        proc(userData, &hit);
+
+        float fraction = proc(userData, &hit);
+        UpdateEarlyOutFraction(fraction);
         hadHit = true;
     }
 
