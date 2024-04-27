@@ -2279,6 +2279,11 @@ void JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(JPH_TwoBodyConstraint* con
 
 
 /* JPH_MotionProperties */
+JPH_AllowedDOFs JPH_MotionProperties_GetAllowedDOFs(const JPH_MotionProperties* properties)
+{
+    return static_cast<JPH_AllowedDOFs>(reinterpret_cast<const JPH::MotionProperties*>(properties)->GetAllowedDOFs());
+}
+
 void JPH_MotionProperties_SetLinearDamping(JPH_MotionProperties* properties, float damping)
 {
     reinterpret_cast<JPH::MotionProperties*>(properties)->SetLinearDamping(damping);
