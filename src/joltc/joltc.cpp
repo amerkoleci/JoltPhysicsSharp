@@ -3086,7 +3086,7 @@ public:
 	uint32_t _padding;
 };
 
-JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CastRay(const JPH_BroadPhaseQuery* query,
+JPH_Bool32 JPH_BroadPhaseQuery_CastRay(const JPH_BroadPhaseQuery* query,
     const JPH_Vec3* origin, const JPH_Vec3* direction,
     JPH_RayCastBodyCollector* callback, void* userData,
     JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
@@ -3100,7 +3100,7 @@ JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CastRay(const JPH_BroadPhaseQuery* query
     return collector.hadHit;
 }
 
-JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CollideAABox(const JPH_BroadPhaseQuery* query,
+JPH_Bool32 JPH_BroadPhaseQuery_CollideAABox(const JPH_BroadPhaseQuery* query,
     const JPH_AABox* box, JPH_CollideShapeBodyCollector* callback, void* userData,
     JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
     JPH_ObjectLayerFilter* objectLayerFilter)
@@ -3113,7 +3113,7 @@ JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CollideAABox(const JPH_BroadPhaseQuery* 
     return collector.hadHit;
 }
 
-JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CollideSphere(const JPH_BroadPhaseQuery* query,
+JPH_Bool32 JPH_BroadPhaseQuery_CollideSphere(const JPH_BroadPhaseQuery* query,
     const JPH_Vec3* center, float radius, JPH_CollideShapeBodyCollector* callback, void* userData,
     JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
     JPH_ObjectLayerFilter* objectLayerFilter)
@@ -3125,7 +3125,7 @@ JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CollideSphere(const JPH_BroadPhaseQuery*
     return collector.hadHit;
 }
 
-JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CollidePoint(const JPH_BroadPhaseQuery* query,
+JPH_Bool32 JPH_BroadPhaseQuery_CollidePoint(const JPH_BroadPhaseQuery* query,
     const JPH_Vec3* point, JPH_CollideShapeBodyCollector* callback, void* userData,
     JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
     JPH_ObjectLayerFilter* objectLayerFilter)
@@ -3272,7 +3272,7 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
     return hadHit;
 }
 
-JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRay2(const JPH_NarrowPhaseQuery* query,
+JPH_Bool32 JPH_NarrowPhaseQuery_CastRay2(const JPH_NarrowPhaseQuery* query,
     const JPH_RVec3* origin, const JPH_Vec3* direction,
     JPH_CastRayCollector* callback, void* userData,
     JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
@@ -3298,7 +3298,7 @@ JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRay2(const JPH_NarrowPhaseQuery* qu
     return collector.hadHit;
 }
 
-JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CollidePoint(const JPH_NarrowPhaseQuery* query,
+JPH_Bool32 JPH_NarrowPhaseQuery_CollidePoint(const JPH_NarrowPhaseQuery* query,
 	const JPH_RVec3* point,
 	JPH_CollidePointCollector* callback, void* userData,
 	JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
@@ -3322,7 +3322,7 @@ JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CollidePoint(const JPH_NarrowPhaseQuery
     return collector.hadHit;
 }
 
-JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CollideShape(const JPH_NarrowPhaseQuery* query,
+JPH_Bool32 JPH_NarrowPhaseQuery_CollideShape(const JPH_NarrowPhaseQuery* query,
     const JPH_Shape* shape, const JPH_Vec3* scale, const JPH_RMatrix4x4* centerOfMassTransform,
     JPH_RVec3* baseOffset,
     JPH_CollideShapeCollector* callback, void* userData,
@@ -3358,7 +3358,7 @@ JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CollideShape(const JPH_NarrowPhaseQuery
     return collector.hadHit;
 }
 
-JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
+JPH_Bool32 JPH_NarrowPhaseQuery_CastShape(const JPH_NarrowPhaseQuery* query,
     const JPH_Shape* shape,
     const JPH_RMatrix4x4* worldTransform, const JPH_Vec3* direction,
     JPH_RVec3* baseOffset,
