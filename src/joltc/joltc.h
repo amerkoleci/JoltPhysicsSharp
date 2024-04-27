@@ -943,6 +943,7 @@ JPH_CAPI void JPH_BodyLockInterface_UnlockWrite(const JPH_BodyLockInterface* loc
 //--------------------------------------------------------------------------------------------------
 // JPH_MotionProperties
 //--------------------------------------------------------------------------------------------------
+JPH_CAPI JPH_AllowedDOFs JPH_MotionProperties_GetAllowedDOFs(const JPH_MotionProperties* properties);
 JPH_CAPI void JPH_MotionProperties_SetLinearDamping(JPH_MotionProperties* properties, float damping);
 JPH_CAPI float JPH_MotionProperties_GetLinearDamping(const JPH_MotionProperties* properties);
 JPH_CAPI void JPH_MotionProperties_SetAngularDamping(JPH_MotionProperties* properties, float damping);
