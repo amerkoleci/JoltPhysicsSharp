@@ -3063,9 +3063,10 @@ public:
         hadHit = true;
     }
 
-    bool hadHit = false;
     JPH_RayCastBodyCollector* proc;
     void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
 };
 
 class CollideShapeBodyCollectorCallback : public CollideShapeBodyCollector
@@ -3079,9 +3080,10 @@ public:
         hadHit = true;
     }
 
-    bool hadHit = false;
     JPH_CollideShapeBodyCollector* proc;
     void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
 };
 
 JPH_CAPI JPH_Bool32 JPH_BroadPhaseQuery_CastRay(const JPH_BroadPhaseQuery* query,
@@ -3155,9 +3157,10 @@ public:
         hadHit = true;
     }
 
-    bool hadHit = false;
     JPH_CastRayCollector* proc;
     void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
 };
 
 class CollidePointCollectorCallback : public CollidePointCollector
@@ -3176,9 +3179,10 @@ public:
         hadHit = true;
     }
 
-    bool hadHit = false;
     JPH_CollidePointCollector* proc;
     void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
 };
 
 class CollideShapeCollectorCallback : public CollideShapeCollector
@@ -3202,9 +3206,10 @@ public:
         hadHit = true;
     }
 
-    bool hadHit = false;
     JPH_CollideShapeCollector* proc;
     void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
 };
 
 class CastShapeCollectorCallback : public CastShapeCollector
@@ -3230,9 +3235,10 @@ public:
         hadHit = true;
     }
 
-    bool hadHit = false;
     JPH_CastShapeCollector* proc;
     void* userData;
+    JPH_Bool32 hadHit = false;
+	uint32_t _padding;
 };
 
 JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
