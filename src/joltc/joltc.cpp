@@ -3298,6 +3298,30 @@ JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CastRay2(const JPH_NarrowPhaseQuery* qu
     return collector.hadHit;
 }
 
+JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CollidePoint(const JPH_NarrowPhaseQuery* query,
+	const JPH_RVec3* point,
+	JPH_CollidePointCollector* callback, void* userData,
+	JPH_BroadPhaseLayerFilter* broadPhaseLayerFilter,
+	JPH_ObjectLayerFilter* objectLayerFilter,
+	JPH_BodyFilter* bodyFilter)
+{
+    JPH_ASSERT(query && point && callback);
+    auto joltQuery = reinterpret_cast<const JPH::NarrowPhaseQuery*>(query);
+    auto joltPoint = ToJolt(point);
+
+    CollidePointCollectorCallback collector(callback, userData);
+
+    joltQuery->CollidePoint(
+        joltPoint,
+        collector,
+        ToJolt(broadPhaseLayerFilter),
+        ToJolt(objectLayerFilter),
+        ToJolt(bodyFilter)
+    );
+
+    return collector.hadHit;
+}
+
 JPH_CAPI JPH_Bool32 JPH_NarrowPhaseQuery_CollideShape(const JPH_NarrowPhaseQuery* query,
     const JPH_Shape* shape, const JPH_Vec3* scale, const JPH_RMatrix4x4* centerOfMassTransform,
     JPH_RVec3* baseOffset,
