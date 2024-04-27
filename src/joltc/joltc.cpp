@@ -530,8 +530,8 @@ const JPH_BodyLockInterface* JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(const 
 /* JPH_BroadPhaseLayerFilter */
 static const JPH::BroadPhaseLayerFilter& ToJolt(JPH_BroadPhaseLayerFilter* bpFilter)
 {
-    JPH::BroadPhaseLayerFilter fallback;
-    return bpFilter ? *reinterpret_cast<JPH::BroadPhaseLayerFilter*>(bpFilter) : fallback;
+    static const JPH::BroadPhaseLayerFilter g_defaultBroadPhaseLayerFilter = {};
+    return bpFilter ? *reinterpret_cast<JPH::BroadPhaseLayerFilter*>(bpFilter) : g_defaultBroadPhaseLayerFilter;
 }
 
 class ManagedBroadPhaseLayerFilter final : public JPH::BroadPhaseLayerFilter
@@ -582,8 +582,8 @@ void JPH_BroadPhaseLayerFilter_Destroy(JPH_BroadPhaseLayerFilter* filter)
 /* JPH_ObjectLayerFilter */
 static const JPH::ObjectLayerFilter& ToJolt(JPH_ObjectLayerFilter* opFilter)
 {
-    JPH::ObjectLayerFilter fallback;
-    return opFilter ? *reinterpret_cast<JPH::ObjectLayerFilter*>(opFilter) : fallback;
+    static const JPH::ObjectLayerFilter g_defaultObjectLayerFilter = {};
+    return opFilter ? *reinterpret_cast<JPH::ObjectLayerFilter*>(opFilter) : g_defaultObjectLayerFilter;
 }
 
 class ManagedObjectLayerFilter final : public JPH::ObjectLayerFilter
@@ -634,8 +634,8 @@ void JPH_ObjectLayerFilter_Destroy(JPH_ObjectLayerFilter* filter)
 /* JPH_BodyFilter */
 static const JPH::BodyFilter& ToJolt(JPH_BodyFilter* bodyFilter)
 {
-    JPH::BodyFilter fallback;
-    return bodyFilter ? *reinterpret_cast<JPH::BodyFilter*>(bodyFilter) : fallback;
+    static const JPH::BodyFilter g_defaultBodyFilter = {};
+    return bodyFilter ? *reinterpret_cast<JPH::BodyFilter*>(bodyFilter) : g_defaultBodyFilter;
 }
 
 class ManagedBodyFilter final : public JPH::BodyFilter
