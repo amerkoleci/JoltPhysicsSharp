@@ -47,6 +47,7 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Constraints/DistanceConstraint.h"
 #include "Jolt/Physics/Constraints/HingeConstraint.h"
 #include "Jolt/Physics/Constraints/SliderConstraint.h"
+#include "Jolt/Physics/Constraints/ConeConstraint.h"
 #include "Jolt/Physics/Constraints/SwingTwistConstraint.h"
 #include "Jolt/Physics/Constraints/SixDOFConstraint.h"
 #include "Jolt/Physics/Character/CharacterBase.h"
@@ -1963,6 +1964,123 @@ float JPH_SliderConstraint_GetTotalLambdaMotor(const JPH_SliderConstraint* const
 	JPH_ASSERT(constraint);
 	auto joltConstraint = reinterpret_cast<const JPH::SliderConstraint*>(constraint);
 	return joltConstraint->GetTotalLambdaMotor();
+}
+
+/* JPH_ConeConstraintSettings */
+JPH_ConeConstraintSettings* JPH_ConeConstraintSettings_Create(void)
+{
+	auto settings = new JPH::ConeConstraintSettings();
+    settings->AddRef();
+
+    return reinterpret_cast<JPH_ConeConstraintSettings*>(settings);
+}
+
+void JPH_ConeConstraintSettings_SetPoint1(JPH_ConeConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    joltSettings->mPoint1 = ToJolt(value);
+}
+
+void JPH_ConeConstraintSettings_GetPoint1(JPH_ConeConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    auto joltVector = joltSettings->mPoint1;
+    FromJolt(joltVector, result);
+}
+
+void JPH_ConeConstraintSettings_SetPoint2(JPH_ConeConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    joltSettings->mPoint2 = ToJolt(value);
+}
+
+void JPH_ConeConstraintSettings_GetPoint2(JPH_ConeConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    auto joltVector = joltSettings->mPoint2;
+    FromJolt(joltVector, result);
+}
+
+void JPH_ConeConstraintSettings_SetTwistAxis1(JPH_ConeConstraintSettings* settings, const JPH_Vec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    joltSettings->mTwistAxis1 = ToJolt(value);
+}
+
+void JPH_ConeConstraintSettings_GetTwistAxis1(JPH_ConeConstraintSettings* settings, JPH_Vec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    FromJolt(joltSettings->mTwistAxis1, result);
+}
+
+void JPH_ConeConstraintSettings_SetTwistAxis2(JPH_ConeConstraintSettings* settings, const JPH_Vec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    joltSettings->mTwistAxis2 = ToJolt(value);
+}
+
+void JPH_ConeConstraintSettings_GetTwistAxis2(JPH_ConeConstraintSettings* settings, JPH_Vec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::ConeConstraintSettings*>(settings);
+    FromJolt(joltSettings->mTwistAxis2, result);
+}
+
+void JPH_ConeConstraintSettings_SetHalfConeAngle(JPH_ConeConstraintSettings* settings, float halfConeAngle)
+{
+    JPH_ASSERT(settings);
+    reinterpret_cast<JPH::ConeConstraintSettings*>(settings)->mHalfConeAngle = halfConeAngle;
+}
+
+float JPH_ConeConstraintSettings_GetHalfConeAngle(JPH_ConeConstraintSettings* settings)
+{
+    JPH_ASSERT(settings);
+    return reinterpret_cast<JPH::ConeConstraintSettings*>(settings)->mHalfConeAngle;
+}
+
+JPH_ConeConstraint* JPH_ConeConstraintSettings_CreateConstraint(JPH_ConeConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
+{
+	auto joltBody1 = body1 ? reinterpret_cast<JPH::Body*>(body1) : &JPH::Body::sFixedToWorld;
+    auto joltBody2 = body2 ? reinterpret_cast<JPH::Body*>(body2) : &JPH::Body::sFixedToWorld;
+    JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::ConeConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
+    return reinterpret_cast<JPH_ConeConstraint*>(static_cast<JPH::ConeConstraint*>(constraint));
+}
+
+/* JPH_ConeConstraint */
+void JPH_ConeConstraint_SetHalfConeAngle(JPH_ConeConstraint* constraint, float halfConeAngle)
+{
+	JPH_ASSERT(constraint);
+	reinterpret_cast<JPH::ConeConstraint*>(constraint)->SetHalfConeAngle(halfConeAngle);
+}
+
+float JPH_ConeConstraint_GetCosHalfConeAngle(const JPH_ConeConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	return reinterpret_cast<const JPH::ConeConstraint*>(constraint)->GetCosHalfConeAngle();
+}
+
+void JPH_ConeConstraint_GetTotalLambdaPosition(const JPH_ConeConstraint* constraint, JPH_Vec3* result)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::ConeConstraint*>(constraint);
+	auto lambda = joltConstraint->GetTotalLambdaPosition();
+	FromJolt(lambda, result);
+}
+
+float JPH_ConeConstraint_GetTotalLambdaRotation(const JPH_ConeConstraint* constraint)
+{
+	JPH_ASSERT(constraint);
+	auto joltConstraint = reinterpret_cast<const JPH::ConeConstraint*>(constraint);
+	return joltConstraint->GetTotalLambdaRotation();
 }
 
 /* JPH_SwingTwistConstraintSettings */
