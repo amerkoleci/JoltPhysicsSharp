@@ -506,13 +506,13 @@ void JPH_PhysicsSystem_SetPhysicsSettings(JPH_PhysicsSystem* system, JPH_Physics
 	joltSettings.mMinVelocityForRestitution = settings->minVelocityForRestitution;
 	joltSettings.mTimeBeforeSleep = settings->timeBeforeSleep;
 	joltSettings.mPointVelocitySleepThreshold = settings->pointVelocitySleepThreshold;
-	joltSettings.mDeterministicSimulation = settings->deterministicSimulation;
-	joltSettings.mConstraintWarmStart = settings->constraintWarmStart;
-	joltSettings.mUseBodyPairContactCache = settings->useBodyPairContactCache;
-	joltSettings.mUseManifoldReduction = settings->useManifoldReduction;
-	joltSettings.mUseLargeIslandSplitter = settings->useLargeIslandSplitter;
-	joltSettings.mAllowSleeping = settings->allowSleeping;
-	joltSettings.mCheckActiveEdges = settings->checkActiveEdges;
+	joltSettings.mDeterministicSimulation = static_cast<bool>(settings->deterministicSimulation);
+	joltSettings.mConstraintWarmStart = static_cast<bool>(settings->constraintWarmStart);
+	joltSettings.mUseBodyPairContactCache = static_cast<bool>(settings->useBodyPairContactCache);
+	joltSettings.mUseManifoldReduction = static_cast<bool>(settings->useManifoldReduction);
+	joltSettings.mUseLargeIslandSplitter = static_cast<bool>(settings->useLargeIslandSplitter);
+	joltSettings.mAllowSleeping = static_cast<bool>(settings->allowSleeping);
+	joltSettings.mCheckActiveEdges = static_cast<bool>(settings->checkActiveEdges);
 	system->physicsSystem->SetPhysicsSettings(joltSettings);
 }
 
