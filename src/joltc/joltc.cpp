@@ -918,6 +918,32 @@ JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHul
     return reinterpret_cast<JPH_ConvexHullShape*>(shape);
 }
 
+uint32_t JPH_ConvexHullShape_GetNumPoints(const JPH_ConvexHullShape* shape)
+{
+	return reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetNumPoints();
+}
+
+void JPH_ConvexHullShape_GetPoint(const JPH_ConvexHullShape* shape, uint32_t index, JPH_Vec3* result)
+{
+	auto point = reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetPoint(index);
+	FromJolt(point, result);
+}
+
+uint32_t JPH_ConvexHullShape_GetNumFaces(const JPH_ConvexHullShape* shape)
+{
+	return reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetNumFaces();
+}
+
+uint32_t JPH_ConvexHullShape_GetNumVerticesInFace(const JPH_ConvexHullShape* shape, uint32_t faceIndex)
+{
+	return reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetNumVerticesInFace(faceIndex);
+}
+
+uint32_t JPH_ConvexHullShape_GetFaceVertices(const JPH_ConvexHullShape* shape, uint32_t faceIndex, uint32_t maxVertices, uint32_t* vertices)
+{
+	return reinterpret_cast<const JPH::ConvexHullShape*>(shape)->GetFaceVertices(faceIndex, maxVertices, vertices);
+}
+
 /* MeshShapeSettings */
 JPH_MeshShapeSettings* JPH_MeshShapeSettings_Create(const JPH_Triangle* triangles, uint32_t triangleCount)
 {
