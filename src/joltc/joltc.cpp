@@ -1397,7 +1397,7 @@ void JPH_ConstraintSettings_Destroy(JPH_ConstraintSettings* settings)
 /* JPH_Constraint */
 JPH_ConstraintSettings* JPH_Constraint_GetConstraintSettings(JPH_Constraint* constraint)
 {
-    auto joltConstraint = reinterpret_cast<JPH::HingeConstraint*>(constraint);
+    auto joltConstraint = reinterpret_cast<JPH::Constraint*>(constraint);
     auto settings = joltConstraint->GetConstraintSettings().GetPtr();
     return reinterpret_cast<JPH_ConstraintSettings*>(settings);
 }
