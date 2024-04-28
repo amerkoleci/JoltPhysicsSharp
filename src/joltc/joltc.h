@@ -549,8 +549,40 @@ typedef struct JPH_PhysicsSystemSettings {
 	JPH_ObjectVsBroadPhaseLayerFilter* objectVsBroadPhaseLayerFilter;
 } JPH_PhysicsSystemSettings;
 
+typedef struct JPH_PhysicsSettings {
+	int maxInFlightBodyPairs;
+	int stepListenersBatchSize;
+	int stepListenerBatchesPerJob;
+	float baumgarte;
+	float speculativeContactDistance;
+	float penetrationSlop;
+	float linearCastThreshold;
+	float linearCastMaxPenetration;
+	float manifoldToleranceSq;
+	float maxPenetrationDistance;
+	float bodyPairCacheMaxDeltaPositionSq;
+	float bodyPairCacheCosMaxDeltaRotationDiv2;
+	float contactNormalCosMaxDeltaRotation;
+	float contactPointPreserveLambdaMaxDistSq;
+	uint32_t numVelocitySteps;
+	uint32_t numPositionSteps;
+	float minVelocityForRestitution;
+	float timeBeforeSleep;
+	float pointVelocitySleepThreshold;
+	JPH_Bool32 deterministicSimulation;
+	JPH_Bool32 constraintWarmStart;
+	JPH_Bool32 useBodyPairContactCache;
+	JPH_Bool32 useManifoldReduction;
+	JPH_Bool32 useLargeIslandSplitter;
+	JPH_Bool32 allowSleeping;
+	JPH_Bool32 checkActiveEdges;
+} JPH_PhysicsSettings;
+
 JPH_CAPI JPH_PhysicsSystem* JPH_PhysicsSystem_Create(const JPH_PhysicsSystemSettings* settings);
 JPH_CAPI void JPH_PhysicsSystem_Destroy(JPH_PhysicsSystem* system);
+
+JPH_CAPI void JPH_PhysicsSystem_SetPhysicsSettings(JPH_PhysicsSystem* system, JPH_PhysicsSettings* settings);
+JPH_CAPI void JPH_PhysicsSystem_GetPhysicsSettings(JPH_PhysicsSystem* system, JPH_PhysicsSettings* result);
 
 JPH_CAPI void JPH_PhysicsSystem_OptimizeBroadPhase(JPH_PhysicsSystem* system);
 JPH_CAPI JPH_PhysicsUpdateError JPH_PhysicsSystem_Step(JPH_PhysicsSystem* system, float deltaTime, int collisionSteps);
