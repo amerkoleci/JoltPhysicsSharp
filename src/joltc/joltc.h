@@ -449,6 +449,7 @@ typedef struct JPH_DistanceConstraintSettings		JPH_DistanceConstraintSettings;
 typedef struct JPH_HingeConstraintSettings			JPH_HingeConstraintSettings;
 typedef struct JPH_SliderConstraintSettings			JPH_SliderConstraintSettings;
 typedef struct JPH_PointConstraintSettings			JPH_PointConstraintSettings;
+typedef struct JPH_ConeConstraintSettings			JPH_ConeConstraintSettings;
 typedef struct JPH_SwingTwistConstraintSettings     JPH_SwingTwistConstraintSettings;
 typedef struct JPH_SixDOFConstraintSettings			JPH_SixDOFConstraintSettings;
 
@@ -459,6 +460,7 @@ typedef struct JPH_DistanceConstraint           JPH_DistanceConstraint;
 typedef struct JPH_PointConstraint              JPH_PointConstraint;
 typedef struct JPH_HingeConstraint              JPH_HingeConstraint;
 typedef struct JPH_SliderConstraint             JPH_SliderConstraint;
+typedef struct JPH_ConeConstraint               JPH_ConeConstraint;
 typedef struct JPH_SwingTwistConstraint         JPH_SwingTwistConstraint;
 typedef struct JPH_SixDOFConstraint				JPH_SixDOFConstraint;
 
@@ -850,6 +852,26 @@ JPH_CAPI void JPH_SliderConstraint_GetTotalLambdaPosition(const JPH_SliderConstr
 JPH_CAPI float JPH_SliderConstraint_GetTotalLambdaPositionLimits(const JPH_SliderConstraint* constraint);
 JPH_CAPI void JPH_SliderConstraint_GetTotalLambdaRotation(const JPH_SliderConstraint* constraint, JPH_Vec3* result);
 JPH_CAPI float JPH_SliderConstraint_GetTotalLambdaMotor(const JPH_SliderConstraint* constraint);
+
+/* JPH_ConeConstraintSettings */
+JPH_CAPI JPH_ConeConstraintSettings* JPH_ConeConstraintSettings_Create(void);
+JPH_CAPI void JPH_ConeConstraintSettings_GetPoint1(JPH_ConeConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_ConeConstraintSettings_SetPoint1(JPH_ConeConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI void JPH_ConeConstraintSettings_GetPoint2(JPH_ConeConstraintSettings* settings, JPH_RVec3* result);
+JPH_CAPI void JPH_ConeConstraintSettings_SetPoint2(JPH_ConeConstraintSettings* settings, const JPH_RVec3* value);
+JPH_CAPI void JPH_ConeConstraintSettings_SetTwistAxis1(JPH_ConeConstraintSettings* settings, const JPH_Vec3* value);
+JPH_CAPI void JPH_ConeConstraintSettings_GetTwistAxis1(JPH_ConeConstraintSettings* settings, JPH_Vec3* result);
+JPH_CAPI void JPH_ConeConstraintSettings_SetTwistAxis2(JPH_ConeConstraintSettings* settings, const JPH_Vec3* value);
+JPH_CAPI void JPH_ConeConstraintSettings_GetTwistAxis2(JPH_ConeConstraintSettings* settings, JPH_Vec3* result);
+JPH_CAPI void JPH_ConeConstraintSettings_SetHalfConeAngle(JPH_ConeConstraintSettings* settings, float halfConeAngle);
+JPH_CAPI float JPH_ConeConstraintSettings_GetHalfConeAngle(JPH_ConeConstraintSettings* settings);
+JPH_CAPI JPH_ConeConstraint* JPH_ConeConstraintSettings_CreateConstraint(JPH_ConeConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2);
+
+/* JPH_ConeConstraint */
+JPH_CAPI void JPH_ConeConstraint_SetHalfConeAngle(JPH_ConeConstraint* constraint, float halfConeAngle);
+JPH_CAPI float JPH_ConeConstraint_GetCosHalfConeAngle(const JPH_ConeConstraint* constraint);
+JPH_CAPI void JPH_ConeConstraint_GetTotalLambdaPosition(const JPH_ConeConstraint* constraint, JPH_Vec3* result);
+JPH_CAPI float JPH_ConeConstraint_GetTotalLambdaRotation(const JPH_ConeConstraint* constraint);
 
 /* JPH_SwingTwistConstraintSettings */
 JPH_CAPI JPH_SwingTwistConstraintSettings* JPH_SwingTwistConstraintSettings_Create(void);
