@@ -25,8 +25,8 @@ public sealed class PointConstraintSettings : TwoBodyConstraintSettings
 
     public ConstraintSpace Space
     {
-        get => JPH_PointConstraintSettings_GetSpace(Handle);
-        set => JPH_PointConstraintSettings_SetSpace(Handle, value);
+        get => JPH_FixedConstraintSettings_GetSpace(Handle);
+        set => JPH_FixedConstraintSettings_SetSpace(Handle, value);
     }
 
     public Vector3 Point1

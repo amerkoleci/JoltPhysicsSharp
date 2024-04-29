@@ -21,7 +21,7 @@ public sealed class SoftBodyCreationSettings : NativeObject
     {
         if (isDisposing)
         {
-            //JPH_SoftBodyCreationSettings_Destroy(Handle);
+            JPH_SoftBodyCreationSettings_Destroy(Handle);
         }
     }
 }

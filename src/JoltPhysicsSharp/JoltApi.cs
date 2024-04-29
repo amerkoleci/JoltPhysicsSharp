@@ -447,11 +447,11 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyCreationSettings_SetAllowedDOFs(IntPtr settings, AllowedDOFs value);
 
     /* SoftBodyCreationSettings */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_SoftBodyCreationSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SoftBodyCreationSettings_Create();
 
-    //[DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    //public static extern void JPH_SoftBodyCreationSettings_Destroy(IntPtr settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_Destroy(nint settings);
 
     #region JPH_Constraint
     /* JPH_Constraint */
@@ -459,10 +459,60 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_ConstraintSettings_Destroy(nint handle);
 
     [LibraryImport(LibName)]
+    public static partial Bool32 JPH_ConstraintSettings_GetEnabled(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetEnabled(nint handle, Bool32 value);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ConstraintSettings_GetConstraintPriority(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetConstraintPriority(nint handle, uint value);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ConstraintSettings_GetNumVelocityStepsOverride(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConstraintSettings_SetNumVelocityStepsOverride(nint handle, uint value);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ConstraintSettings_GetNumPositionStepsOverride(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConstraintSettings_SetNumPositionStepsOverride(nint handle, uint value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_ConstraintSettings_GetDrawConstraintSize(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConstraintSettings_SetDrawConstraintSize(nint handle, float value);
+
+
+    [LibraryImport(LibName)]
+    public static partial ulong JPH_ConstraintSettings_GetUserData(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConstraintSettings_SetUserData(nint handle, ulong value);
+
+
+    [LibraryImport(LibName)]
     public static partial void JPH_Constraint_Destroy(nint constraint);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_Constraint_GetConstraintSettings(nint constraint);
+
+    [LibraryImport(LibName)]
+    public static partial ConstraintType JPH_Constraint_GetType(nint constraint);
+
+    [LibraryImport(LibName)]
+    public static partial ConstraintSubType JPH_Constraint_GetSubType(nint constraint);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_Constraint_GetConstraintPriority(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_SetConstraintPriority(nint handle, uint value);
 
     [LibraryImport(LibName)]
     public static partial Bool32 JPH_Constraint_GetEnabled(nint constraint);
@@ -475,31 +525,90 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_Constraint_SetUserData(nint constraint, ulong value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_NotifyShapeChanged(nint constraint, uint bodyID, Vector3* deltaCOM);
     #endregion
 
     #region JPH_TwoBodyConstraint
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_TwoBodyConstraint_GetBody1(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TwoBodyConstraint_GetBody1(nint constraint);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_TwoBodyConstraint_GetBody2(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TwoBodyConstraint_GetBody2(nint constraint);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(nint constraint, out Matrix4x4 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(nint constraint, Matrix4x4* result);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(nint constraint, out Matrix4x4 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(nint constraint, Matrix4x4* result);
+    #endregion
+
+    #region JPH_FixedConstraint
+    [LibraryImport(LibName)]
+    public static partial nint JPH_FixedConstraintSettings_Create();
+
+    [LibraryImport(LibName)]
+    public static partial ConstraintSpace JPH_FixedConstraintSettings_GetSpace(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetSpace(nint handle, ConstraintSpace value);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_FixedConstraintSettings_GetAutoDetectPoint(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetAutoDetectPoint(nint handle, Bool32 value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_GetPoint1(nint handle, Vector3* result); // RVec3
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetPoint1(nint handle, Vector3* value); // RVec3
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_GetAxisX1(nint handle, Vector3* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetAxisX1(nint handle, Vector3* value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_GetAxisY1(nint handle, Vector3* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetAxisY1(nint handle, Vector3* value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_GetPoint2(nint handle, Vector3* result); // RVec3
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetPoint2(nint handle, Vector3* value); // RVec3
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_GetAxisX2(nint handle, Vector3* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetAxisX2(nint handle, Vector3* value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_GetAxisY2(nint handle, Vector3* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraintSettings_SetAxisY2(nint handle, Vector3* value);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_FixedConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
     #endregion
 
     #region JPH_PointConstraint
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_PointConstraintSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PointConstraintSettings_Create();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern ConstraintSpace JPH_PointConstraintSettings_GetSpace(IntPtr handle);
+    [LibraryImport(LibName)]
+    public static partial ConstraintSpace JPH_PointConstraintSettings_GetSpace(nint handle);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_PointConstraintSettings_SetSpace(IntPtr handle, ConstraintSpace value);
+    [LibraryImport(LibName)]
+    public static partial void JPH_PointConstraintSettings_SetSpace(nint handle, ConstraintSpace value);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_GetPoint1(IntPtr handle, out Vector3 result); // RVec3
@@ -513,8 +622,8 @@ internal static unsafe partial class JoltApi
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraintSettings_SetPoint2(IntPtr handle, in Vector3 value); // RVec3
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr JPH_PointConstraintSettings_CreateConstraint(IntPtr handle, IntPtr body1, IntPtr body2);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PointConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_PointConstraint_SetPoint1(IntPtr handle, ConstraintSpace space, in Vector3 value); // RVec3

@@ -2,6 +2,7 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
@@ -21,7 +22,7 @@ public abstract class TwoBodyConstraintSettings : ConvexShapeSettings
     public abstract TwoBodyConstraint CreateConstraint(in Body body1, in Body body2);
 }
 
-public abstract class TwoBodyConstraint : Constraint
+public abstract unsafe class TwoBodyConstraint : Constraint
 {
     protected TwoBodyConstraint(IntPtr handle)
         : base(handle)
@@ -45,13 +46,31 @@ public abstract class TwoBodyConstraint : Constraint
 
     public Matrix4x4 GetConstraintToBody1Matrix()
     {
-        JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, out Matrix4x4 result);
+        Matrix4x4 result;
+        JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, &result);
         return result;
+    }
+
+    public void GetConstraintToBody1Matrix(out Matrix4x4 result)
+    {
+        Unsafe.SkipInit(out result);
+
+        fixed (Matrix4x4* resultPtr = &result)
+            JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, resultPtr);
     }
 
     public Matrix4x4 GetConstraintToBody2Matrix()
     {
-        JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, out Matrix4x4 result);
+        Matrix4x4 result;
+        JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, &result);
         return result;
+    }
+
+    public void GetConstraintToBody2Matrix(out Matrix4x4 result)
+    {
+        Unsafe.SkipInit(out result);
+
+        fixed (Matrix4x4* resultPtr = &result)
+            JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, resultPtr);
     }
 }

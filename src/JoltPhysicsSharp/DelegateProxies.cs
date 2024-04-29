@@ -11,13 +11,13 @@ internal delegate object UserDataDelegate();
 internal static partial class DelegateProxies
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Create<T>(object managedDel, T nativeDel, out GCHandle gch, out IntPtr contextPtr)
+    public static T? Create<T>(object managedDel, T nativeDel, out GCHandle gch, out nint contextPtr)
     {
         if (managedDel == null)
         {
-            gch = default(GCHandle);
+            gch = default;
             contextPtr = IntPtr.Zero;
-            return default(T);
+            return default;
         }
 
         gch = GCHandle.Alloc(managedDel);

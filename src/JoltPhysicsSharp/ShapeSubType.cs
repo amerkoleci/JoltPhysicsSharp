@@ -4,7 +4,7 @@
 namespace JoltPhysicsSharp;
 
 /// <summary>
-/// This enumerates all shape types, each shape can return its type through Shape::GetSubType
+/// This enumerates all shape types, each shape can return its type through <see cref="Shape.SubType"/>
 /// </summary>
 public enum ShapeSubType
 {
