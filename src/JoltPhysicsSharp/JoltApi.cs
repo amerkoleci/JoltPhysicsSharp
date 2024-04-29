@@ -598,6 +598,12 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial nint JPH_FixedConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraint_GetTotalLambdaPosition(nint handle, Vector3* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_FixedConstraint_GetTotalLambdaRotation(nint handle, Vector3* result);
     #endregion
 
     #region JPH_PointConstraint
@@ -634,23 +640,23 @@ internal static unsafe partial class JoltApi
 
     #region JPH_DistanceConstraint
     /* JPH_DistanceConstraint */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_DistanceConstraintSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial nint JPH_DistanceConstraintSettings_Create();
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_DistanceConstraintSettings_GetPoint1(nint handle, out Vector3 result); // RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_DistanceConstraintSettings_GetPoint1(nint handle, Vector3* result); // RVec3
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_DistanceConstraintSettings_SetPoint1(nint handle, in Vector3 value); // RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_DistanceConstraintSettings_SetPoint1(nint handle, Vector3* value); // RVec3
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_DistanceConstraintSettings_GetPoint2(nint handle, out Vector3 result); // RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_DistanceConstraintSettings_GetPoint2(nint handle, Vector3* result); // RVec3
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_DistanceConstraintSettings_SetPoint2(nint handle, in Vector3 value); // RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_DistanceConstraintSettings_SetPoint2(nint handle, Vector3* value); // RVec3
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_DistanceConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_DistanceConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
     #endregion
 
     #region JPH_HingeConstraint

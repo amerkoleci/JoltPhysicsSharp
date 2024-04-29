@@ -2,6 +2,7 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
@@ -122,7 +123,7 @@ public unsafe class FixedConstraintSettings : TwoBodyConstraintSettings
     }
 }
 
-public class FixedConstraint : TwoBodyConstraint
+public unsafe class FixedConstraint : TwoBodyConstraint
 {
     internal FixedConstraint(nint handle)
         : base(handle)
@@ -133,4 +134,36 @@ public class FixedConstraint : TwoBodyConstraint
     /// Finalizes an instance of the <see cref="FixedConstraint" /> class.
     /// </summary>
     ~FixedConstraint() => Dispose(isDisposing: false);
+
+    public Vector3 GetTotalLambdaPosition()
+    {
+        Vector3 result;
+        JPH_FixedConstraint_GetTotalLambdaPosition(Handle, &result);
+        return result;
+    }
+
+    public Vector3 GetTotalLambdaRotation()
+    {
+        Vector3 result;
+        JPH_FixedConstraint_GetTotalLambdaRotation(Handle, &result);
+        return result;
+    }
+
+    public void GetTotalLambdaPosition(out Vector3 result)
+    {
+        Unsafe.SkipInit(out result);
+        fixed (Vector3* resultPtr = &result)
+        {
+            JPH_FixedConstraint_GetTotalLambdaPosition(Handle, resultPtr);
+        }
+    }
+
+    public void GetTotalLambdaRotation(out Vector3 result)
+    {
+        Unsafe.SkipInit(out result);
+        fixed (Vector3* resultPtr = &result)
+        {
+            JPH_FixedConstraint_GetTotalLambdaRotation(Handle, resultPtr);
+        }
+    }
 }

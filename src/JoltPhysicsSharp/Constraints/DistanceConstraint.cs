@@ -6,7 +6,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class DistanceConstraintSettings : TwoBodyConstraintSettings
+public unsafe class DistanceConstraintSettings : TwoBodyConstraintSettings
 {
     internal DistanceConstraintSettings(nint handle)
         : base(handle)
@@ -22,12 +22,13 @@ public class DistanceConstraintSettings : TwoBodyConstraintSettings
     {
         get
         {
-            JPH_DistanceConstraintSettings_GetPoint1(Handle, out Vector3 value);
-            return value;
+            Vector3 result;
+            JPH_DistanceConstraintSettings_GetPoint1(Handle, &result);
+            return result;
         }
         set
         {
-            JPH_DistanceConstraintSettings_SetPoint1(Handle, value);
+            JPH_DistanceConstraintSettings_SetPoint1(Handle, &value);
         }
     }
 
@@ -35,12 +36,13 @@ public class DistanceConstraintSettings : TwoBodyConstraintSettings
     {
         get
         {
-            JPH_DistanceConstraintSettings_GetPoint2(Handle, out Vector3 value);
-            return value;
+            Vector3 result;
+            JPH_DistanceConstraintSettings_GetPoint2(Handle, &result);
+            return result;
         }
         set
         {
-            JPH_DistanceConstraintSettings_SetPoint2(Handle, value);
+            JPH_DistanceConstraintSettings_SetPoint2(Handle, &value);
         }
     }
 
