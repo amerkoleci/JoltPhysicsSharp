@@ -3,9 +3,10 @@
 
 #include "joltc.h"
 
-#ifdef _MSC_VER
-__pragma(warning(push, 0))
-#endif
+#include <Jolt/Core/Core.h>
+
+JPH_SUPPRESS_WARNING_PUSH
+JPH_SUPPRESS_WARNINGS
 
 #include "Jolt/Jolt.h"
 #include "Jolt/RegisterTypes.h"
@@ -54,15 +55,6 @@ __pragma(warning(push, 0))
 #include "Jolt/Physics/Constraints/SixDOFConstraint.h"
 #include "Jolt/Physics/Character/CharacterBase.h"
 #include "Jolt/Physics/Character/CharacterVirtual.h"
-
-#ifdef _MSC_VER
-__pragma(warning(pop))
-#endif
-
-#ifdef _MSC_VER
-#	pragma warning(push)
-#	pragma warning(disable : 5045) // Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
-#endif
 
 #include <iostream>
 #include <cstdarg>
@@ -4199,6 +4191,4 @@ void JPH_CharacterVirtual_RefreshContacts(JPH_CharacterVirtual* character, JPH_O
     );
 }
 
-#ifdef _MSC_VER
-#   pragma warning(pop)
-#endif
+JPH_SUPPRESS_WARNING_POP
