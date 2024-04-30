@@ -78,8 +78,27 @@ public unsafe class ConvexHullShape : ConvexShape
         return JPH_ConvexHullShape_GetNumVerticesInFace(Handle, faceIndex);
     }
 
-    public uint GetNumVerticesInFace(uint faceIndex)
+    /// <summary>
+    /// Get the vertices indices of a face
+    /// </summary>
+    /// <param name="faceIndex">Index of the face.</param>
+    /// <param name="maxVertices">Maximum number of vertices to return.</param>
+    /// <param name="outVertices">
+    /// Array of vertices indices, must be at least maxVertices in size, the vertices are returned in counter clockwise order and the positions can be obtained using <see cref="GetPoint(uint)"/>.
+    /// </param>
+    /// <returns>
+    /// Number of vertices in face, if this is bigger than inMaxVertices, not all vertices were retrieved.
+    /// </returns>
+    public uint GetFaceVertices(uint faceIndex, uint maxVertices, uint* outVertices)
     {
-        return JPH_ConvexHullShape_GetFaceVertices(Handle, faceIndex);
+        return JPH_ConvexHullShape_GetFaceVertices(Handle, faceIndex, maxVertices, outVertices);
+    }
+
+    public uint GetFaceVertices(uint faceIndex, uint maxVertices, ReadOnlySpan<uint> outVertices)
+    {
+        fixed (uint* outVerticesPtr = outVertices)
+        {
+            return JPH_ConvexHullShape_GetFaceVertices(Handle, faceIndex, maxVertices, outVerticesPtr);
+        }
     }
 }
