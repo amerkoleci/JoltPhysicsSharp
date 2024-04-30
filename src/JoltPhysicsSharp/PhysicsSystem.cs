@@ -173,6 +173,8 @@ public sealed class PhysicsSystem : NativeObject
     public BodyLockInterface BodyLockInterface => new(JPH_PhysicsSystem_GetBodyLockInterface(Handle));
     public BodyLockInterface BodyLockInterfaceNoLock => new(JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(Handle));
 
+    public BroadPhaseQuery BroadPhaseQuery => new(JPH_PhysicsSystem_GetBroadPhaseQuery(Handle));
+
     public NarrowPhaseQuery NarrowPhaseQuery => new(JPH_PhysicsSystem_GetNarrowPhaseQuery(Handle));
     public NarrowPhaseQuery NarrowPhaseQueryNoLock => new(JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(Handle));
 

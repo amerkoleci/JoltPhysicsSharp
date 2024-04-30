@@ -19,7 +19,7 @@ public struct RayCastResult
     /// Default values for raycasting.
     /// Required for raycasting successfully, as it expects these values to do it correctly.
     /// </summary>
-    public static RayCastResult Default => new RayCastResult()
+    public static RayCastResult Default => new()
     {
         BodyID = BodyID.Invalid,
         Fraction = 1.0f + CEpsilon,

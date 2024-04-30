@@ -179,9 +179,7 @@ public readonly unsafe struct Body(IntPtr handle) : IEquatable<Body>
 
         Unsafe.SkipInit(out result);
         fixed (Vector3* resultPtr = &result)
-        {
             JPH_Body_GetPosition(Handle, resultPtr);
-        }
     }
 
     public void GetRPosition(out Double3 result)

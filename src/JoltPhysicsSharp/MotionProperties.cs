@@ -23,6 +23,11 @@ public readonly struct MotionProperties(nint handle) : IEquatable<MotionProperti
     /// <inheritdoc/>
     public override int GetHashCode() => Handle.GetHashCode();
 
+    public AllowedDOFs AllowedDOFs
+    {
+        get => JPH_MotionProperties_GetAllowedDOFs(Handle);
+    }
+
     public float LinearDamping
     {
         readonly get => JPH_MotionProperties_GetLinearDamping(Handle);

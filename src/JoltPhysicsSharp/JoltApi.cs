@@ -282,6 +282,22 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_ConvexHullShapeSettings_CreateShape(nint settings);
 
     [LibraryImport(LibName)]
+    public static partial uint JPH_ConvexHullShape_GetNumPoints(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConvexHullShape_GetPoint(nint shape, uint index, Vector3* result);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ConvexHullShape_GetNumFaces(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ConvexHullShape_GetFaceVertices(nint shape, uint faceIndex, uint maxVertices, uint* vertices);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ConvexHullShape_GetNumVerticesInFace(nint shape, uint faceIndex);
+
+    /* ConvexShape */
+    [LibraryImport(LibName)]
     public static partial float JPH_ConvexShapeSettings_GetDensity(nint shape);
 
     [LibraryImport(LibName)]
@@ -1006,11 +1022,11 @@ internal static unsafe partial class JoltApi
     public static extern ulong JPH_BodyInterface_GetUserData(IntPtr handle, uint bodyId);
 
     /* BodyLockInterface */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_PhysicsSystem_GetBodyLockInterface(nint system);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PhysicsSystem_GetBodyLockInterface(nint system);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(nint system);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(nint system);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void JPH_BodyLockInterface_LockRead(nint lockInterface, uint bodyID, out BodyLockRead @lock);
@@ -1025,31 +1041,68 @@ internal static unsafe partial class JoltApi
     public static extern void JPH_BodyLockInterface_UnlockWrite(nint lockInterface, in BodyLockWrite @lock);
 
     /* JPH_MotionProperties */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_MotionProperties_SetLinearDamping(nint properties, float damping);
+    [LibraryImport(LibName)]
+    public static partial AllowedDOFs JPH_MotionProperties_GetAllowedDOFs(nint properties);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern float JPH_MotionProperties_GetLinearDamping(nint properties);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotionProperties_SetLinearDamping(nint properties, float damping);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void JPH_MotionProperties_SetAngularDamping(nint properties, float damping);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotionProperties_GetLinearDamping(nint properties);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern float JPH_MotionProperties_GetAngularDamping(nint properties);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotionProperties_SetAngularDamping(nint properties, float damping);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern float JPH_MotionProperties_GetInverseMassUnchecked(nint properties);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotionProperties_GetAngularDamping(nint properties);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotionProperties_GetInverseMassUnchecked(nint properties);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern float JPH_MotionProperties_SetMassProperties(nint properties, AllowedDOFs allowedDOFs, in MassProperties massProperties);
 
     /* BodyLockInterface */
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_PhysicsSystem_GetNarrowPhaseQuery(nint system);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PhysicsSystem_GetBroadPhaseQuery(nint system);
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(nint system);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PhysicsSystem_GetNarrowPhaseQuery(nint system);
 
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(nint system);
+
+    #region BroadPhaseQuery
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_BroadPhaseQuery_CastRay(nint query,
+        Vector3* origin, Vector3* direction,
+        delegate* unmanaged<void*, BroadPhaseCastResult*, float>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_BroadPhaseQuery_CollideAABox(nint query,
+        BoundingBox* box,
+        delegate* unmanaged<void*, in BodyID, void>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_BroadPhaseQuery_CollideSphere(nint query,
+        Vector3* center, float radius,
+        delegate* unmanaged<void*, in BodyID, void>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_BroadPhaseQuery_CollidePoint(nint query,
+        Vector3* point,
+        delegate* unmanaged<void*, in BodyID, void>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter);
+    #endregion
+
+    #region NarrowPhaseQuery
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay))]
     public static partial Bool32 JPH_NarrowPhaseQuery_CastRay(nint system,
         Vector3* origin, Vector3* direction,
@@ -1066,19 +1119,78 @@ internal static unsafe partial class JoltApi
         IntPtr objectLayerFilter,
         IntPtr bodyFilter);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastShape))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CastShape(nint query,
-        nint shape,
-        Matrix4x4* worldTransform, Vector3* direction, Vector3* baseOffset,
-        /*JPH_AllHit_CastShapeCollector*/ IntPtr hit_collector
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay2))]
+    public static partial Bool32 JPH_NarrowPhaseQuery_CastRay2(nint system,
+        Vector3* origin, Vector3* direction,
+        delegate* unmanaged<void*, RayCastResult*, float>* callback, void* userData,
+        IntPtr broadPhaseLayerFilter,
+        IntPtr objectLayerFilter,
+        IntPtr bodyFilter);
+
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay2))]
+    public static partial Bool32 JPH_NarrowPhaseQuery_CastRay2Double(nint system,
+        Double3* origin, Vector3* direction,
+        delegate* unmanaged<void*, RayCastResult*, float>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter,
+        nint bodyFilter);
+
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollidePoint))]
+    public static partial Bool32 JPH_NarrowPhaseQuery_CollidePoint(nint query,
+        Vector3* point,
+        delegate* unmanaged<void*, CollidePointResult*, float>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter,
+        nint bodyFilter
+        );
+
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollidePoint))]
+    public static partial Bool32 JPH_NarrowPhaseQuery_CollidePointDouble(nint query,
+        Double3* point,
+        delegate* unmanaged<void*, CollidePointResult*, float>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter,
+        nint bodyFilter
+        );
+
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollideShape))]
+    public static partial Bool32 JPH_NarrowPhaseQuery_CollideShape(nint query,
+        nint shape, Vector3* scale, Matrix4x4* centerOfMassTransform, Vector3* baseOffset,
+        delegate* unmanaged<void*, CollideShapeResult*, float>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter,
+        nint bodyFilter
+        );
+
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollideShape))]
+    public static partial Bool32 JPH_NarrowPhaseQuery_CollideShapeDouble(nint query,
+        nint shape, Vector3* scale, RMatrix4x4* centerOfMassTransform, Double3* baseOffset,
+        delegate* unmanaged<void*, CollideShapeResult*, float>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter,
+        nint bodyFilter
         );
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastShape))]
     public static partial Bool32 JPH_NarrowPhaseQuery_CastShape(nint query,
         nint shape,
-        RMatrix4x4* worldTransform, Vector3* direction, Vector3* baseOffset,
-        /*JPH_AllHit_CastShapeCollector*/ IntPtr hit_collector
+        Matrix4x4* centerOfMassTransform, Vector3* direction, Vector3* baseOffset,
+        delegate* unmanaged<void*, ShapeCastResult*, float>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter,
+        nint bodyFilter
         );
+
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastShape))]
+    public static partial Bool32 JPH_NarrowPhaseQuery_CastShapeDouble(nint query,
+        nint shape,
+        RMatrix4x4* centerOfMassTransform, Vector3* direction, Double3* baseOffset,
+        delegate* unmanaged<void*, ShapeCastResult*, float>* callback, void* userData,
+        nint broadPhaseLayerFilter,
+        nint objectLayerFilter,
+        nint bodyFilter
+        );
+    #endregion
 
     /* Body */
     [LibraryImport(LibName)]

@@ -2896,17 +2896,6 @@ JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCre
     return reinterpret_cast<JPH_Body*>(body);
 }
 
-JPH_Body* JPH_BodyInterface_CreateSoftBody(JPH_BodyInterface* interface, JPH_SoftBodyCreationSettings* settings)
-{
-    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
-
-    auto body = joltBodyInterface->CreateSoftBody(
-        *reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings)
-    );
-
-    return reinterpret_cast<JPH_Body*>(body);
-}
-
 JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_BodyCreationSettings* settings)
 {
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
@@ -2977,6 +2966,42 @@ void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID body
 
     auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
     joltBodyInterface->DestroyBody(JPH::BodyID(bodyID));
+}
+
+JPH_Body* JPH_BodyInterface_CreateSoftBody(JPH_BodyInterface* interface, const JPH_SoftBodyCreationSettings* settings)
+{
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	auto joltSettings = reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings);
+
+    JPH::Body* body = joltBodyInterface->CreateSoftBody(*joltSettings);
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_Body* JPH_BodyInterface_CreateSoftBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_SoftBodyCreationSettings* settings)
+{
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	auto joltSettings = reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings);
+
+    JPH::Body* body = joltBodyInterface->CreateSoftBodyWithID(JPH::BodyID(bodyID),*joltSettings);
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_Body* JPH_BodyInterface_CreateSoftBodyWithoutID(JPH_BodyInterface* interface, const JPH_SoftBodyCreationSettings* settings)
+{
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	auto joltSettings = reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings);
+
+    JPH::Body* body = joltBodyInterface->CreateSoftBodyWithoutID(*joltSettings);
+    return reinterpret_cast<JPH_Body*>(body);
+}
+
+JPH_BodyID JPH_BodyInterface_CreateAndAddSoftBody(JPH_BodyInterface* interface, const JPH_SoftBodyCreationSettings* settings, JPH_Activation activationMode)
+{
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+	auto joltSettings = reinterpret_cast<const JPH::SoftBodyCreationSettings*>(settings);
+
+    JPH::BodyID bodyID = joltBodyInterface->CreateAndAddSoftBody(*joltSettings, static_cast<JPH::EActivation>(activationMode));
+    return bodyID.GetIndexAndSequenceNumber();
 }
 
 void JPH_BodyInterface_AddBody(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Activation activationMode)
@@ -3679,7 +3704,7 @@ JPH_Bool32 JPH_NarrowPhaseQuery_CastRay(const JPH_NarrowPhaseQuery* query,
         hit->subShapeID2 = result.mSubShapeID2.GetValue();
     }
 
-    return hadHit;
+    return static_cast<JPH_Bool32>(hadHit);
 }
 
 JPH_Bool32 JPH_NarrowPhaseQuery_CastRay2(const JPH_NarrowPhaseQuery* query,
