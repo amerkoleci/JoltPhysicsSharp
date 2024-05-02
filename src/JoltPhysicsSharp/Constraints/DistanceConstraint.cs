@@ -18,17 +18,22 @@ public unsafe class DistanceConstraintSettings : TwoBodyConstraintSettings
     /// </summary>
     ~DistanceConstraintSettings() => Dispose(disposing: false);
 
+    public ConstraintSpace Space
+    {
+        get => JPH_DistanceConstraintSettings_GetSpace(Handle);
+        set => JPH_DistanceConstraintSettings_SetSpace(Handle, value);
+    }
+
     public Vector3 Point1
     {
         get
         {
-            Vector3 result;
-            JPH_DistanceConstraintSettings_GetPoint1(Handle, &result);
+            JPH_DistanceConstraintSettings_GetPoint1(Handle, out Vector3 result);
             return result;
         }
         set
         {
-            JPH_DistanceConstraintSettings_SetPoint1(Handle, &value);
+            JPH_DistanceConstraintSettings_SetPoint1(Handle, in value);
         }
     }
 
@@ -36,13 +41,12 @@ public unsafe class DistanceConstraintSettings : TwoBodyConstraintSettings
     {
         get
         {
-            Vector3 result;
-            JPH_DistanceConstraintSettings_GetPoint2(Handle, &result);
+            JPH_DistanceConstraintSettings_GetPoint2(Handle, out Vector3 result);
             return result;
         }
         set
         {
-            JPH_DistanceConstraintSettings_SetPoint2(Handle, &value);
+            JPH_DistanceConstraintSettings_SetPoint2(Handle, in value);
         }
     }
 
@@ -52,7 +56,7 @@ public unsafe class DistanceConstraintSettings : TwoBodyConstraintSettings
     }
 }
 
-public class DistanceConstraint : TwoBodyConstraint
+public unsafe class DistanceConstraint : TwoBodyConstraint
 {
     internal DistanceConstraint(nint handle)
         : base(handle)
@@ -63,4 +67,34 @@ public class DistanceConstraint : TwoBodyConstraint
     /// Finalizes an instance of the <see cref="DistanceConstraint" /> class.
     /// </summary>
     ~DistanceConstraint() => Dispose(isDisposing: false);
+
+    public float MinDisptance => JPH_DistanceConstraint_GetMinDistance(Handle);
+    public float MaxDisptance => JPH_DistanceConstraint_GetMaxDistance(Handle);
+
+    public SpringSettings SpringSettings
+    {
+        get
+        {
+            SpringSettings result;
+            JPH_DistanceConstraint_GetLimitsSpringSettings(Handle, &result);
+            return result;
+        }
+        set
+        {
+            JPH_DistanceConstraint_SetLimitsSpringSettings(Handle, &value);
+        }
+    }
+
+    public float TotalLambdaPosition
+    {
+        get
+        {
+            return JPH_DistanceConstraint_GetTotalLambdaPosition(Handle);
+        }
+    }
+
+    public void SetDistance(float minDistance, float maxDistance)
+    {
+        JPH_DistanceConstraint_SetDistance(Handle, minDistance, maxDistance);
+    }
 }

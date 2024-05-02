@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <Description>Cross platform .NET bindings for Jolt Physics engine</Description>
     <PackageTags>physics standard game gamedev jolt</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -10,7 +10,7 @@
 
   <!-- Version -->
   <PropertyGroup>
-    <VersionPrefix>2.4.4</VersionPrefix>
+    <VersionPrefix>2.4.5</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
   </PropertyGroup>
 

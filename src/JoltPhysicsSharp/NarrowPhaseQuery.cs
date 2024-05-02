@@ -72,7 +72,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     public unsafe bool CastRay(
         in Vector3 origin,
         in Vector3 direction,
-        delegate* unmanaged<void*, RayCastResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, RayCastResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default,
         BodyFilter? bodyFilter = default)
@@ -95,7 +95,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     public unsafe bool CastRay(
         in Double3 origin,
         in Vector3 direction,
-        delegate* unmanaged<void*, RayCastResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, RayCastResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default,
         BodyFilter? bodyFilter = default)
@@ -119,7 +119,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     #region CollidePoint
     public unsafe bool CollidePoint(
         in Vector3 point,
-        delegate* unmanaged<void*, CollidePointResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, CollidePointResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default,
         BodyFilter? bodyFilter = default)
@@ -141,7 +141,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
 
     public unsafe bool CollidePoint(
         in Double3 point,
-        delegate* unmanaged<void*, CollidePointResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, CollidePointResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default,
         BodyFilter? bodyFilter = default)
@@ -165,7 +165,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     #region CollideShape
     public unsafe bool CollideShape(Shape shape, 
         in Vector3 scale, in Matrix4x4 centerOfMassTransform, in Vector3 baseOffset,
-        delegate* unmanaged<void*, CollideShapeResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, CollideShapeResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default,
         BodyFilter? bodyFilter = default)
@@ -189,7 +189,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
 
     public unsafe bool CollideShape(Shape shape,
         in Vector3 scale, in RMatrix4x4 centerOfMassTransform, in Double3 baseOffset,
-        delegate* unmanaged<void*, CollideShapeResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, CollideShapeResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default,
         BodyFilter? bodyFilter = default)
@@ -215,7 +215,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     #region CastShape
     public unsafe bool CastShape(Shape shape,
         in Matrix4x4 centerOfMassTransform, in Vector3 direction, in Vector3 baseOffset,
-        delegate* unmanaged<void*, ShapeCastResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, ShapeCastResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default,
         BodyFilter? bodyFilter = default)
@@ -239,7 +239,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
 
     public unsafe bool CastShape(Shape shape,
         in RMatrix4x4 centerOfMassTransform, in Vector3 direction, in Double3 baseOffset,
-        delegate* unmanaged<void*, ShapeCastResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, ShapeCastResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default,
         BodyFilter? bodyFilter = default)

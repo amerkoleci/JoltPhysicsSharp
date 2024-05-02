@@ -29,7 +29,7 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     public unsafe bool CastRay(
         in Vector3 origin,
         in Vector3 direction,
-        delegate* unmanaged<void*, BroadPhaseCastResult*, float>* callback, void* userData,
+        delegate* unmanaged<void*, BroadPhaseCastResult*, float> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
@@ -64,7 +64,7 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
 
     public unsafe bool CollideSphere(
         in Vector3 center, float radius,
-        delegate* unmanaged<void*, in BodyID, void>* callback, void* userData,
+        delegate* unmanaged<void*, in BodyID, void> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
@@ -81,7 +81,7 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
 
     public unsafe bool CollidePoint(
         in Vector3 point,
-        delegate* unmanaged<void*, in BodyID, void>* callback, void* userData,
+        delegate* unmanaged<void*, in BodyID, void> callback, void* userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {

@@ -1,6 +1,7 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
@@ -35,5 +36,29 @@ public static class Foundation
 
     public static void Shutdown() => JPH_Shutdown();
 
-    public static void SetAssertFailureHandler(AssertFailedDelegate impl) => JPH_SetAssertFailureHandler(impl);
+    private static AssertFailedDelegate? s_assertCallback;
+
+    public static unsafe void SetAssertFailureHandler(AssertFailedDelegate callback)
+    {
+        s_assertCallback = callback;
+
+        JPH_SetAssertFailureHandler(callback != null ? &OnNativeAssertCallback : null);
+    }
+
+    public delegate bool AssertFailedDelegate(string expression, string message, string file, uint line);
+
+    [UnmanagedCallersOnly]
+    private static unsafe Bool32 OnNativeAssertCallback(sbyte* expressionPtr, sbyte* messagePtr, sbyte* filePtr, uint line)
+    {
+        string expression = new (expressionPtr);
+        string message = new(messagePtr);
+        string file = new(filePtr);
+
+        if (s_assertCallback != null)
+        {
+            return s_assertCallback(expression, message, file, line);
+        }
+
+        return Bool32.True;
+    }
 }
