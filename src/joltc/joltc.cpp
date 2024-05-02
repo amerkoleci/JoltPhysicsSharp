@@ -269,6 +269,15 @@ static inline JPH::MotorSettings ToJolt(const JPH_MotorSettings* settings)
     return result;
 }
 
+void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(JPH_MassProperties* properties, JPH_Matrix4x4* rotation, JPH_Vec3* diagonal)
+{
+	JPH::Mat44 joltRotation;
+	JPH::Vec3 joltDiagonal;
+	reinterpret_cast<JPH::MassProperties*>(properties)->DecomposePrincipalMomentsOfInertia(joltRotation, joltDiagonal);
+	FromJolt(joltRotation, rotation);
+	FromJolt(joltDiagonal, diagonal);
+}
+
 void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
 {
     reinterpret_cast<JPH::MassProperties*>(properties)->ScaleToMass(mass);

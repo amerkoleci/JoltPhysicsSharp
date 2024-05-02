@@ -1066,6 +1066,7 @@ JPH_CAPI void JPH_MotionProperties_SetInverseInertia(JPH_MotionProperties* prope
 //--------------------------------------------------------------------------------------------------
 // JPH_MassProperties
 //--------------------------------------------------------------------------------------------------
+JPH_CAPI void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(JPH_MassProperties* properties, JPH_Matrix4x4* rotation, JPH_Vec3* diagonal);
 JPH_CAPI void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass);
 
 //--------------------------------------------------------------------------------------------------
