@@ -1,17 +1,3 @@
-include(FetchContent)
-FetchContent_Declare(
-        JoltPhysics
-        GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics"
-        GIT_TAG "6b7681d920bb9b8649e4daed67f63849396daa9e"
-		SOURCE_SUBDIR "Build"
-)
-FetchContent_MakeAvailable(JoltPhysics)
-
-if (XCODE)
-	# Ensure that we enable SSE4.2 for the x86_64 build, XCode builds multiple architectures
-	set_property(TARGET Jolt PROPERTY XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=x86_64] "$(inherited) -msse4.2 -mpopcnt")
-endif()
-
 # Define target name
 if (DOUBLE_PRECISION)
     set (TARGET_NAME joltc_double)
