@@ -269,6 +269,15 @@ static inline JPH::MotorSettings ToJolt(const JPH_MotorSettings* settings)
     return result;
 }
 
+void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(JPH_MassProperties* properties, JPH_Matrix4x4* rotation, JPH_Vec3* diagonal)
+{
+	JPH::Mat44 joltRotation;
+	JPH::Vec3 joltDiagonal;
+	reinterpret_cast<JPH::MassProperties*>(properties)->DecomposePrincipalMomentsOfInertia(joltRotation, joltDiagonal);
+	FromJolt(joltRotation, rotation);
+	FromJolt(joltDiagonal, diagonal);
+}
+
 void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
 {
     reinterpret_cast<JPH::MassProperties*>(properties)->ScaleToMass(mass);
@@ -2709,16 +2718,36 @@ float JPH_MotionProperties_GetAngularDamping(const JPH_MotionProperties* propert
     return reinterpret_cast<const JPH::MotionProperties*>(properties)->GetAngularDamping();
 }
 
-float JPH_MotionProperties_GetInverseMassUnchecked(JPH_MotionProperties* properties)
-{
-    return reinterpret_cast<JPH::MotionProperties*>(properties)->GetInverseMassUnchecked();
-}
-
 void JPH_MotionProperties_SetMassProperties(JPH_MotionProperties* properties, JPH_AllowedDOFs allowedDOFs, const JPH_MassProperties* massProperties)
 {
     reinterpret_cast<JPH::MotionProperties*>(properties)->SetMassProperties(
         static_cast<EAllowedDOFs>(allowedDOFs),
         ToJolt(massProperties));
+}
+
+float JPH_MotionProperties_GetInverseMassUnchecked(JPH_MotionProperties* properties)
+{
+    return reinterpret_cast<JPH::MotionProperties*>(properties)->GetInverseMassUnchecked();
+}
+
+void JPH_MotionProperties_SetInverseMass(JPH_MotionProperties* properties, float inverseMass)
+{
+    reinterpret_cast<JPH::MotionProperties*>(properties)->SetInverseMass(inverseMass);
+}
+
+void JPH_MotionProperties_GetInverseInertiaDiagonal(JPH_MotionProperties* properties, JPH_Vec3* result)
+{
+    FromJolt(reinterpret_cast<JPH::MotionProperties*>(properties)->GetInverseInertiaDiagonal(), result);
+}
+
+void JPH_MotionProperties_GetInertiaRotation(JPH_MotionProperties* properties, JPH_Quat* result)
+{
+    FromJolt(reinterpret_cast<JPH::MotionProperties*>(properties)->GetInertiaRotation(), result);
+}
+
+void JPH_MotionProperties_SetInverseInertia(JPH_MotionProperties* properties, JPH_Vec3* diagonal, JPH_Quat* rot)
+{
+    reinterpret_cast<JPH::MotionProperties*>(properties)->SetInverseInertia(ToJolt(diagonal), ToJolt(rot));
 }
 
 const JPH_BroadPhaseQuery* JPH_PhysicsSystem_GetBroadPhaseQuery(const JPH_PhysicsSystem* system)
