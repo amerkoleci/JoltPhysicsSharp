@@ -273,14 +273,16 @@ void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(JPH_MassProperties* p
 {
 	JPH::Mat44 joltRotation;
 	JPH::Vec3 joltDiagonal;
-	reinterpret_cast<JPH::MassProperties*>(properties)->DecomposePrincipalMomentsOfInertia(joltRotation, joltDiagonal);
+	JPH::MassProperties joltProperties = ToJolt(properties);
+	joltProperties.DecomposePrincipalMomentsOfInertia(joltRotation, joltDiagonal);
 	FromJolt(joltRotation, rotation);
 	FromJolt(joltDiagonal, diagonal);
 }
 
 void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
 {
-    reinterpret_cast<JPH::MassProperties*>(properties)->ScaleToMass(mass);
+	JPH::MassProperties joltProperties = ToJolt(properties);
+    joltProperties.ScaleToMass(mass);
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
@@ -1843,6 +1845,23 @@ JPH_DistanceConstraintSettings* JPH_DistanceConstraintSettings_Create(void)
 
     return reinterpret_cast<JPH_DistanceConstraintSettings*>(settings);
 }
+
+JPH_ConstraintSpace JPH_DistanceConstraintSettings_GetSpace(JPH_DistanceConstraintSettings* settings)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::DistanceConstraintSettings*>(settings);
+
+    return static_cast<JPH_ConstraintSpace>(joltSettings->mSpace);
+}
+
+void JPH_DistanceConstraintSettings_SetSpace(JPH_DistanceConstraintSettings* settings, JPH_ConstraintSpace space)
+{
+	JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::DistanceConstraintSettings*>(settings);
+
+    joltSettings->mSpace = static_cast<JPH::EConstraintSpace>(space);
+}
+
 
 void JPH_DistanceConstraintSettings_GetPoint1(JPH_DistanceConstraintSettings* settings, JPH_RVec3* result)
 {
