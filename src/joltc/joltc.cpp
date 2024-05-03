@@ -4397,12 +4397,12 @@ void JPH_ContactSettings_SetInvInertiaScale2(JPH_ContactSettings* settings, floa
 
 JPH_Bool32 JPH_ContactSettings_GetIsSensor(JPH_ContactSettings* settings)
 {
-	return reinterpret_cast<JPH::ContactSettings*>(settings)->mIsSensor;
+	return static_cast<JPH_Bool32>(reinterpret_cast<JPH::ContactSettings*>(settings)->mIsSensor);
 }
 
 void JPH_ContactSettings_SetIsSensor(JPH_ContactSettings* settings, JPH_Bool32 sensor)
 {
-	reinterpret_cast<JPH::ContactSettings*>(settings)->mIsSensor = sensor;
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mIsSensor = static_cast<bool>(sensor);
 }
 
 void JPH_ContactSettings_GetRelativeLinearSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* result)
