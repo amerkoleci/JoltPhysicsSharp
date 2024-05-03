@@ -456,6 +456,8 @@ typedef struct JPH_ShapeCastSettings            JPH_ShapeCastSettings;
 
 typedef struct JPH_CollideShapeResult           JPH_CollideShapeResult;
 typedef struct JPH_ContactListener              JPH_ContactListener;
+typedef struct JPH_ContactManifold              JPH_ContactManifold;
+typedef struct JPH_ContactSettings              JPH_ContactSettings;
 
 typedef struct JPH_BodyActivationListener       JPH_BodyActivationListener;
 
@@ -1235,11 +1237,15 @@ typedef struct JPH_ContactListener_Procs {
 
     void(JPH_API_CALL* OnContactAdded)(void* userData,
         const JPH_Body* body1,
-        const JPH_Body* body2);
+        const JPH_Body* body2,
+        const JPH_ContactManifold* manifold,
+        JPH_ContactSettings* settings);
 
     void(JPH_API_CALL* OnContactPersisted)(void* userData,
         const JPH_Body* body1,
-        const JPH_Body* body2);
+        const JPH_Body* body2,
+        const JPH_ContactManifold* manifold,
+        JPH_ContactSettings* settings);
 
     void(JPH_API_CALL* OnContactRemoved)(void* userData,
         const JPH_SubShapeIDPair* subShapePair
@@ -1259,6 +1265,35 @@ typedef struct JPH_BodyActivationListener_Procs {
 JPH_CAPI void JPH_BodyActivationListener_SetProcs(JPH_BodyActivationListener* listener, JPH_BodyActivationListener_Procs procs, void* userData);
 JPH_CAPI JPH_BodyActivationListener* JPH_BodyActivationListener_Create(void);
 JPH_CAPI void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener);
+
+/* ContactManifold */
+JPH_CAPI void JPH_ContactManifold_GetWorldSpaceNormal(const JPH_ContactManifold* manifold, JPH_Vec3* result);
+JPH_CAPI float JPH_ContactManifold_GetPenetrationDepth(const JPH_ContactManifold* manifold);
+JPH_CAPI JPH_SubShapeID JPH_ContactManifold_GetSubShapeID1(const JPH_ContactManifold* manifold);
+JPH_CAPI JPH_SubShapeID JPH_ContactManifold_GetSubShapeID2(const JPH_ContactManifold* manifold);
+JPH_CAPI uint32_t JPH_ContactManifold_GetPointCount(const JPH_ContactManifold* manifold);
+JPH_CAPI void JPH_ContactManifold_GetWorldSpaceContactPointOn1(const JPH_ContactManifold* manifold, uint32_t index, JPH_RVec3* result);
+JPH_CAPI void JPH_ContactManifold_GetWorldSpaceContactPointOn2(const JPH_ContactManifold* manifold, uint32_t index, JPH_RVec3* result);
+
+/* ContactSettings */
+JPH_CAPI float JPH_ContactSettings_GetFriction(JPH_ContactSettings* settings);
+JPH_CAPI void JPH_ContactSettings_SetFriction(JPH_ContactSettings* settings, float friction);
+JPH_CAPI float JPH_ContactSettings_GetRestitution(JPH_ContactSettings* settings);
+JPH_CAPI void JPH_ContactSettings_SetRestitution(JPH_ContactSettings* settings, float restitution);
+JPH_CAPI float JPH_ContactSettings_GetInvMassScale1(JPH_ContactSettings* settings);
+JPH_CAPI void JPH_ContactSettings_SetInvMassScale1(JPH_ContactSettings* settings, float scale);
+JPH_CAPI float JPH_ContactSettings_GetInvInertiaScale1(JPH_ContactSettings* settings);
+JPH_CAPI void JPH_ContactSettings_SetInvInertiaScale1(JPH_ContactSettings* settings, float scale);
+JPH_CAPI float JPH_ContactSettings_GetInvMassScale2(JPH_ContactSettings* settings);
+JPH_CAPI void JPH_ContactSettings_SetInvMassScale2(JPH_ContactSettings* settings, float scale);
+JPH_CAPI float JPH_ContactSettings_GetInvInertiaScale2(JPH_ContactSettings* settings);
+JPH_CAPI void JPH_ContactSettings_SetInvInertiaScale2(JPH_ContactSettings* settings, float scale);
+JPH_CAPI JPH_Bool32 JPH_ContactSettings_GetIsSensor(JPH_ContactSettings* settings);
+JPH_CAPI void JPH_ContactSettings_SetIsSensor(JPH_ContactSettings* settings, JPH_Bool32 sensor);
+JPH_CAPI void JPH_ContactSettings_GetRelativeLinearSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* result);
+JPH_CAPI void JPH_ContactSettings_SetRelativeLinearSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* velocity);
+JPH_CAPI void JPH_ContactSettings_GetRelativeAngularSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* result);
+JPH_CAPI void JPH_ContactSettings_SetRelativeAngularSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* velocity);
 
 /* CharacterBaseSettings */
 JPH_CAPI void JPH_CharacterBaseSettings_Destroy(JPH_CharacterBaseSettings* settings);
