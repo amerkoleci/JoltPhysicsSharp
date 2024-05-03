@@ -4185,7 +4185,9 @@ public:
             procs.OnContactAdded(
                 userData,
                 reinterpret_cast<const JPH_Body*>(&inBody1),
-                reinterpret_cast<const JPH_Body*>(&inBody2)
+                reinterpret_cast<const JPH_Body*>(&inBody2),
+                reinterpret_cast<const JPH_ContactManifold*>(&inManifold),
+                reinterpret_cast<JPH_ContactSettings*>(&ioSettings)
             );
         }
     }
@@ -4200,7 +4202,9 @@ public:
             procs.OnContactPersisted(
                 userData,
                 reinterpret_cast<const JPH_Body*>(&inBody1),
-                reinterpret_cast<const JPH_Body*>(&inBody2)
+                reinterpret_cast<const JPH_Body*>(&inBody2),
+                reinterpret_cast<const JPH_ContactManifold*>(&inManifold),
+                reinterpret_cast<JPH_ContactSettings*>(&ioSettings)
             );
         }
     }
@@ -4292,6 +4296,133 @@ void JPH_BodyActivationListener_Destroy(JPH_BodyActivationListener* listener)
     {
         delete reinterpret_cast<ManagedBodyActivationListener*>(listener);
     }
+}
+
+/* ContactManifold */
+void JPH_ContactManifold_GetWorldSpaceNormal(const JPH_ContactManifold* manifold, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->mWorldSpaceNormal, result);
+}
+
+float JPH_ContactManifold_GetPenetrationDepth(const JPH_ContactManifold* manifold)
+{
+	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mPenetrationDepth;
+}
+
+JPH_SubShapeID JPH_ContactManifold_GetSubShapeID1(const JPH_ContactManifold* manifold)
+{
+	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mSubShapeID1.GetValue();
+}
+
+JPH_SubShapeID JPH_ContactManifold_GetSubShapeID2(const JPH_ContactManifold* manifold)
+{
+	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mSubShapeID2.GetValue();
+}
+
+uint32_t JPH_ContactManifold_GetPointCount(const JPH_ContactManifold* manifold)
+{
+	return reinterpret_cast<const JPH::ContactManifold*>(manifold)->mRelativeContactPointsOn1.size();
+}
+
+void JPH_ContactManifold_GetWorldSpaceContactPointOn1(const JPH_ContactManifold* manifold, uint32_t index, JPH_RVec3* result)
+{
+	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->GetWorldSpaceContactPointOn1(index), result);
+}
+
+void JPH_ContactManifold_GetWorldSpaceContactPointOn2(const JPH_ContactManifold* manifold, uint32_t index, JPH_RVec3* result)
+{
+	FromJolt(reinterpret_cast<const JPH::ContactManifold*>(manifold)->GetWorldSpaceContactPointOn2(index), result);
+}
+
+/* ContactSettings */
+float JPH_ContactSettings_GetFriction(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mCombinedFriction;
+}
+
+void JPH_ContactSettings_SetFriction(JPH_ContactSettings* settings, float friction)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mCombinedFriction = friction;
+}
+
+float JPH_ContactSettings_GetRestitution(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mCombinedRestitution;
+}
+
+void JPH_ContactSettings_SetRestitution(JPH_ContactSettings* settings, float restitution)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mCombinedRestitution = restitution;
+}
+
+float JPH_ContactSettings_GetInvMassScale1(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mInvMassScale1;
+}
+
+void JPH_ContactSettings_SetInvMassScale1(JPH_ContactSettings* settings, float scale)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mInvMassScale1 = scale;
+}
+
+float JPH_ContactSettings_GetInvInertiaScale1(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mInvInertiaScale1;
+}
+
+void JPH_ContactSettings_SetInvInertiaScale1(JPH_ContactSettings* settings, float scale)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mInvInertiaScale1 = scale;
+}
+
+float JPH_ContactSettings_GetInvMassScale2(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mInvMassScale2;
+}
+
+void JPH_ContactSettings_SetInvMassScale2(JPH_ContactSettings* settings, float scale)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mInvMassScale2 = scale;
+}
+
+float JPH_ContactSettings_GetInvInertiaScale2(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mInvInertiaScale2;
+}
+
+void JPH_ContactSettings_SetInvInertiaScale2(JPH_ContactSettings* settings, float scale)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mInvInertiaScale2 = scale;
+}
+
+JPH_Bool32 JPH_ContactSettings_GetIsSensor(JPH_ContactSettings* settings)
+{
+	return reinterpret_cast<JPH::ContactSettings*>(settings)->mIsSensor;
+}
+
+void JPH_ContactSettings_SetIsSensor(JPH_ContactSettings* settings, JPH_Bool32 sensor)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mIsSensor = sensor;
+}
+
+void JPH_ContactSettings_GetRelativeLinearSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<JPH::ContactSettings*>(settings)->mRelativeLinearSurfaceVelocity, result);
+}
+
+void JPH_ContactSettings_SetRelativeLinearSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* velocity)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mRelativeLinearSurfaceVelocity = ToJolt(velocity);
+}
+
+void JPH_ContactSettings_GetRelativeAngularSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<JPH::ContactSettings*>(settings)->mRelativeAngularSurfaceVelocity, result);
+}
+
+void JPH_ContactSettings_SetRelativeAngularSurfaceVelocity(JPH_ContactSettings* settings, JPH_Vec3* velocity)
+{
+	reinterpret_cast<JPH::ContactSettings*>(settings)->mRelativeAngularSurfaceVelocity = ToJolt(velocity);
 }
 
 /* CharacterBaseSettings */
