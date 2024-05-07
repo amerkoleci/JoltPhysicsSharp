@@ -1231,21 +1231,21 @@ void JPH_MutableCompoundShape_AdjustCenterOfMass(JPH_MutableCompoundShape* shape
 }
 
 /* RotatedTranslatedShape */
-JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_ShapeSettings* shapeSettings)
+JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_ShapeSettings* shapeSettings)
 {
-    auto jolt_settings = reinterpret_cast<JPH::ShapeSettings*>(shapeSettings);
+    auto joltSettings = reinterpret_cast<const JPH::ShapeSettings*>(shapeSettings);
 
-    auto settings = new JPH::RotatedTranslatedShapeSettings(ToJolt(position), ToJolt(rotation), jolt_settings);
+    auto settings = new JPH::RotatedTranslatedShapeSettings(ToJolt(position), ToJolt(rotation), joltSettings);
     settings->AddRef();
 
     return reinterpret_cast<JPH_RotatedTranslatedShapeSettings*>(settings);
 }
 
-JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create2(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_Shape* shape)
+JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create2(const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape)
 {
-    auto jolt_shape = reinterpret_cast<JPH::Shape*>(shape);
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
 
-    auto settings = new JPH::RotatedTranslatedShapeSettings(ToJolt(position), ToJolt(rotation), jolt_shape);
+    auto settings = new JPH::RotatedTranslatedShapeSettings(ToJolt(position), ToJolt(rotation), joltShape);
     settings->AddRef();
 
     return reinterpret_cast<JPH_RotatedTranslatedShapeSettings*>(settings);
@@ -1262,9 +1262,9 @@ JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShapeSettings_CreateShape(const
     return reinterpret_cast<JPH_RotatedTranslatedShape*>(shape);
 }
 
-JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH_Vec3* position, const JPH_Quat* rotation, JPH_Shape* shape)
+JPH_RotatedTranslatedShape* JPH_RotatedTranslatedShape_Create(const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* shape)
 {
-    auto jolt_shape = reinterpret_cast<JPH::Shape*>(shape);
+    auto jolt_shape = reinterpret_cast<const JPH::Shape*>(shape);
 
     auto rotatedTranslatedShape = new JPH::RotatedTranslatedShape(ToJolt(position), ToJolt(rotation), jolt_shape);
     rotatedTranslatedShape->AddRef();
@@ -1286,6 +1286,27 @@ void JPH_RotatedTranslatedShape_GetRotation(const JPH_RotatedTranslatedShape* sh
 	auto joltShape = reinterpret_cast<const JPH::RotatedTranslatedShape*>(shape);
 	JPH::Quat joltQuat = joltShape->GetRotation();
 	FromJolt(joltQuat, rotation);
+}
+
+/* JPH_OffsetCenterOfMassShape */
+JPH_OffsetCenterOfMassShapeSettings* JPH_OffsetCenterOfMassShapeSettings_Create(const JPH_Vec3* offset, const JPH_ShapeSettings* shapeSettings)
+{
+	auto joltSettings = reinterpret_cast<const JPH::ShapeSettings*>(shapeSettings);
+
+    auto settings = new JPH::OffsetCenterOfMassShapeSettings(ToJolt(offset), joltSettings);
+    settings->AddRef();
+
+    return reinterpret_cast<JPH_OffsetCenterOfMassShapeSettings*>(settings);
+}
+
+JPH_OffsetCenterOfMassShapeSettings* JPH_OffsetCenterOfMassShapeSettings_Create2(const JPH_Vec3* offset, const JPH_Shape* shape)
+{
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+
+    auto rotatedTranslatedShape = new JPH::OffsetCenterOfMassShapeSettings(ToJolt(offset), joltShape);
+    rotatedTranslatedShape->AddRef();
+
+    return reinterpret_cast<JPH_OffsetCenterOfMassShapeSettings*>(rotatedTranslatedShape);
 }
 
 JPH_OffsetCenterOfMassShape* JPH_OffsetCenterOfMassShape_Create(JPH_Vec3* offset, JPH_Shape* shape)
