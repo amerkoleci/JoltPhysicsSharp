@@ -367,6 +367,22 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial nint JPH_RotatedTranslatedShape_GetRotation(nint shape, Quaternion* rotation);
 
+    /* JPH_OffsetCenterOfMassShape */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_OffsetCenterOfMassShapeSettings_Create(in Vector3 offset, nint shapeSettings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_OffsetCenterOfMassShapeSettings_Create2(in Vector3 offset, nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_OffsetCenterOfMassShapeSettings_CreateShape(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_OffsetCenterOfMassShape_Create(in Vector3 offset, nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_OffsetCenterOfMassShape_GetOffset(nint handle, out Vector3 offset);
+
     /* Shape */
     [LibraryImport(LibName)]
     public static partial void JPH_Shape_Destroy(nint shape);
@@ -753,6 +769,42 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_SixDOFConstraint_GetLimitsMax(nint handle, uint axis);
     #endregion
 
+    #region JPH_ConeConstraint
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ConeConstraintSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_GetPoint1(nint settings, Vector3* result); // RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_SetPoint1(nint settings, Vector3* value); // RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_GetPoint2(nint settings, Vector3* result); // RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_SetPoint2(nint settings, Vector3* value); // RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_SetTwistAxis1(nint settings, Vector3* value);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_GetTwistAxis1(nint settings, Vector3* result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_SetTwistAxis2(nint settings, Vector3* value);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_GetTwistAxis2(nint settings, Vector3* result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_SetHalfConeAngle(nint settings, float halfConeAngle);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ConeConstraintSettings_GetHalfConeAngle(nint settings);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ConeConstraintSettings_CreateConstraint(nint settings, nint body1, nint body2);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraint_SetHalfConeAngle(nint constraint, float halfConeAngle);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ConeConstraint_GetCosHalfConeAngle(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraint_GetTotalLambdaPosition(nint constraint, Vector3* result);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ConeConstraint_GetTotalLambdaRotation(nint constraint);
+    #endregion
+
     /* PhysicsSystem */
     [StructLayout(LayoutKind.Sequential)]
     public struct NativePhysicsSystemSettings
@@ -771,6 +823,12 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_Destroy(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_GetPhysicsSettings(nint handle, PhysicsSettings* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_SetPhysicsSettings(nint handle, PhysicsSettings* result);
 
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_OptimizeBroadPhase(nint handle);
@@ -1082,7 +1140,19 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_MotionProperties_GetInverseMassUnchecked(nint properties);
 
     [LibraryImport(LibName)]
-    public static partial float JPH_MotionProperties_SetMassProperties(nint properties, AllowedDOFs allowedDOFs, in MassProperties massProperties);
+    public static partial float JPH_MotionProperties_SetMassProperties(nint properties, AllowedDOFs allowedDOFs, MassProperties* massProperties);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotionProperties_SetInverseMass(nint properties, float inverseMass);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotionProperties_GetInverseInertiaDiagonal(nint properties, Vector3* result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotionProperties_GetInertiaRotation(nint properties, Quaternion* result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotionProperties_SetInverseInertia(nint properties, Vector3* diagonal, Quaternion* rot);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(MassProperties* properties, Matrix4x4* rotation, Vector3* diagonal);
 
     /* BodyLockInterface */
     [LibraryImport(LibName)]
@@ -1378,16 +1448,16 @@ internal static unsafe partial class JoltApi
     public struct JPH_ContactListener_Procs
     {
         public delegate* unmanaged<nint, nint, nint, Vector3*, nint, uint> OnContactValidate;
-        public delegate* unmanaged<nint, nint, nint, void> OnContactAdded;
-        public delegate* unmanaged<nint, nint, nint, void> OnContactPersisted;
+        public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactAdded;
+        public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactPersisted;
         public delegate* unmanaged<nint, SubShapeIDPair*, void> OnContactRemoved;
     }
 
     public struct JPH_ContactListener_ProcsDouble
     {
         public delegate* unmanaged<nint, nint, nint, Double3*, nint, uint> OnContactValidate;
-        public delegate* unmanaged<nint, nint, nint, void> OnContactAdded;
-        public delegate* unmanaged<nint, nint, nint, void> OnContactPersisted;
+        public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactAdded;
+        public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactPersisted;
         public delegate* unmanaged<nint, SubShapeIDPair*, void> OnContactRemoved;
     }
 
@@ -1418,6 +1488,62 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyActivationListener_Destroy(nint handle);
+
+    /* ContactManifold */
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactManifold_GetWorldSpaceNormal(nint manifold, out Vector3 result);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_ContactManifold_GetPenetrationDepth(nint manifold);
+    [LibraryImport(LibName)]
+    public static partial SubShapeID JPH_ContactManifold_GetSubShapeID1(nint manifold);
+    [LibraryImport(LibName)]
+    public static partial SubShapeID JPH_ContactManifold_GetSubShapeID2(nint manifold);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_ContactManifold_GetPointCount(nint manifold);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactManifold_GetWorldSpaceContactPointOn1(nint manifold, uint index, Vector3* result); // JPH_RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactManifold_GetWorldSpaceContactPointOn2(nint manifold, uint index, Vector3* result); // JPH_RVec3
+
+    /* ContactSettings */
+    [LibraryImport(LibName)]
+    public static partial float JPH_ContactSettings_GetFriction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetFriction(nint settings, float friction);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ContactSettings_GetRestitution(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetRestitution(nint settings, float restitution);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ContactSettings_GetInvMassScale1(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetInvMassScale1(nint settings, float scale);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ContactSettings_GetInvInertiaScale1(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetInvInertiaScale1(nint settings, float scale);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ContactSettings_GetInvMassScale2(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetInvMassScale2(nint settings, float scale);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ContactSettings_GetInvInertiaScale2(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetInvInertiaScale2(nint settings, float scale);
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_ContactSettings_GetIsSensor(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetIsSensor(nint settings, Bool32 sensor);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_GetRelativeLinearSurfaceVelocity(nint settings, Vector3* result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetRelativeLinearSurfaceVelocity(nint settings, Vector3* velocity);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_GetRelativeAngularSurfaceVelocity(nint settings, Vector3* result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ContactSettings_SetRelativeAngularSurfaceVelocity(nint settings, Vector3* velocity);
+
 
     /* CharacterBaseSettings */
     [LibraryImport(LibName)]

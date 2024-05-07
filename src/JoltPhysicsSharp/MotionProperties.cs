@@ -1,11 +1,12 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Numerics;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public readonly struct MotionProperties(nint handle) : IEquatable<MotionProperties>
+public readonly unsafe struct MotionProperties(nint handle) : IEquatable<MotionProperties>
 {
     public nint Handle { get; } = handle; public bool IsNull => Handle == 0;
     public bool IsNotNull => Handle != 0;
@@ -45,8 +46,42 @@ public readonly struct MotionProperties(nint handle) : IEquatable<MotionProperti
         get => JPH_MotionProperties_GetInverseMassUnchecked(Handle);
     }
 
+    public Vector3 InverseInertiaDiagonal
+    {
+        get
+        {
+            Vector3 result;
+            JPH_MotionProperties_GetInverseInertiaDiagonal(Handle, &result);
+            return result;
+        }
+    }
+
+    public Quaternion InertiaRotation
+    {
+        get
+        {
+            Quaternion result;
+            JPH_MotionProperties_GetInertiaRotation(Handle, &result);
+            return result;
+        }
+    }
+
     public void SetMassProperties(AllowedDOFs allowedDOFs, in MassProperties massProperties)
     {
-        //JPH_MotionProperties_SetMassProperties(Handle, allowedDOFs, massProperties.Handle);
+        fixed (MassProperties* massPropertiesPtr = &massProperties)
+            JPH_MotionProperties_SetMassProperties(Handle, allowedDOFs, massPropertiesPtr);
     }
+
+    public void SetInverseMass(float inverseMass)
+    {
+        JPH_MotionProperties_SetInverseMass(Handle, inverseMass);
+    }
+
+    public void SetInverseInertia(in Vector3 diagonal, in Quaternion rotation)
+    {
+        fixed (Vector3* diagonalPtr = &diagonal)
+        fixed (Quaternion* rotationPtr = &rotation)
+            JPH_MotionProperties_SetInverseInertia(Handle, diagonalPtr, rotationPtr);
+    }
+
 }

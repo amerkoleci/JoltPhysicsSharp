@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
@@ -87,5 +88,15 @@ public struct MassProperties : IEquatable<MassProperties>
             // Just set the mass
             Mass = mass;
         }
+    }
+
+    public unsafe void DecomposePrincipalMomentsOfInertia(out Matrix4x4 rotation, out Vector3 diagonal)
+    {
+        Unsafe.SkipInit(out rotation);
+
+        fixed (MassProperties* thisPtr = &this)
+        fixed (Matrix4x4* rotationPtr = &rotation)
+        fixed (Vector3* diagonalPtr = &diagonal)
+            JPH_MassProperties_DecomposePrincipalMomentsOfInertia(thisPtr, rotationPtr, diagonalPtr);
     }
 }

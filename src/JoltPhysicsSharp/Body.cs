@@ -7,15 +7,15 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public readonly unsafe struct Body(IntPtr handle) : IEquatable<Body>
+public readonly unsafe struct Body(nint handle) : IEquatable<Body>
 {
-    public IntPtr Handle { get; } = handle; public bool IsNull => Handle == IntPtr.Zero;
-    public static Body Null => new(IntPtr.Zero);
-    public static implicit operator Body(IntPtr handle) => new(handle);
+    public nint Handle { get; } = handle; public bool IsNull => Handle == 0;
+    public static Body Null => new(0);
+    public static implicit operator Body(nint handle) => new(handle);
     public static bool operator ==(Body left, Body right) => left.Handle == right.Handle;
     public static bool operator !=(Body left, Body right) => left.Handle != right.Handle;
-    public static bool operator ==(Body left, IntPtr right) => left.Handle == right;
-    public static bool operator !=(Body left, IntPtr right) => left.Handle != right;
+    public static bool operator ==(Body left, nint right) => left.Handle == right;
+    public static bool operator !=(Body left, nint right) => left.Handle != right;
     public bool Equals(Body other) => Handle == other.Handle;
 
     /// <inheritdoc/>

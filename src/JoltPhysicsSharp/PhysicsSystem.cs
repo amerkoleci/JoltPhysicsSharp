@@ -9,8 +9,8 @@ using static JoltPhysicsSharp.JoltApi;
 namespace JoltPhysicsSharp;
 
 public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, nint collisionResult);
-public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2);
-public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2);
+public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings);
+public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings);
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
 public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData);
 
@@ -28,7 +28,7 @@ public readonly struct PhysicsSystemSettings
     }
 }
 
-public sealed class PhysicsSystem : NativeObject
+public sealed unsafe class PhysicsSystem : NativeObject
 {
     private readonly JPH_ContactListener_Procs _contactListener_Procs;
     private readonly JPH_ContactListener_ProcsDouble _contactListener_ProcsDouble;
@@ -38,7 +38,7 @@ public sealed class PhysicsSystem : NativeObject
     private readonly nint _bodyActivationListenerHandle;
 
 
-    public unsafe PhysicsSystem(PhysicsSystemSettings settings)
+    public PhysicsSystem(PhysicsSystemSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings.ObjectLayerPairFilter, nameof(settings.ObjectLayerPairFilter));
         ArgumentNullException.ThrowIfNull(settings.BroadPhaseLayerInterface, nameof(settings.BroadPhaseLayerInterface));
@@ -106,6 +106,20 @@ public sealed class PhysicsSystem : NativeObject
             JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
 
             JPH_PhysicsSystem_Destroy(Handle);
+        }
+    }
+
+    public PhysicsSettings Settings
+    {
+        get
+        {
+            PhysicsSettings result;
+            JPH_PhysicsSystem_GetPhysicsSettings(Handle, &result);
+            return result;
+        }
+        set
+        {
+            JPH_PhysicsSystem_SetPhysicsSettings(Handle, &value);
         }
     }
 
@@ -269,19 +283,31 @@ public sealed class PhysicsSystem : NativeObject
     }
 
     [UnmanagedCallersOnly]
-    private static void OnContactAddedCallback(nint context, nint body1, nint body2)
+    private static void OnContactAddedCallback(nint context, nint body1, nint body2, nint manifold, nint settings)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 
-        listener.OnContactAdded?.Invoke(listener, new Body(body1), new Body(body2));
+        listener.OnContactAdded?.Invoke(
+            listener,
+            new Body(body1),
+            new Body(body2),
+            new ContactManifold(manifold),
+            new ContactSettings(settings)
+            );
     }
 
     [UnmanagedCallersOnly]
-    private static void OnContactPersistedCallback(nint context, nint body1, nint body2)
+    private static void OnContactPersistedCallback(nint context, nint body1, nint body2, nint manifold, nint settings)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 
-        listener.OnContactPersisted?.Invoke(listener, new Body(body1), new Body(body2));
+        listener.OnContactPersisted?.Invoke(
+            listener,
+            new Body(body1),
+            new Body(body2),
+            new ContactManifold(manifold),
+            new ContactSettings(settings)
+            );
     }
 
     [UnmanagedCallersOnly]

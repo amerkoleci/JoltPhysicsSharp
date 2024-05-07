@@ -294,12 +294,12 @@ public static class Program
         return ValidateResult.AcceptAllContactsForThisBodyPair;
     }
 
-    private static void OnContactAdded(PhysicsSystem system, in Body body1, in Body body2)
+    private static void OnContactAdded(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings)
     {
         Console.WriteLine("A contact was added");
     }
 
-    private static void OnContactPersisted(PhysicsSystem system, in Body body1, in Body body2)
+    private static void OnContactPersisted(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings)
     {
         Console.WriteLine("A contact was persisted");
     }
