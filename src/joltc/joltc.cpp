@@ -1309,6 +1309,17 @@ JPH_OffsetCenterOfMassShapeSettings* JPH_OffsetCenterOfMassShapeSettings_Create2
     return reinterpret_cast<JPH_OffsetCenterOfMassShapeSettings*>(rotatedTranslatedShape);
 }
 
+JPH_OffsetCenterOfMassShape* JPH_OffsetCenterOfMassShapeSettings_CreateShape(const JPH_OffsetCenterOfMassShapeSettings* settings)
+{
+	const JPH::OffsetCenterOfMassShapeSettings* joltSettings = reinterpret_cast<const JPH::OffsetCenterOfMassShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_OffsetCenterOfMassShape*>(shape);
+}
+
 JPH_OffsetCenterOfMassShape* JPH_OffsetCenterOfMassShape_Create(JPH_Vec3* offset, JPH_Shape* shape)
 {
     auto joltShape = reinterpret_cast<JPH::Shape*>(shape);

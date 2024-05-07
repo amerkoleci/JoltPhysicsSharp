@@ -706,6 +706,7 @@ JPH_CAPI void JPH_RotatedTranslatedShape_GetRotation(const JPH_RotatedTranslated
 /* OffsetCenterOfMassShape */
 JPH_CAPI JPH_OffsetCenterOfMassShapeSettings* JPH_OffsetCenterOfMassShapeSettings_Create(const JPH_Vec3* offset, const JPH_ShapeSettings* shapeSettings);
 JPH_CAPI JPH_OffsetCenterOfMassShapeSettings* JPH_OffsetCenterOfMassShapeSettings_Create2(const JPH_Vec3* offset, const JPH_Shape* shape);
+JPH_CAPI JPH_OffsetCenterOfMassShape* JPH_OffsetCenterOfMassShapeSettings_CreateShape(const JPH_OffsetCenterOfMassShapeSettings* settings);
 
 JPH_CAPI JPH_OffsetCenterOfMassShape* JPH_OffsetCenterOfMassShape_Create(JPH_Vec3* offset, JPH_Shape* shape);
 JPH_CAPI void JPH_OffsetCenterOfMassShape_GetOffset(const JPH_OffsetCenterOfMassShape* shape, JPH_Vec3* result);
