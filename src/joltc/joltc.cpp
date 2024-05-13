@@ -37,6 +37,7 @@ JPH_SUPPRESS_WARNINGS
 #include "Jolt/Physics/Collision/Shape/HeightFieldShape.h"
 #include "Jolt/Physics/Collision/Shape/StaticCompoundShape.h"
 #include "Jolt/Physics/Collision/Shape/MutableCompoundShape.h"
+#include "Jolt/Physics/Collision/Shape/DecoratedShape.h"
 #include "Jolt/Physics/Collision/Shape/RotatedTranslatedShape.h"
 #include "Jolt/Physics/Collision/Shape/OffsetCenterOfMassShape.h"
 #include "Jolt/Physics/Body/BodyCreationSettings.h"
@@ -1228,6 +1229,12 @@ void JPH_MutableCompoundShape_ModifyShape2(JPH_MutableCompoundShape* shape, uint
 
 void JPH_MutableCompoundShape_AdjustCenterOfMass(JPH_MutableCompoundShape* shape) {
     reinterpret_cast<JPH::MutableCompoundShape*>(shape)->AdjustCenterOfMass();
+}
+
+/* DecoratedShape */
+const JPH_Shape* JPH_DecoratedShape_GetInnerShape(const JPH_DecoratedShape* shape) {
+	auto joltShape = reinterpret_cast<const JPH::DecoratedShape*>(shape);
+	return reinterpret_cast<const JPH_Shape*>(joltShape->GetInnerShape());
 }
 
 /* RotatedTranslatedShape */
