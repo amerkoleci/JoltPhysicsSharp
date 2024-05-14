@@ -414,6 +414,7 @@ typedef struct JPH_StaticCompoundShape          JPH_StaticCompoundShape;
 typedef struct JPH_MutableCompoundShape         JPH_MutableCompoundShape;
 typedef struct JPH_MeshShape                    JPH_MeshShape;
 typedef struct JPH_HeightFieldShape             JPH_HeightFieldShape;
+typedef struct JPH_DecoratedShape               JPH_DecoratedShape;
 typedef struct JPH_RotatedTranslatedShape       JPH_RotatedTranslatedShape;
 typedef struct JPH_OffsetCenterOfMassShape      JPH_OffsetCenterOfMassShape;
 
@@ -694,6 +695,9 @@ JPH_CAPI void JPH_MutableCompoundShape_RemoveShape(JPH_MutableCompoundShape* sha
 JPH_CAPI void JPH_MutableCompoundShape_ModifyShape(JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation);
 JPH_CAPI void JPH_MutableCompoundShape_ModifyShape2(JPH_MutableCompoundShape* shape, uint32_t index, const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_Shape* newShape);
 JPH_CAPI void JPH_MutableCompoundShape_AdjustCenterOfMass(JPH_MutableCompoundShape* shape);
+
+/* DecoratedShape */
+JPH_CAPI const JPH_Shape* JPH_DecoratedShape_GetInnerShape(const JPH_DecoratedShape* shape);
 
 /* RotatedTranslatedShape */
 JPH_CAPI JPH_RotatedTranslatedShapeSettings* JPH_RotatedTranslatedShapeSettings_Create(const JPH_Vec3* position, const JPH_Quat* rotation, const JPH_ShapeSettings* shapeSettings);
