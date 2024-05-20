@@ -130,7 +130,7 @@ endif()
 FetchContent_Declare(
         JoltPhysics
         GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics"
-        GIT_TAG "3ae9520be65c60d0524692be01c0b35d7648d150"
+        GIT_TAG "7edba88d5336047ebae8c6e26a5aa89dd5ae069e"
 		SOURCE_SUBDIR "Build"
 )
 FetchContent_MakeAvailable(JoltPhysics)
@@ -265,7 +265,6 @@ SET_INTERPROCEDURAL_OPTIMIZATION()
 
 set(PHYSICS_REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src/joltc)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Disable shared library when building Jolt" FORCE)
-
 
 # Options
 if (IOS OR EMSCRIPTEN)
