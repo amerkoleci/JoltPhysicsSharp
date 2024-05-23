@@ -385,6 +385,8 @@ typedef struct JPH_BodyFilter                       JPH_BodyFilter;
 
 typedef struct JPH_PhysicsSystem                    JPH_PhysicsSystem;
 
+typedef struct JPH_PhysicsMaterial					JPH_PhysicsMaterial;
+
 typedef struct JPH_ShapeSettings                    JPH_ShapeSettings;
 typedef struct JPH_ConvexShapeSettings			    JPH_ConvexShapeSettings;
 typedef struct JPH_SphereShapeSettings              JPH_SphereShapeSettings;
@@ -493,6 +495,7 @@ typedef struct JPH_CharacterBaseSettings            JPH_CharacterBaseSettings;
 typedef struct JPH_CharacterBase                    JPH_CharacterBase;
 
 /* CharacterVirtual */
+typedef struct JPH_CharacterContactListener			JPH_CharacterContactListener;
 typedef struct JPH_CharacterVirtualSettings         JPH_CharacterVirtualSettings;
 typedef struct JPH_CharacterVirtual                 JPH_CharacterVirtual;
 
@@ -1323,10 +1326,13 @@ JPH_CAPI JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase*
 JPH_CAPI JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void);
 
 /* CharacterVirtual */
-JPH_CAPI JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings,
+JPH_CAPI JPH_CharacterVirtual* JPH_CharacterVirtual_Create(const JPH_CharacterVirtualSettings* settings,
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
+	uint64_t userData,
     JPH_PhysicsSystem* system);
+
+JPH_CAPI void JPH_CharacterVirtual_SetListener(JPH_CharacterVirtual* character, JPH_CharacterContactListener* listener);
 
 JPH_CAPI void JPH_CharacterVirtual_GetLinearVelocity(JPH_CharacterVirtual* character, JPH_Vec3* velocity);
 JPH_CAPI void JPH_CharacterVirtual_SetLinearVelocity(JPH_CharacterVirtual* character, const JPH_Vec3* velocity);
@@ -1334,8 +1340,62 @@ JPH_CAPI void JPH_CharacterVirtual_GetPosition(JPH_CharacterVirtual* character, 
 JPH_CAPI void JPH_CharacterVirtual_SetPosition(JPH_CharacterVirtual* character, const JPH_RVec3* position);
 JPH_CAPI void JPH_CharacterVirtual_GetRotation(JPH_CharacterVirtual* character, JPH_Quat* rotation);
 JPH_CAPI void JPH_CharacterVirtual_SetRotation(JPH_CharacterVirtual* character, const JPH_Quat* rotation);
+JPH_CAPI void JPH_CharacterVirtual_GetWorldTransform(JPH_CharacterVirtual* character, JPH_RMatrix4x4* result);
+JPH_CAPI void JPH_CharacterVirtual_GetCenterOfMassTransform(JPH_CharacterVirtual* character, JPH_RMatrix4x4* result);
+JPH_CAPI float JPH_CharacterVirtual_GetMass(JPH_CharacterVirtual* character);
+JPH_CAPI void JPH_CharacterVirtual_SetMass(JPH_CharacterVirtual* character, float value);
+JPH_CAPI float JPH_CharacterVirtual_GetMaxStrength(JPH_CharacterVirtual* character);
+JPH_CAPI void JPH_CharacterVirtual_SetMaxStrength(JPH_CharacterVirtual* character, float value);
+
+JPH_CAPI float JPH_CharacterVirtual_GetPenetrationRecoverySpeed(JPH_CharacterVirtual* character);
+JPH_CAPI void JPH_CharacterVirtual_SetPenetrationRecoverySpeed(JPH_CharacterVirtual* character, float value);
+JPH_CAPI JPH_Bool32	JPH_CharacterVirtual_GetEnhancedInternalEdgeRemoval(JPH_CharacterVirtual* character);
+JPH_CAPI void JPH_CharacterVirtual_SetEnhancedInternalEdgeRemoval(JPH_CharacterVirtual* character, JPH_Bool32 value);
+JPH_CAPI float JPH_CharacterVirtual_GetCharacterPadding(JPH_CharacterVirtual* character);
+JPH_CAPI uint32_t JPH_CharacterVirtual_GetMaxNumHits(JPH_CharacterVirtual* character);
+JPH_CAPI void JPH_CharacterVirtual_SetMaxNumHits(JPH_CharacterVirtual* character, uint32_t value);
+JPH_CAPI float JPH_CharacterVirtual_GetHitReductionCosMaxAngle(JPH_CharacterVirtual* character);
+JPH_CAPI void JPH_CharacterVirtual_SetHitReductionCosMaxAngle(JPH_CharacterVirtual* character, float value);
+
+JPH_CAPI void JPH_CharacterVirtual_Update(JPH_CharacterVirtual* character, float deltaTime, JPH_ObjectLayer layer, JPH_PhysicsSystem* system);
 JPH_CAPI void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime,
 	const JPH_ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, JPH_PhysicsSystem* system);
 JPH_CAPI void JPH_CharacterVirtual_RefreshContacts(JPH_CharacterVirtual* character, JPH_ObjectLayer layer, JPH_PhysicsSystem* system);
+
+/* CharacterContactListener */
+typedef struct JPH_CharacterContactListener_Procs {
+    void (JPH_API_CALL *OnAdjustBodyVelocity)(void* userData,
+		const JPH_CharacterVirtual* character,
+        const JPH_Body* body2,
+        const JPH_Vec3* linearVelocity,
+		const JPH_Vec3* angularVelocity);
+
+    JPH_Bool32(JPH_API_CALL* OnContactValidate)(void* userData,
+		const JPH_CharacterVirtual* character,
+        const JPH_BodyID bodyID2,
+        const JPH_SubShapeID subShapeID2);
+
+    void(JPH_API_CALL* OnContactAdded)(void* userData,
+		const JPH_CharacterVirtual* character,
+        const JPH_BodyID bodyID2,
+		const JPH_SubShapeID subShapeID2,
+        const JPH_RVec3* contactPosition,
+        const JPH_Vec3* contactNormal);
+
+    void(JPH_API_CALL* OnContactSolve)(void* userData,
+		const JPH_CharacterVirtual* character,
+        const JPH_BodyID bodyID2,
+		const JPH_SubShapeID subShapeID2,
+        const JPH_RVec3* contactPosition,
+        const JPH_Vec3* contactNormal,
+		const JPH_Vec3* contactVelocity,
+		const JPH_PhysicsMaterial* contactMaterial,
+		const JPH_Vec3* characterVelocity,
+		JPH_Vec3* newCharacterVelocity
+		);
+} JPH_CharacterContactListener_Procs;
+
+JPH_CAPI JPH_CharacterContactListener* JPH_CharacterContactListener_Create(JPH_CharacterContactListener_Procs procs, void* userData);
+JPH_CAPI void JPH_CharacterContactListener_Destroy(JPH_CharacterContactListener* listener);
 
 #endif /* _JOLT_C_H */

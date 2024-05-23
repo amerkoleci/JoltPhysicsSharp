@@ -98,6 +98,11 @@ static bool AssertFailedImpl(const char* inExpression, const char* inMessage, co
 #endif // JPH_ENABLE_ASSERTS
 
 // From Jolt conversion methods
+static inline JPH_Bool32 FromJolt(bool value)
+{
+    return value ? 1 : 0;
+}
+
 static inline void FromJolt(const JPH::Vec3& vec, JPH_Vec3* result)
 {
     result->x = vec.GetX();
@@ -201,6 +206,11 @@ static inline void FromJolt(const JPH::MotorSettings& jolt, JPH_MotorSettings* r
 }
 
 // To Jolt conversion methods
+static inline bool ToJolt(JPH_Bool32 value)
+{
+    return value == 1;
+}
+
 static inline JPH::Vec3 ToJolt(const JPH_Vec3* vec)
 {
     return JPH::Vec3(vec->x, vec->y, vec->z);
@@ -4560,57 +4570,173 @@ JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void)
 }
 
 /* CharacterVirtual */
-JPH_CharacterVirtual* JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings,
+JPH_CharacterVirtual* JPH_CharacterVirtual_Create(const JPH_CharacterVirtualSettings* settings,
     const JPH_RVec3* position,
     const JPH_Quat* rotation,
 	uint64_t userData,
     JPH_PhysicsSystem* system)
 {
-    auto jolt_settings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+    auto joltSettings = reinterpret_cast<const JPH::CharacterVirtualSettings*>(settings);
 
-    auto jolt_character = new JPH::CharacterVirtual(jolt_settings, ToJolt(position), ToJolt(rotation), userData, system->physicsSystem);
-    jolt_character->AddRef();
+    auto joltCharacter = new JPH::CharacterVirtual(joltSettings, ToJolt(position), ToJolt(rotation), userData, system->physicsSystem);
+    joltCharacter->AddRef();
 
-    return reinterpret_cast<JPH_CharacterVirtual*>(jolt_character);
+    return reinterpret_cast<JPH_CharacterVirtual*>(joltCharacter);
+}
+
+void JPH_CharacterVirtual_SetListener(JPH_CharacterVirtual* character, JPH_CharacterContactListener* listener)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	auto joltListener = reinterpret_cast<JPH::CharacterContactListener*>(listener);
+	joltCharacter->SetListener(joltListener);
 }
 
 void JPH_CharacterVirtual_GetLinearVelocity(JPH_CharacterVirtual* character, JPH_Vec3* velocity)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    auto jolt_vector = jolt_character->GetLinearVelocity();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    auto jolt_vector = joltCharacter->GetLinearVelocity();
     FromJolt(jolt_vector, velocity);
 }
 
 void JPH_CharacterVirtual_SetLinearVelocity(JPH_CharacterVirtual* character, const JPH_Vec3* velocity)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    jolt_character->SetLinearVelocity(ToJolt(velocity));
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    joltCharacter->SetLinearVelocity(ToJolt(velocity));
 }
 
 void JPH_CharacterVirtual_GetPosition(JPH_CharacterVirtual* character, JPH_RVec3* position)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    auto jolt_vector = jolt_character->GetPosition();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    auto jolt_vector = joltCharacter->GetPosition();
     FromJolt(jolt_vector, position);
 }
 
 void JPH_CharacterVirtual_SetPosition(JPH_CharacterVirtual* character, const JPH_RVec3* position)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    jolt_character->SetPosition(ToJolt(position));
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    joltCharacter->SetPosition(ToJolt(position));
 }
 
 void JPH_CharacterVirtual_GetRotation(JPH_CharacterVirtual* character, JPH_Quat* rotation)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    auto jolt_quat = jolt_character->GetRotation();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    auto jolt_quat = joltCharacter->GetRotation();
     FromJolt(jolt_quat, rotation);
 }
 
 void JPH_CharacterVirtual_SetRotation(JPH_CharacterVirtual* character, const JPH_Quat* rotation)
 {
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+    joltCharacter->SetRotation(ToJolt(rotation));
+}
+
+void JPH_CharacterVirtual_GetWorldTransform(JPH_CharacterVirtual* character, JPH_RMatrix4x4* result)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+
+    const JPH::RMat44& mat = joltCharacter->GetWorldTransform();
+    FromJolt(mat, result);
+}
+
+void JPH_CharacterVirtual_GetCenterOfMassTransform(JPH_CharacterVirtual* character, JPH_RMatrix4x4* result)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+
+    const JPH::RMat44& mat = joltCharacter->GetCenterOfMassTransform();
+    FromJolt(mat, result);
+}
+
+float JPH_CharacterVirtual_GetMass(JPH_CharacterVirtual* character)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetMass();
+}
+
+void JPH_CharacterVirtual_SetMass(JPH_CharacterVirtual* character, float value)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetMass(value);
+}
+
+float JPH_CharacterVirtual_GetMaxStrength(JPH_CharacterVirtual* character)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetMaxStrength();
+}
+
+void JPH_CharacterVirtual_SetMaxStrength(JPH_CharacterVirtual* character, float value)
+{
+    auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetMaxStrength(value);
+}
+
+float JPH_CharacterVirtual_GetPenetrationRecoverySpeed(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetPenetrationRecoverySpeed();
+}
+
+void JPH_CharacterVirtual_SetPenetrationRecoverySpeed(JPH_CharacterVirtual* character, float value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetPenetrationRecoverySpeed(value);
+}
+
+JPH_Bool32 JPH_CharacterVirtual_GetEnhancedInternalEdgeRemoval(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return FromJolt(joltCharacter->GetEnhancedInternalEdgeRemoval());
+}
+
+void JPH_CharacterVirtual_SetEnhancedInternalEdgeRemoval(JPH_CharacterVirtual* character, JPH_Bool32 value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetEnhancedInternalEdgeRemoval(ToJolt(value));
+}
+
+float JPH_CharacterVirtual_GetCharacterPadding(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetCharacterPadding();
+}
+
+uint32_t JPH_CharacterVirtual_GetMaxNumHits(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetMaxNumHits();
+}
+
+void JPH_CharacterVirtual_SetMaxNumHits(JPH_CharacterVirtual* character, uint32_t value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetMaxNumHits(value);
+}
+
+float JPH_CharacterVirtual_GetHitReductionCosMaxAngle(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetHitReductionCosMaxAngle();
+}
+
+void JPH_CharacterVirtual_SetHitReductionCosMaxAngle(JPH_CharacterVirtual* character, float value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetHitReductionCosMaxAngle(value);
+}
+
+void JPH_CharacterVirtual_Update(JPH_CharacterVirtual* character, float deltaTime, JPH_ObjectLayer layer, JPH_PhysicsSystem* system)
+{
     auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
-    jolt_character->SetRotation(ToJolt(rotation));
+	auto jolt_object_layer = static_cast<JPH::ObjectLayer>(layer);
+
+    jolt_character->Update(deltaTime,
+        system->physicsSystem->GetGravity(),
+        system->physicsSystem->GetDefaultBroadPhaseLayerFilter(jolt_object_layer),
+        system->physicsSystem->GetDefaultLayerFilter(jolt_object_layer),
+        {},
+        {},
+        *s_TempAllocator
+    );
 }
 
 void JPH_CharacterVirtual_ExtendedUpdate(JPH_CharacterVirtual* character, float deltaTime,
@@ -4654,6 +4780,118 @@ void JPH_CharacterVirtual_RefreshContacts(JPH_CharacterVirtual* character, JPH_O
         {},
         *s_TempAllocator
     );
+}
+
+/* CharacterContactListener */
+class ManagedCharacterContactListener final : public JPH::CharacterContactListener
+{
+public:
+    void OnAdjustBodyVelocity(const CharacterVirtual *inCharacter, const Body &inBody2, Vec3 &ioLinearVelocity, Vec3 &ioAngularVelocity) override
+    {
+        JPH_RVec3 linearVelocity, angularVelocity;
+        FromJolt(ioLinearVelocity, &linearVelocity);
+		FromJolt(ioAngularVelocity, &angularVelocity);
+
+        if (procs.OnAdjustBodyVelocity)
+        {
+            procs.OnAdjustBodyVelocity(
+                userData,
+				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
+                reinterpret_cast<const JPH_Body*>(&inBody2),
+                &linearVelocity,
+                &angularVelocity
+            );
+        }
+    }
+
+    bool OnContactValidate(const CharacterVirtual *inCharacter, const BodyID &inBodyID2, const SubShapeID &inSubShapeID2) override
+    {
+        if (procs.OnContactValidate)
+        {
+            return procs.OnContactValidate(
+                userData,
+				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
+                (JPH_BodyID)inBodyID2.GetIndexAndSequenceNumber(),
+                (JPH_SubShapeID)inSubShapeID2.GetValue()
+            ) == 1;
+        }
+
+		return true;
+    }
+
+    void OnContactAdded(const CharacterVirtual *inCharacter, const BodyID &inBodyID2, const SubShapeID &inSubShapeID2, RVec3Arg inContactPosition, Vec3Arg inContactNormal, CharacterContactSettings &ioSettings) override
+    {
+        JPH_UNUSED(ioSettings);
+
+        if (procs.OnContactAdded)
+        {
+			JPH_RVec3 contactPosition;
+			JPH_Vec3 contactNormal;
+
+			FromJolt(inContactPosition, &contactPosition);
+			FromJolt(inContactNormal, &contactNormal);
+
+            procs.OnContactAdded(
+                userData,
+				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
+                (JPH_BodyID)inBodyID2.GetIndexAndSequenceNumber(),
+                (JPH_SubShapeID)inSubShapeID2.GetValue(),
+                &contactPosition,
+				&contactNormal
+            );
+        }
+    }
+
+    void OnContactSolve(const CharacterVirtual *inCharacter, const BodyID &inBodyID2, const SubShapeID &inSubShapeID2,
+		RVec3Arg inContactPosition, Vec3Arg inContactNormal, Vec3Arg inContactVelocity,
+		const PhysicsMaterial *inContactMaterial, Vec3Arg inCharacterVelocity,
+		Vec3 &ioNewCharacterVelocity) override
+    {
+        if (procs.OnContactSolve)
+        {
+			JPH_RVec3 contactPosition;
+			JPH_Vec3 contactNormal, contactVelocity, characterVelocity;
+
+			FromJolt(inContactPosition, &contactPosition);
+			FromJolt(inContactNormal, &contactNormal);
+			FromJolt(inContactVelocity, &contactVelocity);
+			FromJolt(inCharacterVelocity, &characterVelocity);
+			JPH_Vec3 newCharacterVelocity;
+
+            procs.OnContactSolve(
+                userData,
+				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
+                (JPH_BodyID)inBodyID2.GetIndexAndSequenceNumber(),
+                (JPH_SubShapeID)inSubShapeID2.GetValue(),
+				&contactPosition,
+				&contactNormal,
+				&contactVelocity,
+				reinterpret_cast<const JPH_PhysicsMaterial*>(inContactMaterial),
+				&characterVelocity,
+				&newCharacterVelocity
+            );
+
+			ioNewCharacterVelocity = ToJolt(&newCharacterVelocity);
+        }
+    }
+
+    JPH_CharacterContactListener_Procs procs = {};
+    void* userData = nullptr;
+};
+
+
+JPH_CharacterContactListener* JPH_CharacterContactListener_Create(JPH_CharacterContactListener_Procs procs, void* userData)
+{
+	auto impl = new ManagedCharacterContactListener();
+	impl->procs = procs;
+    impl->userData = userData;
+    return reinterpret_cast<JPH_CharacterContactListener*>(impl);
+}
+
+void JPH_CharacterContactListener_Destroy(JPH_CharacterContactListener* listener)
+{
+	if (listener)
+        delete reinterpret_cast<ManagedCharacterContactListener*>(listener);
 }
 
 JPH_SUPPRESS_WARNING_POP
