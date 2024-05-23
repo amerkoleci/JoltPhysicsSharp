@@ -4788,7 +4788,7 @@ class ManagedCharacterContactListener final : public JPH::CharacterContactListen
 public:
     void OnAdjustBodyVelocity(const CharacterVirtual *inCharacter, const Body &inBody2, Vec3 &ioLinearVelocity, Vec3 &ioAngularVelocity) override
     {
-        JPH_RVec3 linearVelocity, angularVelocity;
+        JPH_Vec3 linearVelocity, angularVelocity;
         FromJolt(ioLinearVelocity, &linearVelocity);
 		FromJolt(ioAngularVelocity, &angularVelocity);
 
