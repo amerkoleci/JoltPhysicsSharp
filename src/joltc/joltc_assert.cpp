@@ -174,6 +174,10 @@ static_assert(JPH_GroundState_OnSteepGround == (int)JPH::CharacterBase::EGroundS
 static_assert(JPH_GroundState_NotSupported == (int)JPH::CharacterBase::EGroundState::NotSupported);
 static_assert(JPH_GroundState_InAir == (int)JPH::CharacterBase::EGroundState::InAir);
 
+// EBackFaceMode
+static_assert(JPH_BackFaceMode_IgnoreBackFaces == (int)JPH::EBackFaceMode::IgnoreBackFaces);
+static_assert(JPH_BackFaceMode_CollideWithBackFaces == (int)JPH::EBackFaceMode::CollideWithBackFaces);
+
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));
 

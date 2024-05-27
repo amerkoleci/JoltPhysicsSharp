@@ -4670,14 +4670,139 @@ JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void)
     return reinterpret_cast<JPH_CharacterVirtualSettings*>(settings);
 }
 
-void JPH_CharacterVirtualSettings_Destroy(JPH_CharacterVirtualSettings* settings)
+float JPH_CharacterVirtualSettings_GetMass(JPH_CharacterVirtualSettings* settings)
 {
-	if (settings)
-    {
-        auto joltSettings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
-        joltSettings->Release();
-    }
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMass;
 }
+
+void JPH_CharacterVirtualSettings_SetMass(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMass = value;
+}
+
+float JPH_CharacterVirtualSettings_GetMaxStrength(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxStrength;
+}
+
+void JPH_CharacterVirtualSettings_SetMaxStrength(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxStrength = value;
+}
+
+void JPH_CharacterVirtualSettings_GetShapeOffset(JPH_CharacterVirtualSettings* settings, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mShapeOffset, result);
+}
+
+void JPH_CharacterVirtualSettings_SetShapeOffset(JPH_CharacterVirtualSettings* settings, const JPH_Vec3* value)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+    joltSettings->mShapeOffset = ToJolt(value);
+}
+
+JPH_BackFaceMode JPH_CharacterVirtualSettings_GetBackFaceMode(JPH_CharacterVirtualSettings* settings)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+	return static_cast<JPH_BackFaceMode>(joltSettings->mBackFaceMode);
+}
+
+void JPH_CharacterVirtualSettings_SetBackFaceMode(JPH_CharacterVirtualSettings* settings, JPH_BackFaceMode value)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+	joltSettings->mBackFaceMode = static_cast<JPH::EBackFaceMode>(value);
+}
+
+float JPH_CharacterVirtualSettings_GetPredictiveContactDistance(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mPredictiveContactDistance;
+}
+
+void JPH_CharacterVirtualSettings_SetPredictiveContactDistance(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mPredictiveContactDistance = value;
+}
+
+uint32_t JPH_CharacterVirtualSettings_GetMaxCollisionIterations(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxCollisionIterations;
+}
+
+void JPH_CharacterVirtualSettings_SetMaxCollisionIterations(JPH_CharacterVirtualSettings* settings, uint32_t value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxCollisionIterations = value;
+}
+
+uint32_t JPH_CharacterVirtualSettings_GetMaxConstraintIterations(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxConstraintIterations;
+}
+
+void JPH_CharacterVirtualSettings_SetMaxConstraintIterations(JPH_CharacterVirtualSettings* settings, uint32_t value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxConstraintIterations = value;
+}
+
+float JPH_CharacterVirtualSettings_GetMinTimeRemaining(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMinTimeRemaining;
+}
+
+void JPH_CharacterVirtualSettings_SetMinTimeRemaining(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMinTimeRemaining = value;
+}
+
+float JPH_CharacterVirtualSettings_GetCollisionTolerance(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mCollisionTolerance;
+}
+
+void JPH_CharacterVirtualSettings_SetCollisionTolerance(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mCollisionTolerance = value;
+}
+
+float JPH_CharacterVirtualSettings_GetCharacterPadding(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mCharacterPadding;
+}
+
+void JPH_CharacterVirtualSettings_SetCharacterPadding(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mCharacterPadding = value;
+}
+
+uint32_t JPH_CharacterVirtualSettings_GetMaxNumHits(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxNumHits;
+}
+
+void JPH_CharacterVirtualSettings_SetMaxNumHits(JPH_CharacterVirtualSettings* settings, uint32_t value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mMaxNumHits = value;
+}
+
+float JPH_CharacterVirtualSettings_GetHitReductionCosMaxAngle(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mHitReductionCosMaxAngle;
+}
+
+void JPH_CharacterVirtualSettings_SetHitReductionCosMaxAngle(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mHitReductionCosMaxAngle = value;
+}
+
+float JPH_CharacterVirtualSettings_GetPenetrationRecoverySpeed(JPH_CharacterVirtualSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mPenetrationRecoverySpeed;
+}
+
+void JPH_CharacterVirtualSettings_SetPenetrationRecoverySpeed(JPH_CharacterVirtualSettings* settings, float value)
+{
+	reinterpret_cast<JPH::CharacterVirtualSettings*>(settings)->mPenetrationRecoverySpeed = value;
+}
+
 
 /* CharacterVirtual */
 JPH_CharacterVirtual* JPH_CharacterVirtual_Create(const JPH_CharacterVirtualSettings* settings,
@@ -4834,6 +4959,30 @@ void JPH_CharacterVirtual_SetHitReductionCosMaxAngle(JPH_CharacterVirtual* chara
 	joltCharacter->SetHitReductionCosMaxAngle(value);
 }
 
+JPH_Bool32 JPH_CharacterVirtual_GetMaxHitsExceeded(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return FromJolt(joltCharacter->GetMaxHitsExceeded());
+}
+
+uint64_t JPH_CharacterVirtual_GetUserData(JPH_CharacterVirtual* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	return joltCharacter->GetUserData();
+}
+
+void JPH_CharacterVirtual_SetUserData(JPH_CharacterVirtual* character, uint64_t value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	joltCharacter->SetUserData(value);
+}
+
+void JPH_CharacterVirtual_CancelVelocityTowardsSteepSlopes(JPH_CharacterVirtual* character, const JPH_Vec3* desiredVelocity, JPH_Vec3* velocity)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterVirtual*>(character);
+	FromJolt(joltCharacter->CancelVelocityTowardsSteepSlopes(ToJolt(desiredVelocity)), velocity);
+}
+
 void JPH_CharacterVirtual_Update(JPH_CharacterVirtual* character, float deltaTime, JPH_ObjectLayer layer, JPH_PhysicsSystem* system)
 {
     auto jolt_character = reinterpret_cast<JPH::CharacterVirtual*>(character);
@@ -4941,14 +5090,22 @@ public:
 			FromJolt(inContactPosition, &contactPosition);
 			FromJolt(inContactNormal, &contactNormal);
 
+			JPH_CharacterContactSettings settings = {};
+			settings.canPushCharacter = FromJolt(ioSettings.mCanPushCharacter);
+			settings.canReceiveImpulses = FromJolt(ioSettings.mCanReceiveImpulses);
+
             procs.OnContactAdded(
                 userData,
 				reinterpret_cast<const JPH_CharacterVirtual*>(inCharacter),
                 (JPH_BodyID)inBodyID2.GetIndexAndSequenceNumber(),
                 (JPH_SubShapeID)inSubShapeID2.GetValue(),
                 &contactPosition,
-				&contactNormal
+				&contactNormal,
+				&settings
             );
+
+			ioSettings.mCanPushCharacter = ToJolt(settings.canPushCharacter);
+			ioSettings.mCanReceiveImpulses = ToJolt(settings.canReceiveImpulses);
         }
     }
 
