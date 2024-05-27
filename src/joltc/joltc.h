@@ -196,7 +196,10 @@ typedef enum JPH_GroundState {
     JPH_GroundState_OnGround = 0,
     JPH_GroundState_OnSteepGround = 1,
     JPH_GroundState_NotSupported = 2,
-    JPH_GroundState_InAir = 3
+    JPH_GroundState_InAir = 3,
+
+    _JPH_GroundState_Count,
+    _JPH_GroundState_Force32 = 0x7FFFFFFF
 } JPH_GroundState;
 
 typedef enum JPH_MotorState {
@@ -248,6 +251,11 @@ typedef struct JPH_Quat {
     float z;
     float w;
 } JPH_Quat;
+
+typedef struct JPH_Plane {
+	JPH_Vec3 normal;
+	float distance;
+} JPH_Plane;
 
 typedef struct JPH_Matrix4x4 {
     float m11, m12, m13, m14;
@@ -496,8 +504,8 @@ typedef struct JPH_CharacterBase                    JPH_CharacterBase;
 
 /* CharacterVirtual */
 typedef struct JPH_CharacterContactListener			JPH_CharacterContactListener;
-typedef struct JPH_CharacterVirtualSettings         JPH_CharacterVirtualSettings;
-typedef struct JPH_CharacterVirtual                 JPH_CharacterVirtual;
+typedef struct JPH_CharacterVirtualSettings         JPH_CharacterVirtualSettings; /* Inherics JPH_CharacterBaseSettings */
+typedef struct JPH_CharacterVirtual                 JPH_CharacterVirtual;  /* Inherics JPH_CharacterBase */
 
 typedef JPH_Bool32(JPH_API_CALL* JPH_AssertFailureFunc)(const char* expression, const char* mssage, const char* file, uint32_t line);
 
@@ -1308,22 +1316,39 @@ JPH_CAPI void JPH_ContactSettings_SetRelativeAngularSurfaceVelocity(JPH_ContactS
 
 /* CharacterBaseSettings */
 JPH_CAPI void JPH_CharacterBaseSettings_Destroy(JPH_CharacterBaseSettings* settings);
-JPH_CAPI void JPH_CharacterBaseSettings_SetSupportingVolume(JPH_CharacterBaseSettings* settings, const JPH_Vec3* normal, float constant);
+JPH_CAPI void JPH_CharacterBaseSettings_GetUp(JPH_CharacterBaseSettings* settings, JPH_Vec3* result);
+JPH_CAPI void JPH_CharacterBaseSettings_SetUp(JPH_CharacterBaseSettings* settings, const JPH_Vec3* value);
+JPH_CAPI void JPH_CharacterBaseSettings_GetSupportingVolume(JPH_CharacterBaseSettings* settings, JPH_Plane* result);
+JPH_CAPI void JPH_CharacterBaseSettings_SetSupportingVolume(JPH_CharacterBaseSettings* settings, const JPH_Plane* value);
+JPH_CAPI float JPH_CharacterBaseSettings_GetMaxSlopeAngle(JPH_CharacterBaseSettings* settings);
 JPH_CAPI void JPH_CharacterBaseSettings_SetMaxSlopeAngle(JPH_CharacterBaseSettings* settings, float maxSlopeAngle);
-JPH_CAPI void JPH_CharacterBaseSettings_SetShape(JPH_CharacterBaseSettings* settings, JPH_Shape* shape);
+JPH_CAPI JPH_Bool32 JPH_CharacterBaseSettings_GetEnhancedInternalEdgeRemoval(JPH_CharacterBaseSettings* settings);
+JPH_CAPI void JPH_CharacterBaseSettings_SetEnhancedInternalEdgeRemoval(JPH_CharacterBaseSettings* settings, JPH_Bool32 value);
+JPH_CAPI const JPH_Shape* JPH_CharacterBaseSettings_GetShape(JPH_CharacterBaseSettings* settings);
+JPH_CAPI void JPH_CharacterBaseSettings_SetShape(JPH_CharacterBaseSettings* settings, const JPH_Shape* shape);
 
 /* CharacterBase */
 JPH_CAPI void JPH_CharacterBase_Destroy(JPH_CharacterBase* character);
+JPH_CAPI float JPH_CharacterBase_GetCosMaxSlopeAngle(JPH_CharacterBase* character);
+JPH_CAPI void JPH_CharacterBase_SetMaxSlopeAngle(JPH_CharacterBase* character, float maxSlopeAngle);
+JPH_CAPI void JPH_CharacterBase_GetUp(JPH_CharacterBase* character, JPH_Vec3* result);
+JPH_CAPI void JPH_CharacterBase_SetUp(JPH_CharacterBase* character, const JPH_Vec3* value);
+JPH_CAPI JPH_Bool32 JPH_CharacterBase_IsSlopeTooSteep(JPH_CharacterBase* character, const JPH_Vec3* value);
+JPH_CAPI const JPH_Shape* JPH_CharacterBase_GetShape(JPH_CharacterBase* character);
+
 JPH_CAPI JPH_GroundState JPH_CharacterBase_GetGroundState(JPH_CharacterBase* character);
 JPH_CAPI JPH_Bool32 JPH_CharacterBase_IsSupported(JPH_CharacterBase* character);
 JPH_CAPI void JPH_CharacterBase_GetGroundPosition(JPH_CharacterBase* character, JPH_RVec3* position);
 JPH_CAPI void JPH_CharacterBase_GetGroundNormal(JPH_CharacterBase* character, JPH_Vec3* normal);
 JPH_CAPI void JPH_CharacterBase_GetGroundVelocity(JPH_CharacterBase* character, JPH_Vec3* velocity);
+JPH_CAPI const JPH_PhysicsMaterial* JPH_CharacterBase_GetGroundMaterial(JPH_CharacterBase* character);
 JPH_CAPI JPH_BodyID JPH_CharacterBase_GetGroundBodyId(JPH_CharacterBase* character);
 JPH_CAPI JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* character);
+JPH_CAPI uint64_t JPH_CharacterBase_GetGroundUserData(JPH_CharacterBase* character);
 
 /* CharacterVirtualSettings */
 JPH_CAPI JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void);
+JPH_CAPI void JPH_CharacterVirtualSettings_Destroy(JPH_CharacterVirtualSettings* settings);
 
 /* CharacterVirtual */
 JPH_CAPI JPH_CharacterVirtual* JPH_CharacterVirtual_Create(const JPH_CharacterVirtualSettings* settings,

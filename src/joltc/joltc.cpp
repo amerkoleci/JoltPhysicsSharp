@@ -118,6 +118,12 @@ static inline void FromJolt(const JPH::Quat& quat, JPH_Quat* result)
     result->w = quat.GetW();
 }
 
+static inline void FromJolt(const JPH::Plane& value, JPH_Plane* result)
+{
+	FromJolt(value.GetNormal(), &result->normal);
+	result->distance = value.GetConstant();
+}
+
 static inline void FromJolt(const JPH::Mat44& matrix, JPH_Matrix4x4* result)
 {
     JPH::Vec4 column0 = matrix.GetColumn4(0);
@@ -211,6 +217,11 @@ static inline bool ToJolt(JPH_Bool32 value)
     return value == 1;
 }
 
+static inline JPH::Vec3 ToJolt(const JPH_Vec3& vec)
+{
+    return JPH::Vec3(vec.x, vec.y, vec.z);
+}
+
 static inline JPH::Vec3 ToJolt(const JPH_Vec3* vec)
 {
     return JPH::Vec3(vec->x, vec->y, vec->z);
@@ -219,6 +230,11 @@ static inline JPH::Vec3 ToJolt(const JPH_Vec3* vec)
 static inline JPH::Quat ToJolt(const JPH_Quat* quat)
 {
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
+}
+
+static inline JPH::Plane ToJolt(const JPH_Plane* value)
+{
+    return JPH::Plane(ToJolt(value->normal), value->distance);
 }
 
 static inline JPH::Mat44 ToJolt(const JPH_Matrix4x4& matrix)
@@ -4479,30 +4495,68 @@ void JPH_CharacterBaseSettings_Destroy(JPH_CharacterBaseSettings* settings)
 {
     if (settings)
     {
-        auto jolt_settings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
-        jolt_settings->Release();
+        auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+        joltSettings->Release();
     }
 }
 
-void JPH_CharacterBaseSettings_SetSupportingVolume(JPH_CharacterBaseSettings* settings, const JPH_Vec3* normal, float constant)
+void JPH_CharacterBaseSettings_GetUp(JPH_CharacterBaseSettings* settings, JPH_Vec3* result)
 {
-    auto jolt_settings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+	FromJolt(reinterpret_cast<JPH::CharacterBaseSettings*>(settings)->mUp, result);
+}
 
-    jolt_settings->mSupportingVolume = JPH::Plane(ToJolt(normal), constant);
+void JPH_CharacterBaseSettings_SetUp(JPH_CharacterBaseSettings* settings, const JPH_Vec3* value)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    joltSettings->mUp = ToJolt(value);
+}
+
+void JPH_CharacterBaseSettings_GetSupportingVolume(JPH_CharacterBaseSettings* settings, JPH_Plane* result)
+{
+	FromJolt(reinterpret_cast<JPH::CharacterBaseSettings*>(settings)->mSupportingVolume, result);
+}
+
+void JPH_CharacterBaseSettings_SetSupportingVolume(JPH_CharacterBaseSettings* settings, const JPH_Plane* value)
+{
+    auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    joltSettings->mSupportingVolume = ToJolt(value);
+}
+
+float JPH_CharacterBaseSettings_GetMaxSlopeAngle(JPH_CharacterBaseSettings* settings)
+{
+	return reinterpret_cast<JPH::CharacterBaseSettings*>(settings)->mMaxSlopeAngle;
 }
 
 void JPH_CharacterBaseSettings_SetMaxSlopeAngle(JPH_CharacterBaseSettings* settings, float maxSlopeAngle)
 {
-    auto jolt_settings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
-    jolt_settings->mMaxSlopeAngle = DegreesToRadians(maxSlopeAngle);
+    auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    joltSettings->mMaxSlopeAngle = maxSlopeAngle;
 }
 
-void JPH_CharacterBaseSettings_SetShape(JPH_CharacterBaseSettings* settings, JPH_Shape* shape)
+JPH_Bool32 JPH_CharacterBaseSettings_GetEnhancedInternalEdgeRemoval(JPH_CharacterBaseSettings* settings)
 {
-    auto jolt_settings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
-    auto jolt_shape = reinterpret_cast<JPH::Shape*>(shape);
+	auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    return FromJolt(joltSettings->mEnhancedInternalEdgeRemoval);
+}
 
-    jolt_settings->mShape = jolt_shape;
+void JPH_CharacterBaseSettings_SetEnhancedInternalEdgeRemoval(JPH_CharacterBaseSettings* settings, JPH_Bool32 value)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    joltSettings->mEnhancedInternalEdgeRemoval = ToJolt(value);
+}
+
+const JPH_Shape* JPH_CharacterBaseSettings_GetShape(JPH_CharacterBaseSettings* settings)
+{
+	auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+	return reinterpret_cast<const JPH_Shape*>(joltSettings->mShape.GetPtr());
+}
+
+void JPH_CharacterBaseSettings_SetShape(JPH_CharacterBaseSettings* settings, const JPH_Shape* shape)
+{
+    auto joltSettings = reinterpret_cast<JPH::CharacterBaseSettings*>(settings);
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+
+    joltSettings->mShape = joltShape;
 }
 
 /* CharacterBase */
@@ -4510,54 +4564,101 @@ void JPH_CharacterBase_Destroy(JPH_CharacterBase* character)
 {
     if (character)
     {
-        auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-        jolt_character->Release();
+        auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+        joltCharacter->Release();
     }
+}
+
+float JPH_CharacterBase_GetCosMaxSlopeAngle(JPH_CharacterBase* character)
+{
+	 auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	 return joltCharacter->GetCosMaxSlopeAngle();
+}
+
+void JPH_CharacterBase_SetMaxSlopeAngle(JPH_CharacterBase* character, float maxSlopeAngle)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	joltCharacter->SetMaxSlopeAngle(maxSlopeAngle);
+}
+
+void JPH_CharacterBase_GetUp(JPH_CharacterBase* character, JPH_Vec3* result)
+{
+	FromJolt(reinterpret_cast<JPH::CharacterBase*>(character)->GetUp(), result);
+}
+
+void JPH_CharacterBase_SetUp(JPH_CharacterBase* character, const JPH_Vec3* value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    joltCharacter->SetUp(ToJolt(value));
+}
+
+JPH_Bool32 JPH_CharacterBase_IsSlopeTooSteep(JPH_CharacterBase* character, const JPH_Vec3* value)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	return FromJolt(joltCharacter->IsSlopeTooSteep(ToJolt(value)));
+}
+
+const JPH_Shape* JPH_CharacterBase_GetShape(JPH_CharacterBase* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	return reinterpret_cast<const JPH_Shape*>(joltCharacter->GetShape());
 }
 
 JPH_GroundState JPH_CharacterBase_GetGroundState(JPH_CharacterBase* character)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    return static_cast<JPH_GroundState>(jolt_character->GetGroundState());
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return static_cast<JPH_GroundState>(joltCharacter->GetGroundState());
 }
 
 JPH_Bool32 JPH_CharacterBase_IsSupported(JPH_CharacterBase* character)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    return jolt_character->IsSupported();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return joltCharacter->IsSupported();
 }
 
 void JPH_CharacterBase_GetGroundPosition(JPH_CharacterBase* character, JPH_RVec3* position)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    auto jolt_vector = jolt_character->GetGroundPosition();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    auto jolt_vector = joltCharacter->GetGroundPosition();
     FromJolt(jolt_vector, position);
 }
 
 void JPH_CharacterBase_GetGroundNormal(JPH_CharacterBase* character, JPH_Vec3* normal)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    auto jolt_vector = jolt_character->GetGroundNormal();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    auto jolt_vector = joltCharacter->GetGroundNormal();
     FromJolt(jolt_vector, normal);
 }
 
 void JPH_CharacterBase_GetGroundVelocity(JPH_CharacterBase* character, JPH_Vec3* velocity)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    auto jolt_vector = jolt_character->GetGroundVelocity();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    auto jolt_vector = joltCharacter->GetGroundVelocity();
     FromJolt(jolt_vector, velocity);
+}
+
+const JPH_PhysicsMaterial* JPH_CharacterBase_GetGroundMaterial(JPH_CharacterBase* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+	return reinterpret_cast<const JPH_PhysicsMaterial*>(joltCharacter->GetGroundMaterial());
 }
 
 JPH_BodyID JPH_CharacterBase_GetGroundBodyId(JPH_CharacterBase* character)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    return jolt_character->GetGroundBodyID().GetIndexAndSequenceNumber();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return joltCharacter->GetGroundBodyID().GetIndexAndSequenceNumber();
 }
 
 JPH_SubShapeID JPH_CharacterBase_GetGroundSubShapeId(JPH_CharacterBase* character)
 {
-    auto jolt_character = reinterpret_cast<JPH::CharacterBase*>(character);
-    return jolt_character->GetGroundSubShapeID().GetValue();
+    auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return joltCharacter->GetGroundSubShapeID().GetValue();
+}
+
+uint64_t JPH_CharacterBase_GetGroundUserData(JPH_CharacterBase* character)
+{
+	auto joltCharacter = reinterpret_cast<JPH::CharacterBase*>(character);
+    return joltCharacter->GetGroundUserData();
 }
 
 /* CharacterVirtualSettings */
@@ -4567,6 +4668,15 @@ JPH_CharacterVirtualSettings* JPH_CharacterVirtualSettings_Create(void)
     settings->AddRef();
 
     return reinterpret_cast<JPH_CharacterVirtualSettings*>(settings);
+}
+
+void JPH_CharacterVirtualSettings_Destroy(JPH_CharacterVirtualSettings* settings)
+{
+	if (settings)
+    {
+        auto joltSettings = reinterpret_cast<JPH::CharacterVirtualSettings*>(settings);
+        joltSettings->Release();
+    }
 }
 
 /* CharacterVirtual */
