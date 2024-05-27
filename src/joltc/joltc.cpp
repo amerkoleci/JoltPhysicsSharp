@@ -3299,6 +3299,18 @@ void JPH_BodyInterface_SetPositionAndRotationWhenChanged(JPH_BodyInterface* inte
     joltBodyInterface->SetPositionAndRotationWhenChanged(JPH::BodyID(bodyId), ToJolt(position), ToJolt(rotation), static_cast<JPH::EActivation>(activationMode));
 }
 
+void JPH_BodyInterface_GetPositionAndRotation(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation)
+{
+	JPH_ASSERT(interface);
+	auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+
+	JPH::RVec3 joltPosition;
+	JPH::Quat joltRotation;
+	joltBodyInterface->GetPositionAndRotation(JPH::BodyID(bodyId), joltPosition, joltRotation);
+	FromJolt(joltPosition, position);
+	FromJolt(joltRotation, rotation);
+}
+
 void JPH_BodyInterface_SetPositionRotationAndVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyId, JPH_RVec3* position, JPH_Quat* rotation, JPH_Vec3* linearVelocity, JPH_Vec3* angularVelocity)
 {
     JPH_ASSERT(interface);
