@@ -914,7 +914,6 @@ JPH_SphereShape* JPH_SphereShape_Create(float radius)
 
 float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape)
 {
-    JPH_ASSERT(shape);
     return reinterpret_cast<const JPH::SphereShape*>(shape)->GetRadius();
 }
 
@@ -927,6 +926,30 @@ JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, 
     return reinterpret_cast<JPH_TriangleShapeSettings*>(settings);
 }
 
+JPH_TriangleShape* JPH_TriangleShapeSettings_CreateShape(const JPH_TriangleShapeSettings* settings)
+{
+	const JPH::TriangleShapeSettings* joltSettings = reinterpret_cast<const JPH::TriangleShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_TriangleShape*>(shape);
+}
+
+JPH_TriangleShape* JPH_TriangleShape_Create(const JPH_Vec3* v1, const JPH_Vec3* v2, const JPH_Vec3* v3, float convexRadius)
+{
+	auto shape = new JPH::TriangleShape(ToJolt(v1), ToJolt(v2), ToJolt(v3), convexRadius);
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_TriangleShape*>(shape);
+}
+
+float JPH_TriangleShape_GetConvexRadius(const JPH_TriangleShape* shape)
+{
+    return reinterpret_cast<const JPH::TriangleShape*>(shape)->GetConvexRadius();
+}
+
 /* CapsuleShapeSettings */
 JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius)
 {
@@ -934,6 +957,17 @@ JPH_CapsuleShapeSettings* JPH_CapsuleShapeSettings_Create(float halfHeightOfCyli
     settings->AddRef();
 
     return reinterpret_cast<JPH_CapsuleShapeSettings*>(settings);
+}
+
+JPH_CapsuleShape* JPH_CapsuleShapeSettings_CreateShape(const JPH_CapsuleShapeSettings* settings)
+{
+	const JPH::CapsuleShapeSettings* joltSettings = reinterpret_cast<const JPH::CapsuleShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_CapsuleShape*>(shape);
 }
 
 JPH_CapsuleShape* JPH_CapsuleShape_Create(float halfHeightOfCylinder, float radius)
@@ -963,6 +997,17 @@ JPH_CylinderShapeSettings* JPH_CylinderShapeSettings_Create(float halfHeight, fl
     settings->AddRef();
 
     return reinterpret_cast<JPH_CylinderShapeSettings*>(settings);
+}
+
+JPH_CylinderShape* JPH_CylinderShapeSettings_CreateShape(const JPH_CylinderShapeSettings* settings)
+{
+	const JPH::CylinderShapeSettings* joltSettings = reinterpret_cast<const JPH::CylinderShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_CylinderShape*>(shape);
 }
 
 JPH_CylinderShape* JPH_CylinderShape_Create(float halfHeight, float radius)
@@ -1145,6 +1190,17 @@ JPH_TaperedCapsuleShapeSettings* JPH_TaperedCapsuleShapeSettings_Create(float ha
     settings->AddRef();
 
     return reinterpret_cast<JPH_TaperedCapsuleShapeSettings*>(settings);
+}
+
+JPH_TaperedCapsuleShape* JPH_TaperedCapsuleShapeSettings_CreateShape(JPH_TaperedCapsuleShapeSettings* settings)
+{
+	const JPH::TaperedCapsuleShapeSettings* joltSettings = reinterpret_cast<const JPH::TaperedCapsuleShapeSettings*>(settings);
+    auto shape_res = joltSettings->Create();
+
+    auto shape = shape_res.Get().GetPtr();
+    shape->AddRef();
+
+    return reinterpret_cast<JPH_TaperedCapsuleShape*>(shape);
 }
 
 /* CompoundShape */
