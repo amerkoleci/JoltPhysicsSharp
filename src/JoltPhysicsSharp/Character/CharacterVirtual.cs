@@ -15,7 +15,7 @@ public sealed class CharacterVirtual : CharacterBase
         OnAdjustBodyVelocity = &OnAdjustBodyVelocityCallback,
         OnContactValidate = &OnContactValidateCallback,
         OnContactAdded = &OnContactAddedCallback,
-        //OnContactRemoved = &OnContactRemovedCallback
+        OnContactSolve = &OnContactSolveCallback
     };
 
     public delegate void AdjustBodyVelocityHandler(CharacterVirtual character, in Body body2, Vector3 linearVelocity, Vector3 angularVelocity);
@@ -24,6 +24,7 @@ public sealed class CharacterVirtual : CharacterBase
     public delegate void ContactSolveHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2,
         in Double3 contactPosition,
         in Vector3 contactNornal,
+        in Vector3 contactVelocity,
         /*JPH_PhysicsMaterial*/nint contactMaterial,
         in Vector3 characterVelocity,
         out Vector3 newCharacterVelocity);
@@ -246,6 +247,7 @@ public sealed class CharacterVirtual : CharacterBase
         BodyID bodyID2, SubShapeID subShapeID2,
         Vector3* contactPosition, // JPH_RVec3
         Vector3* contactNormal,
+        Vector3* contactVelocity,
         nint contactMaterial, // JPH_PhysicsMaterial
         Vector3* characterVelocity,
         Vector3* newCharacterVelocity)
@@ -255,7 +257,10 @@ public sealed class CharacterVirtual : CharacterBase
         if (listener.OnContactSolve != null)
         {
             Vector3 newCharacterVelocityIn = *newCharacterVelocity;
-            listener.OnContactSolve(listener, bodyID2, subShapeID2, new Double3(*contactPosition), *contactNormal,
+            listener.OnContactSolve(listener, bodyID2, subShapeID2,
+                new Double3(*contactPosition),
+                *contactNormal,
+                *contactVelocity,
                 contactMaterial, *characterVelocity, out newCharacterVelocityIn);
             *newCharacterVelocity = newCharacterVelocityIn;
         }
