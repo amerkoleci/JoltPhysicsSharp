@@ -185,8 +185,8 @@ internal static unsafe partial class JoltApi
     //  BodyFilter
     public struct JPH_BodyFilter_Procs
     {
-        public delegate* unmanaged<IntPtr, BodyID, Bool32> ShouldCollide;
-        public delegate* unmanaged<IntPtr, IntPtr, Bool32> ShouldCollideLocked;
+        public delegate* unmanaged<nint, BodyID, Bool32> ShouldCollide;
+        public delegate* unmanaged<nint, IntPtr, Bool32> ShouldCollideLocked;
     }
 
     [LibraryImport(LibName)]
@@ -246,9 +246,21 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial nint JPH_TriangleShapeSettings_Create(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius);
 
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TriangleShapeSettings_CreateShape(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TriangleShape_Create(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TriangleShape_GetConvexRadius(nint shape);
+
     /* CapsuleShape */
     [LibraryImport(LibName)]
     public static partial nint JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CapsuleShapeSettings_CreateShape(nint settings);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_CapsuleShape_Create(float halfHeightOfCylinder, float radius);
@@ -262,6 +274,9 @@ internal static unsafe partial class JoltApi
     /* CylinderShape */
     [LibraryImport(LibName)]
     public static partial nint JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CylinderShapeSettings_CreateShape(nint settings);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_CylinderShape_Create(float halfHeight, float radius);
@@ -319,6 +334,9 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_HeightFieldShapeSettings_Create(float* samples, in Vector3 offset, in Vector3 scale, int sampleCount);
 
     [LibraryImport(LibName)]
+    public static partial nint JPH_HeightFieldShapeSettings_CreateShape(nint settings);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_MeshShapeSettings_DetermineMinAndMaxSample(IntPtr settings, out float outMinValue, out float outMaxValue, out float outQuantizationScale);
 
     [LibraryImport(LibName)]
@@ -327,6 +345,9 @@ internal static unsafe partial class JoltApi
     /* TaperedCapsuleShapeSettings */
     [LibraryImport(LibName)]
     public static partial nint JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TaperedCapsuleShapeSettings_CreateShape(nint settings);
 
     /* CompoundShape */
     [LibraryImport(LibName)]
@@ -347,6 +368,9 @@ internal static unsafe partial class JoltApi
     /* MutableCompoundShape */
     [LibraryImport(LibName)]
     public static partial nint JPH_MutableCompoundShapeSettings_Create();
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_MutableCompoundShape_Create(nint settings);
 
     /* RotatedTranslatedShape */
     [LibraryImport(LibName)]
@@ -1544,52 +1568,155 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_ContactSettings_SetRelativeAngularSurfaceVelocity(nint settings, Vector3* velocity);
 
-
+    #region CharacterBase
     /* CharacterBaseSettings */
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterBaseSettings_Destroy(IntPtr handle);
+    public static partial void JPH_CharacterBaseSettings_Destroy(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterBaseSettings_SetSupportingVolume(IntPtr handle, in Vector3 normal, float costant);
+    public static partial void JPH_CharacterBaseSettings_GetUp(nint handle, out Vector3 result);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterBaseSettings_SetMaxSlopeAngle(IntPtr handle, float maxSlopeAngle);
+    public static partial void JPH_CharacterBaseSettings_SetUp(nint handle, in Vector3 value);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterBaseSettings_SetShape(IntPtr handle, IntPtr shape);
+    public static partial void JPH_CharacterBaseSettings_GetSupportingVolume(nint handle, out Plane result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterBaseSettings_SetSupportingVolume(nint handle, in Plane value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterBaseSettings_GetMaxSlopeAngle(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterBaseSettings_SetMaxSlopeAngle(nint handle, float value);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_CharacterBaseSettings_GetEnhancedInternalEdgeRemoval(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterBaseSettings_SetEnhancedInternalEdgeRemoval(nint handle, Bool32 value);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterBaseSettings_GetShape(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterBaseSettings_SetShape(nint handle, nint shape);
 
     /* CharacterBase */
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterBase_Destroy(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial GroundState JPH_CharacterBase_GetGroundState(IntPtr handle);
+    public static partial float JPH_CharacterBase_GetCosMaxSlopeAngle(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterBase_SetMaxSlopeAngle(nint handle, float value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterBase_GetUp(nint handle, out Vector3 result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterBase_SetUp(nint handle, in Vector3 value);
+
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_CharacterBase_IsSlopeTooSteep(nint handle, in Vector3 value);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterBase_GetShape(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial GroundState JPH_CharacterBase_GetGroundState(nint handle);
 
     [LibraryImport(LibName)]
     public static partial Bool32 JPH_CharacterBase_IsSupported(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterBase_GetGroundPosition(IntPtr handle, out Double3 position);
+    public static partial void JPH_CharacterBase_GetGroundPosition(nint handle, out Vector3 position); // RVec3
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterBase_GetGroundNormal(IntPtr handle, out Vector3 normal);
+    public static partial void JPH_CharacterBase_GetGroundNormal(nint handle, out Vector3 normal);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterBase_GetGroundVelocity(IntPtr handle, out Vector3 velocity);
+    public static partial void JPH_CharacterBase_GetGroundVelocity(nint handle, out Vector3 velocity);
 
     [LibraryImport(LibName)]
-    public static partial uint JPH_CharacterBase_GetGroundBodyId(IntPtr handle);
+    public static partial nint JPH_CharacterBase_GetGroundMaterial(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial uint JPH_CharacterBase_GetGroundSubShapeId(IntPtr handle);
+    public static partial uint JPH_CharacterBase_GetGroundBodyId(nint handle);
 
+    [LibraryImport(LibName)]
+    public static partial uint JPH_CharacterBase_GetGroundSubShapeId(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial ulong JPH_CharacterBase_GetGroundUserData(nint handle);
+    #endregion
+
+    #region CharacterVirtual
     /* CharacterVirtualSettings */
     [LibraryImport(LibName)]
     public static partial nint JPH_CharacterVirtualSettings_Create();
 
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtualSettings_GetMass(nint handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetMass(nint handle, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtualSettings_GetMaxStrength(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetMaxStrength(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_GetShapeOffset(nint settings, out Vector3 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetShapeOffset(nint settings, in Vector3 value);
+    [LibraryImport(LibName)]
+    public static partial BackFaceMode JPH_CharacterVirtualSettings_GetBackFaceMode(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetBackFaceMode(nint settings, BackFaceMode value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtualSettings_GetPredictiveContactDistance(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetPredictiveContactDistance(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_CharacterVirtualSettings_GetMaxCollisionIterations(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetMaxCollisionIterations(nint settings, uint value);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_CharacterVirtualSettings_GetMaxConstraintIterations(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetMaxConstraintIterations(nint settings, uint value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtualSettings_GetMinTimeRemaining(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetMinTimeRemaining(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtualSettings_GetCollisionTolerance(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetCollisionTolerance(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtualSettings_GetCharacterPadding(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetCharacterPadding(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_CharacterVirtualSettings_GetMaxNumHits(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetMaxNumHits(nint settings, uint value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtualSettings_GetHitReductionCosMaxAngle(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetHitReductionCosMaxAngle(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtualSettings_GetPenetrationRecoverySpeed(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtualSettings_SetPenetrationRecoverySpeed(nint settings, float value);
+
     /* CharacterVirtual */
     [LibraryImport(LibName)]
-    public static partial nint JPH_CharacterVirtual_Create(IntPtr settings, in Double3 position, in Quaternion rotation, ulong userData, IntPtr physicsSystem);
+    public static partial nint JPH_CharacterVirtual_Create(nint settings, in Vector3 position, in Quaternion rotation, ulong userData, nint physicsSystem);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterVirtual_Create(nint settings, in Double3 position, in Quaternion rotation, ulong userData, nint physicsSystem);
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_GetLinearVelocity(IntPtr handle, out Vector3 velocity);
@@ -1598,10 +1725,10 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_CharacterVirtual_SetLinearVelocity(IntPtr handle, in Vector3 velocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_GetPosition(IntPtr handle, out Double3 position);
+    public static partial void JPH_CharacterVirtual_GetPosition(IntPtr handle, out Vector3 position); // RVec3
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_SetPosition(nint handle, in Double3 position);
+    public static partial void JPH_CharacterVirtual_SetPosition(nint handle, in Vector3 position);// RVec3
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_GetRotation(nint handle, out Quaternion rotation);
@@ -1610,5 +1737,69 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_CharacterVirtual_SetRotation(nint handle, in Quaternion rotation);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_GetWorldTransform(nint shape, out Matrix4x4 result); //RMatrix4x4
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_GetCenterOfMassTransform(nint shape, out Matrix4x4 result); //RMatrix4x4
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtual_GetMass(nint handle);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetMass(nint handle, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtual_GetMaxStrength(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetMaxStrength(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtual_GetPenetrationRecoverySpeed(nint character);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetPenetrationRecoverySpeed(nint character, float value);
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_CharacterVirtual_GetEnhancedInternalEdgeRemoval(nint character);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetEnhancedInternalEdgeRemoval(nint character, Bool32 value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtual_GetCharacterPadding(nint character);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_CharacterVirtual_GetMaxNumHits(nint character);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetMaxNumHits(nint character, uint value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterVirtual_GetHitReductionCosMaxAngle(nint character);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetHitReductionCosMaxAngle(nint character, float value);
+    [LibraryImport(LibName)]
+    public static partial Bool32 JPH_CharacterVirtual_GetMaxHitsExceeded(nint character);
+    [LibraryImport(LibName)]
+    public static partial ulong JPH_CharacterVirtual_GetUserData(nint character);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetUserData(nint character, ulong value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_Update(nint handle, float deltaTime, ushort layer, nint physicsSytem);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_ExtendedUpdate(nint handle, float deltaTime, ExtendedUpdateSettings* settings, ushort layer, nint physicsSytem);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_RefreshContacts(nint handle, ushort layer, nint physicsSytem);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_CancelVelocityTowardsSteepSlopes(nint handle, in Vector3 desiredVelocity, out Vector3 velocity);
+
+    public struct JPH_CharacterContactListener_Procs
+    {
+        public delegate* unmanaged<nint, nint, nint, Vector3*, Vector3*, void> OnAdjustBodyVelocity;
+        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Bool32> OnContactValidate;
+        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, CharacterContactSettings*, void> OnContactAdded;
+        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, Vector3*, nint, Vector3*, Vector3*, void> OnContactSolve;
+    }
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterContactListener_Create(JPH_CharacterContactListener_Procs procs, nint userData);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterContactListener_Destroy(nint listener);
+    #endregion
 }

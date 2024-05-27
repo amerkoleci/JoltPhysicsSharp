@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -17,17 +17,24 @@ public sealed class TriangleShapeSettings : ConvexShapeSettings
     /// Finalizes an instance of the <see cref="TriangleShapeSettings" /> class.
     /// </summary>
     ~TriangleShapeSettings() => Dispose(disposing: false);
+
+    public override Shape Create() => new TriangleShape(this);
 }
 
-//public sealed class TriangleShape : ConvexShape
-//{
-//    public unsafe TriangleShape(float radius)
-//        : base(JPH_SphereShape_Create(radius))
-//    {
-//    }
+public sealed class TriangleShape : ConvexShape
+{
+    public TriangleShape(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius = 0.0f)
+        : base(JPH_TriangleShape_Create(v1, v2, v3, convexRadius))
+    {
+    }
 
-//    /// <summary>
-//    /// Finalizes an instance of the <see cref="TriangleShape" /> class.
-//    /// </summary>
-//    ~TriangleShape() => Dispose(isDisposing: false);
-//}
+    public TriangleShape(TriangleShapeSettings settings)
+        : base(JPH_TriangleShapeSettings_CreateShape(settings.Handle))
+    {
+    }
+
+    /// <summary>
+    /// Finalizes an instance of the <see cref="TriangleShape" /> class.
+    /// </summary>
+    ~TriangleShape() => Dispose(disposing: false);
+}

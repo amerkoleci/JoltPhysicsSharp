@@ -1,14 +1,7 @@
 # Define target name
 set (TARGET_NAME HelloWorldNative)
 
-set(SOURCE_FILES main.cpp)
-
-if (ANDROID)
-    add_library(${TARGET_NAME} SHARED ${SOURCE_FILES})
-    target_link_libraries(${TARGET_NAME} log android native_app_glue)
-else ()
-    add_executable(${TARGET_NAME} ${SOURCE_FILES})
-endif ()
+add_executable(${TARGET_NAME} main.cpp)
 
  if (WIN32)
     set_target_properties(${TARGET_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)

@@ -45,6 +45,8 @@ public unsafe class RotatedTranslatedShapeSettings : DecoratedShapeSettings
             return rotation;
         }
     }
+
+    public override Shape Create() => new RotatedTranslatedShape(this);
 }
 
 public unsafe class RotatedTranslatedShape : DecoratedShape

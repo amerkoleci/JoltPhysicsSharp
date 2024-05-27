@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using static JoltPhysicsSharp.JoltApi;
@@ -11,12 +11,14 @@ public sealed class MutableCompoundShapeSettings : CompoundShapeShapeSettings
         : base(JPH_MutableCompoundShapeSettings_Create())
     {
     }
+
+    public override Shape Create() => new MutableCompoundShape(this);
 }
 
 public sealed class MutableCompoundShape : CompoundShape
 {
-    internal MutableCompoundShape(nint handle)
-        : base(handle)
+    public MutableCompoundShape(MutableCompoundShapeSettings settings)
+        : base(JPH_MutableCompoundShape_Create(settings.Handle))
     {
     }
 }

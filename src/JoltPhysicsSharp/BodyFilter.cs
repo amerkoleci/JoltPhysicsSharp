@@ -25,11 +25,11 @@ public abstract class BodyFilter : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="BodyFilter" /> class.
     /// </summary>
-    ~BodyFilter() => Dispose(isDisposing: false);
+    ~BodyFilter() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_BodyFilter_Destroy(Handle);
         }

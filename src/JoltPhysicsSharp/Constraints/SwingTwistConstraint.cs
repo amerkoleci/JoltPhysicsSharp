@@ -33,7 +33,7 @@ public sealed class SwingTwistConstraint : TwoBodyConstraint
     /// <summary>
     /// Finalizes an instance of the <see cref="SwingTwistConstraint" /> class.
     /// </summary>
-    ~SwingTwistConstraint() => Dispose(isDisposing: false);
+    ~SwingTwistConstraint() => Dispose(disposing: false);
 
     public float GetNormalHalfConeAngle() => JPH_SwingTwistConstraint_GetNormalHalfConeAngle(Handle);
 }

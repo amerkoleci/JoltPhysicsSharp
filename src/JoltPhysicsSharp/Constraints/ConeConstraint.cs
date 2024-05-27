@@ -96,7 +96,7 @@ public unsafe class ConeConstraint : TwoBodyConstraint
     /// <summary>
     /// Finalizes an instance of the <see cref="ConeConstraint" /> class.
     /// </summary>
-    ~ConeConstraint() => Dispose(isDisposing: false);
+    ~ConeConstraint() => Dispose(disposing: false);
 
     public float CosHalfConeAngle
     {

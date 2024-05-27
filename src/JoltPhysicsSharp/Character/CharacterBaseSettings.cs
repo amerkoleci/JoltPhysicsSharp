@@ -1,4 +1,4 @@
-﻿// Copyright © Amer Koleci and Contributors.
+﻿// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -7,38 +7,73 @@ using static JoltPhysicsSharp.JoltApi;
 namespace JoltPhysicsSharp;
 public abstract class CharacterBaseSettings : NativeObject
 {
-    protected CharacterBaseSettings()
-        : base()
-    {
-    }
-
     protected CharacterBaseSettings(nint handle)
         : base(handle)
     {
     }
 
-    ~CharacterBaseSettings() => Dispose(isDisposing: false);
+    ~CharacterBaseSettings() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_CharacterBaseSettings_Destroy(Handle);
         }
     }
 
-    public void SetMaxSlopeAngle(float maxSlopeAngle)
+    public Vector3 Up
     {
-        JPH_CharacterBaseSettings_SetMaxSlopeAngle(Handle, maxSlopeAngle);
+        get
+        {
+            JPH_CharacterBaseSettings_GetUp(Handle, out Vector3 result);
+            return result;
+        }
+        set
+        {
+            JPH_CharacterBaseSettings_SetUp(Handle, in value);
+        }
     }
 
-    public void SetShape(Shape shape)
+    public Plane SupportingVolume
     {
-        JPH_CharacterBaseSettings_SetShape(Handle, shape.Handle);
+        get
+        {
+            JPH_CharacterBaseSettings_GetSupportingVolume(Handle, out Plane result);
+            return result;
+        }
+        set
+        {
+            JPH_CharacterBaseSettings_SetSupportingVolume(Handle, in value);
+        }
     }
 
-    public void SetSupportingVolume(in Vector3 normal, float constant)
+    public float MaxSlopeAngle
     {
-        JPH_CharacterBaseSettings_SetSupportingVolume(Handle, normal, constant);
+        get
+        {
+            return JPH_CharacterBaseSettings_GetMaxSlopeAngle(Handle);
+        }
+        set
+        {
+            JPH_CharacterBaseSettings_SetMaxSlopeAngle(Handle, value);
+        }
+    }
+
+    public bool EnhancedInternalEdgeRemoval
+    {
+        get
+        {
+            return JPH_CharacterBaseSettings_GetEnhancedInternalEdgeRemoval(Handle);
+        }
+        set
+        {
+            JPH_CharacterBaseSettings_SetEnhancedInternalEdgeRemoval(Handle, value);
+        }
+    }
+
+    public Shape Shape
+    {
+        set => JPH_CharacterBaseSettings_SetShape(Handle, value.Handle);
     }
 }

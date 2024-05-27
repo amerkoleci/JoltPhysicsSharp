@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -17,6 +17,8 @@ public sealed class CapsuleShapeSettings : ConvexShapeSettings
     /// Finalizes an instance of the <see cref="CapsuleShapeSettings" /> class.
     /// </summary>
     ~CapsuleShapeSettings() => Dispose(disposing: false);
+
+    public override Shape Create() => new CapsuleShape(this);
 }
 
 public sealed class CapsuleShape : ConvexShape
@@ -26,10 +28,15 @@ public sealed class CapsuleShape : ConvexShape
     {
     }
 
+    public CapsuleShape(CapsuleShapeSettings settings)
+        : base(JPH_CapsuleShapeSettings_CreateShape(settings.Handle))
+    {
+    }
+
     /// <summary>
     /// Finalizes an instance of the <see cref="CapsuleShape" /> class.
     /// </summary>
-    ~CapsuleShape() => Dispose(isDisposing: false);
+    ~CapsuleShape() => Dispose(disposing: false);
 
     public float Radius => JPH_CapsuleShape_GetRadius(Handle);
     public float HalfHeightOfCylinder => JPH_CapsuleShape_GetHalfHeightOfCylinder(Handle);

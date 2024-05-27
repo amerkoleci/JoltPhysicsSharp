@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using static JoltPhysicsSharp.JoltApi;
@@ -22,6 +22,8 @@ public sealed class SphereShapeSettings : ConvexShapeSettings
         get => JPH_SphereShapeSettings_GetRadius(Handle);
         set => JPH_SphereShapeSettings_SetRadius(Handle, value);
     }
+
+    public override Shape Create() => new SphereShape(this);
 }
 
 public sealed class SphereShape : ConvexShape
@@ -39,7 +41,7 @@ public sealed class SphereShape : ConvexShape
     /// <summary>
     /// Finalizes an instance of the <see cref="SphereShape" /> class.
     /// </summary>
-    ~SphereShape() => Dispose(isDisposing: false);
+    ~SphereShape() => Dispose(disposing: false);
 
     public float Radius
     {

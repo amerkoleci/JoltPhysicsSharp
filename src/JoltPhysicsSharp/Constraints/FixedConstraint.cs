@@ -133,7 +133,7 @@ public unsafe class FixedConstraint : TwoBodyConstraint
     /// <summary>
     /// Finalizes an instance of the <see cref="FixedConstraint" /> class.
     /// </summary>
-    ~FixedConstraint() => Dispose(isDisposing: false);
+    ~FixedConstraint() => Dispose(disposing: false);
 
     public Vector3 GetTotalLambdaPosition()
     {

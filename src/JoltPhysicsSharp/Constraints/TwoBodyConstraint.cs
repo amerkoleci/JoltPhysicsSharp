@@ -7,17 +7,12 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public abstract class TwoBodyConstraintSettings : ConvexShapeSettings
+public abstract class TwoBodyConstraintSettings : ConstraintSettings
 {
     protected TwoBodyConstraintSettings(IntPtr handle)
         : base(handle)
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TwoBodyConstraintSettings" /> class.
-    /// </summary>
-    ~TwoBodyConstraintSettings() => Dispose(disposing: false);
 
     public abstract TwoBodyConstraint CreateConstraint(in Body body1, in Body body2);
 }
@@ -32,7 +27,7 @@ public abstract unsafe class TwoBodyConstraint : Constraint
     /// <summary>
     /// Finalizes an instance of the <see cref="TwoBodyConstraint" /> class.
     /// </summary>
-    ~TwoBodyConstraint() => Dispose(isDisposing: false);
+    ~TwoBodyConstraint() => Dispose(disposing: false);
 
     public Body Body1
     {

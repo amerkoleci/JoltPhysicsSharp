@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -31,6 +31,8 @@ public sealed class HeightFieldShapeSettings : ConvexShapeSettings
     /// </summary>
     ~HeightFieldShapeSettings() => Dispose(disposing: false);
 
+    public override Shape Create() => new HeightFieldShape(this);
+
     public void Sanitize() => JPH_MeshShapeSettings_Sanitize(Handle);
 
     public void DetermineMinAndMaxSample(out float minValue, out float maxValue, out float quantizationScale)
@@ -41,5 +43,13 @@ public sealed class HeightFieldShapeSettings : ConvexShapeSettings
     public uint CalculateBitsPerSampleForError(float maxError)
     {
         return JPH_MeshShapeSettings_CalculateBitsPerSampleForError(Handle, maxError);
+    }
+}
+
+public sealed class HeightFieldShape : Shape
+{
+    public HeightFieldShape(in HeightFieldShapeSettings settings)
+        : base(JPH_HeightFieldShapeSettings_CreateShape(settings.Handle))
+    {
     }
 }

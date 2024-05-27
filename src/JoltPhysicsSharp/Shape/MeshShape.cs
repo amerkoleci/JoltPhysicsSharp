@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -58,6 +58,8 @@ public sealed unsafe class MeshShapeSettings : ConvexShapeSettings
     /// Finalizes an instance of the <see cref="TriangleShapeSettings" /> class.
     /// </summary>
     ~MeshShapeSettings() => Dispose(disposing: false);
+
+    public override Shape Create() => new MeshShape(this);
 
     public void Sanitize() => JPH_MeshShapeSettings_Sanitize(Handle);
 }

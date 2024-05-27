@@ -70,5 +70,5 @@ public sealed class HingeConstraint : TwoBodyConstraint
     /// <summary>
     /// Finalizes an instance of the <see cref="HingeConstraint" /> class.
     /// </summary>
-    ~HingeConstraint() => Dispose(isDisposing: false);
+    ~HingeConstraint() => Dispose(disposing: false);
 }

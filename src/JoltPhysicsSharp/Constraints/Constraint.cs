@@ -20,11 +20,11 @@ public abstract class ConstraintSettings : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="ConstraintSettings" /> class.
     /// </summary>
-    ~ConstraintSettings() => Dispose(isDisposing: false);
+    ~ConstraintSettings() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_ConstraintSettings_Destroy(Handle);
         }
@@ -41,11 +41,11 @@ public abstract class Constraint : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="Constraint" /> class.
     /// </summary>
-    ~Constraint() => Dispose(isDisposing: false);
+    ~Constraint() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_Constraint_Destroy(Handle);
         }

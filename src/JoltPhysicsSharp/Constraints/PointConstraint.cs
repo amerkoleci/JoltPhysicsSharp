@@ -85,7 +85,7 @@ public sealed unsafe class PointConstraint : TwoBodyConstraint
     /// <summary>
     /// Finalizes an instance of the <see cref="PointConstraint" /> class.
     /// </summary>
-    ~PointConstraint() => Dispose(isDisposing: false);
+    ~PointConstraint() => Dispose(disposing: false);
 
     public void SetPoint1(ConstraintSpace space, in Vector3 value)
     {

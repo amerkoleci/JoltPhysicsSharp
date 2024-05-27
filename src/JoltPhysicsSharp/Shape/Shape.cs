@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -31,7 +31,7 @@ public abstract class ShapeSettings : NativeObject
         }
     }
 
-    //public abstract Shape Create();
+    public abstract Shape Create();
 }
 
 
@@ -49,11 +49,11 @@ public abstract unsafe class Shape : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="Shape" /> class.
     /// </summary>
-    ~Shape() => Dispose(isDisposing: false);
+    ~Shape() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_Shape_Destroy(Handle);
         }

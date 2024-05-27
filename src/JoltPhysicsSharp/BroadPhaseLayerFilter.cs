@@ -24,11 +24,11 @@ public abstract class BroadPhaseLayerFilter : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="BodyFilter" /> class.
     /// </summary>
-    ~BroadPhaseLayerFilter() => Dispose(isDisposing: false);
+    ~BroadPhaseLayerFilter() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_BroadPhaseLayerFilter_Destroy(Handle);
         }

@@ -99,11 +99,11 @@ public sealed unsafe class BodyCreationSettings : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="BodyCreationSettings" /> class.
     /// </summary>
-    ~BodyCreationSettings() => Dispose(isDisposing: false);
+    ~BodyCreationSettings() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_BodyCreationSettings_Destroy(Handle);
         }

@@ -66,7 +66,7 @@ public unsafe class DistanceConstraint : TwoBodyConstraint
     /// <summary>
     /// Finalizes an instance of the <see cref="DistanceConstraint" /> class.
     /// </summary>
-    ~DistanceConstraint() => Dispose(isDisposing: false);
+    ~DistanceConstraint() => Dispose(disposing: false);
 
     public float MinDisptance => JPH_DistanceConstraint_GetMinDistance(Handle);
     public float MaxDisptance => JPH_DistanceConstraint_GetMaxDistance(Handle);

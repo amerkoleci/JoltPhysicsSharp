@@ -24,11 +24,11 @@ public abstract class ObjectLayerFilter : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="BodyFilter" /> class.
     /// </summary>
-    ~ObjectLayerFilter() => Dispose(isDisposing: false);
+    ~ObjectLayerFilter() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_ObjectLayerFilter_Destroy(Handle);
         }

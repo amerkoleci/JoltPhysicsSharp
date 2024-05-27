@@ -1,4 +1,4 @@
-﻿// Copyright © Amer Koleci and Contributors.
+﻿// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
@@ -13,53 +13,94 @@ public abstract class CharacterBase : NativeObject
     }
 
     protected CharacterBase(IntPtr handle)
-        : base(handle) { }
-
-    ~CharacterBase() => Dispose(isDisposing: false);
-
-    protected override void Dispose(bool isDisposing)
+        : base(handle)
     {
-        if (isDisposing)
+    }
+
+    ~CharacterBase() => Dispose(disposing: false);
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
         {
             JPH_CharacterBase_Destroy(Handle);
         }
     }
 
-    public GroundState GetGroundState()
+    public float CosMaxSlopeAngle => JPH_CharacterBase_GetCosMaxSlopeAngle(Handle);
+    public float MaxSlopeAngle
     {
-        return JPH_CharacterBase_GetGroundState(Handle);
+        set => JPH_CharacterBase_SetMaxSlopeAngle(Handle, value);
     }
 
-    public bool IsSupported()
+    public Vector3 Up
     {
-        return JPH_CharacterBase_IsSupported(Handle);
+        get
+        {
+            JPH_CharacterBase_GetUp(Handle, out Vector3 result);
+            return result;
+        }
+        set
+        {
+            JPH_CharacterBase_SetUp(Handle, in value);
+        }
     }
 
-    public Double3 GetGroundPosition()
+    public GroundState GroundState
     {
-        JPH_CharacterBase_GetGroundPosition(Handle, out Double3 position);
-        return position;
+        get => JPH_CharacterBase_GetGroundState(Handle);
     }
 
-    public Vector3 GetGroundNormal()
+    public bool IsSupported
     {
-        JPH_CharacterBase_GetGroundNormal(Handle, out Vector3 normal);
-        return normal;
+        get => JPH_CharacterBase_IsSupported(Handle);
     }
 
-    public Vector3 GetGroundVelocity()
+    public Vector3 GroundPosition
     {
-        JPH_CharacterBase_GetGroundVelocity(Handle, out Vector3 velocity);
-        return velocity;
+        get
+        {
+            JPH_CharacterBase_GetGroundPosition(Handle, out Vector3 position);
+            return position;
+        }
     }
 
-    public uint GetGroundBodyId()
+    public Vector3 GroundNormal
     {
-        return JPH_CharacterBase_GetGroundBodyId(Handle);
+        get
+        {
+            JPH_CharacterBase_GetGroundNormal(Handle, out Vector3 normal);
+            return normal;
+        }
     }
 
-    public uint GetGroundSubShapeId()
+    public Vector3 GroundVelocity
     {
-        return JPH_CharacterBase_GetGroundSubShapeId(Handle);
+        get
+        {
+            JPH_CharacterBase_GetGroundVelocity(Handle, out Vector3 velocity);
+            return velocity;
+        }
+    }
+
+    public uint GroundBodyId
+    {
+        get => JPH_CharacterBase_GetGroundBodyId(Handle);
+    }
+
+    public uint GroundSubShapeId
+    {
+        get => JPH_CharacterBase_GetGroundSubShapeId(Handle);
+    }
+
+    public ulong GroundUserDat
+    {
+        get => JPH_CharacterBase_GetGroundUserData(Handle);
+    }
+
+
+    public bool IsSlopeTooSteep(in Vector3 value)
+    {
+        return JPH_CharacterBase_IsSlopeTooSteep(Handle, in value);
     }
 }

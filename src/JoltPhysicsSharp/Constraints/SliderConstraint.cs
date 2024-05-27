@@ -39,5 +39,5 @@ public sealed class SliderConstraint : TwoBodyConstraint
     /// <summary>
     /// Finalizes an instance of the <see cref="SliderConstraint" /> class.
     /// </summary>
-    ~SliderConstraint() => Dispose(isDisposing: false);
+    ~SliderConstraint() => Dispose(disposing: false);
 }

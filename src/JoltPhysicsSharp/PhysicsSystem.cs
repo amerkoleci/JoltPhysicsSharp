@@ -96,11 +96,11 @@ public sealed unsafe class PhysicsSystem : NativeObject
     /// <summary>
     /// Finalizes an instance of the <see cref="PhysicsSystem" /> class.
     /// </summary>
-    ~PhysicsSystem() => Dispose(isDisposing: false);
+    ~PhysicsSystem() => Dispose(disposing: false);
 
-    protected override void Dispose(bool isDisposing)
+    protected override void Dispose(bool disposing)
     {
-        if (isDisposing)
+        if (disposing)
         {
             JPH_ContactListener_Destroy(_contactListenerHandle);
             JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);

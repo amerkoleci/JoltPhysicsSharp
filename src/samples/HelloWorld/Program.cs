@@ -241,6 +241,21 @@ public static class Program
             MeshShapeSettings meshShape = CreateTorusMesh(3.0f, 1.0f);
             BodyCreationSettings bodySettings = new(meshShape, new Vector3(0, 10, 0), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
 
+            // Create capsule
+            float mHeightStanding = 1.35f;
+            float mRadiusStanding = 0.3f;
+
+            CapsuleShape capsule = new(0.5f * mHeightStanding, mRadiusStanding);
+
+            CharacterVirtualSettings characterSettings = new();
+            characterSettings.Shape = new RotatedTranslatedShapeSettings(new Vector3(0, 0.5f * mHeightStanding + mRadiusStanding, 0), Quaternion.Identity, capsule).Create();
+
+            // Configure supporting volume
+            characterSettings.SupportingVolume = new Plane(Vector3.UnitY, -mHeightStanding); // Accept contacts that touch the lower sphere of the capsule
+
+
+            CharacterVirtual character = new(characterSettings, new Vector3(0, 0, 0), Quaternion.Identity, 0, physicsSystem);
+
             // We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
             const float deltaTime = 1.0f / 60.0f;
 

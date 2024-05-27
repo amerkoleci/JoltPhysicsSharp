@@ -49,7 +49,7 @@ public sealed class SixDOFConstraint : TwoBodyConstraint
     /// <summary>
     /// Finalizes an instance of the <see cref="SixDOFConstraint" /> class.
     /// </summary>
-    ~SixDOFConstraint() => Dispose(isDisposing: false);
+    ~SixDOFConstraint() => Dispose(disposing: false);
 
     public float GetLimitsMin(Axis axis) => JPH_SixDOFConstraint_GetLimitsMin(Handle, (uint)axis);
     public float GetLimitsMax(Axis axis) => JPH_SixDOFConstraint_GetLimitsMax(Handle, (uint)axis);

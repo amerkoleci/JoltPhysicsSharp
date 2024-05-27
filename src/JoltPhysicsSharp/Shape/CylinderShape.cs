@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using static JoltPhysicsSharp.JoltApi;
@@ -16,6 +16,8 @@ public sealed class CylinderShapeSettings : ConvexShapeSettings
     /// Finalizes an instance of the <see cref="CylinderShapeSettings" /> class.
     /// </summary>
     ~CylinderShapeSettings() => Dispose(disposing: false);
+
+    public override Shape Create() => new CylinderShape(this);
 }
 
 
@@ -26,10 +28,15 @@ public sealed class CylinderShape : ConvexShape
     {
     }
 
+    public CylinderShape(CylinderShapeSettings settings)
+        : base(JPH_CylinderShapeSettings_CreateShape(settings.Handle))
+    {
+    }
+
     /// <summary>
     /// Finalizes an instance of the <see cref="CylinderShape" /> class.
     /// </summary>
-    ~CylinderShape() => Dispose(isDisposing: false);
+    ~CylinderShape() => Dispose(disposing: false);
 
     public float Radius => JPH_CylinderShape_GetRadius(Handle);
     public float HalfHeight => JPH_CylinderShape_GetHalfHeight(Handle);
