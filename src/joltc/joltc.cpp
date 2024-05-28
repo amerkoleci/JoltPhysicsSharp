@@ -2519,8 +2519,8 @@ float JPH_ConeConstraintSettings_GetHalfConeAngle(JPH_ConeConstraintSettings* se
 
 JPH_ConeConstraint* JPH_ConeConstraintSettings_CreateConstraint(JPH_ConeConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
 {
-	auto joltBody1 = body1 ? reinterpret_cast<JPH::Body*>(body1) : &JPH::Body::sFixedToWorld;
-    auto joltBody2 = body2 ? reinterpret_cast<JPH::Body*>(body2) : &JPH::Body::sFixedToWorld;
+    auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
+    auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
     JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::ConeConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
     constraint->AddRef();
 
@@ -4280,6 +4280,11 @@ void JPH_Body_SetUserData(JPH_Body* body, uint64_t userData)
 uint64_t JPH_Body_GetUserData(JPH_Body* body)
 {
     return reinterpret_cast<JPH::Body*>(body)->GetUserData();
+}
+
+JPH_Body* JPH_Body_GetFixedToWorldBody(void)
+{
+	return reinterpret_cast<JPH_Body*>(&JPH::Body::sFixedToWorld);
 }
 
 /* Contact Listener */
