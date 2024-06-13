@@ -140,7 +140,7 @@ jobs:
           message: Updated native libs
           committer_name: GitHub Actions
           committer_email: actions@github.com
-      - uses: geekyeggo/delete-artifact@v2
+      - uses: geekyeggo/delete-artifact@v5
         with:
           name: |
             libs_windows
