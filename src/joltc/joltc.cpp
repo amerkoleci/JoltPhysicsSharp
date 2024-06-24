@@ -2302,12 +2302,118 @@ void JPH_SliderConstraintSettings_SetSliderAxis(JPH_SliderConstraintSettings* se
     joltSettings->SetSliderAxis(ToJolt(axis));
 }
 
-void JPH_SliderConstraintSettings_GetSliderAxis(JPH_SliderConstraintSettings* settings, JPH_Vec3* result)
+JPH_Bool32 JPH_SliderConstraintSettings_GetAutoDetectPoint(JPH_SliderConstraintSettings* settings)
 {
 	JPH_ASSERT(settings);
 
+    JPH::SliderConstraintSettings* joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    return static_cast<JPH_Bool32>(joltSettings->mAutoDetectPoint);
+}
+
+void JPH_SliderConstraintSettings_SetAutoDetectPoint(JPH_SliderConstraintSettings* settings, JPH_Bool32 value)
+{
+	JPH_ASSERT(settings);
+
+    JPH::SliderConstraintSettings* joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    joltSettings->mAutoDetectPoint = static_cast<bool>(value);
+}
+
+void JPH_SliderConstraintSettings_GetPoint1(JPH_SliderConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+
+    auto joltVector = joltSettings->mPoint1;
+    FromJolt(joltVector, result);
+}
+
+void JPH_SliderConstraintSettings_SetPoint1(JPH_SliderConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+
+    joltSettings->mPoint1 = ToJolt(value);
+}
+
+void JPH_SliderConstraintSettings_GetPoint2(JPH_SliderConstraintSettings* settings, JPH_RVec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    auto joltVector = joltSettings->mPoint2;
+    FromJolt(joltVector, result);
+}
+
+void JPH_SliderConstraintSettings_SetPoint2(JPH_SliderConstraintSettings* settings, const JPH_RVec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    joltSettings->mPoint2 = ToJolt(value);
+}
+
+void JPH_SliderConstraintSettings_SetSliderAxis1(JPH_SliderConstraintSettings* settings, const JPH_Vec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    joltSettings->mSliderAxis1 = ToJolt(value);
+}
+
+void JPH_SliderConstraintSettings_GetSliderAxis1(JPH_SliderConstraintSettings* settings, JPH_Vec3* result)
+{
+    JPH_ASSERT(settings);
     auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
     FromJolt(joltSettings->mSliderAxis1, result);
+}
+
+void JPH_SliderConstraintSettings_SetNormalAxis1(JPH_SliderConstraintSettings* settings, const JPH_Vec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    joltSettings->mNormalAxis1 = ToJolt(value);
+}
+
+void JPH_SliderConstraintSettings_GetNormalAxis1(JPH_SliderConstraintSettings* settings, JPH_Vec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    FromJolt(joltSettings->mNormalAxis1, result);
+}
+
+void JPH_SliderConstraintSettings_SetSliderAxis2(JPH_SliderConstraintSettings* settings, const JPH_Vec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    joltSettings->mSliderAxis2 = ToJolt(value);
+}
+
+void JPH_SliderConstraintSettings_GetSliderAxis2(JPH_SliderConstraintSettings* settings, JPH_Vec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    FromJolt(joltSettings->mSliderAxis2, result);
+}
+
+void JPH_SliderConstraintSettings_SetNormalAxis2(JPH_SliderConstraintSettings* settings, const JPH_Vec3* value)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    joltSettings->mNormalAxis2 = ToJolt(value);
+}
+
+void JPH_SliderConstraintSettings_GetNormalAxis2(JPH_SliderConstraintSettings* settings, JPH_Vec3* result)
+{
+    JPH_ASSERT(settings);
+    auto joltSettings = reinterpret_cast<JPH::SliderConstraintSettings*>(settings);
+    FromJolt(joltSettings->mNormalAxis2, result);
+}
+
+JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
+{
+    auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
+    auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
+    JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::SliderConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
+    constraint->AddRef();
+
+    return reinterpret_cast<JPH_SliderConstraint*>(static_cast<JPH::SliderConstraint*>(constraint));
 }
 
 JPH_SliderConstraintSettings* JPH_SliderConstraint_GetSettings(JPH_SliderConstraint* constraint)
@@ -2677,16 +2783,6 @@ void JPH_SixDOFConstraint_GetTotalLambdaMotorRotation(const JPH_SixDOFConstraint
 	auto joltConstraint = reinterpret_cast<const JPH::SixDOFConstraint*>(constraint);
 	auto lambda = joltConstraint->GetTotalLambdaMotorRotation();
 	FromJolt(lambda, result);
-}
-
-JPH_SliderConstraint* JPH_SliderConstraintSettings_CreateConstraint(JPH_SliderConstraintSettings* settings, JPH_Body* body1, JPH_Body* body2)
-{
-    auto joltBody1 = reinterpret_cast<JPH::Body*>(body1);
-    auto joltBody2 = reinterpret_cast<JPH::Body*>(body2);
-    JPH::TwoBodyConstraint* constraint = reinterpret_cast<JPH::SliderConstraintSettings*>(settings)->Create(*joltBody1, *joltBody2);
-    constraint->AddRef();
-
-    return reinterpret_cast<JPH_SliderConstraint*>(static_cast<JPH::SliderConstraint*>(constraint));
 }
 
 void JPH_DistanceConstraint_SetDistance(JPH_DistanceConstraint* constraint, float minDistance, float maxDistance)
