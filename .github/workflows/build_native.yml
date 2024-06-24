@@ -72,22 +72,25 @@ jobs:
     - name: Build linux-x64
       run: cmake --build build_linux_x64 --config Distribution --verbose --parallel
 
-    - name: Setup Linux dependencies (arm64)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
-        sudo sed -i "s/^deb/deb [arch=amd64,i386]/g" /etc/apt/sources.list
-        echo "deb [arch=arm64,armhf] http://ports.ubuntu.com/ $(lsb_release -s -c) main universe multiverse restricted" | sudo tee -a /etc/apt/sources.list
-        echo "deb [arch=arm64,armhf] http://ports.ubuntu.com/ $(lsb_release -s -c)-updates main universe multiverse restricted" | sudo tee -a /etc/apt/sources.list
-        sudo dpkg --add-architecture arm64
-        sudo apt-get update
-        sudo apt-get install -y libwayland-dev:arm64 libegl-dev:arm64 libdrm-dev:arm64 libxkbcommon-dev:arm64 libpulse-dev:arm64
+    - name: Setup Android NDK
+      id: setup-ndk
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r25
+        add-to-path: false
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
 
-    - name: CMake Configure (linux-arm64)
-      run: PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig cmake -S "." -B "build_linux_arm64"  -S Platform -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_SYSTEM_NAME=Linux
+    - name: CMake Configure (android-arm64-v8a)
+      run: >
+        cmake -S "." -B "build_android_arm64_v8a"
+        -DANDROID_ABI=arm64-v8a
+        -DCMAKE_BUILD_TYPE=Distribution
+        -DANDROID_NDK=${{ steps.setup-ndk.outputs.ndk-path }}
+        -DCMAKE_TOOLCHAIN_FILE="${{ steps.setup-ndk.outputs.ndk-path }}/build/cmake/android.toolchain.cmake"
 
-    - name: Build linux-arm64
-      run: cmake --build build_linux_arm64 --config Distribution --verbose --parallel
+    - name: Build (android-arm64-v8a)
+      run: cmake --build build_android_arm64_v8a --config Distribution --verbose --parallel
 
     # Linux artifact 
     - name: package_linux
