@@ -113,7 +113,7 @@ jobs:
       run: cmake --build build_android_x86_64 --config Distribution --verbose --parallel
 
     # Linux and Android artifacts
-    - name: package_linux
+    - name: Package Linux and Android
       run: |
         mkdir -p bin/linux-x64/native
         mkdir -p bin/android-arm64/native
