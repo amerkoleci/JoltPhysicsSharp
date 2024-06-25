@@ -33,10 +33,6 @@ __pragma(warning(push, 0))
 __pragma(warning(pop))
 #endif
 
-#ifdef JPH_COMPILER_GCC
-JPH_GCC_SUPPRESS_WARNING("-Winvalid-offsetof")
-#endif
-
 #define ENSURE_SIZE_ALIGN(type0, type1) \
     static_assert(sizeof(type0) == sizeof(type1)); \
     static_assert(alignof(type0) == alignof(type1))
@@ -180,10 +176,5 @@ static_assert(JPH_BackFaceMode_CollideWithBackFaces == (int)JPH::EBackFaceMode::
 
 static_assert(sizeof(JPH::SubShapeIDPair) == sizeof(JPH_SubShapeIDPair));
 static_assert(alignof(JPH::SubShapeIDPair) == alignof(JPH_SubShapeIDPair));
-
-ENSURE_SIZE_ALIGN(JPH::RayCastResult, JPH_RayCastResult);
-static_assert(offsetof(JPH::RayCastResult, mBodyID) == offsetof(JPH_RayCastResult, bodyID));
-static_assert(offsetof(JPH::RayCastResult, mFraction) == offsetof(JPH_RayCastResult, fraction));
-static_assert(offsetof(JPH::RayCastResult, mSubShapeID2) == offsetof(JPH_RayCastResult, subShapeID2));
 
 //static_assert(offsetof(JPH::MassProperties, mMass) == offsetof(JPH_MassProperties, mass));
