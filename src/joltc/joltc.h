@@ -346,7 +346,6 @@ typedef struct JPH_BroadPhaseCastResult {
     float          fraction;
 } JPH_BroadPhaseCastResult;
 
-// NOTE: Needs to be kept in sync with JPH::RayCastResult
 typedef struct JPH_RayCastResult {
     JPH_BodyID     bodyID;
     float          fraction;
@@ -358,7 +357,6 @@ typedef struct JPH_CollidePointResult {
 	JPH_SubShapeID subShapeID2;
 } JPH_CollidePointResult;
 
-// NOTE: Needs to be kept in sync with JPH::ShapeCastResult
 typedef struct JPH_CollideShapeResult
 {
     JPH_Vec3           contactPointOn1;
