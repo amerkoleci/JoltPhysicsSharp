@@ -43,7 +43,6 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_RUN_ID)' != ''">true</ContinuousIntegrationBuild>
     <IsAotCompatible>true</IsAotCompatible>
-    <UseSharedCompilation>true</UseSharedCompilation>
   </PropertyGroup>
 
 </Project>
