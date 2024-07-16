@@ -80,6 +80,10 @@ option(USE_TZCNT "Enable TZCNT" ON)
 option(USE_F16C "Enable F16C" ON)
 option(USE_FMADD "Enable FMADD" ON)
 
+# Enable SIMD for the WASM build. Note that this is currently off by default since not all browsers support this.
+# See: https://caniuse.com/?search=WebAssembly%20SIMD (Safari got support in March 2023 and was the last major browser to get support).
+option(USE_WASM_SIMD "Enable SIMD for WASM" OFF)
+
 # Enable all warnings
 option(ENABLE_ALL_WARNINGS "Enable all warnings and warnings as errors" OFF)
 
@@ -130,7 +134,7 @@ endif()
 FetchContent_Declare(
         JoltPhysics
         GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics"
-        GIT_TAG "66ad0fff0c857392876ddbb16ea1d1f3d0a4d8e9"
+        GIT_TAG "fe9dbbbe1b873dbbc856320750692f185081e14d"
 		SOURCE_SUBDIR "Build"
 )
 FetchContent_MakeAvailable(JoltPhysics)
