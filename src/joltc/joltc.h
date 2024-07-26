@@ -1,8 +1,8 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-#ifndef _JOLT_C_H
-#define _JOLT_C_H
+#ifndef JOLT_C_H_
+#define JOLT_C_H_ 1
 
 #if defined(JPH_SHARED_LIBRARY_BUILD)
 #   if defined(_MSC_VER)
@@ -554,6 +554,7 @@ JPH_CAPI JPH_ObjectVsBroadPhaseLayerFilter* JPH_ObjectVsBroadPhaseLayerFilterTab
 /* JPH_PhysicsSystem */
 typedef struct JPH_PhysicsSystemSettings {
 	uint32_t maxBodies; /* 10240 */
+	uint32_t numBodyMutexes; /* 0 */
 	uint32_t maxBodyPairs; /* 65536 */
 	uint32_t maxContactConstraints; /* 10240 */
 	uint32_t _padding;
@@ -1490,4 +1491,4 @@ typedef struct JPH_CharacterContactListener_Procs {
 JPH_CAPI JPH_CharacterContactListener* JPH_CharacterContactListener_Create(JPH_CharacterContactListener_Procs procs, void* userData);
 JPH_CAPI void JPH_CharacterContactListener_Destroy(JPH_CharacterContactListener* listener);
 
-#endif /* _JOLT_C_H */
+#endif /* JOLT_C_H_ */

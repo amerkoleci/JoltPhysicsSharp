@@ -493,7 +493,7 @@ JPH_PhysicsSystem* JPH_PhysicsSystem_Create(const JPH_PhysicsSystemSettings* set
 
 	// Init the physics system
 	const uint maxBodies = settings->maxBodies ? settings->maxBodies : 10240;
-	constexpr uint cNumBodyMutexes = 0;
+	const uint cNumBodyMutexes = settings->numBodyMutexes;
 	const uint maxBodyPairs = settings->maxBodyPairs ? settings->maxBodyPairs : 65536;
 	const uint maxContactConstraints = settings->maxContactConstraints ? settings->maxContactConstraints : 10240;
 	system->physicsSystem = new PhysicsSystem();

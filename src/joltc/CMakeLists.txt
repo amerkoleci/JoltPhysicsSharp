@@ -19,16 +19,6 @@ target_include_directories(${TARGET_NAME} PUBLIC
 )
 target_link_libraries(${TARGET_NAME} PUBLIC Jolt)
 
-set_target_properties(${TARGET_NAME} PROPERTIES
-    CXX_STANDARD 17
-)
-
-if (MSVC)
-    target_compile_options(${TARGET_NAME} PRIVATE /Wall /WX)
-else()
-    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Werror)
-endif()
-
 if(BUILD_SHARED_LIBS)
 	set_property(TARGET Jolt PROPERTY POSITION_INDEPENDENT_CODE ON)
     set_property(TARGET ${TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
