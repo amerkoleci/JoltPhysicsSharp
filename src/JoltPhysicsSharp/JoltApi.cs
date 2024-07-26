@@ -834,6 +834,7 @@ internal static unsafe partial class JoltApi
     public struct NativePhysicsSystemSettings
     {
         public int maxBodies; /* 10240 */
+        public int numBodyMutexes; /* 0 */
         public int maxBodyPairs; /* 65536 */
         public int maxContactConstraints; /* 10240 */
         private int _padding;
@@ -1310,13 +1311,13 @@ internal static unsafe partial class JoltApi
 
     /* Body */
     [LibraryImport(LibName)]
-    public static partial uint JPH_Body_GetID(IntPtr body);
+    public static partial uint JPH_Body_GetID(nint body);
 
     [LibraryImport(LibName)]
-    public static partial BodyType JPH_Body_GetBodyType(IntPtr body);
+    public static partial BodyType JPH_Body_GetBodyType(nint body);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_GetWorldSpaceBounds(IntPtr body, BoundingBox* box);
+    public static partial void JPH_Body_GetWorldSpaceBounds(nint body, BoundingBox* box);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_Body_GetWorldSpaceSurfaceNormal))]
     public static partial void JPH_Body_GetWorldSpaceSurfaceNormal(nint body, SubShapeID subShapeID, Vector3* position, Vector3* normal);
@@ -1325,19 +1326,20 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Body_GetWorldSpaceSurfaceNormalDouble(nint body, SubShapeID subShapeID, Double3* position, Vector3* normal);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsActive(IntPtr handle);
+    public static partial Bool32 JPH_Body_IsActive(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsStatic(IntPtr handle);
+    public static partial Bool32 JPH_Body_IsStatic(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsKinematic(IntPtr handle);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Body_IsKinematic(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsDynamic(IntPtr handle);
+    public static partial Bool32 JPH_Body_IsDynamic(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsSensor(IntPtr handle);
+    public static partial Bool32 JPH_Body_IsSensor(nint handle);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Body_SetIsSensor(nint handle, Bool32 value);

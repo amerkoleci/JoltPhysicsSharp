@@ -7,5 +7,5 @@ public readonly struct BodyLockWrite
 {
     public readonly BodyLockInterface LockInterface;
     public readonly IntPtr Mutex; /* JPH_SharedMutex */
-    public readonly Body Body;
+    public readonly nint Body;
 }

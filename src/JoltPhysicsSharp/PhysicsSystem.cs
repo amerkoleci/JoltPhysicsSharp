@@ -17,6 +17,7 @@ public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyI
 public readonly struct PhysicsSystemSettings
 {
     public readonly int MaxBodies { get; init; } = 10240;
+    public readonly int NumBodyMutexes { get; init; } = 0;
     public readonly int MaxBodyPairs { get; init; } = 65536;
     public readonly int MaxContactConstraints { get; init; } = 10240;
     public ObjectLayerPairFilter? ObjectLayerPairFilter { get; init; }
@@ -37,7 +38,6 @@ public sealed unsafe class PhysicsSystem : NativeObject
     private readonly nint _contactListenerHandle;
     private readonly nint _bodyActivationListenerHandle;
 
-
     public PhysicsSystem(PhysicsSystemSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings.ObjectLayerPairFilter, nameof(settings.ObjectLayerPairFilter));
@@ -47,6 +47,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
         NativePhysicsSystemSettings nativeSettings = new()
         {
             maxBodies = settings.MaxBodies,
+            numBodyMutexes = settings.NumBodyMutexes,
             maxBodyPairs = settings.MaxBodyPairs,
             maxContactConstraints = settings.MaxContactConstraints,
             broadPhaseLayerInterface = settings.BroadPhaseLayerInterface.Handle,

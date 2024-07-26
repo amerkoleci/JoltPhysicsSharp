@@ -27,12 +27,12 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public Body CreateBody(BodyCreationSettings settings)
     {
-        return JPH_BodyInterface_CreateBody(Handle, settings.Handle);
+        return new(JPH_BodyInterface_CreateBody(Handle, settings.Handle));
     }
 
     public Body CreateSoftBody(SoftBodyCreationSettings settings)
     {
-        return JPH_BodyInterface_CreateSoftBody(Handle, settings.Handle);
+        return new(JPH_BodyInterface_CreateSoftBody(Handle, settings.Handle));
     }
 
     public BodyID CreateAndAddBody(BodyCreationSettings settings, Activation activationMode)
@@ -42,12 +42,12 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public Body CreateBodyWithID(in BodyID bodyID, BodyCreationSettings settings)
     {
-        return JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle);
+        return new(JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle));
     }
 
     public Body CreateBodyWithoutID(BodyCreationSettings settings)
     {
-        return JPH_BodyInterface_CreateBodyWithoutID(Handle, settings.Handle);
+        return new(JPH_BodyInterface_CreateBodyWithoutID(Handle, settings.Handle));
     }
 
     public void DestroyBody(in BodyID bodyID)
@@ -87,7 +87,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public Body UnassignBodyID(in BodyID bodyID)
     {
-        return JPH_BodyInterface_UnassignBodyID(Handle, bodyID);
+        return new(JPH_BodyInterface_UnassignBodyID(Handle, bodyID));
     }
 
     public Vector3 GetLinearVelocity(in BodyID bodyID)

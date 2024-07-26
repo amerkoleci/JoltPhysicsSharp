@@ -7,69 +7,64 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public readonly unsafe struct Body(nint handle) : IEquatable<Body>
+public sealed unsafe class Body : NativeObject
 {
-    public nint Handle { get; } = handle; public bool IsNull => Handle == 0;
-    public static Body Null => new(0);
-    public static implicit operator Body(nint handle) => new(handle);
-    public static bool operator ==(Body left, Body right) => left.Handle == right.Handle;
-    public static bool operator !=(Body left, Body right) => left.Handle != right.Handle;
-    public static bool operator ==(Body left, nint right) => left.Handle == right;
-    public static bool operator !=(Body left, nint right) => left.Handle != right;
-    public bool Equals(Body other) => Handle == other.Handle;
+    internal Body(nint handle)
+        : base(handle)
+    {
+    }
 
-    /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is Body handle && Equals(handle);
+    public static Body GetFromHandle(nint body)
+    {
+        return GetOrAddObject(body, (ptr) => new Body(ptr)) ?? throw new InvalidOperationException("Invalid body handle");
+    }
 
-    /// <inheritdoc/>
-    public override int GetHashCode() => Handle.GetHashCode();
-
-    public readonly BodyID ID => JPH_Body_GetID(Handle);
+    public BodyID ID => JPH_Body_GetID(Handle);
 
     /// <summary>
     /// Get the type of body (rigid or soft)
     /// </summary>
-    public readonly BodyType BodyType => JPH_Body_GetBodyType(Handle);
+    public BodyType BodyType => JPH_Body_GetBodyType(Handle);
 
     /// <summary>
     /// Gets where this body is a rigid body.
     /// </summary>
-    public readonly bool IsRigidBody => JPH_Body_GetBodyType(Handle) == BodyType.Rigid;
+    public bool IsRigidBody => JPH_Body_GetBodyType(Handle) == BodyType.Rigid;
 
     /// <summary>
     /// Gets where this body is a soft body.
     /// </summary>
-    public readonly bool IsSoftBody => JPH_Body_GetBodyType(Handle) == BodyType.Soft;
-    public readonly bool IsActive => JPH_Body_IsActive(Handle);
-    public readonly bool IsStatic => JPH_Body_IsStatic(Handle);
-    public readonly bool IsKinematic => JPH_Body_IsKinematic(Handle);
-    public readonly bool IsDynamic => JPH_Body_IsDynamic(Handle);
+    public bool IsSoftBody => JPH_Body_GetBodyType(Handle) == BodyType.Soft;
+    public bool IsActive => JPH_Body_IsActive(Handle);
+    public bool IsStatic => JPH_Body_IsStatic(Handle);
+    public bool IsKinematic => JPH_Body_IsKinematic(Handle);
+    public bool IsDynamic => JPH_Body_IsDynamic(Handle);
 
     public bool IsSensor
     {
-        readonly get => JPH_Body_IsSensor(Handle);
+        get => JPH_Body_IsSensor(Handle);
         set => JPH_Body_SetIsSensor(Handle, value);
     }
 
     public bool CollideKinematicVsNonDynamic
     {
-        readonly get => JPH_Body_GetCollideKinematicVsNonDynamic(Handle);
+        get => JPH_Body_GetCollideKinematicVsNonDynamic(Handle);
         set => JPH_Body_SetCollideKinematicVsNonDynamic(Handle, value);
     }
 
     public bool UseManifoldReduction
     {
-        readonly get => JPH_Body_GetUseManifoldReduction(Handle);
+        get => JPH_Body_GetUseManifoldReduction(Handle);
         set => JPH_Body_SetUseManifoldReduction(Handle, value);
     }
 
     public bool ApplyGyroscopicForce
     {
-        readonly get => JPH_Body_GetApplyGyroscopicForce(Handle);
+        get => JPH_Body_GetApplyGyroscopicForce(Handle);
         set => JPH_Body_SetApplyGyroscopicForce(Handle, value);
     }
 
-    public unsafe BoundingBox WorldSpaceBounds
+    public BoundingBox WorldSpaceBounds
     {
         get
         {
@@ -83,25 +78,25 @@ public readonly unsafe struct Body(nint handle) : IEquatable<Body>
 
     public MotionType MotionType
     {
-        readonly get => JPH_Body_GetMotionType(Handle);
+        get => JPH_Body_GetMotionType(Handle);
         set => JPH_Body_SetMotionType(Handle, value);
     }
 
     public bool AllowSleeping
     {
-        readonly get => JPH_Body_GetAllowSleeping(Handle);
+        get => JPH_Body_GetAllowSleeping(Handle);
         set => JPH_Body_SetAllowSleeping(Handle, value);
     }
 
     public float Friction
     {
-        readonly get => JPH_Body_GetFriction(Handle);
+        get => JPH_Body_GetFriction(Handle);
         set => JPH_Body_SetFriction(Handle, value);
     }
 
     public float Restitution
     {
-        readonly get => JPH_Body_GetRestitution(Handle);
+        get => JPH_Body_GetRestitution(Handle);
         set => JPH_Body_SetRestitution(Handle, value);
     }
 

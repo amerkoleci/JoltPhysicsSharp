@@ -31,12 +31,12 @@ public abstract unsafe class TwoBodyConstraint : Constraint
 
     public Body Body1
     {
-        get => JPH_TwoBodyConstraint_GetBody1(Handle);
+        get => Body.GetFromHandle(JPH_TwoBodyConstraint_GetBody1(Handle));
     }
 
     public Body Body2
     {
-        get => JPH_TwoBodyConstraint_GetBody2(Handle);
+        get => Body.GetFromHandle(JPH_TwoBodyConstraint_GetBody2(Handle));
     }
 
     public Matrix4x4 GetConstraintToBody1Matrix()
