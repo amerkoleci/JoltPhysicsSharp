@@ -12,14 +12,19 @@ set(SOURCE_FILES
 	joltc.c
 )
 
-add_library(${TARGET_NAME} ${SOURCE_FILES})
+if (JPH_BUILD_SHARED)
+	add_library(${TARGET_NAME} SHARED ${SOURCE_FILES})
+else()
+	add_library(${TARGET_NAME} ${SOURCE_FILES})
+endif()
+
 target_include_directories(${TARGET_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 	${JoltPhysics_SOURCE_DIR}/..
 )
 target_link_libraries(${TARGET_NAME} PUBLIC Jolt)
 
-if(BUILD_SHARED_LIBS)
+if(JPH_BUILD_SHARED)
 	set_property(TARGET Jolt PROPERTY POSITION_INDEPENDENT_CODE ON)
     set_property(TARGET ${TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
