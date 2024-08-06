@@ -310,7 +310,9 @@ void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(JPH_MassProperties* p
 void JPH_MassProperties_ScaleToMass(JPH_MassProperties* properties, float mass)
 {
 	JPH::MassProperties joltProperties = ToJolt(properties);
-    joltProperties.ScaleToMass(mass);
+	joltProperties.ScaleToMass(mass);
+	properties->mass = joltProperties.mMass;
+	FromJolt(joltProperties.mInertia, &properties->inertia);
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle& triangle)
