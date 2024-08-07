@@ -9,11 +9,10 @@ namespace HelloWorld;
 
 public static class Program
 {
-    private const uint MaxBodies = 1024;
-
-    private const uint NumBodyMutexes = 0;
-    private const uint MaxBodyPairs = 1024;
-    private const uint MaxContactConstraints = 1024;
+    private const int MaxBodies = 65536;
+    private const int MaxBodyPairs = 65536;
+    private const int MaxContactConstraints = 65536;
+    private const int NumBodyMutexes = 0;
 
     static class Layers
     {
@@ -155,6 +154,24 @@ public static class Program
             return;
         }
 
+        Foundation.SetTraceHandler((message) =>
+        {
+            Console.WriteLine(message);
+        });
+
+#if DEBUG
+        Foundation.SetAssertFailureHandler((inExpression, inMessage, inFile, inLine) =>
+        {
+            string message = inMessage ?? inExpression;
+
+            string outMessage = $"[JoltPhysics] Assertion failure at {inFile}:{inLine}: {message}";
+
+            Debug.WriteLine(outMessage);
+
+            throw new Exception(outMessage);
+        });
+#endif
+
         {
             ObjectLayerPairFilter objectLayerPairFilter;
             BroadPhaseLayerInterface broadPhaseLayerInterface;
@@ -197,6 +214,10 @@ public static class Program
 
             PhysicsSystemSettings settings = new()
             {
+                MaxBodies = MaxBodies,
+                MaxBodyPairs = MaxBodyPairs,
+                MaxContactConstraints = MaxContactConstraints,
+                NumBodyMutexes = NumBodyMutexes,
                 ObjectLayerPairFilter = objectLayerPairFilter,
                 BroadPhaseLayerInterface = broadPhaseLayerInterface,
                 ObjectVsBroadPhaseLayerFilter = objectVsBroadPhaseLayerFilter
@@ -218,9 +239,9 @@ public static class Program
             // Next we can create a rigid body to serve as the floor, we make a large box
             // Create the settings for the collision volume (the shape). 
             // Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
-            BoxShapeSettings floorShapeSettings = new(new Vector3(100.0f, 1.0f, 100.0f));
+            BoxShape floorShape = new(new Vector3(100.0f, 1.0f, 100.0f));
 
-            BodyCreationSettings floorSettings = new(floorShapeSettings, new Vector3(0.0f, -1.0f, 0.0f), Quaternion.Identity, MotionType.Static, Layers.NonMoving);
+            BodyCreationSettings floorSettings = new(floorShape, new Vector3(0.0f, -1.0f, 0.0f), Quaternion.Identity, MotionType.Static, Layers.NonMoving);
 
             // Create the actual rigid body
             Body floor = bodyInterface.CreateBody(floorSettings);
@@ -228,13 +249,19 @@ public static class Program
             // Add it to the world
             bodyInterface.AddBody(floor, Activation.DontActivate);
 
-            SphereShape sphereShape = new(0.5f);
+            SphereShape sphereShape = new(50.0f);
             BodyCreationSettings spherSettings = new(sphereShape, new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
-            BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, Activation.Activate);
+
+            Body sphere = bodyInterface.CreateBody(spherSettings);
+
+            // Add it to the world
+            bodyInterface.AddBody(sphere, Activation.DontActivate);
+
+            //BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, Activation.Activate);
 
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.
             // (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the physics system)
-            bodyInterface.SetLinearVelocity(sphereID, new Vector3(0.0f, -5.0f, 0.0f));
+            sphere.SetLinearVelocity(new Vector3(0.0f, -5.0f, 0.0f));
 
             //StackTest(bodyInterface);
 
@@ -253,7 +280,6 @@ public static class Program
             // Configure supporting volume
             characterSettings.SupportingVolume = new Plane(Vector3.UnitY, -mHeightStanding); // Accept contacts that touch the lower sphere of the capsule
 
-
             CharacterVirtual character = new(characterSettings, new Vector3(0, 0, 0), Quaternion.Identity, 0, physicsSystem);
 
             // We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
@@ -265,14 +291,14 @@ public static class Program
             physicsSystem.OptimizeBroadPhase();
 
             uint step = 0;
-            while (bodyInterface.IsActive(sphereID))
+            while (bodyInterface.IsActive(sphere.ID))
             {
                 // Next step
                 ++step;
 
                 // Output current position and velocity of the sphere
-                Vector3 position = bodyInterface.GetCenterOfMassPosition(sphereID);
-                Vector3 velocity = bodyInterface.GetLinearVelocity(sphereID);
+                Vector3 position = bodyInterface.GetCenterOfMassPosition(sphere.ID);
+                Vector3 velocity = bodyInterface.GetLinearVelocity(sphere.ID);
                 //Matrix4x4 transform = bodyInterface.GetWorldTransform(sphereID);
                 //Vector3 translation = bodyInterface.GetWorldTransform(sphereID).Translation;
                 //Matrix4x4 centerOfMassTransform = bodyInterface.GetCenterOfMassTransform(sphereID);
@@ -287,10 +313,10 @@ public static class Program
             }
 
             // Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any time.
-            bodyInterface.RemoveBody(sphereID);
+            bodyInterface.RemoveBody(sphere.ID);
 
             // Destroy the sphere. After this the sphere ID is no longer valid.
-            bodyInterface.DestroyBody(sphereID);
+            bodyInterface.DestroyBody(sphere.ID);
 
             // Remove and destroy the floor
             bodyInterface.RemoveBody(floor.ID);

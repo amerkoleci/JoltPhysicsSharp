@@ -4,12 +4,21 @@
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace JoltPhysicsSharp;
 
 
 internal static unsafe partial class JoltApi
 {
+    private const DllImportSearchPath DefaultDllImportSearchPath = DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories | DllImportSearchPath.UseDllDirectoryForDependencies;
+
+    /// <summary>
+    /// Raised whenever a native library is loaded by Jolt.
+    /// Handlers can be added to this event to customize how libraries are loaded, and they will be used first whenever a new native library is being resolved.
+    /// </summary>
+    public static event DllImportResolver? JoltDllImporterResolver;
+
     private const string LibName = "joltc";
     private const string LibDoubleName = "joltc_double";
 
@@ -17,87 +26,106 @@ internal static unsafe partial class JoltApi
 
     static JoltApi()
     {
-        NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), OnDllImport);
+        NativeLibrary.SetDllImportResolver(typeof(JoltApi).Assembly, OnDllImport);
     }
 
     private static IntPtr OnDllImport(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
-        if (TryResolveLibrary(libraryName, assembly, searchPath, out IntPtr nativeLibrary))
+        if (libraryName != LibName)
+        {
+            return IntPtr.Zero;
+        }
+
+        IntPtr nativeLibrary = IntPtr.Zero;
+        DllImportResolver? resolver = JoltDllImporterResolver;
+        if (resolver != null)
+        {
+            nativeLibrary = resolver(libraryName, assembly, searchPath);
+        }
+
+        if (nativeLibrary != IntPtr.Zero)
         {
             return nativeLibrary;
         }
 
-        return NativeLibrary.Load(libraryName, assembly, searchPath);
-    }
-
-    private static bool TryResolveLibrary(string libraryName, Assembly assembly, DllImportSearchPath? searchPath, out IntPtr nativeLibrary)
-    {
-        nativeLibrary = IntPtr.Zero;
-        if (libraryName is not LibName)
-            return false;
-
-        string rid = RuntimeInformation.RuntimeIdentifier;
-
-        string nugetNativeLibsPath = Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native");
-        bool isNuGetRuntimeLibrariesDirectoryPresent = Directory.Exists(nugetNativeLibsPath);
-        string dllName = LibName;
-
         if (OperatingSystem.IsWindows())
         {
-            dllName = DoublePrecision ? $"{LibDoubleName}.dll" : $"{LibName}.dll";
+            string dllName = DoublePrecision ? $"{LibDoubleName}.dll" : $"{LibName}.dll";
 
-            if (!isNuGetRuntimeLibrariesDirectoryPresent)
+            if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
-                rid = RuntimeInformation.ProcessArchitecture switch
-                {
-                    Architecture.X64 => "win-x64",
-                    Architecture.Arm64 => "win-arm64",
-                    _ => "win-x64"
-                };
-
-                nugetNativeLibsPath = Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native");
-                isNuGetRuntimeLibrariesDirectoryPresent = Directory.Exists(nugetNativeLibsPath);
+                return nativeLibrary;
             }
         }
         else if (OperatingSystem.IsLinux())
         {
-            // We don't support double precision ATM
-            //dllName = DoublePrecision ? $"lib{LibDoubleName}.so" : $"lib{LibName}.so";
-            dllName = $"lib{LibName}.so";
+            string dllName = DoublePrecision ? $"lib{LibDoubleName}.so" : $"lib{LibName}.so";
+
+            if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
+            {
+                return nativeLibrary;
+            }
         }
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
         {
-            // We don't support double precision ATM
-            //dllName = DoublePrecision ? $"lib{LibDoubleName}.dylib" : $"lib{LibName}.dylib";
-            dllName = $"lib{LibName}.dylib";
-        }
+            string dllName = DoublePrecision ? $"lib{LibDoubleName}.dylib" : $"lib{LibName}.dylib";
 
-        if (isNuGetRuntimeLibrariesDirectoryPresent)
-        {
-            string joltcPath = Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native", dllName);
-
-            if (NativeLibrary.TryLoad(joltcPath, out nativeLibrary))
-            {
-                return true;
-            }
-        }
-        else
-        {
             if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
-                return true;
+                return nativeLibrary;
             }
         }
 
-        nativeLibrary = IntPtr.Zero;
-        return false;
+        string libraryLoadName = DoublePrecision ? $"lib{LibDoubleName}" : $"lib{LibName}";
+
+        if (NativeLibrary.TryLoad(libraryLoadName, assembly, searchPath, out nativeLibrary))
+        {
+            return nativeLibrary;
+        }
+
+        libraryLoadName = DoublePrecision ? LibDoubleName : LibName;
+        if (NativeLibrary.TryLoad(libraryLoadName, assembly, searchPath, out nativeLibrary))
+        {
+            return nativeLibrary;
+        }
+
+        return IntPtr.Zero;
     }
 
+    /// <summary>Converts an unmanaged string to a managed version.</summary>
+    /// <param name="unmanaged">The unmanaged string to convert.</param>
+    /// <returns>A managed string.</returns>
+    public static string? ConvertToManaged(byte* unmanaged)
+    {
+        if (unmanaged == null)
+            return null;
+
+        return UTF8EncodingRelaxed.Default.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(unmanaged));
+    }
+
+    /// <summary>Converts an unmanaged string to a managed version.</summary>
+    /// <param name="unmanaged">The unmanaged string to convert.</param>
+    /// <returns>A managed string.</returns>
+    public static string? ConvertToManaged(byte* unmanaged, int maxLength)
+    {
+        if (unmanaged == null)
+            return null;
+
+        var span = new ReadOnlySpan<byte>(unmanaged, maxLength);
+        var indexOfZero = span.IndexOf((byte)0);
+        return indexOfZero < 0 ? UTF8EncodingRelaxed.Default.GetString(span) : UTF8EncodingRelaxed.Default.GetString(span.Slice(0, indexOfZero));
+    }
+
+
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Init(uint tempAllocatorSize);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Init(uint tempAllocatorSize);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Shutdown();
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SetTraceHandler(delegate* unmanaged<byte*, void> callback);
 
     [LibraryImport(LibName)]
     public static partial void JPH_SetAssertFailureHandler(delegate* unmanaged<sbyte*, sbyte*, sbyte*, uint, Bool32> callback);
@@ -1804,4 +1832,13 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterContactListener_Destroy(nint listener);
     #endregion
+
+    sealed class UTF8EncodingRelaxed : UTF8Encoding
+    {
+        public static new readonly UTF8EncodingRelaxed Default = new UTF8EncodingRelaxed();
+
+        private UTF8EncodingRelaxed() : base(false, false)
+        {
+        }
+    }
 }

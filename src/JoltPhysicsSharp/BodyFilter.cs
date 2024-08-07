@@ -49,6 +49,6 @@ public abstract class BodyFilter : NativeObject
     private static Bool32 ShouldCollideLockedCallback(nint context, nint body)
     {
         BodyFilter listener = DelegateProxies.GetUserData<BodyFilter>(context, out _);
-        return listener.ShouldCollideLocked(Body.GetFromHandle(body));
+        return listener.ShouldCollideLocked(body);
     }
 }

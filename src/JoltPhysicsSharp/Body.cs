@@ -7,17 +7,25 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public sealed unsafe class Body : NativeObject
+public unsafe readonly struct Body(nint handle) : IEquatable<Body>
 {
-    internal Body(nint handle)
-        : base(handle)
-    {
-    }
+    public nint Handle { get; } = handle;
+    public readonly bool IsNull => Handle == 0;
+    public readonly bool IsNotNull => Handle != 0;
 
-    public static Body GetFromHandle(nint body)
-    {
-        return GetOrAddObject(body, (ptr) => new Body(ptr)) ?? throw new InvalidOperationException("Invalid body handle");
-    }
+    public static Body Null => new(0);
+    public static implicit operator Body(nint handle) => new(handle);
+    public static bool operator ==(Body left, Body right) => left.Handle == right.Handle;
+    public static bool operator !=(Body left, Body right) => left.Handle != right.Handle;
+    public static bool operator ==(Body left, nint right) => left.Handle == right;
+    public static bool operator !=(Body left, nint right) => left.Handle != right;
+    public readonly bool Equals(Body other) => Handle == other.Handle;
+
+    /// <inheritdoc/>
+    public override readonly bool Equals(object? obj) => obj is Body handle && Equals(handle);
+
+    /// <inheritdoc/>
+    public override readonly int GetHashCode() => Handle.GetHashCode();
 
     public BodyID ID => JPH_Body_GetID(Handle);
 
@@ -221,7 +229,7 @@ public sealed unsafe class Body : NativeObject
     }
 
     #region GetWorldTransform
-    public unsafe Matrix4x4 GetWorldTransform()
+    public Matrix4x4 GetWorldTransform()
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldTransform)}");
@@ -231,7 +239,7 @@ public sealed unsafe class Body : NativeObject
         return result;
     }
 
-    public unsafe void GetWorldTransform(out Matrix4x4 result)
+    public void GetWorldTransform(out Matrix4x4 result)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldTransform)}");
@@ -243,7 +251,7 @@ public sealed unsafe class Body : NativeObject
         }
     }
 
-    public unsafe RMatrix4x4 GetRWorldTransform()
+    public RMatrix4x4 GetRWorldTransform()
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldTransform)}");
@@ -253,7 +261,7 @@ public sealed unsafe class Body : NativeObject
         return result;
     }
 
-    public unsafe void GetRWorldTransform(out RMatrix4x4 result)
+    public void GetRWorldTransform(out RMatrix4x4 result)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldTransform)}");
@@ -267,7 +275,7 @@ public sealed unsafe class Body : NativeObject
     #endregion
 
     #region GetCenterOfMassTransform
-    public unsafe Matrix4x4 GetCenterOfMassTransform()
+    public Matrix4x4 GetCenterOfMassTransform()
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassTransform)}");
@@ -277,7 +285,7 @@ public sealed unsafe class Body : NativeObject
         return result;
     }
 
-    public unsafe void GetCenterOfMassTransform(out Matrix4x4 result)
+    public void GetCenterOfMassTransform(out Matrix4x4 result)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassTransform)}");
@@ -289,7 +297,7 @@ public sealed unsafe class Body : NativeObject
         }
     }
 
-    public unsafe RMatrix4x4 GetRCenterOfMassTransform()
+    public RMatrix4x4 GetRCenterOfMassTransform()
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassTransform)}");
@@ -299,7 +307,7 @@ public sealed unsafe class Body : NativeObject
         return result;
     }
 
-    public unsafe void GetRCenterOfMassTransform(out RMatrix4x4 result)
+    public void GetRCenterOfMassTransform(out RMatrix4x4 result)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassTransform)}");
@@ -311,6 +319,18 @@ public sealed unsafe class Body : NativeObject
         }
     }
     #endregion
+
+    public void SetIsSensor(bool value) => JPH_Body_SetIsSensor(Handle, value);
+    public void SetCollideKinematicVsNonDynamic(bool value) => JPH_Body_SetCollideKinematicVsNonDynamic(Handle, value);
+    public void SetUseManifoldReduction(bool value) => JPH_Body_SetUseManifoldReduction(Handle, value);
+    public void SetApplyGyroscopicForce(bool value) => JPH_Body_SetApplyGyroscopicForce(Handle, value);
+
+    public void SetMotionType(MotionType value) => JPH_Body_SetMotionType(Handle, value);
+
+    public void SetAllowSleeping(bool value) => JPH_Body_SetAllowSleeping(Handle, value);
+
+    public void SetFriction(float value) => JPH_Body_SetFriction(Handle, value);
+    public void SetRestitution(float value) => JPH_Body_SetRestitution(Handle, value);
 
     public Vector3 GetLinearVelocity()
     {

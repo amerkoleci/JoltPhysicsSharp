@@ -8,8 +8,9 @@ namespace JoltPhysicsSharp;
 
 public readonly unsafe struct MotionProperties(nint handle) : IEquatable<MotionProperties>
 {
-    public nint Handle { get; } = handle; public bool IsNull => Handle == 0;
-    public bool IsNotNull => Handle != 0;
+    public nint Handle { get; } = handle;
+    public readonly bool IsNull => Handle == 0;
+    public readonly bool IsNotNull => Handle != 0;
     public static MotionProperties Null => new(0);
     public static implicit operator MotionProperties(nint handle) => new(handle);
     public static bool operator ==(MotionProperties left, MotionProperties right) => left.Handle == right.Handle;

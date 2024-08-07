@@ -36,7 +36,15 @@ public static class Foundation
 
     public static void Shutdown() => JPH_Shutdown();
 
+    private static TraceDelegate? s_traceCallback;
     private static AssertFailedDelegate? s_assertCallback;
+
+    public static unsafe void SetTraceHandler(TraceDelegate callback)
+    {
+        s_traceCallback = callback;
+
+        JPH_SetTraceHandler(callback != null ? &OnNativeTraceCallback : null);
+    }
 
     public static unsafe void SetAssertFailureHandler(AssertFailedDelegate callback)
     {
@@ -45,12 +53,24 @@ public static class Foundation
         JPH_SetAssertFailureHandler(callback != null ? &OnNativeAssertCallback : null);
     }
 
+    public delegate void TraceDelegate(string message);
+
     public delegate bool AssertFailedDelegate(string expression, string message, string file, uint line);
+
+    [UnmanagedCallersOnly]
+    private static unsafe void OnNativeTraceCallback(byte* messagePtr)
+    {
+        if (s_traceCallback != null)
+        {
+            string message = ConvertToManaged(messagePtr)!;
+            s_traceCallback(message);
+        }
+    }
 
     [UnmanagedCallersOnly]
     private static unsafe Bool32 OnNativeAssertCallback(sbyte* expressionPtr, sbyte* messagePtr, sbyte* filePtr, uint line)
     {
-        string expression = new (expressionPtr);
+        string expression = new(expressionPtr);
         string message = new(messagePtr);
         string file = new(filePtr);
 
