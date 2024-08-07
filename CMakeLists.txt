@@ -127,7 +127,7 @@ endif()
 FetchContent_Declare(
         JoltPhysics
         GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics"
-        GIT_TAG "e7c824ff338fb636d71f852cf858aba3b06c0162"
+        GIT_TAG "b466d504f22360fa976fe88abed67853a23e2666"
 		SOURCE_SUBDIR "Build"
 )
 FetchContent_MakeAvailable(JoltPhysics)

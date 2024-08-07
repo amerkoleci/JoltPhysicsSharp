@@ -520,10 +520,12 @@ typedef struct JPH_CharacterContactListener			JPH_CharacterContactListener;
 typedef struct JPH_CharacterVirtualSettings         JPH_CharacterVirtualSettings; /* Inherics JPH_CharacterBaseSettings */
 typedef struct JPH_CharacterVirtual                 JPH_CharacterVirtual;  /* Inherics JPH_CharacterBase */
 
+typedef void(JPH_API_CALL* JPH_TraceFunc)(const char* mssage);
 typedef JPH_Bool32(JPH_API_CALL* JPH_AssertFailureFunc)(const char* expression, const char* mssage, const char* file, uint32_t line);
 
 JPH_CAPI JPH_Bool32 JPH_Init(uint32_t tempAllocatorSize);
 JPH_CAPI void JPH_Shutdown(void);
+JPH_CAPI void JPH_SetTraceHandler(JPH_TraceFunc handler);
 JPH_CAPI void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler);
 
 /* JPH_BroadPhaseLayerInterface */

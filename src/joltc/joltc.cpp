@@ -66,16 +66,26 @@ JPH_SUPPRESS_WARNINGS
 using namespace JPH;
 
 // Callback for traces, connect this to your own trace function if you have one
-static void TraceImpl(const char* inFMT, ...)
+static JPH_TraceFunc s_TraceFunc = nullptr;
+
+static void TraceImpl(const char* fmt, ...)
 {
     // Format the message
-    va_list list;
-    va_start(list, inFMT);
-    char buffer[1024];
-    vsnprintf(buffer, sizeof(buffer), inFMT, list);
+	va_list list;
+	va_start(list, fmt);
+	char buffer[1024];
+	vsnprintf(buffer, sizeof(buffer), fmt, list);
+	va_end(list);
 
     // Print to the TTY
-    std::cout << buffer << std::endl;
+	if(s_TraceFunc)
+	{
+		s_TraceFunc(buffer);
+	}
+	else
+	{
+		std::cout << buffer << std::endl;
+	}
 }
 
 #ifdef JPH_ENABLE_ASSERTS
@@ -360,6 +370,11 @@ void JPH_Shutdown(void)
     // Destroy the factory
     delete JPH::Factory::sInstance;
     JPH::Factory::sInstance = nullptr;
+}
+
+void JPH_SetTraceHandler(JPH_TraceFunc handler)
+{
+	s_TraceFunc = handler;
 }
 
 void JPH_SetAssertFailureHandler(JPH_AssertFailureFunc handler)
