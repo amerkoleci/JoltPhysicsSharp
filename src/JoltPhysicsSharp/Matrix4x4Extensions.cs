@@ -12,7 +12,7 @@ public static class Matrix4x4Extensions
         return new(matrix[0, j], matrix[1, j], matrix[2,j], matrix[3,j]);
     }
 
-    public static void SetColumn(this Matrix4x4 matrix, int j, Vector4 value)
+    public static void SetColumn(ref this Matrix4x4 matrix, int j, Vector4 value)
     {
         matrix[0, j] = value.X;
         matrix[1, j] = value.Y;
