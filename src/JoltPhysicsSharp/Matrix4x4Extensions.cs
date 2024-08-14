@@ -7,7 +7,7 @@ namespace JoltPhysicsSharp;
 
 public static class Matrix4x4Extensions
 {
-    public static Vector4 GetColumn(this Matrix4x4 matrix, int j)
+    public static Vector4 GetColumn(in this Matrix4x4 matrix, int j)
     {
         return new(matrix[0, j], matrix[1, j], matrix[2,j], matrix[3,j]);
     }
