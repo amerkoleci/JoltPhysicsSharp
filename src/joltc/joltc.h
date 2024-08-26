@@ -313,6 +313,7 @@ typedef struct JPH_IndexedTriangle {
     uint32_t i2;
     uint32_t i3;
     uint32_t materialIndex;
+    uint32_t userData;
 } JPH_IndexedTriangle;
 
 typedef struct JPH_MassProperties {
@@ -405,6 +406,7 @@ typedef struct JPH_ShapeSettings                    JPH_ShapeSettings;
 typedef struct JPH_ConvexShapeSettings			    JPH_ConvexShapeSettings;
 typedef struct JPH_SphereShapeSettings              JPH_SphereShapeSettings;
 typedef struct JPH_BoxShapeSettings                 JPH_BoxShapeSettings;
+typedef struct JPH_PlaneShapeSettings               JPH_PlaneShapeSettings;
 typedef struct JPH_TriangleShapeSettings            JPH_TriangleShapeSettings;
 typedef struct JPH_CapsuleShapeSettings             JPH_CapsuleShapeSettings;
 typedef struct JPH_TaperedCapsuleShapeSettings      JPH_TaperedCapsuleShapeSettings;
@@ -422,6 +424,7 @@ typedef struct JPH_Shape                        JPH_Shape;
 typedef struct JPH_ConvexShape                  JPH_ConvexShape;
 typedef struct JPH_SphereShape                  JPH_SphereShape;
 typedef struct JPH_BoxShape                     JPH_BoxShape;
+typedef struct JPH_PlaneShape                   JPH_PlaneShape;
 typedef struct JPH_CapsuleShape                 JPH_CapsuleShape;
 typedef struct JPH_CylinderShape                JPH_CylinderShape;
 typedef struct JPH_TriangleShape				JPH_TriangleShape;
@@ -639,6 +642,10 @@ JPH_CAPI void JPH_PhysicsSystem_GetConstraints(const JPH_PhysicsSystem* system, 
 /* Math */
 JPH_CAPI void JPH_Quaternion_FromTo(const JPH_Vec3* from, const JPH_Vec3* to, JPH_Quat* quat);
 
+/* Material */
+JPH_CAPI JPH_PhysicsMaterial* JPH_PhysicsMaterial_Create(void);
+JPH_CAPI void JPH_PhysicsMaterial_Destroy(JPH_PhysicsMaterial* material);
+
 /* JPH_ShapeSettings */
 JPH_CAPI void JPH_ShapeSettings_Destroy(JPH_ShapeSettings* settings);
 
@@ -656,13 +663,20 @@ JPH_CAPI void JPH_BoxShape_GetHalfExtent(const JPH_BoxShape* shape, JPH_Vec3* ha
 JPH_CAPI float JPH_BoxShape_GetVolume(const JPH_BoxShape* shape);
 JPH_CAPI float JPH_BoxShape_GetConvexRadius(const JPH_BoxShape* shape);
 
-/* SphereShapeSettings */
+/* SphereShape */
 JPH_CAPI JPH_SphereShapeSettings* JPH_SphereShapeSettings_Create(float radius);
 JPH_CAPI JPH_SphereShape* JPH_SphereShapeSettings_CreateShape(const JPH_SphereShapeSettings* settings);
 JPH_CAPI float JPH_SphereShapeSettings_GetRadius(const JPH_SphereShapeSettings* settings);
 JPH_CAPI void JPH_SphereShapeSettings_SetRadius(JPH_SphereShapeSettings* settings, float radius);
 JPH_CAPI JPH_SphereShape* JPH_SphereShape_Create(float radius);
 JPH_CAPI float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape);
+
+/* PlaneShape */
+JPH_CAPI JPH_PlaneShapeSettings* JPH_PlaneShapeSettings_Create(const JPH_Plane* plane, const JPH_PhysicsMaterial* material, float halfExtent);
+JPH_CAPI JPH_PlaneShape* JPH_PlaneShapeSettings_CreateShape(const JPH_PlaneShapeSettings* settings);
+JPH_CAPI JPH_PlaneShape* JPH_PlaneShape_Create(const JPH_Plane* plane, const JPH_PhysicsMaterial* material, float halfExtent);
+JPH_CAPI void JPH_PlaneShape_GetPlane(const JPH_PlaneShape* shape, JPH_Plane* result);
+JPH_CAPI float JPH_PlaneShape_GetHalfExtent(const JPH_PlaneShape* shape);
 
 /* TriangleShape */
 JPH_CAPI JPH_TriangleShapeSettings* JPH_TriangleShapeSettings_Create(const JPH_Vec3* v1, const JPH_Vec3* v2, const JPH_Vec3* v3, float convexRadius);

@@ -63,6 +63,14 @@ option(INTERPROCEDURAL_OPTIMIZATION "Enable interprocedural optimizations" ON)
 # Note that this currently only works using MSVC. Clang turns Float2 into a SIMD vector sometimes causing floating point exceptions (the option is ignored).
 option(FLOATING_POINT_EXCEPTIONS_ENABLED "Enable floating point exceptions" ON)
 
+# When turning this on, the library will be compiled with C++ exceptions enabled.
+# This adds some overhead and Jolt doesn't use exceptions so by default it is off.
+option(CPP_EXCEPTIONS_ENABLED "Enable C++ exceptions" OFF)
+
+# When turning this on, the library will be compiled with C++ RTTI enabled.
+# This adds some overhead and Jolt doesn't use RTTI so by default it is off.
+option(CPP_RTTI_ENABLED "Enable C++ RTTI" OFF)
+
 # Number of bits to use in ObjectLayer. Can be 16 or 32.
 option(OBJECT_LAYER_BITS "Number of bits in ObjectLayer" 16)
 
@@ -127,7 +135,7 @@ endif()
 FetchContent_Declare(
         JoltPhysics
         GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics"
-        GIT_TAG "33394b357fe36ae1d1f58f55f1bbab45186eff85"
+        GIT_TAG "00160d7bcc63a889f61e0891fe0ce51d960e982f"
 		SOURCE_SUBDIR "Build"
 )
 FetchContent_MakeAvailable(JoltPhysics)
@@ -162,14 +170,28 @@ if (MSVC)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zi")
 	endif()
 
-	# Remove any existing compiler flag that enables RTTI
-	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	# Set compiler flag for disabling RTTI
+	if (NOT CPP_RTTI_ENABLED)
+		# Set compiler flag for disabling RTTI
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
+	else()
+		# Set compiler flag for enabling RTTI
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR")
+	endif()
 
 	# Set compiler flag for disabling RTTI
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
+	if (NOT CPP_RTTI_ENABLED)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
+	endif()
 
-	if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "ARM")
-		# On ARM the exception handling flag is missing which causes warnings
+	if (NOT CPP_EXCEPTIONS_ENABLED)
+		# Remove any existing compiler flag that enables exceptions
+		string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
+		# Disable warning about STL and compiler-generated types using noexcept when exceptions are disabled
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4577")
+	else()
+		# Enable exceptions
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 	endif()
 
@@ -206,6 +228,24 @@ else()
     # Optionally generate debug symbols
 	if (GENERATE_DEBUG_SYMBOLS)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+	endif()
+
+	# Set compiler flag for disabling RTTI
+	if (NOT CPP_RTTI_ENABLED)
+		# Set compiler flag for disabling RTTI
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+	else()
+		# Set compiler flag for enabling RTTI
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
+	endif()
+
+	# Disable exception-handling
+	if (NOT CPP_EXCEPTIONS_ENABLED)
+		# Set compiler flag for disabling exception-handling
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+	else()
+		# Set compiler flag for enabling exception-handling
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
 	endif()
 
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
