@@ -257,18 +257,34 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial float JPH_BoxShape_GetConvexRadius(IntPtr handle);
 
-    /* SphereShapeSettings */
+    /* SphereShape */
     [LibraryImport(LibName)]
-    public static partial IntPtr JPH_SphereShapeSettings_Create(float radius);
+    public static partial nint JPH_SphereShapeSettings_Create(float radius);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_SphereShapeSettings_CreateShape(nint settings);
 
     [LibraryImport(LibName)]
-    public static partial float JPH_SphereShapeSettings_GetRadius(IntPtr shape);
+    public static partial float JPH_SphereShapeSettings_GetRadius(nint shape);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_SphereShapeSettings_SetRadius(IntPtr shape, float radius);
+    public static partial void JPH_SphereShapeSettings_SetRadius(nint shape, float radius);
+
+    /* PlaneShape */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PlaneShapeSettings_Create(in Plane plane, nint material, float halfExtent);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PlaneShapeSettings_CreateShape(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PlaneShape_Create(in Plane plane, nint material, float halfExtent);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PlaneShape_GetPlane(nint handle, out Plane result);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_PlaneShape_GetHalfExtent(nint handle);
 
     /* TriangleShapeSettings */
     [LibraryImport(LibName)]
@@ -931,6 +947,13 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_GetConstraints(nint handle, nint* constraints, uint count);
 
+    /* Material */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_PhysicsMaterial_Create();
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsMaterial_Destroy(nint handle);
+
     /* BodyInterface */
     [LibraryImport(LibName)]
     public static partial nint JPH_PhysicsSystem_GetBodyInterface(nint system);
@@ -1354,41 +1377,48 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Body_GetWorldSpaceSurfaceNormalDouble(nint body, SubShapeID subShapeID, Double3* position, Vector3* normal);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsActive(nint handle);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Body_IsActive(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsStatic(nint handle);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Body_IsStatic(nint handle);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool JPH_Body_IsKinematic(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsDynamic(nint handle);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Body_IsDynamic(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_IsSensor(nint handle);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Body_IsSensor(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetIsSensor(nint handle, Bool32 value);
+    public static partial void JPH_Body_SetIsSensor(nint handle, [MarshalAs(UnmanagedType.Bool)] bool value);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetCollideKinematicVsNonDynamic(nint handle, Bool32 value);
+    public static partial void JPH_Body_SetCollideKinematicVsNonDynamic(nint handle, [MarshalAs(UnmanagedType.Bool)] bool value);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_GetCollideKinematicVsNonDynamic(nint handle);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Body_GetCollideKinematicVsNonDynamic(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetUseManifoldReduction(nint handle, Bool32 value);
+    public static partial void JPH_Body_SetUseManifoldReduction(nint handle, [MarshalAs(UnmanagedType.Bool)] bool value);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_GetUseManifoldReduction(nint handle);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Body_GetUseManifoldReduction(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_GetUseManifoldReductionWithBody(nint handle, nint other);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool JPH_Body_GetUseManifoldReductionWithBody(nint handle, nint other);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetApplyGyroscopicForce(nint handle, Bool32 value);
+    public static partial void JPH_Body_SetApplyGyroscopicForce(nint handle, [MarshalAs(UnmanagedType.Bool)] bool value);
 
     [LibraryImport(LibName)]
     public static partial Bool32 JPH_Body_GetApplyGyroscopicForce(nint handle);
@@ -1406,22 +1436,22 @@ internal static unsafe partial class JoltApi
     public static partial Bool32 JPH_Body_GetAllowSleeping(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetAllowSleeping(nint handle, Bool32 motionType);
+    public static partial void JPH_Body_SetAllowSleeping(nint handle, [MarshalAs(UnmanagedType.Bool)] bool motionType);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Body_ResetSleepTimer(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial float JPH_Body_GetFriction(IntPtr handle);
+    public static partial float JPH_Body_GetFriction(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetFriction(IntPtr handle, float value);
+    public static partial void JPH_Body_SetFriction(nint handle, float value);
 
     [LibraryImport(LibName)]
-    public static partial float JPH_Body_GetRestitution(IntPtr handle);
+    public static partial float JPH_Body_GetRestitution(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetRestitution(IntPtr handle, float value);
+    public static partial void JPH_Body_SetRestitution(nint handle, float value);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_Body_GetPosition))]
     public static partial void JPH_Body_GetPosition(nint handle, Vector3* result);
