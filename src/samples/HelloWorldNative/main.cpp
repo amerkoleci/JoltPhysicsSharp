@@ -13,7 +13,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 int main()
 #endif
 {
-	if(!JPH_Init(0))
+	if(!JPH_Init())
 		return 1;
 
 	JPH_PhysicsSystemSettings settings = {};
