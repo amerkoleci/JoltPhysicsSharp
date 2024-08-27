@@ -336,10 +336,11 @@ static JPH::IndexedTriangle ToIndexedTriangle(const JPH_IndexedTriangle& triangl
     return JPH::IndexedTriangle(triangle.i1, triangle.i2, triangle.i3, triangle.materialIndex, triangle.userData);
 }
 
-static JPH::TempAllocatorImpl* s_TempAllocator = nullptr;
-static JPH::JobSystemThreadPool* s_JobSystem  = nullptr;
+// 10 MB was not enough for large simulation, let's use TempAllocatorMalloc
+static TempAllocator* s_TempAllocator = nullptr;
+static JobSystemThreadPool* s_JobSystem  = nullptr;
 
-JPH_Bool32 JPH_Init(uint32_t tempAllocatorSize)
+JPH_Bool32 JPH_Init(void)
 {
     JPH::RegisterDefaultAllocator();
 
@@ -354,7 +355,7 @@ JPH_Bool32 JPH_Init(uint32_t tempAllocatorSize)
     JPH::RegisterTypes();
 
 	// Init temp allocator
-	s_TempAllocator = new TempAllocatorImpl(tempAllocatorSize ? tempAllocatorSize : 10 * 1024 * 1024);
+	s_TempAllocator = new TempAllocatorMalloc();
 
 	// Init Job system.
     s_JobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, (int)std::thread::hardware_concurrency() - 1);
