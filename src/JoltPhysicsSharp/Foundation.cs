@@ -28,10 +28,10 @@ public static class Foundation
     /// </summary>
     public const float CapsuleProjectionSlop = 0.02f;
 
-    public static bool Init(uint tempAllocatorSize = 0u, bool doublePrecision = false)
+    public static bool Init(bool doublePrecision = false)
     {
         JoltApi.DoublePrecision = doublePrecision;
-        return JPH_Init(tempAllocatorSize);
+        return JPH_Init();
     }
 
     public static void Shutdown() => JPH_Shutdown();

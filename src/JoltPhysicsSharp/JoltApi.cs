@@ -119,7 +119,7 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool JPH_Init(uint tempAllocatorSize);
+    public static partial bool JPH_Init();
 
     [LibraryImport(LibName)]
     public static partial void JPH_Shutdown();

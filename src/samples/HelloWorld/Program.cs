@@ -149,7 +149,7 @@ public static class Program
 
     public static unsafe void Main()
     {
-        if (!Foundation.Init(0u, false))
+        if (!Foundation.Init(false))
         {
             return;
         }
@@ -249,24 +249,19 @@ public static class Program
             // Add it to the world
             bodyInterface.AddBody(floor, Activation.DontActivate);
 
+            // Sphere
             SphereShape sphereShape = new(50.0f);
             BodyCreationSettings spherSettings = new(sphereShape, new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
 
-            Body sphere = bodyInterface.CreateBody(spherSettings);
-
-            // Add it to the world
-            bodyInterface.AddBody(sphere, Activation.DontActivate);
+            BodyID sphereId = bodyInterface.CreateAndAddBody(spherSettings, Activation.Activate);
 
             //BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, Activation.Activate);
 
             // Now you can interact with the dynamic body, in this case we're going to give it a velocity.
             // (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the physics system)
-            sphere.SetLinearVelocity(new Vector3(0.0f, -5.0f, 0.0f));
+            bodyInterface.SetLinearVelocity(sphereId, new Vector3(0.0f, -5.0f, 0.0f));
 
             //StackTest(bodyInterface);
-
-            MeshShapeSettings meshShape = CreateTorusMesh(3.0f, 1.0f);
-            BodyCreationSettings bodySettings = new(meshShape, new Vector3(0, 10, 0), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
 
             // Create capsule
             float mHeightStanding = 1.35f;
@@ -291,14 +286,14 @@ public static class Program
             physicsSystem.OptimizeBroadPhase();
 
             uint step = 0;
-            while (bodyInterface.IsActive(sphere.ID))
+            while (bodyInterface.IsActive(sphereId))
             {
                 // Next step
                 ++step;
 
                 // Output current position and velocity of the sphere
-                Vector3 position = bodyInterface.GetCenterOfMassPosition(sphere.ID);
-                Vector3 velocity = bodyInterface.GetLinearVelocity(sphere.ID);
+                Vector3 position = bodyInterface.GetCenterOfMassPosition(sphereId);
+                Vector3 velocity = bodyInterface.GetLinearVelocity(sphereId);
                 //Matrix4x4 transform = bodyInterface.GetWorldTransform(sphereID);
                 //Vector3 translation = bodyInterface.GetWorldTransform(sphereID).Translation;
                 //Matrix4x4 centerOfMassTransform = bodyInterface.GetCenterOfMassTransform(sphereID);
@@ -313,10 +308,10 @@ public static class Program
             }
 
             // Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any time.
-            bodyInterface.RemoveBody(sphere.ID);
+            bodyInterface.RemoveBody(sphereId);
 
             // Destroy the sphere. After this the sphere ID is no longer valid.
-            bodyInterface.DestroyBody(sphere.ID);
+            bodyInterface.DestroyBody(sphereId);
 
             // Remove and destroy the floor
             bodyInterface.RemoveBody(floor.ID);
