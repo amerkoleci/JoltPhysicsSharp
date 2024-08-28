@@ -59,18 +59,26 @@ jobs:
         path: bin
 
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
 
-    - name: Get CMake
-      uses: lukka/get-cmake@v3.29.4
+    - name: Install dependencies on Ubuntu
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake
+        sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
     # Linux
     - name: CMake Configure (linux-x64)
       run: cmake -S "." -B "build_linux_x64" -G Ninja -DCMAKE_BUILD_TYPE=Distribution
     - name: Build linux-x64
       run: cmake --build build_linux_x64 --config Distribution --verbose --parallel
+
+    - name: CMake Configure (linux-arm64)
+      run: cmake -S "." -B "build_linux_arm64" -G Ninja -DCMAKE_BUILD_TYPE=Distribution -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_SYSTEM_NAME=Linux
+    - name: Build linux-arm64
+      run: cmake --build build_linux_arm64 --config Distribution --verbose --parallel      
 
     # Android
     - name: Setup Android NDK
@@ -116,10 +124,12 @@ jobs:
     - name: Package Linux and Android
       run: |
         mkdir -p bin/linux-x64/native
+        mkdir -p bin/linux-arm64/native
         mkdir -p bin/android-arm64/native
         mkdir -p bin/android-arm/native
         mkdir -p bin/android-x64/native
         mv build_linux_x64/lib/libjoltc.so bin/linux-x64/native/libjoltc.so
+        mv build_linux_arm64/lib/libjoltc.so bin/linux-arm64/native/libjoltc.so
         mv build_android_arm64_v8a/lib/libjoltc.so bin/android-arm64/native/libjoltc.so
         mv build_android_armeabi_v7a/lib/libjoltc.so bin/android-arm/native/libjoltc.so
         mv build_android_x86_64/lib/libjoltc.so bin/android-x64/native/libjoltc.so        
