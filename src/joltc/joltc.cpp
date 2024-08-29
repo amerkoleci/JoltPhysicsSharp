@@ -1589,6 +1589,40 @@ float JPH_Shape_GetVolume(const JPH_Shape* shape)
 	return reinterpret_cast<const JPH::Shape*>(shape)->GetVolume();
 }
 
+JPH_Bool32 JPH_Shape_CastRay(const JPH_Shape* shape, const JPH_Vec3* origin, const JPH_Vec3* direction, JPH_RayCastResult* hit)
+{
+    JPH_ASSERT(shape && origin && direction && hit);
+
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    JPH::RayCast ray(ToJolt(origin), ToJolt(direction));
+    SubShapeIDCreator creator;
+    RayCastResult result;
+
+    bool hadHit = joltShape->CastRay(ray, creator, result);
+
+    if (hadHit)
+    {
+        hit->fraction = result.mFraction;
+        hit->bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+        hit->subShapeID2 = result.mSubShapeID2.GetValue();
+    }
+
+    return static_cast<JPH_Bool32>(hadHit);
+}
+
+JPH_Bool32 JPH_Shape_CollidePoint(const JPH_Shape* shape, JPH_Vec3* point)
+{
+    JPH_ASSERT(shape && point);
+
+    auto joltShape = reinterpret_cast<const JPH::Shape*>(shape);
+    SubShapeIDCreator creator;
+    AnyHitCollisionCollector<CollidePointCollector> collector;
+
+    joltShape->CollidePoint(ToJolt(point), creator, collector);
+
+    return static_cast<JPH_Bool32>(collector.HadHit());
+}
+
 /* JPH_BodyCreationSettings */
 JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create(void)
 {
