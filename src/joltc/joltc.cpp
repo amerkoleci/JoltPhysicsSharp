@@ -355,7 +355,7 @@ JPH_Bool32 JPH_Init(void)
     JPH::RegisterTypes();
 
 	// Init temp allocator
-	s_TempAllocator = new TempAllocatorMalloc();
+	s_TempAllocator = new TempAllocatorImplWithMallocFallback(8 * 1024 * 1024);
 
 	// Init Job system.
     s_JobSystem = new JPH::JobSystemThreadPool(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, (int)std::thread::hardware_concurrency() - 1);
