@@ -331,6 +331,13 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial float JPH_CylinderShape_GetHalfHeight(nint handle);
 
+    /* TaperedCylinderShape */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TaperedCylinderShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius, float convexRadius, nint material);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TaperedCylinderShapeSettings_CreateShape(nint settings);
+
     /* ConvexHullShape */
     [LibraryImport(LibName)]
     public static partial nint JPH_ConvexHullShapeSettings_Create(Vector3* points, int pointsCount, float maxConvexRadius);

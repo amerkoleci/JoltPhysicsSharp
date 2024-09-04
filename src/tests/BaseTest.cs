@@ -10,7 +10,7 @@ public abstract class BaseTest : IDisposable
 {
     protected BaseTest()
     {
-        if (!Foundation.Init(0u, true))
+        if (!Foundation.Init(true))
         {
             return;
         }
