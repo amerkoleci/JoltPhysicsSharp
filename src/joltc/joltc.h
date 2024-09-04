@@ -411,6 +411,7 @@ typedef struct JPH_TriangleShapeSettings            JPH_TriangleShapeSettings;
 typedef struct JPH_CapsuleShapeSettings             JPH_CapsuleShapeSettings;
 typedef struct JPH_TaperedCapsuleShapeSettings      JPH_TaperedCapsuleShapeSettings;
 typedef struct JPH_CylinderShapeSettings            JPH_CylinderShapeSettings;
+typedef struct JPH_TaperedCylinderShapeSettings     JPH_TaperedCylinderShapeSettings;
 typedef struct JPH_ConvexHullShapeSettings          JPH_ConvexHullShapeSettings;
 typedef struct JPH_CompoundShapeSettings            JPH_CompoundShapeSettings;
 typedef struct JPH_StaticCompoundShapeSettings      JPH_StaticCompoundShapeSettings;
@@ -427,6 +428,7 @@ typedef struct JPH_BoxShape                     JPH_BoxShape;
 typedef struct JPH_PlaneShape                   JPH_PlaneShape;
 typedef struct JPH_CapsuleShape                 JPH_CapsuleShape;
 typedef struct JPH_CylinderShape                JPH_CylinderShape;
+typedef struct JPH_TaperedCylinderShape         JPH_TaperedCylinderShape;
 typedef struct JPH_TriangleShape				JPH_TriangleShape;
 typedef struct JPH_TaperedCapsuleShape			JPH_TaperedCapsuleShape;
 typedef struct JPH_ConvexHullShape              JPH_ConvexHullShape;
@@ -700,6 +702,9 @@ JPH_CAPI JPH_CylinderShape* JPH_CylinderShape_Create(float halfHeight, float rad
 JPH_CAPI float JPH_CylinderShape_GetRadius(const JPH_CylinderShape* shape);
 JPH_CAPI float JPH_CylinderShape_GetHalfHeight(const JPH_CylinderShape* shape);
 
+/* TaperedCylinderShape */
+JPH_CAPI JPH_TaperedCylinderShapeSettings* JPH_TaperedCylinderShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius, float convexRadius/* = cDefaultConvexRadius*/, const JPH_PhysicsMaterial* material /* = NULL*/);
+JPH_CAPI JPH_TaperedCylinderShape* JPH_TaperedCylinderShapeSettings_CreateShape(const JPH_TaperedCylinderShapeSettings* settings);
 /* ConvexHullShape */
 JPH_CAPI JPH_ConvexHullShapeSettings* JPH_ConvexHullShapeSettings_Create(const JPH_Vec3* points, uint32_t pointsCount, float maxConvexRadius);
 JPH_CAPI JPH_ConvexHullShape* JPH_ConvexHullShapeSettings_CreateShape(const JPH_ConvexHullShapeSettings* settings);
