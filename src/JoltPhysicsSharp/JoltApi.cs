@@ -286,7 +286,7 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial float JPH_PlaneShape_GetHalfExtent(nint handle);
 
-    /* TriangleShapeSettings */
+    /* TriangleShape */
     [LibraryImport(LibName)]
     public static partial nint JPH_TriangleShapeSettings_Create(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius);
 
@@ -297,7 +297,16 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_TriangleShape_Create(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_TriangleShape_GetConvexRadius(nint shape);
+    public static partial float JPH_TriangleShape_GetConvexRadius(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_TriangleShape_GetVertex1(nint handle, Vector3* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_TriangleShape_GetVertex2(nint handle, Vector3* result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_TriangleShape_GetVertex3(nint handle, Vector3* result);
 
     /* CapsuleShape */
     [LibraryImport(LibName)]
@@ -337,6 +346,18 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial nint JPH_TaperedCylinderShapeSettings_CreateShape(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_TaperedCylinderShape_GetTopRadius(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_TaperedCylinderShape_GetBottomRadius(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_TaperedCylinderShape_GetConvexRadius(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_TaperedCylinderShape_GetHalfHeight(nint shape);
 
     /* ConvexHullShape */
     [LibraryImport(LibName)]
@@ -393,12 +414,21 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial uint JPH_MeshShapeSettings_CalculateBitsPerSampleForError(IntPtr settings, float maxError);
 
-    /* TaperedCapsuleShapeSettings */
+    /* JPH_TaperedCapsuleShape */
     [LibraryImport(LibName)]
     public static partial nint JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_TaperedCapsuleShapeSettings_CreateShape(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_TaperedCapsuleShape_GetTopRadius(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_TaperedCapsuleShape_GetBottomRadius(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_TaperedCapsuleShape_GetHalfHeight(nint shape);
 
     /* CompoundShape */
     [LibraryImport(LibName)]
@@ -910,7 +940,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PhysicsSystem_OptimizeBroadPhase(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial PhysicsUpdateError JPH_PhysicsSystem_Step(nint handle, float deltaTime, int collisionSteps);
+    public static partial PhysicsUpdateError JPH_PhysicsSystem_Update(nint handle, float deltaTime, int collisionSteps);
 
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_SetContactListener(IntPtr system, IntPtr listener);
@@ -1003,6 +1033,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_RemoveBody(nint handle, uint bodyID);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_RemoveAndDestroyBody(nint handle, uint bodyID);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_GetLinearVelocity(nint handle, uint bodyID, Vector3* velocity);

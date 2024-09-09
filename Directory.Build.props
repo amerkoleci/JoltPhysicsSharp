@@ -2,6 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <RepoRootPath>$(MSBuildThisFileDirectory)</RepoRootPath>
+    <NativeLibDirectory>$(MSBuildThisFileDirectory)native/</NativeLibDirectory>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -32,7 +33,6 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
-    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts/</PackageOutputPath>
     <PackageTags>game-engine game-development physics physics-engine physics-simulation</PackageTags>
   </PropertyGroup>
 

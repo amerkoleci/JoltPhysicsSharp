@@ -5,34 +5,11 @@
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-  
-  <Choose>
-    <When Condition="$([MSBuild]::IsOSPlatform('Windows')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'">
-      <ItemGroup>
-        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/win-x64/native/joltc.dll" Link="joltc.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
-        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/win-x64/native/joltc_double.dll" Link="joltc_double.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
-      </ItemGroup>
-    </When>
-    <When Condition="$([MSBuild]::IsOSPlatform('Windows')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">
-      <ItemGroup>
-        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/win-arm64/native/joltc.dll" Link="joltc.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
-        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/win-arm64/native/joltc_double.dll" Link="joltc_double.dll" Visible="False" CopyToOutputDirectory="PreserveNewest" />
-      </ItemGroup>
-    </When>
-    <When Condition="$([MSBuild]::IsOSPlatform('Linux')) AND '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'">
-      <ItemGroup>
-        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/linux-x64/native/libjoltc.so" Link="libjoltc.so" Visible="False" CopyToOutputDirectory="PreserveNewest" />
-      </ItemGroup>
-    </When>
-    <When Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-      <ItemGroup>
-        <None Include="$(RepoRootPath)/src/JoltPhysicsSharp/runtimes/osx/native/libjoltc.dylib" Link="libjoltc.dylib" Visible="False" CopyToOutputDirectory="PreserveNewest" />
-      </ItemGroup>
-    </When>
-  </Choose>
 
   <ItemGroup>
     <ProjectReference Include="..\..\JoltPhysicsSharp\JoltPhysicsSharp.csproj" />
   </ItemGroup>
+
+  <Import Project="$(RepoRootPath)JoltPhysicsSharp.Native.targets" />
 
 </Project>

@@ -75,6 +75,11 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         JPH_BodyInterface_RemoveBody(Handle, bodyID);
     }
 
+    public void RemoveAndDestroyBody(in BodyID bodyID)
+    {
+        JPH_BodyInterface_RemoveAndDestroyBody(Handle, bodyID);
+    }
+
     public bool AssignBodyID(in Body body)
     {
         return JPH_BodyInterface_AssignBodyID(Handle, body.Handle);

@@ -27,4 +27,14 @@ public sealed class TaperedCylinderShape : ConvexShape
         : base(JPH_TaperedCylinderShapeSettings_CreateShape(settings.Handle))
     {
     }
+
+    /// <summary>
+    /// Finalizes an instance of the <see cref="TaperedCylinderShape" /> class.
+    /// </summary>
+    ~TaperedCylinderShape() => Dispose(disposing: false);
+
+    public float TopRadius => JPH_TaperedCylinderShape_GetTopRadius(Handle);
+    public float BottomRadius => JPH_TaperedCylinderShape_GetBottomRadius(Handle);
+    public float ConvexRadius => JPH_TaperedCylinderShape_GetConvexRadius(Handle);
+    public float HalfHeight => JPH_TaperedCylinderShape_GetHalfHeight(Handle);
 }

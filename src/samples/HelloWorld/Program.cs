@@ -303,19 +303,15 @@ public static class Program
                 const int collisionSteps = 1;
 
                 // Step the world
-                PhysicsUpdateError error = physicsSystem.Step(deltaTime, collisionSteps);
+                PhysicsUpdateError error = physicsSystem.Update(deltaTime, collisionSteps);
                 Debug.Assert(error == PhysicsUpdateError.None);
             }
 
-            // Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any time.
-            bodyInterface.RemoveBody(sphereId);
-
-            // Destroy the sphere. After this the sphere ID is no longer valid.
-            bodyInterface.DestroyBody(sphereId);
+            // Remove and destroy the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any time.
+            bodyInterface.RemoveAndDestroyBody(sphereId);
 
             // Remove and destroy the floor
-            bodyInterface.RemoveBody(floor.ID);
-            bodyInterface.DestroyBody(floor.ID);
+            bodyInterface.RemoveAndDestroyBody(floor.ID);
         }
 
         Foundation.Shutdown();

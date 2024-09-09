@@ -32,4 +32,8 @@ public sealed class TaperedCapsuleShape : ConvexShape
     /// Finalizes an instance of the <see cref="TaperedCapsuleShape" /> class.
     /// </summary>
     ~TaperedCapsuleShape() => Dispose(disposing: false);
+
+    public float TopRadius => JPH_TaperedCapsuleShape_GetTopRadius(Handle);
+    public float BottomRadius => JPH_TaperedCapsuleShape_GetBottomRadius(Handle);
+    public float HalfHeight => JPH_TaperedCapsuleShape_GetHalfHeight(Handle);
 }
