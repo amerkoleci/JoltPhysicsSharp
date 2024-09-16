@@ -37,13 +37,10 @@ public sealed class HeightFieldShapeSettings : ConvexShapeSettings
 
     public void DetermineMinAndMaxSample(out float minValue, out float maxValue, out float quantizationScale)
     {
-        JPH_MeshShapeSettings_DetermineMinAndMaxSample(Handle, out minValue, out maxValue, out quantizationScale);
+        JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(Handle, out minValue, out maxValue, out quantizationScale);
     }
 
-    public uint CalculateBitsPerSampleForError(float maxError)
-    {
-        return JPH_MeshShapeSettings_CalculateBitsPerSampleForError(Handle, maxError);
-    }
+    public uint CalculateBitsPerSampleForError(float maxError) => JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(Handle, maxError);
 }
 
 public sealed class HeightFieldShape : Shape
@@ -52,4 +49,37 @@ public sealed class HeightFieldShape : Shape
         : base(JPH_HeightFieldShapeSettings_CreateShape(settings.Handle))
     {
     }
+
+    public uint SampleCount => JPH_HeightFieldShape_GetSampleCount(Handle);
+    public uint BlockSize => JPH_HeightFieldShape_GetBlockSize(Handle);
+
+    public float MinHeightValue => JPH_HeightFieldShape_GetMinHeightValue(Handle);
+    public float MaxHeightValue => JPH_HeightFieldShape_GetMaxHeightValue(Handle);
+
+    public /*JPH_PhysicsMaterial**/nint GetMaterial(uint x, uint y)
+    {
+        return JPH_HeightFieldShape_GetMaterial(Handle, x, y);
+    }
+
+    public Vector3 GetPosition(uint x, uint y)
+    {
+        JPH_HeightFieldShape_GetPosition(Handle, x, y, out Vector3 result);
+        return result;
+    }
+
+    public void GetPosition(uint x, uint y, out Vector3 result)
+    {
+        JPH_HeightFieldShape_GetPosition(Handle, x, y, out result);
+    }
+
+    public bool IsNoCollision(uint x, uint y)
+    {
+        return JPH_HeightFieldShape_IsNoCollision(Handle, x, y);
+    }
+
+    public bool ProjectOntoSurface(in Vector3 localPosition, out Vector3 surfacePosition, out SubShapeID subShapeID)
+    {
+        return JPH_HeightFieldShape_ProjectOntoSurface(Handle, in localPosition, out surfacePosition, out subShapeID);
+    }
+    
 }

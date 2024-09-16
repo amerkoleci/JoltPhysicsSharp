@@ -68,11 +68,11 @@ public static class Foundation
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe Bool8 OnNativeAssertCallback(sbyte* expressionPtr, sbyte* messagePtr, sbyte* filePtr, uint line)
+    private static unsafe Bool8 OnNativeAssertCallback(byte* expressionPtr, byte* messagePtr, byte* filePtr, uint line)
     {
-        string expression = new(expressionPtr);
-        string message = new(messagePtr);
-        string file = new(filePtr);
+        string expression = ConvertToManaged(expressionPtr)!;
+        string message = ConvertToManaged(messagePtr)!;
+        string file = ConvertToManaged(filePtr)!;
 
         if (s_assertCallback != null)
         {

@@ -255,6 +255,27 @@ public sealed unsafe class PhysicsSystem : NativeObject
         }
     }
 
+    public void DrawBodies(in DrawSettings settings, DebugRenderer renderer)
+    {
+        fixed (DrawSettings* settingsPtr = &settings)
+            JPH_PhysicsSystem_DrawBodies(Handle, settingsPtr, renderer.Handle);
+    }
+
+    public void DrawConstraints(DebugRenderer renderer)
+    {
+        JPH_PhysicsSystem_DrawConstraints(Handle, renderer.Handle);
+    }
+
+    public void DrawConstraintLimits(DebugRenderer renderer)
+    {
+        JPH_PhysicsSystem_DrawConstraintLimits(Handle, renderer.Handle);
+    }
+
+    public void DrawConstraintReferenceFrame(DebugRenderer renderer)
+    {
+        JPH_PhysicsSystem_DrawConstraintReferenceFrame(Handle, renderer.Handle);
+    }
+
     #region ContactListener
     [UnmanagedCallersOnly]
     private static unsafe uint OnContactValidateCallback(nint context, nint body1, nint body2, Vector3* baseOffset, nint collisionResult)

@@ -493,6 +493,58 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         JPH_Body_AddAngularImpulse(Handle, angularImpulse);
     }
 
+    public void MoveKinematic(in Vector3 targetPosition, in Quaternion targetRotation, float deltaTime)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(MoveKinematic)}");
+
+        JPH_Body_MoveKinematic(Handle, in targetPosition, in targetRotation, deltaTime);
+    }
+
+    public void MoveKinematic(in Double3 targetPosition, in Quaternion targetRotation, float deltaTime)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(MoveKinematic)}");
+
+        JPH_Body_MoveKinematic(Handle, in targetPosition, in targetRotation, deltaTime);
+    }
+
+    public bool ApplyBuoyancyImpulse(
+        in Vector3 surfacePosition,
+        in Vector3 surfaceNormal,
+        float buoyancy, float linearDrag, float angularDrag,
+        in Vector3 fluidVelocity,
+        in Vector3 gravity,
+        float deltaTime)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(ApplyBuoyancyImpulse)}");
+
+        return JPH_Body_ApplyBuoyancyImpulse(Handle, in surfacePosition, in surfaceNormal,
+            buoyancy, linearDrag, angularDrag,
+            in fluidVelocity,
+            in gravity,
+            deltaTime);
+    }
+
+    public bool ApplyBuoyancyImpulse(
+       in Double3 surfacePosition,
+       in Vector3 surfaceNormal,
+       float buoyancy, float linearDrag, float angularDrag,
+       in Vector3 fluidVelocity,
+       in Vector3 gravity,
+       float deltaTime)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(ApplyBuoyancyImpulse)}");
+
+        return JPH_Body_ApplyBuoyancyImpulse(Handle, in surfacePosition, in surfaceNormal,
+            buoyancy, linearDrag, angularDrag,
+            in fluidVelocity,
+            in gravity,
+            deltaTime);
+    }
+
     public ulong GetUserData()
     {
         return JPH_Body_GetUserData(Handle);

@@ -31,6 +31,12 @@ public abstract class ShapeSettings : NativeObject
         }
     }
 
+    public ulong UserData
+    {
+        get => JPH_ShapeSettings_GetUserData(Handle);
+        set => JPH_ShapeSettings_SetUserData(Handle, value);
+    }
+
     public abstract Shape Create();
 }
 
@@ -77,6 +83,8 @@ public abstract unsafe class Shape : NativeObject
             return result;
         }
     }
+
+    public uint SubShapeIDBitsRecursive => JPH_Shape_GetSubShapeIDBitsRecursive(Handle);
 
     public MassProperties MassProperties
     {
@@ -152,6 +160,8 @@ public abstract unsafe class Shape : NativeObject
         }
     }
 
+    public nint GetMaterial(SubShapeID subShapeID) => JPH_Shape_GetMaterial(Handle, subShapeID);
+
     public Vector3 GetSurfaceNormal(SubShapeID subShapeID, in Vector3 localPosition)
     {
         fixed (Vector3* localPositionPtr = &localPosition)
@@ -171,5 +181,15 @@ public abstract unsafe class Shape : NativeObject
         {
             JPH_Shape_GetSurfaceNormal(Handle, subShapeID, localPositionPtr, normalPtr);
         }
+    }
+
+    public bool CastRay(in Vector3 origin, in Vector3 direction, out RayCastResult hit)
+    {
+        return JPH_Shape_CastRay(Handle, in origin, in direction, out hit);
+    }
+
+    public bool CollidePoint(in Vector3 point)
+    {
+        return JPH_Shape_CollidePoint(Handle, in point);
     }
 }
