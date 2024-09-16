@@ -24,11 +24,11 @@ public record struct PhysicsSettings
     public float MinVelocityForRestitution;
     public float TimeBeforeSleep;
     public float PointVelocitySleepThreshold;
-    public Bool32 DeterministicSimulation;
-    public Bool32 ConstraintWarmStart;
-    public Bool32 UseBodyPairContactCache;
-    public Bool32 UseManifoldReduction;
-    public Bool32 UseLargeIslandSplitter;
-    public Bool32 AllowSleeping;
-    public Bool32 CheckActiveEdges;
+    public Bool8 DeterministicSimulation;
+    public Bool8 ConstraintWarmStart;
+    public Bool8 UseBodyPairContactCache;
+    public Bool8 UseManifoldReduction;
+    public Bool8 UseLargeIslandSplitter;
+    public Bool8 AllowSleeping;
+    public Bool8 CheckActiveEdges;
 }

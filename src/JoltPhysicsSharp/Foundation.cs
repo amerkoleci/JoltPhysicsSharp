@@ -68,7 +68,7 @@ public static class Foundation
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe Bool32 OnNativeAssertCallback(sbyte* expressionPtr, sbyte* messagePtr, sbyte* filePtr, uint line)
+    private static unsafe Bool8 OnNativeAssertCallback(sbyte* expressionPtr, sbyte* messagePtr, sbyte* filePtr, uint line)
     {
         string expression = new(expressionPtr);
         string message = new(messagePtr);
@@ -79,6 +79,6 @@ public static class Foundation
             return s_assertCallback(expression, message, file, line);
         }
 
-        return Bool32.True;
+        return Bool8.True;
     }
 }

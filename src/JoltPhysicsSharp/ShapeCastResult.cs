@@ -15,5 +15,5 @@ public readonly struct ShapeCastResult
     public readonly SubShapeID SubShapeID2;
     public readonly BodyID BodyID2;
     public readonly float Fraction;
-    public readonly Bool32 IsBackFaceHit;
+    public readonly Bool8 IsBackFaceHit;
 }

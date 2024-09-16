@@ -213,7 +213,7 @@ public sealed class CharacterVirtual : CharacterBase
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe Bool32 OnContactValidateCallback(nint context, nint character, BodyID bodyID2, SubShapeID subShapeID2)
+    private static unsafe Bool8 OnContactValidateCallback(nint context, nint character, BodyID bodyID2, SubShapeID subShapeID2)
     {
         CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
 
@@ -270,6 +270,6 @@ public sealed class CharacterVirtual : CharacterBase
 
 public struct CharacterContactSettings
 {
-    public Bool32 CanPushCharacter;
-    public Bool32 CanReceiveImpulses;
+    public Bool8 CanPushCharacter;
+    public Bool8 CanReceiveImpulses;
 }

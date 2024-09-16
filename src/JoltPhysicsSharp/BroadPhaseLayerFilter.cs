@@ -37,7 +37,7 @@ public abstract class BroadPhaseLayerFilter : NativeObject
     protected abstract bool ShouldCollide(BroadPhaseLayer layer);
 
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideCallback(IntPtr context, BroadPhaseLayer layer)
+    private static Bool8 ShouldCollideCallback(IntPtr context, BroadPhaseLayer layer)
     {
         BroadPhaseLayerFilter listener = DelegateProxies.GetUserData<BroadPhaseLayerFilter>(context, out _);
         return listener.ShouldCollide(layer);

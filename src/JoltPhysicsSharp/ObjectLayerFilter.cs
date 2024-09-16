@@ -37,7 +37,7 @@ public abstract class ObjectLayerFilter : NativeObject
     protected abstract bool ShouldCollide(ObjectLayer layer);
 
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideCallback(IntPtr context, ObjectLayer layer)
+    private static Bool8 ShouldCollideCallback(IntPtr context, ObjectLayer layer)
     {
         ObjectLayerFilter listener = DelegateProxies.GetUserData<ObjectLayerFilter>(context, out _);
         return listener.ShouldCollide(layer);

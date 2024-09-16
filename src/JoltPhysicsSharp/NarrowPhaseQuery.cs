@@ -43,8 +43,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         fixed (Vector3* directionPtr = &direction)
         fixed (RayCastResult* hitPtr = &hit)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CastRay(Handle, originPtr, directionPtr, hitPtr, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
-            return result;
+            return JPH_NarrowPhaseQuery_CastRay(Handle, originPtr, directionPtr, hitPtr, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
         }
     }
 
@@ -64,8 +63,7 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         fixed (Vector3* directionPtr = &direction)
         fixed (RayCastResult* hitPtr = &hit)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CastRayDouble(Handle, originPtr, directionPtr, hitPtr, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
-            return result;
+            return JPH_NarrowPhaseQuery_CastRayDouble(Handle, originPtr, directionPtr, hitPtr, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
         }
     }
 
@@ -83,12 +81,11 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         fixed (Vector3* originPtr = &origin)
         fixed (Vector3* directionPtr = &direction)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CastRay2(Handle, originPtr, directionPtr,
+            return JPH_NarrowPhaseQuery_CastRay2(Handle, originPtr, directionPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0,
                 bodyFilter?.Handle ?? 0);
-            return result;
         }
     }
 
@@ -106,12 +103,11 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         fixed (Double3* originPtr = &origin)
         fixed (Vector3* directionPtr = &direction)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CastRay2Double(Handle, originPtr, directionPtr,
+            return JPH_NarrowPhaseQuery_CastRay2Double(Handle, originPtr, directionPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0,
                 bodyFilter?.Handle ?? 0);
-            return result;
         }
     } 
     #endregion
@@ -129,13 +125,12 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
 
         fixed (Vector3* pointPtr = &point)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CollidePoint(Handle,
+            return JPH_NarrowPhaseQuery_CollidePoint(Handle,
                 pointPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0,
                 bodyFilter?.Handle ?? 0);
-            return result;
         }
     }
 
@@ -151,13 +146,12 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
 
         fixed (Double3* pointPtr = &point)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CollidePointDouble(Handle,
+            return JPH_NarrowPhaseQuery_CollidePointDouble(Handle,
                 pointPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0,
                 bodyFilter?.Handle ?? 0);
-            return result;
         }
     }
     #endregion
@@ -177,13 +171,12 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         fixed (Matrix4x4* centerOfMassTransformPtr = &centerOfMassTransform)
         fixed (Vector3* baseOffsetPtr = &baseOffset)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CollideShape(Handle, shape.Handle,
+            return JPH_NarrowPhaseQuery_CollideShape(Handle, shape.Handle,
                 scalePtr, centerOfMassTransformPtr, baseOffsetPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0,
                 bodyFilter?.Handle ?? 0);
-            return result;
         }
     }
 
@@ -201,13 +194,12 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         fixed (RMatrix4x4* centerOfMassTransformPtr = &centerOfMassTransform)
         fixed (Double3* baseOffsetPtr = &baseOffset)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CollideShapeDouble(Handle, shape.Handle,
+            return JPH_NarrowPhaseQuery_CollideShapeDouble(Handle, shape.Handle,
                 scalePtr, centerOfMassTransformPtr, baseOffsetPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0,
                 bodyFilter?.Handle ?? 0);
-            return result;
         }
     }
     #endregion
@@ -227,13 +219,12 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         fixed (Vector3* directionPtr = &direction)
         fixed (Vector3* baseOffsetPtr = &baseOffset)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CastShape(Handle, shape.Handle,
+            return JPH_NarrowPhaseQuery_CastShape(Handle, shape.Handle,
                 centerOfMassTransformPtr, directionPtr, baseOffsetPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0,
                 bodyFilter?.Handle ?? 0);
-            return result;
         }
     }
 
@@ -251,13 +242,12 @@ public readonly struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         fixed (Vector3* directionPtr = &direction)
         fixed (Double3* baseOffsetPtr = &baseOffset)
         {
-            Bool32 result = JPH_NarrowPhaseQuery_CastShapeDouble(Handle, shape.Handle,
+            return JPH_NarrowPhaseQuery_CastShapeDouble(Handle, shape.Handle,
                 centerOfMassTransformPtr, directionPtr, baseOffsetPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0,
                 bodyFilter?.Handle ?? 0);
-            return result;
         }
     }
     #endregion

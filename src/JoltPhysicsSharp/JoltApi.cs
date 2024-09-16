@@ -8,7 +8,6 @@ using System.Text;
 
 namespace JoltPhysicsSharp;
 
-
 internal static unsafe partial class JoltApi
 {
     private const DllImportSearchPath DefaultDllImportSearchPath = DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories | DllImportSearchPath.UseDllDirectoryForDependencies;
@@ -118,7 +117,7 @@ internal static unsafe partial class JoltApi
 
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Init();
 
     [LibraryImport(LibName)]
@@ -128,7 +127,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_SetTraceHandler(delegate* unmanaged<byte*, void> callback);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_SetAssertFailureHandler(delegate* unmanaged<sbyte*, sbyte*, sbyte*, uint, Bool32> callback);
+    public static partial void JPH_SetAssertFailureHandler(delegate* unmanaged<sbyte*, sbyte*, sbyte*, uint, Bool8> callback);
 
     //  BroadPhaseLayerInterface
     [LibraryImport(LibName)]
@@ -183,7 +182,7 @@ internal static unsafe partial class JoltApi
     //  BroadPhaseLayerFilter
     public struct JPH_BroadPhaseLayerFilter_Procs
     {
-        public delegate* unmanaged<nint, BroadPhaseLayer, Bool32> ShouldCollide;
+        public delegate* unmanaged<nint, BroadPhaseLayer, Bool8> ShouldCollide;
     }
 
     [LibraryImport(LibName)]
@@ -198,7 +197,7 @@ internal static unsafe partial class JoltApi
     //  ObjectLayerFilter
     public struct JPH_ObjectLayerFilter_Procs
     {
-        public delegate* unmanaged<IntPtr, ObjectLayer, Bool32> ShouldCollide;
+        public delegate* unmanaged<IntPtr, ObjectLayer, Bool8> ShouldCollide;
     }
 
     [LibraryImport(LibName)]
@@ -213,8 +212,8 @@ internal static unsafe partial class JoltApi
     //  BodyFilter
     public struct JPH_BodyFilter_Procs
     {
-        public delegate* unmanaged<nint, BodyID, Bool32> ShouldCollide;
-        public delegate* unmanaged<nint, IntPtr, Bool32> ShouldCollideLocked;
+        public delegate* unmanaged<nint, BodyID, Bool8> ShouldCollide;
+        public delegate* unmanaged<nint, IntPtr, Bool8> ShouldCollideLocked;
     }
 
     [LibraryImport(LibName)]
@@ -250,9 +249,6 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_BoxShape_GetHalfExtent(IntPtr handle, out Vector3 halfExtent);
-
-    [LibraryImport(LibName)]
-    public static partial float JPH_BoxShape_GetVolume(IntPtr handle);
 
     [LibraryImport(LibName)]
     public static partial float JPH_BoxShape_GetConvexRadius(IntPtr handle);
@@ -505,7 +501,8 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Shape_SetUserData(nint shape, ulong userData);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Shape_MustBeStatic(nint shape);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Shape_MustBeStatic(nint shape);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Shape_GetCenterOfMass(nint handle, Vector3* result);
@@ -558,28 +555,40 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyCreationSettings_Destroy(nint settings);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_GetLinearVelocity(IntPtr settings, Vector3* velocity);
+    public static partial void JPH_BodyCreationSettings_GetPosition(nint settings, Vector3* velocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_SetLinearVelocity(IntPtr settings, Vector3* velocity);
+    public static partial void JPH_BodyCreationSettings_SetPosition(nint settings, Vector3* velocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_GetAngularVelocity(IntPtr settings, Vector3* velocity);
+    public static partial void JPH_BodyCreationSettings_GetRotation(nint settings, Quaternion* velocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_SetAngularVelocity(IntPtr settings, Vector3* velocity);
+    public static partial void JPH_BodyCreationSettings_SetRotation(nint settings, Quaternion* velocity);
 
     [LibraryImport(LibName)]
-    public static partial MotionType JPH_BodyCreationSettings_GetMotionType(IntPtr settings);
+    public static partial void JPH_BodyCreationSettings_GetLinearVelocity(nint settings, Vector3* velocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_SetMotionType(IntPtr settings, MotionType value);
+    public static partial void JPH_BodyCreationSettings_SetLinearVelocity(nint settings, Vector3* velocity);
 
     [LibraryImport(LibName)]
-    public static partial AllowedDOFs JPH_BodyCreationSettings_GetAllowedDOFs(IntPtr settings);
+    public static partial void JPH_BodyCreationSettings_GetAngularVelocity(nint settings, Vector3* velocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_SetAllowedDOFs(IntPtr settings, AllowedDOFs value);
+    public static partial void JPH_BodyCreationSettings_SetAngularVelocity(nint settings, Vector3* velocity);
+
+    [LibraryImport(LibName)]
+    public static partial MotionType JPH_BodyCreationSettings_GetMotionType(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetMotionType(nint settings, MotionType value);
+
+    [LibraryImport(LibName)]
+    public static partial AllowedDOFs JPH_BodyCreationSettings_GetAllowedDOFs(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetAllowedDOFs(nint settings, AllowedDOFs value);
 
     /* SoftBodyCreationSettings */
     [LibraryImport(LibName)]
@@ -594,10 +603,11 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_ConstraintSettings_Destroy(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_ConstraintSettings_GetEnabled(nint handle);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_ConstraintSettings_GetEnabled(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetEnabled(nint handle, Bool32 value);
+    public static partial void JPH_FixedConstraintSettings_SetEnabled(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
 
     [LibraryImport(LibName)]
     public static partial uint JPH_ConstraintSettings_GetConstraintPriority(nint handle);
@@ -650,10 +660,11 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Constraint_SetConstraintPriority(nint handle, uint value);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Constraint_GetEnabled(nint constraint);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Constraint_GetEnabled(nint constraint);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Constraint_SetEnabled(nint constraint, Bool32 value);
+    public static partial void JPH_Constraint_SetEnabled(nint constraint, [MarshalAs(UnmanagedType.U1)] bool value);
 
     [LibraryImport(LibName)]
     public static partial ulong JPH_Constraint_GetUserData(nint constraint);
@@ -690,10 +701,11 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_FixedConstraintSettings_SetSpace(nint handle, ConstraintSpace value);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_FixedConstraintSettings_GetAutoDetectPoint(nint handle);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_FixedConstraintSettings_GetAutoDetectPoint(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetAutoDetectPoint(nint handle, Bool32 value);
+    public static partial void JPH_FixedConstraintSettings_SetAutoDetectPoint(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
 
     [LibraryImport(LibName)]
     public static partial void JPH_FixedConstraintSettings_GetPoint1(nint handle, Vector3* result); // RVec3
@@ -1020,10 +1032,12 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_DestroyBodyWithoutID(IntPtr handle, IntPtr body);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_BodyInterface_AssignBodyID(IntPtr handle, IntPtr body);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyInterface_AssignBodyID(IntPtr handle, IntPtr body);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_BodyInterface_AssignBodyID2(IntPtr handle, IntPtr body, uint bodyID);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyInterface_AssignBodyID2(IntPtr handle, IntPtr body, uint bodyID);
 
     [LibraryImport(LibName)]
     public static partial IntPtr JPH_BodyInterface_UnassignBodyID(IntPtr handle, uint bodyID);
@@ -1050,10 +1064,14 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_GetCenterOfMassPositionDouble(nint handle, uint bodyID, Double3* position);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyInterface_IsActive(IntPtr handle, uint bodyID);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_BodyInterface_IsAdded(IntPtr handle, uint bodyID);
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyInterface_IsAdded(IntPtr handle, uint bodyID);
 
     [LibraryImport(LibName)]
     public static partial BodyType JPH_BodyInterface_GetBodyType(IntPtr handle, uint bodyID);
@@ -1122,10 +1140,10 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_BodyInterface_GetShape(nint handle, uint bodyId);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_SetShape(nint handle, uint bodyId, nint shape, Bool32 updateMassProperties, Activation activationMode);
+    public static partial void JPH_BodyInterface_SetShape(nint handle, uint bodyId, nint shape, [MarshalAs(UnmanagedType.U1)] bool updateMassProperties, Activation activationMode);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_NotifyShapeChanged(nint handle, uint bodyId, Vector3* previousCenterOfMass, Bool32 updateMassProperties, Activation activationMode);
+    public static partial void JPH_BodyInterface_NotifyShapeChanged(nint handle, uint bodyId, Vector3* previousCenterOfMass, [MarshalAs(UnmanagedType.U1)] bool updateMassProperties, Activation activationMode);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_ActivateBody(IntPtr handle, uint bodyId);
@@ -1152,10 +1170,18 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_GetCenterOfMassTransformDouble(nint handle, uint bodyId, RMatrix4x4* result);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_MoveKinematic(IntPtr handle, uint bodyId, Vector3* targetPosition, Quaternion* targetRotation, float deltaTime);
+    public static partial void JPH_BodyInterface_MoveKinematic(nint handle, uint bodyId, Vector3* targetPosition, Quaternion* targetRotation, float deltaTime);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_MoveKinematic))]
-    public static partial void JPH_BodyInterface_MoveKinematicDouble(IntPtr handle, uint bodyId, Double3* targetPosition, Quaternion* targetRotation, float deltaTime);
+    public static partial void JPH_BodyInterface_MoveKinematicDouble(nint handle, uint bodyId, Double3* targetPosition, Quaternion* targetRotation, float deltaTime);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyInterface_ApplyBuoyancyImpulse(nint handle, in BodyID bodyId, /*RVec3*/ Vector3* surfacePosition, Vector3* surfaceNormal, float buoyancy, float linearDrag, float angularDrag, Vector3* fluidVelocity, Vector3* gravity, float deltaTime);
+
+    [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_ApplyBuoyancyImpulse))]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyInterface_ApplyBuoyancyImpulseDouble(nint handle, in BodyID bodyId, /*RVec3*/ Double3* surfacePosition, Vector3* surfaceNormal, float buoyancy, float linearDrag, float angularDrag, Vector3* fluidVelocity, Vector3* gravity, float deltaTime);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_SetLinearAndAngularVelocity(IntPtr handle, uint bodyId, in Vector3 linearVelocity, in Vector3 angularVelocity);
@@ -1282,28 +1308,32 @@ internal static unsafe partial class JoltApi
 
     #region BroadPhaseQuery
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_BroadPhaseQuery_CastRay(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BroadPhaseQuery_CastRay(nint query,
         Vector3* origin, Vector3* direction,
         delegate* unmanaged<void*, BroadPhaseCastResult*, float> callback, void* userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_BroadPhaseQuery_CollideAABox(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BroadPhaseQuery_CollideAABox(nint query,
         BoundingBox* box,
         delegate* unmanaged<void*, in BodyID, void>* callback, void* userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_BroadPhaseQuery_CollideSphere(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BroadPhaseQuery_CollideSphere(nint query,
         Vector3* center, float radius,
         delegate* unmanaged<void*, in BodyID, void> callback, void* userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_BroadPhaseQuery_CollidePoint(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BroadPhaseQuery_CollidePoint(nint query,
         Vector3* point,
         delegate* unmanaged<void*, in BodyID, void> callback, void* userData,
         nint broadPhaseLayerFilter,
@@ -1312,7 +1342,8 @@ internal static unsafe partial class JoltApi
 
     #region NarrowPhaseQuery
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CastRay(nint system,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CastRay(nint system,
         Vector3* origin, Vector3* direction,
         /*out*/ RayCastResult* hit,
         IntPtr broadPhaseLayerFilter,
@@ -1320,7 +1351,8 @@ internal static unsafe partial class JoltApi
         IntPtr bodyFilter);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CastRayDouble(nint system,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CastRayDouble(nint system,
         Double3* origin, Vector3* direction,
         /*out*/ RayCastResult* hit,
         IntPtr broadPhaseLayerFilter,
@@ -1328,7 +1360,8 @@ internal static unsafe partial class JoltApi
         IntPtr bodyFilter);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay2))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CastRay2(nint system,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CastRay2(nint system,
         Vector3* origin, Vector3* direction,
         delegate* unmanaged<void*, RayCastResult*, float> callback, void* userData,
         IntPtr broadPhaseLayerFilter,
@@ -1336,7 +1369,8 @@ internal static unsafe partial class JoltApi
         IntPtr bodyFilter);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay2))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CastRay2Double(nint system,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CastRay2Double(nint system,
         Double3* origin, Vector3* direction,
         delegate* unmanaged<void*, RayCastResult*, float> callback, void* userData,
         nint broadPhaseLayerFilter,
@@ -1344,7 +1378,8 @@ internal static unsafe partial class JoltApi
         nint bodyFilter);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollidePoint))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CollidePoint(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CollidePoint(nint query,
         Vector3* point,
         delegate* unmanaged<void*, CollidePointResult*, float> callback, void* userData,
         nint broadPhaseLayerFilter,
@@ -1353,7 +1388,8 @@ internal static unsafe partial class JoltApi
         );
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollidePoint))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CollidePointDouble(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CollidePointDouble(nint query,
         Double3* point,
         delegate* unmanaged<void*, CollidePointResult*, float> callback, void* userData,
         nint broadPhaseLayerFilter,
@@ -1362,7 +1398,8 @@ internal static unsafe partial class JoltApi
         );
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollideShape))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CollideShape(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CollideShape(nint query,
         nint shape, Vector3* scale, Matrix4x4* centerOfMassTransform, Vector3* baseOffset,
         delegate* unmanaged<void*, CollideShapeResult*, float> callback, void* userData,
         nint broadPhaseLayerFilter,
@@ -1371,7 +1408,8 @@ internal static unsafe partial class JoltApi
         );
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollideShape))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CollideShapeDouble(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CollideShapeDouble(nint query,
         nint shape, Vector3* scale, RMatrix4x4* centerOfMassTransform, Double3* baseOffset,
         delegate* unmanaged<void*, CollideShapeResult*, float> callback, void* userData,
         nint broadPhaseLayerFilter,
@@ -1380,7 +1418,8 @@ internal static unsafe partial class JoltApi
         );
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastShape))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CastShape(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CastShape(nint query,
         nint shape,
         Matrix4x4* centerOfMassTransform, Vector3* direction, Vector3* baseOffset,
         delegate* unmanaged<void*, ShapeCastResult*, float> callback, void* userData,
@@ -1390,7 +1429,8 @@ internal static unsafe partial class JoltApi
         );
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastShape))]
-    public static partial Bool32 JPH_NarrowPhaseQuery_CastShapeDouble(nint query,
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_NarrowPhaseQuery_CastShapeDouble(nint query,
         nint shape,
         RMatrix4x4* centerOfMassTransform, Vector3* direction, Double3* baseOffset,
         delegate* unmanaged<void*, ShapeCastResult*, float> callback, void* userData,
@@ -1417,51 +1457,52 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Body_GetWorldSpaceSurfaceNormalDouble(nint body, SubShapeID subShapeID, Double3* position, Vector3* normal);
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Body_IsActive(nint handle);
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Body_IsStatic(nint handle);
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Body_IsKinematic(nint handle);
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Body_IsDynamic(nint handle);
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Body_IsSensor(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetIsSensor(nint handle, [MarshalAs(UnmanagedType.Bool)] bool value);
+    public static partial void JPH_Body_SetIsSensor(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetCollideKinematicVsNonDynamic(nint handle, [MarshalAs(UnmanagedType.Bool)] bool value);
+    public static partial void JPH_Body_SetCollideKinematicVsNonDynamic(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Body_GetCollideKinematicVsNonDynamic(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetUseManifoldReduction(nint handle, [MarshalAs(UnmanagedType.Bool)] bool value);
+    public static partial void JPH_Body_SetUseManifoldReduction(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Body_GetUseManifoldReduction(nint handle);
 
     [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Body_GetUseManifoldReductionWithBody(nint handle, nint other);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetApplyGyroscopicForce(nint handle, [MarshalAs(UnmanagedType.Bool)] bool value);
+    public static partial void JPH_Body_SetApplyGyroscopicForce(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_GetApplyGyroscopicForce(nint handle);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Body_GetApplyGyroscopicForce(nint handle);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_Body_GetMotionProperties(nint handle);
@@ -1473,10 +1514,11 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Body_SetMotionType(nint handle, MotionType motionType);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_Body_GetAllowSleeping(nint handle);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Body_GetAllowSleeping(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetAllowSleeping(nint handle, [MarshalAs(UnmanagedType.Bool)] bool motionType);
+    public static partial void JPH_Body_SetAllowSleeping(nint handle, [MarshalAs(UnmanagedType.U1)] bool motionType);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Body_ResetSleepTimer(nint handle);
@@ -1656,9 +1698,10 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_ContactSettings_SetInvInertiaScale2(nint settings, float scale);
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_ContactSettings_GetIsSensor(nint settings);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_ContactSettings_GetIsSensor(nint settings);
     [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetIsSensor(nint settings, Bool32 sensor);
+    public static partial void JPH_ContactSettings_SetIsSensor(nint settings, [MarshalAs(UnmanagedType.U1)] bool sensor);
     [LibraryImport(LibName)]
     public static partial void JPH_ContactSettings_GetRelativeLinearSurfaceVelocity(nint settings, Vector3* result);
     [LibraryImport(LibName)]
@@ -1692,10 +1735,11 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_CharacterBaseSettings_SetMaxSlopeAngle(nint handle, float value);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_CharacterBaseSettings_GetEnhancedInternalEdgeRemoval(nint handle);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterBaseSettings_GetEnhancedInternalEdgeRemoval(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterBaseSettings_SetEnhancedInternalEdgeRemoval(nint handle, Bool32 value);
+    public static partial void JPH_CharacterBaseSettings_SetEnhancedInternalEdgeRemoval(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_CharacterBaseSettings_GetShape(nint handle);
@@ -1720,7 +1764,8 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_CharacterBase_SetUp(nint handle, in Vector3 value);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_CharacterBase_IsSlopeTooSteep(nint handle, in Vector3 value);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterBase_IsSlopeTooSteep(nint handle, in Vector3 value);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_CharacterBase_GetShape(nint handle);
@@ -1729,7 +1774,8 @@ internal static unsafe partial class JoltApi
     public static partial GroundState JPH_CharacterBase_GetGroundState(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_CharacterBase_IsSupported(nint handle);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterBase_IsSupported(nint handle);
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterBase_GetGroundPosition(nint handle, out Vector3 position); // RVec3
@@ -1751,6 +1797,44 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial ulong JPH_CharacterBase_GetGroundUserData(nint handle);
+    #endregion
+
+    #region Characted
+    /* CharacterSettings */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial ObjectLayer JPH_CharacterSettings_GetLayer(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterSettings_SetLayer(nint settings, ObjectLayer value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterSettings_GetMass(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterSettings_SetMass(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterSettings_GetFriction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterSettings_SetFriction(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_CharacterSettings_GetGravityFactor(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterSettings_SetGravityFactor(nint settings, float value);
+
+    /* Character */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Character_Create(nint settings, /*const JPH_RVec3**/ in Vector3 position, in Quaternion rotation, ulong userData,/*JPH_PhysicsSystem**/ nint system);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Character_Create(nint settings, in Double3 position, in Quaternion rotation, ulong userData, nint physicsSystem);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_AddToPhysicsSystem(nint character, Activation activationMode /*= JPH_ActivationActivate */, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_RemoveFromPhysicsSystem(nint character, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_Activate(nint character, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_PostSimulation(nint character, float maxSeparationDistance, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
     #endregion
 
     #region CharacterVirtual
@@ -1856,9 +1940,10 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_SetPenetrationRecoverySpeed(nint character, float value);
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_CharacterVirtual_GetEnhancedInternalEdgeRemoval(nint character);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_GetEnhancedInternalEdgeRemoval(nint character);
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_SetEnhancedInternalEdgeRemoval(nint character, Bool32 value);
+    public static partial void JPH_CharacterVirtual_SetEnhancedInternalEdgeRemoval(nint character, [MarshalAs(UnmanagedType.U1)] bool value);
     [LibraryImport(LibName)]
     public static partial float JPH_CharacterVirtual_GetCharacterPadding(nint character);
     [LibraryImport(LibName)]
@@ -1870,7 +1955,8 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_SetHitReductionCosMaxAngle(nint character, float value);
     [LibraryImport(LibName)]
-    public static partial Bool32 JPH_CharacterVirtual_GetMaxHitsExceeded(nint character);
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_GetMaxHitsExceeded(nint character);
     [LibraryImport(LibName)]
     public static partial ulong JPH_CharacterVirtual_GetUserData(nint character);
     [LibraryImport(LibName)]
@@ -1891,7 +1977,7 @@ internal static unsafe partial class JoltApi
     public struct JPH_CharacterContactListener_Procs
     {
         public delegate* unmanaged<nint, nint, nint, Vector3*, Vector3*, void> OnAdjustBodyVelocity;
-        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Bool32> OnContactValidate;
+        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Bool8> OnContactValidate;
         public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, CharacterContactSettings*, void> OnContactAdded;
         public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, Vector3*, nint, Vector3*, Vector3*, void> OnContactSolve;
     }

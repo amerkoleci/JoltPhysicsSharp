@@ -36,12 +36,11 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
         fixed (Vector3* originPtr = &origin)
         fixed (Vector3* directionPtr = &direction)
         {
-            Bool32 result = JPH_BroadPhaseQuery_CastRay(Handle,
+            return JPH_BroadPhaseQuery_CastRay(Handle,
                 originPtr, directionPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0);
-            return result;
         }
     }
 
@@ -53,12 +52,11 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     {
         fixed (BoundingBox* boxPtr = &box)
         {
-            Bool32 result = JPH_BroadPhaseQuery_CollideAABox(Handle,
+            return JPH_BroadPhaseQuery_CollideAABox(Handle,
                 boxPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0);
-            return result;
         }
     }
 
@@ -70,12 +68,11 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     {
         fixed (Vector3* centerPtr = &center)
         {
-            Bool32 result = JPH_BroadPhaseQuery_CollideSphere(Handle,
+            return JPH_BroadPhaseQuery_CollideSphere(Handle,
                 centerPtr, radius,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0);
-            return result;
         }
     }
 
@@ -87,12 +84,11 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     {
         fixed (Vector3* pointPtr = &point)
         {
-            Bool32 result = JPH_BroadPhaseQuery_CollidePoint(Handle,
+            return JPH_BroadPhaseQuery_CollidePoint(Handle,
                 pointPtr,
                 callback, userData,
                 broadPhaseFilter?.Handle ?? 0,
                 objectLayerFilter?.Handle ?? 0);
-            return result;
         }
     }
 }

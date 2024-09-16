@@ -62,6 +62,28 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         }
     }
 
+    public Vector3 Position
+    {
+        get
+        {
+            Vector3 result;
+            JPH_BodyCreationSettings_GetPosition(Handle, &result);
+            return result;
+        }
+        set => JPH_BodyCreationSettings_SetPosition(Handle, &value);
+    }
+
+    public Quaternion Rotation
+    {
+        get
+        {
+            Quaternion result;
+            JPH_BodyCreationSettings_GetRotation(Handle, &result);
+            return result;
+        }
+        set => JPH_BodyCreationSettings_SetRotation(Handle, &value);
+    }
+
     public Vector3 LinearVelocity
     {
         get

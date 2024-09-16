@@ -39,14 +39,14 @@ public abstract class BodyFilter : NativeObject
     protected abstract bool ShouldCollideLocked(Body body);
 
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideCallback(nint context, BodyID bodyID)
+    private static Bool8 ShouldCollideCallback(nint context, BodyID bodyID)
     {
         BodyFilter listener = DelegateProxies.GetUserData<BodyFilter>(context, out _);
         return listener.ShouldCollide(bodyID);
     }
 
     [UnmanagedCallersOnly]
-    private static Bool32 ShouldCollideLockedCallback(nint context, nint body)
+    private static Bool8 ShouldCollideLockedCallback(nint context, nint body)
     {
         BodyFilter listener = DelegateProxies.GetUserData<BodyFilter>(context, out _);
         return listener.ShouldCollideLocked(body);

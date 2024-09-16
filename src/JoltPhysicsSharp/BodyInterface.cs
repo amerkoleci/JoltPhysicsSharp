@@ -489,9 +489,9 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(MoveKinematic)}");
 
         fixed (Vector3* targetPositionPtr = &targetPosition)
-        fixed (Quaternion* targetRotationtr = &targetRotation)
+        fixed (Quaternion* targetRotationPtr = &targetRotation)
         {
-            JPH_BodyInterface_MoveKinematic(Handle, bodyId, targetPositionPtr, targetRotationtr, deltaTime);
+            JPH_BodyInterface_MoveKinematic(Handle, bodyId, targetPositionPtr, targetRotationPtr, deltaTime);
         }
     }
 
@@ -501,9 +501,59 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(MoveKinematic)}");
 
         fixed (Double3* targetPositionPtr = &targetPosition)
-        fixed (Quaternion* targetRotationtr = &targetRotation)
+        fixed (Quaternion* targetRotationPtr = &targetRotation)
         {
-            JPH_BodyInterface_MoveKinematicDouble(Handle, bodyId, targetPositionPtr, targetRotationtr, deltaTime);
+            JPH_BodyInterface_MoveKinematicDouble(Handle, bodyId, targetPositionPtr, targetRotationPtr, deltaTime);
+        }
+    }
+
+    public bool ApplyBuoyancyImpulse(
+        in BodyID bodyId,
+        in Vector3 surfacePosition,
+        in Vector3 surfaceNormal,
+        float buoyancy, float linearDrag, float angularDrag,
+        in Vector3 fluidVelocity,
+        in Vector3 gravity,
+        float deltaTime)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(ApplyBuoyancyImpulse)}");
+
+        fixed (Vector3* surfacePositionPtr = &surfacePosition)
+        fixed (Vector3* surfaceNormalPtr = &surfaceNormal)
+        fixed (Vector3* fluidVelocityPtr = &fluidVelocity)
+        fixed (Vector3* gravityPtr = &gravity)
+        {
+            return JPH_BodyInterface_ApplyBuoyancyImpulse(Handle, bodyId, surfacePositionPtr, surfaceNormalPtr,
+                buoyancy, linearDrag, angularDrag,
+                fluidVelocityPtr,
+                gravityPtr,
+                deltaTime);
+        }
+    }
+
+    public bool ApplyBuoyancyImpulse(
+       in BodyID bodyId,
+       in Double3 surfacePosition,
+       in Vector3 surfaceNormal,
+       float buoyancy, float linearDrag, float angularDrag,
+       in Vector3 fluidVelocity,
+       in Vector3 gravity,
+       float deltaTime)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(ApplyBuoyancyImpulse)}");
+
+        fixed (Double3* surfacePositionPtr = &surfacePosition)
+        fixed (Vector3* surfaceNormalPtr = &surfaceNormal)
+        fixed (Vector3* fluidVelocityPtr = &fluidVelocity)
+        fixed (Vector3* gravityPtr = &gravity)
+        {
+            return JPH_BodyInterface_ApplyBuoyancyImpulseDouble(Handle, bodyId, surfacePositionPtr, surfaceNormalPtr,
+                buoyancy, linearDrag, angularDrag,
+                fluidVelocityPtr,
+                gravityPtr,
+                deltaTime);
         }
     }
 
