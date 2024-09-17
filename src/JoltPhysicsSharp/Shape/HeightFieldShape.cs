@@ -8,21 +8,34 @@ namespace JoltPhysicsSharp;
 
 public sealed class HeightFieldShapeSettings : ConvexShapeSettings
 {
+    /// <summary>
+    /// Create a height field shape of sampleCount * sampleCount vertices.
+    /// The height field is a surface defined by: offset + scale * (x, samples[y * sampleCount + x], y).
+	/// where x and y are integers in the range x and y e [0, sampleCount - 1].
+    /// </summary>
+    /// <param name="samples">sampleCount^2 vertices.</param>
+    /// <param name="offset">The shape offset.</param>
+    /// <param name="scale">Shape scale.</param>
+    /// <param name="sampleCount">sampleCount / blockSize must be minimally 2 and a power of 2 is the most efficient in terms of performance and storage.</param>
     public unsafe HeightFieldShapeSettings(float* samples, in Vector3 offset, in Vector3 scale, int sampleCount)
-      : base(JPH_HeightFieldShapeSettings_Create(samples, offset, scale, sampleCount))
+        : base(JPH_HeightFieldShapeSettings_Create(samples, offset, scale, sampleCount))
     {
     }
 
-    public HeightFieldShapeSettings(float[] samples, in Vector3 offset, in Vector3 scale)
-        : this(samples.AsSpan(), offset, scale)
-    {
-    }
-
-    public unsafe HeightFieldShapeSettings(ReadOnlySpan<float> samples, in Vector3 offset, in Vector3 scale)
+    /// <summary>
+    /// Create a height field shape of sampleCount * sampleCount vertices.
+    /// The height field is a surface defined by: offset + scale * (x, samples[y * sampleCount + x], y).
+	/// where x and y are integers in the range x and y e [0, sampleCount - 1].
+    /// </summary>
+    /// <param name="samples">sampleCount^2 vertices.</param>
+    /// <param name="offset">The shape offset.</param>
+    /// <param name="scale">Shape scale.</param>
+    /// <param name="sampleCount">sampleCount / blockSize must be minimally 2 and a power of 2 is the most efficient in terms of performance and storage.</param>
+    public unsafe HeightFieldShapeSettings(Span<float> samples, in Vector3 offset, in Vector3 scale, int sampleCount)
     {
         fixed (float* samplesPtr = samples)
         {
-            Handle = JPH_HeightFieldShapeSettings_Create(samplesPtr, offset, scale, samples.Length);
+            Handle = JPH_HeightFieldShapeSettings_Create(samplesPtr, offset, scale, sampleCount);
         }
     }
 
@@ -81,5 +94,5 @@ public sealed class HeightFieldShape : Shape
     {
         return JPH_HeightFieldShape_ProjectOntoSurface(Handle, in localPosition, out surfacePosition, out subShapeID);
     }
-    
+
 }
