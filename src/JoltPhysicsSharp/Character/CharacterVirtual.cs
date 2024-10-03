@@ -34,22 +34,26 @@ public sealed class CharacterVirtual : CharacterBase
     public event ContactAddedHandler? OnContactAdded;
     public event ContactSolveHandler? OnContactSolve;
 
-    public CharacterVirtual(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use constructor with Double3");
 
-        Handle = JPH_CharacterVirtual_Create(settings.Handle, position, rotation, userData, physicsSystem.Handle);
+        JPH_CharacterVirtualSettings nativeSettings;
+        settings.ToNative(&nativeSettings);
+        Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listener_Procs, listenerContext);
     }
 
-    public CharacterVirtual(CharacterVirtualSettings settings, in Double3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Double3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
 
-        Handle = JPH_CharacterVirtual_Create(settings.Handle, position, rotation, userData, physicsSystem.Handle);
+        JPH_CharacterVirtualSettings nativeSettings;
+        settings.ToNative(&nativeSettings);
+        Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
 
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listener_Procs, listenerContext);

@@ -9,20 +9,24 @@ namespace JoltPhysicsSharp;
 
 public sealed class Character : CharacterBase
 {
-    public Character(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe Character(CharacterSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use constructor with Double3");
 
-        Handle = JPH_Character_Create(settings.Handle, position, rotation, userData, physicsSystem.Handle);
+        JPH_CharacterSettings nativeSettings;
+        settings.ToNative(&nativeSettings);
+        Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
     }
 
-    public Character(CharacterVirtualSettings settings, in Double3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe Character(CharacterSettings settings, in Double3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
 
-        Handle = JPH_Character_Create(settings.Handle, position, rotation, userData, physicsSystem.Handle);
+        JPH_CharacterSettings nativeSettings;
+        settings.ToNative(&nativeSettings);
+        Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
     }
 
     public void AddToPhysicsSystem(Activation activationMode = Activation.Activate, bool lockBodies = true)

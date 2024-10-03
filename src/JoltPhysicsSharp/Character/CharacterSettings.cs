@@ -8,33 +8,39 @@ namespace JoltPhysicsSharp;
 
 public sealed class CharacterSettings : CharacterBaseSettings
 {
-    public CharacterSettings()
-        : base(JPH_CharacterSettings_Create())
+    public unsafe CharacterSettings()
     {
+        JPH_CharacterSettings native;
+        JPH_CharacterSettings_Init(&native);
+
+        FromNative(native.baseSettings);
+
+        Layer = native.layer;
+        Mass = native.mass;
+        Friction = native.friction;
+        GravityFactor = native.gravityFactor;
     }
 
-    public ObjectLayer Layer
-    {
-        get => JPH_CharacterSettings_GetLayer(Handle);
-        set => JPH_CharacterSettings_SetLayer(Handle, value);
-    }
+    public ObjectLayer Layer { get; set; }
 
-    public float Mass
-    {
-        get => JPH_CharacterSettings_GetMass(Handle);
-        set => JPH_CharacterSettings_SetMass(Handle, value);
-    }
+    public float Mass { get; set; }
 
-    public float Friction
-    {
-        get => JPH_CharacterSettings_GetFriction(Handle);
-        set => JPH_CharacterSettings_SetFriction(Handle, value);
-    }
+    public float Friction { get; set; }
 
-    public float GravityFactor
+    public float GravityFactor { get; set; }
+
+    internal unsafe void ToNative(JPH_CharacterSettings* native)
     {
-        get => JPH_CharacterSettings_GetGravityFactor(Handle);
-        set => JPH_CharacterSettings_SetGravityFactor(Handle, value);
+        native->baseSettings.up = Up;
+        native->baseSettings.supportingVolume = SupportingVolume;
+        native->baseSettings.maxSlopeAngle = MaxSlopeAngle;
+        native->baseSettings.enhancedInternalEdgeRemoval = EnhancedInternalEdgeRemoval;
+        native->baseSettings.shape = Shape != null ? Shape.Handle : 0;
+
+        native->layer = Layer;
+        native->mass = Mass;
+        native->friction = Friction;
+        native->gravityFactor = GravityFactor;
     }
 }
 

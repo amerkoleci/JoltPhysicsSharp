@@ -8,94 +8,83 @@ namespace JoltPhysicsSharp;
 
 public sealed class CharacterVirtualSettings : CharacterBaseSettings
 {
-    public CharacterVirtualSettings()
-        : base(JPH_CharacterVirtualSettings_Create())
+    private readonly JPH_CharacterVirtualSettings _native;
+
+    public unsafe CharacterVirtualSettings()
     {
+        JPH_CharacterVirtualSettings native;
+        JPH_CharacterVirtualSettings_Init(&native);
+
+        FromNative(native.baseSettings);
+
+        Mass = native.mass;
+        MaxStrength = native.maxStrength;
+        ShapeOffset = native.shapeOffset;
+        BackFaceMode = native.backFaceMode;
+        PredictiveContactDistance = native.predictiveContactDistance;
+        MaxCollisionIterations = native.maxCollisionIterations;
+        MaxConstraintIterations = native.maxConstraintIterations;
+        MinTimeRemaining = native.minTimeRemaining;
+        CollisionTolerance = native.collisionTolerance;
+        CharacterPadding = native.characterPadding;
+        MaxNumHits = native.maxNumHits;
+        HitReductionCosMaxAngle = native.hitReductionCosMaxAngle;
+        PenetrationRecoverySpeed = native.penetrationRecoverySpeed;
+        innerBodyLayer = native.innerBodyLayer;
     }
 
-    public float Mass
-    {
-        get => JPH_CharacterVirtualSettings_GetMass(Handle);
-        set => JPH_CharacterVirtualSettings_SetMass(Handle, value);
-    }
+    public float Mass { get; set; }
 
-    public float MaxStrength
-    {
-        get => JPH_CharacterVirtualSettings_GetMaxStrength(Handle);
-        set => JPH_CharacterVirtualSettings_SetMaxStrength(Handle, value);
-    }
+    public float MaxStrength { get; set; }
 
-    public Vector3 ShapeOffset
-    {
-        get
-        {
-            JPH_CharacterVirtualSettings_GetShapeOffset(Handle, out Vector3 result);
-            return result;
-        }
-        set
-        {
-            JPH_CharacterVirtualSettings_SetShapeOffset(Handle, in value);
-        }
-    }
+    public Vector3 ShapeOffset { get; set; }
 
-    public BackFaceMode BackFaceMode
-    {
-        get => JPH_CharacterVirtualSettings_GetBackFaceMode(Handle);
-        set => JPH_CharacterVirtualSettings_SetBackFaceMode(Handle, value);
-    }
+    public BackFaceMode BackFaceMode { get; set; }
 
-    public float PredictiveContactDistance
-    {
-        get => JPH_CharacterVirtualSettings_GetPredictiveContactDistance(Handle);
-        set => JPH_CharacterVirtualSettings_SetPredictiveContactDistance(Handle, value);
-    }
+    public float PredictiveContactDistance { get; set; }
 
-    public uint MaxCollisionIterations
-    {
-        get => JPH_CharacterVirtualSettings_GetMaxCollisionIterations(Handle);
-        set => JPH_CharacterVirtualSettings_SetMaxCollisionIterations(Handle, value);
-    }
+    public uint MaxCollisionIterations { get; set; }
 
-    public uint MaxConstraintIterations
-    {
-        get => JPH_CharacterVirtualSettings_GetMaxConstraintIterations(Handle);
-        set => JPH_CharacterVirtualSettings_SetMaxConstraintIterations(Handle, value);
-    }
+    public uint MaxConstraintIterations { get; set; }
 
-    public float MinTimeRemaining
-    {
-        get => JPH_CharacterVirtualSettings_GetMinTimeRemaining(Handle);
-        set => JPH_CharacterVirtualSettings_SetMinTimeRemaining(Handle, value);
-    }
+    public float MinTimeRemaining { get; set; }
 
-    public float CollisionTolerance
-    {
-        get => JPH_CharacterVirtualSettings_GetCollisionTolerance(Handle);
-        set => JPH_CharacterVirtualSettings_SetCollisionTolerance(Handle, value);
-    }
+    public float CollisionTolerance { get; set; }
 
-    public float CharacterPadding
-    {
-        get => JPH_CharacterVirtualSettings_GetCharacterPadding(Handle);
-        set => JPH_CharacterVirtualSettings_SetCharacterPadding(Handle, value);
-    }
+    public float CharacterPadding { get; set; }
 
-    public uint MaxNumHits
-    {
-        get => JPH_CharacterVirtualSettings_GetMaxNumHits(Handle);
-        set => JPH_CharacterVirtualSettings_SetMaxNumHits(Handle, value);
-    }
+    public uint MaxNumHits { get; set; }
 
-    public float HitReductionCosMaxAngle
-    {
-        get => JPH_CharacterVirtualSettings_GetHitReductionCosMaxAngle(Handle);
-        set => JPH_CharacterVirtualSettings_SetHitReductionCosMaxAngle(Handle, value);
-    }
+    public float HitReductionCosMaxAngle { get; set; }
 
-    public float PenetrationRecoverySpeed
+    public float PenetrationRecoverySpeed { get; set; }
+
+    public Shape? InnerBodyShape { get; set; }
+    public ObjectLayer innerBodyLayer { get; set; }
+
+    internal unsafe void ToNative(JPH_CharacterVirtualSettings* native)
     {
-        get => JPH_CharacterVirtualSettings_GetPenetrationRecoverySpeed(Handle);
-        set => JPH_CharacterVirtualSettings_SetPenetrationRecoverySpeed(Handle, value);
+        native->baseSettings.up = Up;
+        native->baseSettings.supportingVolume = SupportingVolume;
+        native->baseSettings.maxSlopeAngle = MaxSlopeAngle;
+        native->baseSettings.enhancedInternalEdgeRemoval = EnhancedInternalEdgeRemoval;
+        native->baseSettings.shape = Shape != null ? Shape.Handle : 0;
+
+        native->mass = Mass;
+        native->maxStrength = MaxStrength;
+        native->shapeOffset = ShapeOffset;
+        native->backFaceMode = BackFaceMode;
+        native->predictiveContactDistance = PredictiveContactDistance;
+        native->maxCollisionIterations = MaxCollisionIterations;
+        native->maxConstraintIterations = MaxConstraintIterations;
+        native->minTimeRemaining = MinTimeRemaining;
+        native->collisionTolerance = CollisionTolerance;
+        native->characterPadding = CharacterPadding;
+        native->maxNumHits = MaxNumHits;
+        native->hitReductionCosMaxAngle = HitReductionCosMaxAngle;
+        native->penetrationRecoverySpeed = PenetrationRecoverySpeed;
+        native->innerBodyShape = InnerBodyShape != null ? InnerBodyShape.Handle : 0;
+        native->innerBodyLayer = innerBodyLayer;
     }
 }
 

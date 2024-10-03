@@ -5,75 +5,30 @@ using System.Numerics;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
-public abstract class CharacterBaseSettings : NativeObject
+
+public abstract class CharacterBaseSettings
 {
-    protected CharacterBaseSettings(nint handle)
-        : base(handle)
+    protected CharacterBaseSettings()
     {
     }
 
-    ~CharacterBaseSettings() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    internal void FromNative(in JPH_CharacterBaseSettings settings)
     {
-        if (disposing)
-        {
-            JPH_CharacterBaseSettings_Destroy(Handle);
-        }
+        Up = settings.up;
+        SupportingVolume = settings.supportingVolume;
+        MaxSlopeAngle = settings.maxSlopeAngle;
+        EnhancedInternalEdgeRemoval = settings.enhancedInternalEdgeRemoval;
+        //Shape = settings.shape != 0 ? new 
     }
 
-    public Vector3 Up
-    {
-        get
-        {
-            JPH_CharacterBaseSettings_GetUp(Handle, out Vector3 result);
-            return result;
-        }
-        set
-        {
-            JPH_CharacterBaseSettings_SetUp(Handle, in value);
-        }
-    }
 
-    public Plane SupportingVolume
-    {
-        get
-        {
-            JPH_CharacterBaseSettings_GetSupportingVolume(Handle, out Plane result);
-            return result;
-        }
-        set
-        {
-            JPH_CharacterBaseSettings_SetSupportingVolume(Handle, in value);
-        }
-    }
+    public Vector3 Up { get; set; }
 
-    public float MaxSlopeAngle
-    {
-        get
-        {
-            return JPH_CharacterBaseSettings_GetMaxSlopeAngle(Handle);
-        }
-        set
-        {
-            JPH_CharacterBaseSettings_SetMaxSlopeAngle(Handle, value);
-        }
-    }
+    public Plane SupportingVolume { get; set; }
 
-    public bool EnhancedInternalEdgeRemoval
-    {
-        get
-        {
-            return JPH_CharacterBaseSettings_GetEnhancedInternalEdgeRemoval(Handle);
-        }
-        set
-        {
-            JPH_CharacterBaseSettings_SetEnhancedInternalEdgeRemoval(Handle, value);
-        }
-    }
+    public float MaxSlopeAngle { get; set; }
 
-    public Shape Shape
-    {
-        set => JPH_CharacterBaseSettings_SetShape(Handle, value.Handle);
-    }
+    public bool EnhancedInternalEdgeRemoval { get; set; }
+
+    public Shape? Shape { get; set; }
 }
