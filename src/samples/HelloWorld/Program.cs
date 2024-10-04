@@ -26,27 +26,12 @@ public static class Program
         public static readonly BroadPhaseLayer Moving = 1;
     };
 
-    public const int NumLayers = 2;
-
-    private static float WorldScale = 1.0f;
-
-    private static Body CreateFloor(in BodyInterface bodyInterface, float size = 200.0f)
-    {
-        Body floor = bodyInterface.CreateBody(new BodyCreationSettings(
-            new BoxShapeSettings(WorldScale * new Vector3(0.5f * size, 1.0f, 0.5f * size), 0.0f),
-            WorldScale * new Vector3(0.0f, -1.0f, 0.0f),
-            Quaternion.Identity,
-            MotionType.Static,
-            Layers.NonMoving)
-            );
-        bodyInterface.AddBody(floor.ID, Activation.DontActivate);
-        return floor;
-    }
+    private const int NumLayers = 2;
 
     private static void StackTest(in BodyInterface bodyInterface)
     {
         // Floor
-        CreateFloor(bodyInterface);
+        //CreateFloor(bodyInterface);
 
         ReadOnlySpan<Vector3> box = [
             new(5, 6, 7),
@@ -173,95 +158,10 @@ public static class Program
 #endif
 
         {
-            ObjectLayerPairFilter objectLayerPairFilter;
-            BroadPhaseLayerInterface broadPhaseLayerInterface;
-            ObjectVsBroadPhaseLayerFilter objectVsBroadPhaseLayerFilter;
-
-            bool useTable = true;
-            if (useTable)
-            {
-                // We use only 2 layers: one for non-moving objects and one for moving objects
-                ObjectLayerPairFilterTable objectLayerPairFilterTable = new(2);
-                objectLayerPairFilterTable.EnableCollision(Layers.NonMoving, Layers.Moving);
-                objectLayerPairFilterTable.EnableCollision(Layers.Moving, Layers.Moving);
-
-                // We use a 1-to-1 mapping between object layers and broadphase layers
-                BroadPhaseLayerInterfaceTable broadPhaseLayerInterfaceTable = new(2, 2);
-                broadPhaseLayerInterfaceTable.MapObjectToBroadPhaseLayer(Layers.NonMoving, BroadPhaseLayers.NonMoving);
-                broadPhaseLayerInterfaceTable.MapObjectToBroadPhaseLayer(Layers.Moving, BroadPhaseLayers.Moving);
-
-                objectLayerPairFilter = objectLayerPairFilterTable;
-                broadPhaseLayerInterface = broadPhaseLayerInterfaceTable;
-                objectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterTable(broadPhaseLayerInterfaceTable, 2, objectLayerPairFilterTable, 2);
-            }
-            else
-            {
-                objectLayerPairFilter = new ObjectLayerPairFilterMask();
-
-                // Layer that objects can be in, determines which other objects it can collide with
-                // Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
-                // layers if you want. E.g. you could have a layer for high detail collision (which is not used by the physics simulation
-                // but only if you do collision testing).
-                const uint NUM_BROAD_PHASE_LAYERS = 2;
-
-                BroadPhaseLayerInterfaceMask bpInterface = new(NUM_BROAD_PHASE_LAYERS);
-                //bpInterface.ConfigureLayer(BroadPhaseLayers.NonMoving, GROUP_STATIC, 0); // Anything that has the static bit set goes into the static broadphase layer
-                //bpInterface.ConfigureLayer(BroadPhaseLayers.Moving, GROUP_FLOOR1 | GROUP_FLOOR2 | GROUP_FLOOR3, 0); // Anything that has one of the floor bits set goes into the dynamic broadphase layer
-
-                broadPhaseLayerInterface = bpInterface;
-                objectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterMask(bpInterface);
-            }
-
-            PhysicsSystemSettings settings = new()
-            {
-                MaxBodies = MaxBodies,
-                MaxBodyPairs = MaxBodyPairs,
-                MaxContactConstraints = MaxContactConstraints,
-                NumBodyMutexes = NumBodyMutexes,
-                ObjectLayerPairFilter = objectLayerPairFilter,
-                BroadPhaseLayerInterface = broadPhaseLayerInterface,
-                ObjectVsBroadPhaseLayerFilter = objectVsBroadPhaseLayerFilter
-            };
-
-            using PhysicsSystem physicsSystem = new(settings);
-
-            // ContactListener
-            physicsSystem.OnContactValidate += OnContactValidate;
-            physicsSystem.OnContactAdded += OnContactAdded;
-            physicsSystem.OnContactPersisted += OnContactPersisted;
-            physicsSystem.OnContactRemoved += OnContactRemoved;
-            // BodyActivationListener
-            physicsSystem.OnBodyActivated += OnBodyActivated;
-            physicsSystem.OnBodyDeactivated += OnBodyDeactivated;
-
-            BodyInterface bodyInterface = physicsSystem.BodyInterface;
-
-            // Next we can create a rigid body to serve as the floor, we make a large box
-            // Create the settings for the collision volume (the shape). 
-            // Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
-            BoxShape floorShape = new(new Vector3(100.0f, 1.0f, 100.0f));
-
-            BodyCreationSettings floorSettings = new(floorShape, new Vector3(0.0f, -1.0f, 0.0f), Quaternion.Identity, MotionType.Static, Layers.NonMoving);
-
-            // Create the actual rigid body
-            Body floor = bodyInterface.CreateBody(floorSettings);
-
-            // Add it to the world
-            bodyInterface.AddBody(floor, Activation.DontActivate);
-
-            // Sphere
-            SphereShape sphereShape = new(50.0f);
-            BodyCreationSettings spherSettings = new(sphereShape, new Vector3(0.0f, 2.0f, 0.0f), Quaternion.Identity, MotionType.Dynamic, Layers.Moving);
-
-            BodyID sphereId = bodyInterface.CreateAndAddBody(spherSettings, Activation.Activate);
-
-            //BodyID sphereID = bodyInterface.CreateAndAddBody(spherSettings, Activation.Activate);
-
-            // Now you can interact with the dynamic body, in this case we're going to give it a velocity.
-            // (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the physics system)
-            bodyInterface.SetLinearVelocity(sphereId, new Vector3(0.0f, -5.0f, 0.0f));
-
-            //StackTest(bodyInterface);
+            //using Sample sample = new HelloWorld();
+            using Sample sample = new AlternativeCollissionFilteringSample();
+            sample.Initialize();
+            sample.Run();
 
             // Create capsule
             float mHeightStanding = 1.35f;
@@ -275,79 +175,9 @@ public static class Program
             // Configure supporting volume
             characterSettings.SupportingVolume = new Plane(Vector3.UnitY, -mHeightStanding); // Accept contacts that touch the lower sphere of the capsule
 
-            CharacterVirtual character = new(characterSettings, new Vector3(0, 0, 0), Quaternion.Identity, 0, physicsSystem);
-
-            // We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
-            const float deltaTime = 1.0f / 60.0f;
-
-            // Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection performance (it's pointless here because we only have 2 bodies).
-            // You should definitely not call this every frame or when e.g. streaming in a new level section as it is an expensive operation.
-            // Instead insert all new objects in batches instead of 1 at a time to keep the broad phase efficient.
-            physicsSystem.OptimizeBroadPhase();
-
-            uint step = 0;
-            while (bodyInterface.IsActive(sphereId))
-            {
-                // Next step
-                ++step;
-
-                // Output current position and velocity of the sphere
-                Vector3 position = bodyInterface.GetCenterOfMassPosition(sphereId);
-                Vector3 velocity = bodyInterface.GetLinearVelocity(sphereId);
-                //Matrix4x4 transform = bodyInterface.GetWorldTransform(sphereID);
-                //Vector3 translation = bodyInterface.GetWorldTransform(sphereID).Translation;
-                //Matrix4x4 centerOfMassTransform = bodyInterface.GetCenterOfMassTransform(sphereID);
-                Console.WriteLine($"Step {step} : Position = ({position}), Velocity = ({velocity})");
-
-                // If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
-                const int collisionSteps = 1;
-
-                // Step the world
-                PhysicsUpdateError error = physicsSystem.Update(deltaTime, collisionSteps);
-                Debug.Assert(error == PhysicsUpdateError.None);
-            }
-
-            // Remove and destroy the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any time.
-            bodyInterface.RemoveAndDestroyBody(sphereId);
-
-            // Remove and destroy the floor
-            bodyInterface.RemoveAndDestroyBody(floor.ID);
+            //CharacterVirtual character = new(characterSettings, new Vector3(0, 0, 0), Quaternion.Identity, 0, physicsSystem);
         }
 
         Foundation.Shutdown();
-    }
-
-
-    private static ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, nint collisionResult)
-    {
-        Console.WriteLine("Contact validate callback");
-
-        // Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
-        return ValidateResult.AcceptAllContactsForThisBodyPair;
-    }
-
-    private static void OnContactAdded(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings)
-    {
-        Console.WriteLine("A contact was added");
-    }
-
-    private static void OnContactPersisted(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings)
-    {
-        Console.WriteLine("A contact was persisted");
-    }
-
-    private static void OnContactRemoved(PhysicsSystem system, ref SubShapeIDPair subShapePair)
-    {
-        Console.WriteLine("A contact was removed");
-    }
-
-    private static void OnBodyActivated(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData)
-    {
-        Console.WriteLine("A body got activated");
-    }
-
-    private static void OnBodyDeactivated(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData)
-    {
-        Console.WriteLine("A body went to sleep");
     }
 }

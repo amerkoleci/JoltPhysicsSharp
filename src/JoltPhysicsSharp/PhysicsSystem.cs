@@ -14,15 +14,15 @@ public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
 public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData);
 
-public readonly struct PhysicsSystemSettings
+public struct PhysicsSystemSettings
 {
-    public readonly int MaxBodies { get; init; } = 10240;
-    public readonly int NumBodyMutexes { get; init; } = 0;
-    public readonly int MaxBodyPairs { get; init; } = 65536;
-    public readonly int MaxContactConstraints { get; init; } = 10240;
-    public ObjectLayerPairFilter? ObjectLayerPairFilter { get; init; }
-    public BroadPhaseLayerInterface? BroadPhaseLayerInterface { get; init; }
-    public ObjectVsBroadPhaseLayerFilter? ObjectVsBroadPhaseLayerFilter { get; init; }
+    public int MaxBodies { get; set; } = 10240;
+    public int NumBodyMutexes { get; set; } = 0;
+    public int MaxBodyPairs { get; set; } = 65536;
+    public int MaxContactConstraints { get; set; } = 10240;
+    public ObjectLayerPairFilter? ObjectLayerPairFilter { get; set; }
+    public BroadPhaseLayerInterface? BroadPhaseLayerInterface { get; set; }
+    public ObjectVsBroadPhaseLayerFilter? ObjectVsBroadPhaseLayerFilter { get; set; }
 
     public PhysicsSystemSettings()
     {
@@ -56,8 +56,6 @@ public sealed unsafe class PhysicsSystem : NativeObject
         };
         Handle = JPH_PhysicsSystem_Create(&nativeSettings);
 
-        _contactListenerHandle = JPH_ContactListener_Create();
-
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
         if (!DoublePrecision)
         {
@@ -68,7 +66,8 @@ public sealed unsafe class PhysicsSystem : NativeObject
                 OnContactPersisted = &OnContactPersistedCallback,
                 OnContactRemoved = &OnContactRemovedCallback
             };
-            JPH_ContactListener_SetProcs(_contactListenerHandle, _contactListener_Procs, listenerContext);
+
+            _contactListenerHandle = JPH_ContactListener_Create(_contactListener_Procs, listenerContext);
         }
         else
         {
@@ -79,16 +78,15 @@ public sealed unsafe class PhysicsSystem : NativeObject
                 OnContactPersisted = &OnContactPersistedCallback,
                 OnContactRemoved = &OnContactRemovedCallback
             };
-            JPH_ContactListener_SetProcsDouble(_contactListenerHandle, _contactListener_ProcsDouble, listenerContext);
+            _contactListenerHandle = JPH_ContactListener_Create(_contactListener_ProcsDouble, listenerContext);
         }
 
-        _bodyActivationListenerHandle = JPH_BodyActivationListener_Create();
         _bodyActivationListener_Procs = new JPH_BodyActivationListener_Procs
         {
             OnBodyActivated = &OnBodyActivatedCallback,
             OnBodyDeactivated = &OnBodyDeactivatedCallback
         };
-        JPH_BodyActivationListener_SetProcs(_bodyActivationListenerHandle, _bodyActivationListener_Procs, listenerContext);
+        _bodyActivationListenerHandle = JPH_BodyActivationListener_Create(_bodyActivationListener_Procs, listenerContext);
 
         JPH_PhysicsSystem_SetContactListener(Handle, _contactListenerHandle);
         JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
@@ -255,10 +253,12 @@ public sealed unsafe class PhysicsSystem : NativeObject
         }
     }
 
-    public void DrawBodies(in DrawSettings settings, DebugRenderer renderer)
+    public void DrawBodies(in DrawSettings settings, DebugRenderer renderer, BodyDrawFilter? bodyDrawFilter = default)
     {
         fixed (DrawSettings* settingsPtr = &settings)
-            JPH_PhysicsSystem_DrawBodies(Handle, settingsPtr, renderer.Handle);
+        {
+            JPH_PhysicsSystem_DrawBodies(Handle, settingsPtr, renderer.Handle, bodyDrawFilter != null ? bodyDrawFilter.Handle : 0);
+        }
     }
 
     public void DrawConstraints(DebugRenderer renderer)

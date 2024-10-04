@@ -11,14 +11,13 @@ public abstract class BroadPhaseLayerFilter : NativeObject
     private readonly JPH_BroadPhaseLayerFilter_Procs _broadPhaseLayerFilter_Procs;
 
     public BroadPhaseLayerFilter()
-        : base(JPH_BroadPhaseLayerFilter_Create())
     {
-        nint ctx = DelegateProxies.CreateUserData(this, true);
+        nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _broadPhaseLayerFilter_Procs = new JPH_BroadPhaseLayerFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback,
         };
-        JPH_BroadPhaseLayerFilter_SetProcs(Handle, _broadPhaseLayerFilter_Procs, ctx);
+        Handle = JPH_BroadPhaseLayerFilter_Create(_broadPhaseLayerFilter_Procs, listenerContext);
     }
 
     /// <summary>

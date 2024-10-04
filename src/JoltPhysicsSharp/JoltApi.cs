@@ -186,10 +186,7 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BroadPhaseLayerFilter_SetProcs(nint filter, JPH_BroadPhaseLayerFilter_Procs procs, nint userData);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_BroadPhaseLayerFilter_Create();
+    public static partial nint JPH_BroadPhaseLayerFilter_Create(JPH_BroadPhaseLayerFilter_Procs procs, nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BroadPhaseLayerFilter_Destroy(nint handle);
@@ -201,10 +198,7 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial void JPH_ObjectLayerFilter_SetProcs(nint filter, JPH_ObjectLayerFilter_Procs procs, nint userData);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_ObjectLayerFilter_Create();
+    public static partial nint JPH_ObjectLayerFilter_Create(JPH_ObjectLayerFilter_Procs procs, nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_ObjectLayerFilter_Destroy(nint handle);
@@ -217,13 +211,22 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyFilter_SetProcs(nint filter, JPH_BodyFilter_Procs procs, nint userData);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_BodyFilter_Create();
+    public static partial nint JPH_BodyFilter_Create(JPH_BodyFilter_Procs procs, nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyFilter_Destroy(nint handle);
+
+    //  BodyDrawFilter
+    public struct JPH_BodyDrawFilter_Procs
+    {
+        public delegate* unmanaged<nint, IntPtr, Bool8> ShouldDraw;
+    }
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyDrawFilter_Create(JPH_BodyDrawFilter_Procs procs, nint userData);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyDrawFilter_Destroy(nint handle);
 
     /* ShapeSettings */
     [LibraryImport(LibName)]
@@ -1036,7 +1039,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PhysicsSystem_GetConstraints(nint handle, nint* constraints, uint count);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_PhysicsSystem_DrawBodies(nint system, DrawSettings* settings, nint renderer);
+    public static partial void JPH_PhysicsSystem_DrawBodies(nint system, DrawSettings* settings, nint renderer, nint bodyFilter);
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_DrawConstraints(nint system, nint renderer);
     [LibraryImport(LibName)]
@@ -1697,17 +1700,14 @@ internal static unsafe partial class JoltApi
         public delegate* unmanaged<nint, SubShapeIDPair*, void> OnContactRemoved;
     }
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_ContactListener_SetProcs))]
-    public static partial void JPH_ContactListener_SetProcs(nint listener, JPH_ContactListener_Procs procs, nint userData);
-
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_ContactListener_SetProcs))]
-    public static partial void JPH_ContactListener_SetProcsDouble(nint listener, JPH_ContactListener_ProcsDouble procs, nint userData);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ContactListener_Create(JPH_ContactListener_Procs procs, nint userData);
 
     [LibraryImport(LibName)]
-    public static partial IntPtr JPH_ContactListener_Create();
+    public static partial nint JPH_ContactListener_Create(JPH_ContactListener_ProcsDouble procs, nint userData);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_ContactListener_Destroy(IntPtr handle);
+    public static partial void JPH_ContactListener_Destroy(nint handle);
 
     // BodyActivationListener
     public struct JPH_BodyActivationListener_Procs
@@ -1717,10 +1717,7 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyActivationListener_SetProcs(nint listener, JPH_BodyActivationListener_Procs procs, nint userData);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_BodyActivationListener_Create();
+    public static partial nint JPH_BodyActivationListener_Create(JPH_BodyActivationListener_Procs procs, nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyActivationListener_Destroy(nint handle);

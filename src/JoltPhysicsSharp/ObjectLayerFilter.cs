@@ -11,14 +11,13 @@ public abstract class ObjectLayerFilter : NativeObject
     private readonly JPH_ObjectLayerFilter_Procs _objectLayerFilter_Procs;
 
     public ObjectLayerFilter()
-        : base(JPH_ObjectLayerFilter_Create())
     {
-        nint context = DelegateProxies.CreateUserData(this, true);
+        nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _objectLayerFilter_Procs = new JPH_ObjectLayerFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback,
         };
-        JPH_ObjectLayerFilter_SetProcs(Handle, _objectLayerFilter_Procs, context);
+        Handle = JPH_ObjectLayerFilter_Create(_objectLayerFilter_Procs, listenerContext);
     }
 
     /// <summary>

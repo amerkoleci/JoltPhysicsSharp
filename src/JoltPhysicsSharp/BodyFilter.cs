@@ -11,7 +11,6 @@ public abstract class BodyFilter : NativeObject
     private readonly JPH_BodyFilter_Procs _bodyFilter_Procs;
 
     public BodyFilter()
-        : base(JPH_BodyFilter_Create())
     {
         nint context = DelegateProxies.CreateUserData(this, true);
         _bodyFilter_Procs = new JPH_BodyFilter_Procs
@@ -19,7 +18,7 @@ public abstract class BodyFilter : NativeObject
             ShouldCollide = &ShouldCollideCallback,
             ShouldCollideLocked = &ShouldCollideLockedCallback,
         };
-        JPH_BodyFilter_SetProcs(Handle, _bodyFilter_Procs, context);
+        Handle = JPH_BodyFilter_Create(_bodyFilter_Procs, context);
     }
 
     /// <summary>
