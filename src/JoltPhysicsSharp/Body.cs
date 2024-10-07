@@ -47,6 +47,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     public bool IsStatic => JPH_Body_IsStatic(Handle);
     public bool IsKinematic => JPH_Body_IsKinematic(Handle);
     public bool IsDynamic => JPH_Body_IsDynamic(Handle);
+    public bool CanBeKinematicOrDynamic => JPH_Body_CanBeKinematicOrDynamic(Handle);
 
     public bool IsSensor
     {
@@ -72,6 +73,12 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         set => JPH_Body_SetApplyGyroscopicForce(Handle, value);
     }
 
+    public bool EnhancedInternalEdgeRemoval
+    {
+        get => JPH_Body_GetEnhancedInternalEdgeRemoval(Handle);
+        set => JPH_Body_SetEnhancedInternalEdgeRemoval(Handle, value);
+    }
+
     public BoundingBox WorldSpaceBounds
     {
         get
@@ -83,11 +90,22 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     }
 
     public MotionProperties MotionProperties => JPH_Body_GetMotionProperties(Handle);
+    public MotionProperties MotionPropertiesUnchecked => JPH_Body_GetMotionPropertiesUnchecked(Handle);
 
     public MotionType MotionType
     {
         get => JPH_Body_GetMotionType(Handle);
         set => JPH_Body_SetMotionType(Handle, value);
+    }
+
+    public BroadPhaseLayer BroadPhaseLayer
+    {
+        get => JPH_Body_GetBroadPhaseLayer(Handle);
+    }
+
+    public ObjectLayer ObjectLayer
+    {
+        get => JPH_Body_GetObjectLayer(Handle);
     }
 
     public bool AllowSleeping
@@ -115,8 +133,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
             if (DoublePrecision)
                 throw new InvalidOperationException($"Double precision is enabled: use {nameof(RPosition)}");
 
-            Vector3 result;
-            JPH_Body_GetPosition(Handle, &result);
+            JPH_Body_GetPosition(Handle, out Vector3 result);
             return result;
         }
     }
@@ -128,8 +145,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
             if (!DoublePrecision)
                 throw new InvalidOperationException($"Double precision is disabled: use {nameof(Position)}");
 
-            Double3 result;
-            JPH_Body_GetPositionDouble(Handle, &result);
+            JPH_Body_GetPosition(Handle, out Double3 result);
             return result;
         }
     }
@@ -138,8 +154,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     {
         get
         {
-            Quaternion value;
-            JPH_Body_GetRotation(Handle, &value);
+            JPH_Body_GetRotation(Handle, out Quaternion value);
             return value;
         }
     }
@@ -151,8 +166,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
             if (DoublePrecision)
                 throw new InvalidOperationException($"Double precision is enabled: use {nameof(RCenterOfMassPosition)}");
 
-            Vector3 value;
-            JPH_Body_GetCenterOfMassPosition(Handle, &value);
+            JPH_Body_GetCenterOfMassPosition(Handle, out Vector3 value);
             return value;
         }
     }
@@ -164,8 +178,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
             if (!DoublePrecision)
                 throw new InvalidOperationException($"Double precision is disabled: use {nameof(CenterOfMassPosition)}");
 
-            Double3 value;
-            JPH_Body_GetCenterOfMassPositionDouble(Handle, &value);
+            JPH_Body_GetCenterOfMassPosition(Handle, out Double3 value);
             return value;
         }
     }
@@ -175,14 +188,17 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         return JPH_Body_GetUseManifoldReductionWithBody(Handle, other.Handle);
     }
 
+    public bool GetEnhancedInternalEdgeRemovalWithBody(in Body other)
+    {
+        return JPH_Body_GetEnhancedInternalEdgeRemovalWithBody(Handle, other.Handle);
+    }
+
     public void GetPosition(out Vector3 result)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRPosition)}");
 
-        Unsafe.SkipInit(out result);
-        fixed (Vector3* resultPtr = &result)
-            JPH_Body_GetPosition(Handle, resultPtr);
+        JPH_Body_GetPosition(Handle, out result);
     }
 
     public void GetRPosition(out Double3 result)
@@ -190,18 +206,12 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPosition)}");
 
-        Unsafe.SkipInit(out result);
-        fixed (Double3* resultPtr = &result)
-        {
-            JPH_Body_GetPositionDouble(Handle, resultPtr);
-        }
+        JPH_Body_GetPosition(Handle, out result);
     }
 
     public void GetRotation(out Quaternion result)
     {
-        Unsafe.SkipInit(out result);
-        fixed (Quaternion* resultPtr = &result)
-            JPH_Body_GetRotation(Handle, resultPtr);
+        JPH_Body_GetRotation(Handle, out result);
     }
 
     public void GetCenterOfMassPosition(out Vector3 result)
@@ -209,11 +219,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassPosition)}");
 
-        Unsafe.SkipInit(out result);
-        fixed (Vector3* resultPtr = &result)
-        {
-            JPH_Body_GetCenterOfMassPosition(Handle, resultPtr);
-        }
+        JPH_Body_GetCenterOfMassPosition(Handle, out result);
     }
 
     public void GetRCenterOfMassPosition(out Double3 result)
@@ -221,11 +227,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassPosition)}");
 
-        Unsafe.SkipInit(out result);
-        fixed (Double3* resultPtr = &result)
-        {
-            JPH_Body_GetCenterOfMassPositionDouble(Handle, resultPtr);
-        }
+        JPH_Body_GetCenterOfMassPosition(Handle, out result);
     }
 
     #region GetWorldTransform
@@ -234,8 +236,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldTransform)}");
 
-        Matrix4x4 result;
-        JPH_Body_GetWorldTransform(Handle, &result);
+        JPH_Body_GetWorldTransform(Handle, out Matrix4x4 result);
         return result;
     }
 
@@ -244,11 +245,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldTransform)}");
 
-        Unsafe.SkipInit(out result);
-        fixed (Matrix4x4* resultPtr = &result)
-        {
-            JPH_Body_GetWorldTransform(Handle, resultPtr);
-        }
+        JPH_Body_GetWorldTransform(Handle, out result);
     }
 
     public RMatrix4x4 GetRWorldTransform()
@@ -256,8 +253,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldTransform)}");
 
-        RMatrix4x4 result;
-        JPH_Body_GetWorldTransformDouble(Handle, &result);
+        JPH_Body_GetWorldTransform(Handle, out RMatrix4x4 result);
         return result;
     }
 
@@ -266,11 +262,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldTransform)}");
 
-        Unsafe.SkipInit(out result);
-        fixed (RMatrix4x4* resultPtr = &result)
-        {
-            JPH_Body_GetWorldTransformDouble(Handle, resultPtr);
-        }
+        JPH_Body_GetWorldTransform(Handle, out result);
     }
     #endregion
 
@@ -280,8 +272,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassTransform)}");
 
-        Matrix4x4 result;
-        JPH_Body_GetCenterOfMassTransform(Handle, &result);
+        JPH_Body_GetCenterOfMassTransform(Handle, out Matrix4x4 result);
         return result;
     }
 
@@ -290,11 +281,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassTransform)}");
 
-        Unsafe.SkipInit(out result);
-        fixed (Matrix4x4* resultPtr = &result)
-        {
-            JPH_Body_GetCenterOfMassTransform(Handle, resultPtr);
-        }
+        JPH_Body_GetCenterOfMassTransform(Handle, out result);
     }
 
     public RMatrix4x4 GetRCenterOfMassTransform()
@@ -302,8 +289,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassTransform)}");
 
-        RMatrix4x4 result;
-        JPH_Body_GetCenterOfMassTransformDouble(Handle, &result);
+        JPH_Body_GetCenterOfMassTransform(Handle, out RMatrix4x4 result);
         return result;
     }
 
@@ -312,11 +298,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassTransform)}");
 
-        Unsafe.SkipInit(out result);
-        fixed (RMatrix4x4* resultPtr = &result)
-        {
-            JPH_Body_GetCenterOfMassTransformDouble(Handle, resultPtr);
-        }
+        JPH_Body_GetCenterOfMassTransform(Handle, out result);
     }
     #endregion
 
@@ -324,7 +306,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     public void SetCollideKinematicVsNonDynamic(bool value) => JPH_Body_SetCollideKinematicVsNonDynamic(Handle, value);
     public void SetUseManifoldReduction(bool value) => JPH_Body_SetUseManifoldReduction(Handle, value);
     public void SetApplyGyroscopicForce(bool value) => JPH_Body_SetApplyGyroscopicForce(Handle, value);
-
+    public void SetEnhancedInternalEdgeRemoval(bool value) => JPH_Body_SetEnhancedInternalEdgeRemoval(Handle, value);
     public void SetMotionType(MotionType value) => JPH_Body_SetMotionType(Handle, value);
 
     public void SetAllowSleeping(bool value) => JPH_Body_SetAllowSleeping(Handle, value);
@@ -334,107 +316,147 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
 
     public Vector3 GetLinearVelocity()
     {
-        Vector3 velocity;
-        JPH_Body_GetLinearVelocity(Handle, &velocity);
+        JPH_Body_GetLinearVelocity(Handle, out Vector3 velocity);
         return velocity;
     }
 
     public void GetLinearVelocity(out Vector3 velocity)
     {
-        Unsafe.SkipInit(out velocity);
-
-        fixed (Vector3* velocityPtr = &velocity)
-            JPH_Body_GetLinearVelocity(Handle, velocityPtr);
+        JPH_Body_GetLinearVelocity(Handle, out velocity);
     }
 
     public void SetLinearVelocity(in Vector3 velocity)
     {
-        fixed (Vector3* velocityPtr = &velocity)
-            JPH_Body_SetLinearVelocity(Handle, velocityPtr);
+        JPH_Body_SetLinearVelocity(Handle, in velocity);
+    }
+
+    public void SetLinearVelocityClamped(in Vector3 velocity)
+    {
+        JPH_Body_SetLinearVelocityClamped(Handle, in velocity);
     }
 
     public Vector3 GetAngularVelocity()
     {
-        Vector3 velocity;
-        JPH_Body_GetAngularVelocity(Handle, &velocity);
+        JPH_Body_GetAngularVelocity(Handle, out Vector3 velocity);
         return velocity;
     }
 
     public void GetAngularVelocity(out Vector3 velocity)
     {
-        Unsafe.SkipInit(out velocity);
-
-        fixed (Vector3* velocityPtr = &velocity)
-            JPH_Body_GetAngularVelocity(Handle, velocityPtr);
+        JPH_Body_GetAngularVelocity(Handle, out velocity);
     }
 
     public void SetAngularVelocity(in Vector3 velocity)
     {
-        fixed (Vector3* velocityPtr = &velocity)
-            JPH_Body_SetAngularVelocity(Handle, velocityPtr);
+        JPH_Body_SetAngularVelocity(Handle, in velocity);
+    }
+
+    public void SetAngularVelocityClamped(in Vector3 velocity)
+    {
+        JPH_Body_SetAngularVelocityClamped(Handle, in velocity);
+    }
+
+    public Vector3 GetPointVelocityCOM(in Vector3 pointRelativeToCOM)
+    {
+        JPH_Body_GetPointVelocityCOM(Handle, in pointRelativeToCOM, out Vector3 result);
+        return result;
+    }
+
+    public void GetPointVelocityCOM(in Vector3 pointRelativeToCOM, out Vector3 result)
+    {
+        JPH_Body_GetPointVelocityCOM(Handle, in pointRelativeToCOM, out result);
+    }
+
+    public Vector3 GetPointVelocity(in Vector3 point)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetPointVelocity)}");
+
+        JPH_Body_GetPointVelocity(Handle, in point, out Vector3 result);
+        return result;
+    }
+
+    public void GetPointVelocity(in Vector3 point, out Vector3 velocity)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetPointVelocity)}");
+
+        JPH_Body_GetPointVelocity(Handle, in point, out velocity);
+    }
+
+    public Vector3 GetPointVelocity(in Double3 point)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPointVelocity)}");
+
+        JPH_Body_GetPointVelocity(Handle, in point, out Vector3 result);
+        return result;
+    }
+
+    public void GetPointVelocity(in Double3 point, out Vector3 velocity)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPointVelocity)}");
+
+        JPH_Body_GetPointVelocity(Handle, in point, out velocity);
     }
 
     public Vector3 GetAccumulatedForce()
     {
-        Vector3 force;
-        JPH_Body_GetAccumulatedForce(Handle, &force);
+        JPH_Body_GetAccumulatedForce(Handle, out Vector3 force);
         return force;
     }
 
     public void GetAccumulatedForce(out Vector3 force)
     {
-        Unsafe.SkipInit(out force);
-
-        fixed (Vector3* forcePtr = &force)
-            JPH_Body_GetAccumulatedForce(Handle, forcePtr);
+        JPH_Body_GetAccumulatedForce(Handle, out force);
     }
 
     public Vector3 GetAccumulatedTorque()
     {
-        Vector3 torque;
-        JPH_Body_GetAccumulatedTorque(Handle, &torque);
+        JPH_Body_GetAccumulatedTorque(Handle, out Vector3 torque);
         return torque;
     }
 
     public void GetAccumulatedTorque(out Vector3 torque)
     {
-        Unsafe.SkipInit(out torque);
-
-        fixed (Vector3* torquePtr = &torque)
-            JPH_Body_GetAccumulatedTorque(Handle, torquePtr);
+        JPH_Body_GetAccumulatedTorque(Handle, out torque);
     }
 
-    public void GetWorldSpaceSurfaceNormal(SubShapeID subShapeID, in Vector3 position, out Vector3 normal)
+    public void ResetForce() => JPH_Body_ResetForce(Handle);
+    public void ResetTorque() => JPH_Body_ResetTorque(Handle);
+    public void ResetMotion() => JPH_Body_ResetMotion(Handle);
+
+    public Matrix4x4 GetInverseInertia()
+    {
+        JPH_Body_GetInverseInertia(Handle, out Matrix4x4 result);
+        return result;
+    }
+
+    public void GetInverseInertia(out Matrix4x4 result)
+    {
+        JPH_Body_GetInverseInertia(Handle, out result);
+    }
+
+    public void GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Vector3 position, out Vector3 normal)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceSurfaceNormal)}");
 
-        Unsafe.SkipInit(out normal);
-
-        fixed (Vector3* positionPtr = &position)
-        fixed (Vector3* normalPtr = &normal)
-        {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID, positionPtr, normalPtr);
-        }
+        JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, in position, out normal);
     }
 
-    public void GetRWorldSpaceSurfaceNormal(SubShapeID subShapeID, in Double3 position, out Vector3 normal)
+    public void GetRWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Double3 position, out Vector3 normal)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldSpaceSurfaceNormal)}");
 
-        Unsafe.SkipInit(out normal);
-        fixed (Double3* positionPtr = &position)
-        fixed (Vector3* normalPtr = &normal)
-        {
-            JPH_Body_GetWorldSpaceSurfaceNormalDouble(Handle, subShapeID, positionPtr, normalPtr);
-        }
+        JPH_Body_GetWorldSpaceSurfaceNormalDouble(Handle, in subShapeID, in position, out normal);
     }
 
     public void AddForce(in Vector3 force)
     {
-        fixed (Vector3* forcePtr = &force)
-            JPH_Body_AddForce(Handle, forcePtr);
+        JPH_Body_AddForce(Handle, in force);
     }
 
     public void AddForceAtPosition(in Vector3 force, in Vector3 position)
@@ -442,9 +464,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(AddForceAtPosition)}");
 
-        fixed (Vector3* forcePtr = &force)
-        fixed (Vector3* positionPtr = &position)
-            JPH_Body_AddForceAtPosition(Handle, forcePtr, positionPtr);
+        JPH_Body_AddForceAtPosition(Handle, in force, in position);
     }
 
     public void AddForceAtPosition(in Vector3 force, in Double3 position)
@@ -452,15 +472,12 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(AddForceAtPosition)}");
 
-        fixed (Vector3* forcePtr = &force)
-        fixed (Double3* positionPtr = &position)
-            JPH_Body_AddForceAtPositionDouble(Handle, forcePtr, positionPtr);
+        JPH_Body_AddForceAtPosition(Handle, in force, in position);
     }
 
     public void AddTorque(in Vector3 torque)
     {
-        fixed (Vector3* torquePtr = &torque)
-            JPH_Body_AddTorque(Handle, torquePtr);
+        JPH_Body_AddTorque(Handle, in torque);
     }
 
     public void AddImpulse(in Vector3 impulse)
@@ -473,9 +490,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(AddImpulseAtPosition)}");
 
-        fixed (Vector3* impulsePtr = &impulse)
-        fixed (Vector3* positionPtr = &position)
-            JPH_Body_AddImpulseAtPosition(Handle, impulsePtr, positionPtr);
+        JPH_Body_AddImpulseAtPosition(Handle, in impulse, in position);
     }
 
     public void AddImpulseAtPosition(in Vector3 impulse, in Double3 position)
@@ -483,9 +498,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(AddImpulseAtPosition)}");
 
-        fixed (Vector3* impulsePtr = &impulse)
-        fixed (Double3* positionPtr = &position)
-            JPH_Body_AddImpulseAtPositionDouble(Handle, impulsePtr, positionPtr);
+        JPH_Body_AddImpulseAtPosition(Handle, in impulse, in position);
     }
 
     public void AddAngularImpulse(in Vector3 angularImpulse)
@@ -543,6 +556,14 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
             in fluidVelocity,
             in gravity,
             deltaTime);
+    }
+
+    public bool IsInBroadPhase => JPH_Body_IsInBroadPhase(Handle);
+    public bool IsCollisionCacheInvalid => JPH_Body_IsCollisionCacheInvalid(Handle);
+
+    public nint GetShape()
+    {
+        return JPH_Body_GetShape(Handle);
     }
 
     public ulong GetUserData()
