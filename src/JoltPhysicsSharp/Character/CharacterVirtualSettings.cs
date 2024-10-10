@@ -8,8 +8,6 @@ namespace JoltPhysicsSharp;
 
 public sealed class CharacterVirtualSettings : CharacterBaseSettings
 {
-    private readonly JPH_CharacterVirtualSettings _native;
-
     public unsafe CharacterVirtualSettings()
     {
         JPH_CharacterVirtualSettings native;

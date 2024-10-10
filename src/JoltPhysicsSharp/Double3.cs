@@ -380,12 +380,7 @@ public struct Double3 : IEquatable<Double3>, IFormattable
 
     internal static double GetElement(Double3 vector, int index)
     {
-        if (index >= Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        return GetElementUnsafe(ref vector, index);
+        return index >= Count ? throw new ArgumentOutOfRangeException(nameof(index)) : GetElementUnsafe(ref vector, index);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

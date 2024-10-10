@@ -1152,16 +1152,16 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_SetFriction(nint handle, uint bodyID, float value);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPosition))]
-    public static partial void JPH_BodyInterface_SetPosition(nint handle, uint bodyId, Vector3* position, Activation activationMode);
+    public static partial void JPH_BodyInterface_SetPosition(nint handle, uint bodyId, in Vector3 position, Activation activationMode);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPosition))]
-    public static partial void JPH_BodyInterface_SetPositionDouble(nint handle, uint bodyId, Double3* position, Activation activationMode);
+    public static partial void JPH_BodyInterface_SetPositionDouble(nint handle, uint bodyId, in Double3 position, Activation activationMode);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_GetPosition))]
-    public static partial void JPH_BodyInterface_GetPosition(nint handle, uint bodyId, Vector3* position);
+    public static partial void JPH_BodyInterface_GetPosition(nint handle, uint bodyId, out Vector3 position);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_GetPosition))]
-    public static partial void JPH_BodyInterface_GetPositionDouble(nint handle, uint bodyId, Double3* position);
+    public static partial void JPH_BodyInterface_GetPositionDouble(nint handle, uint bodyId, out Double3 position);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_SetRotation(nint handle, uint bodyId, in Quaternion rotation, Activation activationMode);
@@ -1169,23 +1169,23 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_GetRotation(nint handle, uint bodyId, out Quaternion rotation);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPositionAndRotation))]
-    public static partial void JPH_BodyInterface_SetPositionAndRotation(nint handle, uint bodyID, Vector3* position, Quaternion* rotation, Activation activationMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetPositionAndRotation(nint handle, uint bodyID, in Vector3 position, in Quaternion rotation, Activation activationMode);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPositionAndRotation))]
-    public static partial void JPH_BodyInterface_SetPositionAndRotationDouble(nint handle, uint bodyID, Double3* position, Quaternion* rotation, Activation activationMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetPositionAndRotation(nint handle, uint bodyID, in Double3 position, in Quaternion rotation, Activation activationMode);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPositionAndRotationWhenChanged))]
-    public static partial void JPH_BodyInterface_SetPositionAndRotationWhenChanged(nint handle, uint bodyID, Vector3* position, Quaternion* rotation, Activation activationMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetPositionAndRotationWhenChanged(nint handle, uint bodyID, in Vector3 position, in Quaternion rotation, Activation activationMode);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPositionAndRotationWhenChanged))]
-    public static partial void JPH_BodyInterface_SetPositionAndRotationWhenChangedDouble(nint handle, uint bodyID, Double3* position, Quaternion* rotation, Activation activationMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetPositionAndRotationWhenChanged(nint handle, uint bodyID, in Double3 position, in Quaternion rotation, Activation activationMode);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPositionRotationAndVelocity))]
-    public static partial void JPH_BodyInterface_SetPositionRotationAndVelocity(nint handle, uint bodyID, Vector3* position, Quaternion* rotation, Vector3* linearVelocity, Vector3* angularVelocity);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetPositionRotationAndVelocity(nint handle, uint bodyID, in Vector3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_SetPositionRotationAndVelocity))]
-    public static partial void JPH_BodyInterface_SetPositionRotationAndVelocityDouble(nint handle, uint bodyID, Double3* position, Quaternion* rotation, Vector3* linearVelocity, Vector3* angularVelocity);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetPositionRotationAndVelocity(nint handle, uint bodyID, in Double3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_BodyInterface_GetShape(nint handle, uint bodyId);
@@ -1194,7 +1194,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_SetShape(nint handle, uint bodyId, nint shape, [MarshalAs(UnmanagedType.U1)] bool updateMassProperties, Activation activationMode);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_NotifyShapeChanged(nint handle, uint bodyId, Vector3* previousCenterOfMass, [MarshalAs(UnmanagedType.U1)] bool updateMassProperties, Activation activationMode);
+    public static partial void JPH_BodyInterface_NotifyShapeChanged(nint handle, uint bodyId, in Vector3 previousCenterOfMass, [MarshalAs(UnmanagedType.U1)] bool updateMassProperties, Activation activationMode);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_ActivateBody(nint handle, uint bodyId);

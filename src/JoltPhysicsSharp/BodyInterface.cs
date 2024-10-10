@@ -220,10 +220,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(SetRPosition)}");
 
-        fixed (Vector3* positionPtr = &position)
-        {
-            JPH_BodyInterface_SetPosition(Handle, bodyID, positionPtr, activationMode);
-        }
+        JPH_BodyInterface_SetPosition(Handle, bodyID, in position, activationMode);
     }
 
     public void SetRPosition(in BodyID bodyID, in Double3 position, Activation activationMode)
@@ -231,10 +228,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(SetPosition)}");
 
-        fixed (Double3* positionPtr = &position)
-        {
-            JPH_BodyInterface_SetPositionDouble(Handle, bodyID, positionPtr, activationMode);
-        }
+        JPH_BodyInterface_SetPositionDouble(Handle, bodyID, in position, activationMode);
     }
 
     #region GetPosition
@@ -243,8 +237,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRPosition)}");
 
-        Vector3 position;
-        JPH_BodyInterface_GetPosition(Handle, bodyID, &position);
+        JPH_BodyInterface_GetPosition(Handle, bodyID, out Vector3 position);
         return position;
     }
 
@@ -253,11 +246,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRPosition)}");
 
-        Unsafe.SkipInit(out position);
-        fixed (Vector3* positionPtr = &position)
-        {
-            JPH_BodyInterface_GetPosition(Handle, bodyID, positionPtr);
-        }
+        JPH_BodyInterface_GetPosition(Handle, bodyID, out position);
     }
 
     public Double3 GetRPosition(in BodyID bodyID)
@@ -265,8 +254,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPosition)}");
 
-        Double3 position;
-        JPH_BodyInterface_GetPositionDouble(Handle, bodyID, &position);
+        JPH_BodyInterface_GetPositionDouble(Handle, bodyID, out Double3 position);
         return position;
     }
 
@@ -275,11 +263,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPosition)}");
 
-        Unsafe.SkipInit(out position);
-        fixed (Double3* positionPtr = &position)
-        {
-            JPH_BodyInterface_GetPositionDouble(Handle, bodyID, positionPtr);
-        }
+        JPH_BodyInterface_GetPositionDouble(Handle, bodyID, out position);
     }
     #endregion
 
@@ -299,9 +283,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(SetRPositionAndRotation)}");
 
-        fixed (Vector3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
-            JPH_BodyInterface_SetPositionAndRotation(Handle, bodyID, positionPtr, rotationPtr, activationMode);
+        JPH_BodyInterface_SetPositionAndRotation(Handle, bodyID, in position, in rotation, activationMode);
     }
 
     public void SetRPositionAndRotation(in BodyID bodyID, in Double3 position, in Quaternion rotation, Activation activationMode)
@@ -309,9 +291,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(SetPositionAndRotation)}");
 
-        fixed (Double3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
-            JPH_BodyInterface_SetPositionAndRotationDouble(Handle, bodyID, positionPtr, rotationPtr, activationMode);
+        JPH_BodyInterface_SetPositionAndRotation(Handle, bodyID, in position, in rotation, activationMode);
     }
 
     public void SetPositionAndRotationWhenChanged(in BodyID bodyID, in Vector3 position, in Quaternion rotation, Activation activationMode)
@@ -319,9 +299,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(SetRPositionAndRotationWhenChanged)}");
 
-        fixed (Vector3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
-            JPH_BodyInterface_SetPositionAndRotationWhenChanged(Handle, bodyID, positionPtr, rotationPtr, activationMode);
+        JPH_BodyInterface_SetPositionAndRotationWhenChanged(Handle, bodyID, in position, in rotation, activationMode);
     }
 
     public void SetRPositionAndRotationWhenChanged(in BodyID bodyID, in Double3 position, in Quaternion rotation, Activation activationMode)
@@ -329,9 +307,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(SetPositionAndRotationWhenChanged)}");
 
-        fixed (Double3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
-            JPH_BodyInterface_SetPositionAndRotationWhenChangedDouble(Handle, bodyID, positionPtr, rotationPtr, activationMode);
+        JPH_BodyInterface_SetPositionAndRotationWhenChanged(Handle, bodyID, in position, in rotation, activationMode);
     }
 
     public void SetPositionRotationAndVelocity(in BodyID bodyID, in Vector3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity)
@@ -339,11 +315,9 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(SetRPositionRotationAndVelocity)}");
 
-        fixed (Vector3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
         fixed (Vector3* linearVelocityPtr = &linearVelocity)
         fixed (Vector3* angularVelocityPtr = &angularVelocity)
-            JPH_BodyInterface_SetPositionRotationAndVelocity(Handle, bodyID, positionPtr, rotationPtr, linearVelocityPtr, angularVelocityPtr);
+            JPH_BodyInterface_SetPositionRotationAndVelocity(Handle, bodyID, in position, in rotation, in linearVelocity, in angularVelocity);
     }
 
     public void SetRPositionRotationAndVelocity(in BodyID bodyID, in Double3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity)
@@ -351,11 +325,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(SetPositionRotationAndVelocity)}");
 
-        fixed (Double3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
-        fixed (Vector3* linearVelocityPtr = &linearVelocity)
-        fixed (Vector3* angularVelocityPtr = &angularVelocity)
-            JPH_BodyInterface_SetPositionRotationAndVelocityDouble(Handle, bodyID, positionPtr, rotationPtr, linearVelocityPtr, angularVelocityPtr);
+        JPH_BodyInterface_SetPositionRotationAndVelocity(Handle, bodyID, in position, in rotation, in linearVelocity, in angularVelocity);
     }
 
     public void SetShape(in BodyID bodyId, in Shape shape, bool updateMassProperties, Activation activationMode)
@@ -365,10 +335,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public void NotifyShapeChanged(in BodyID bodyId, in Vector3 previousCenterOfMass, bool updateMassProperties, Activation activationMode)
     {
-        fixed (Vector3* previousCenterOfMassPtr = &previousCenterOfMass)
-        {
-            JPH_BodyInterface_NotifyShapeChanged(Handle, bodyId, previousCenterOfMassPtr, updateMassProperties, activationMode);
-        }
+        JPH_BodyInterface_NotifyShapeChanged(Handle, bodyId, in previousCenterOfMass, updateMassProperties, activationMode);
     }
 
     public void ActivateBody(in BodyID bodyId)
