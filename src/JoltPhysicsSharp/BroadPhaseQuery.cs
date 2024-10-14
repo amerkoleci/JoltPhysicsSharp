@@ -2,10 +2,12 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
+
+using unsafe JPH_RayCastBodyCollector = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
+using unsafe JPH_CollideShapeBodyCollector = delegate* unmanaged<nint, in BodyID, void>;
 
 public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
 {
@@ -29,66 +31,57 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     public unsafe bool CastRay(
         in Vector3 origin,
         in Vector3 direction,
-        delegate* unmanaged<void*, BroadPhaseCastResult*, float> callback, void* userData,
+        JPH_RayCastBodyCollector callback,
+        nint userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
-        fixed (Vector3* originPtr = &origin)
-        fixed (Vector3* directionPtr = &direction)
-        {
-            return JPH_BroadPhaseQuery_CastRay(Handle,
-                originPtr, directionPtr,
-                callback, userData,
-                broadPhaseFilter?.Handle ?? 0,
-                objectLayerFilter?.Handle ?? 0);
-        }
+        return JPH_BroadPhaseQuery_CastRay(Handle,
+            in origin, in direction,
+            callback, userData,
+            broadPhaseFilter?.Handle ?? 0,
+            objectLayerFilter?.Handle ?? 0);
     }
 
     public unsafe bool CollideAABox(
         in BoundingBox box,
-        delegate* unmanaged<void*, in BodyID, void>* callback, void* userData,
+        JPH_CollideShapeBodyCollector callback,
+        nint userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
-        fixed (BoundingBox* boxPtr = &box)
-        {
-            return JPH_BroadPhaseQuery_CollideAABox(Handle,
-                boxPtr,
-                callback, userData,
-                broadPhaseFilter?.Handle ?? 0,
-                objectLayerFilter?.Handle ?? 0);
-        }
+        return JPH_BroadPhaseQuery_CollideAABox(Handle,
+            in box,
+            callback, userData,
+            broadPhaseFilter?.Handle ?? 0,
+            objectLayerFilter?.Handle ?? 0);
     }
 
     public unsafe bool CollideSphere(
         in Vector3 center, float radius,
-        delegate* unmanaged<void*, in BodyID, void> callback, void* userData,
+        JPH_CollideShapeBodyCollector callback,
+        nint userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
-        fixed (Vector3* centerPtr = &center)
-        {
-            return JPH_BroadPhaseQuery_CollideSphere(Handle,
-                centerPtr, radius,
-                callback, userData,
-                broadPhaseFilter?.Handle ?? 0,
-                objectLayerFilter?.Handle ?? 0);
-        }
+        return JPH_BroadPhaseQuery_CollideSphere(Handle,
+            in center, radius,
+            callback, userData,
+            broadPhaseFilter?.Handle ?? 0,
+            objectLayerFilter?.Handle ?? 0);
     }
 
     public unsafe bool CollidePoint(
         in Vector3 point,
-        delegate* unmanaged<void*, in BodyID, void> callback, void* userData,
+        JPH_CollideShapeBodyCollector callback,
+        nint userData,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
-        fixed (Vector3* pointPtr = &point)
-        {
-            return JPH_BroadPhaseQuery_CollidePoint(Handle,
-                pointPtr,
-                callback, userData,
-                broadPhaseFilter?.Handle ?? 0,
-                objectLayerFilter?.Handle ?? 0);
-        }
+        return JPH_BroadPhaseQuery_CollidePoint(Handle,
+            in point,
+            callback, userData,
+            broadPhaseFilter?.Handle ?? 0,
+            objectLayerFilter?.Handle ?? 0);
     }
 }

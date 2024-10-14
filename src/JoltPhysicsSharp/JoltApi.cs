@@ -8,6 +8,13 @@ using System.Text;
 
 namespace JoltPhysicsSharp;
 
+using unsafe JPH_RayCastBodyCollector = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
+using unsafe JPH_CollideShapeBodyCollector = delegate* unmanaged<nint, in BodyID, void>;
+using unsafe JPH_CastRayCollector = delegate* unmanaged<nint, RayCastResult*, float>;
+using unsafe JPH_CollidePointCollector = delegate* unmanaged<nint, CollidePointResult*, float>;
+using unsafe JPH_CollideShapeCollector = delegate* unmanaged<nint, CollidePointResult*, float>;
+using unsafe JPH_CastShapeCollector = delegate* unmanaged<nint, ShapeCastResult*, float>;
+
 internal static unsafe partial class JoltApi
 {
     private const DllImportSearchPath DefaultDllImportSearchPath = DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories | DllImportSearchPath.UseDllDirectoryForDependencies;
@@ -1368,130 +1375,141 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CastRay(nint query,
-        Vector3* origin, Vector3* direction,
-        delegate* unmanaged<void*, BroadPhaseCastResult*, float> callback, void* userData,
+        in Vector3 origin, in Vector3 direction,
+        JPH_RayCastBodyCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollideAABox(nint query,
-        BoundingBox* box,
-        delegate* unmanaged<void*, in BodyID, void>* callback, void* userData,
+        in BoundingBox box,
+        JPH_CollideShapeBodyCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollideSphere(nint query,
-        Vector3* center, float radius,
-        delegate* unmanaged<void*, in BodyID, void> callback, void* userData,
+        in Vector3 center, float radius,
+        JPH_CollideShapeBodyCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollidePoint(nint query,
-        Vector3* point,
-        delegate* unmanaged<void*, in BodyID, void> callback, void* userData,
+        in Vector3 point,
+        JPH_CollideShapeBodyCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
     #endregion
 
     #region NarrowPhaseQuery
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_NarrowPhaseQuery_CastRay(nint system,
-        Vector3* origin, Vector3* direction,
-        /*out*/ RayCastResult* hit,
+        in Vector3 origin, in Vector3 direction,
+        out RayCastResult hit,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_NarrowPhaseQuery_CastRayDouble(nint system,
-        Double3* origin, Vector3* direction,
-        /*out*/ RayCastResult* hit,
+    public static partial bool JPH_NarrowPhaseQuery_CastRay(nint system,
+        in Double3 origin, in Vector3 direction,
+        out RayCastResult hit,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay2))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_NarrowPhaseQuery_CastRay2(nint system,
-        Vector3* origin, Vector3* direction,
-        delegate* unmanaged<void*, RayCastResult*, float> callback, void* userData,
+        in Vector3 origin, in Vector3 direction,
+        JPH_CastRayCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastRay2))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_NarrowPhaseQuery_CastRay2Double(nint system,
-        Double3* origin, Vector3* direction,
-        delegate* unmanaged<void*, RayCastResult*, float> callback, void* userData,
+    public static partial bool JPH_NarrowPhaseQuery_CastRay2(nint system,
+        in Double3 origin, in Vector3 direction,
+        JPH_CastRayCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollidePoint))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_NarrowPhaseQuery_CollidePoint(nint query,
-        Vector3* point,
-        delegate* unmanaged<void*, CollidePointResult*, float> callback, void* userData,
+        in Vector3 point,
+        JPH_CollidePointCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter
         );
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollidePoint))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_NarrowPhaseQuery_CollidePointDouble(nint query,
-        Double3* point,
-        delegate* unmanaged<void*, CollidePointResult*, float> callback, void* userData,
+    public static partial bool JPH_NarrowPhaseQuery_CollidePoint(nint query,
+        in Double3 point,
+        JPH_CollidePointCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter
         );
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollideShape))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_NarrowPhaseQuery_CollideShape(nint query,
-        nint shape, Vector3* scale, Matrix4x4* centerOfMassTransform, Vector3* baseOffset,
-        delegate* unmanaged<void*, CollideShapeResult*, float> callback, void* userData,
+        nint shape, in Vector3 scale, in Matrix4x4 centerOfMassTransform, in Vector3 baseOffset,
+        JPH_CollideShapeCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter
         );
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CollideShape))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_NarrowPhaseQuery_CollideShapeDouble(nint query,
-        nint shape, Vector3* scale, RMatrix4x4* centerOfMassTransform, Double3* baseOffset,
-        delegate* unmanaged<void*, CollideShapeResult*, float> callback, void* userData,
+    public static partial bool JPH_NarrowPhaseQuery_CollideShape(nint query,
+        nint shape, in Vector3 scale, in RMatrix4x4 centerOfMassTransform, in Double3 baseOffset,
+        JPH_CollideShapeCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter
         );
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastShape))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_NarrowPhaseQuery_CastShape(nint query,
         nint shape,
-        Matrix4x4* centerOfMassTransform, Vector3* direction, Vector3* baseOffset,
-        delegate* unmanaged<void*, ShapeCastResult*, float> callback, void* userData,
+        in Matrix4x4 centerOfMassTransform, in Vector3 direction, in Vector3 baseOffset,
+        JPH_CastShapeCollector callback, nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter
         );
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_NarrowPhaseQuery_CastShape))]
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_NarrowPhaseQuery_CastShapeDouble(nint query,
+    public static partial bool JPH_NarrowPhaseQuery_CastShape(nint query,
         nint shape,
-        RMatrix4x4* centerOfMassTransform, Vector3* direction, Double3* baseOffset,
-        delegate* unmanaged<void*, ShapeCastResult*, float> callback, void* userData,
+        in RMatrix4x4 centerOfMassTransform, in Vector3 direction, in Double3 baseOffset,
+        JPH_CastShapeCollector callback,
+        nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter
