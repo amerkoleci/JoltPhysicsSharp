@@ -1,6 +1,7 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -140,7 +141,7 @@ public struct BoundingBox : IEquatable<BoundingBox>
     }
 
     /// <inheritdoc/>
-    public override readonly bool Equals(object? obj) => (obj is BoundingBox other) && Equals(other);
+    public override readonly bool Equals([NotNullWhen(true)] object? obj) => (obj is BoundingBox other) && Equals(other);
 
     /// <summary>
     /// Determines whether the specified <see cref="BoundingBox"/> is equal to this instance.

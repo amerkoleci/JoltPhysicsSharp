@@ -31,8 +31,9 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     public unsafe bool CastRay(
         in Vector3 origin,
         in Vector3 direction,
-        JPH_RayCastBodyCollector callback,
-        nint userData,
+        Memory<BroadPhaseCastResult> results,
+        RayCastBodyCollector callback,
+        nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
@@ -45,8 +46,8 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
 
     public unsafe bool CollideAABox(
         in BoundingBox box,
-        JPH_CollideShapeBodyCollector callback,
-        nint userData,
+        CollideShapeBodyCollector callback,
+        nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
@@ -58,14 +59,14 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     }
 
     public unsafe bool CollideSphere(
-        in Vector3 center, float radius,
-        JPH_CollideShapeBodyCollector callback,
-        nint userData,
+        in BoundingSphere sphere,
+        CollideShapeBodyCollector callback,
+        nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {
         return JPH_BroadPhaseQuery_CollideSphere(Handle,
-            in center, radius,
+            sphere.Center, sphere.Radius,
             callback, userData,
             broadPhaseFilter?.Handle ?? 0,
             objectLayerFilter?.Handle ?? 0);
@@ -73,8 +74,8 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
 
     public unsafe bool CollidePoint(
         in Vector3 point,
-        JPH_CollideShapeBodyCollector callback,
-        nint userData,
+        CollideShapeBodyCollector callback,
+        nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
     {

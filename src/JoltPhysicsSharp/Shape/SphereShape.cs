@@ -7,7 +7,7 @@ namespace JoltPhysicsSharp;
 
 public sealed class SphereShapeSettings : ConvexShapeSettings
 {
-    public unsafe SphereShapeSettings(float radius)
+    public SphereShapeSettings(float radius)
         : base(JPH_SphereShapeSettings_Create(radius))
     {
     }
@@ -43,8 +43,5 @@ public sealed class SphereShape : ConvexShape
     /// </summary>
     ~SphereShape() => Dispose(disposing: false);
 
-    public float Radius
-    {
-        get => JPH_SphereShape_GetRadius(Handle);
-    }
+    public float Radius => JPH_SphereShape_GetRadius(Handle);
 }

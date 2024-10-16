@@ -3,6 +3,7 @@
 
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
@@ -188,8 +189,43 @@ public abstract unsafe class Shape : NativeObject
         return JPH_Shape_CastRay(Handle, in origin, in direction, out hit);
     }
 
+    public bool CastRay(in Vector3 origin, in Vector3 direction, CollisionCollectorType collectorType, ICollection<RayCastResult> result)
+    {
+        return CastRay(in origin, in direction, new RayCastSettings(), collectorType, result);
+    }
+
+    public bool CastRay(in Vector3 origin, in Vector3 direction, in RayCastSettings rayCastSettings, CollisionCollectorType collectorType, ICollection<RayCastResult> result)
+    {
+        GCHandle callbackHandle = GCHandle.Alloc(result);
+        bool callbackResult = JPH_Shape_CastRay2(Handle, in origin, in direction, in rayCastSettings, collectorType, &OnCastRayResultCallback, GCHandle.ToIntPtr(callbackHandle));
+        callbackHandle.Free();
+        return callbackResult;
+    }
+
     public bool CollidePoint(in Vector3 point)
     {
         return JPH_Shape_CollidePoint(Handle, in point);
+    }
+
+    public bool CollidePoint(in Vector3 point, CollisionCollectorType collectorType, ICollection<CollidePointResult> result)
+    {
+        GCHandle callbackHandle = GCHandle.Alloc(result);
+        bool callbackResult = JPH_Shape_CollidePoint2(Handle, in point, collectorType, &OnCollidePointCallback, GCHandle.ToIntPtr(callbackHandle));
+        callbackHandle.Free();
+        return callbackResult;
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe void OnCastRayResultCallback(nint userData, RayCastResult* result)
+    {
+        ICollection<RayCastResult> collection = (ICollection<RayCastResult>)GCHandle.FromIntPtr(userData).Target!;
+        collection.Add(*result);
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe void OnCollidePointCallback(nint userData, CollidePointResult* result)
+    {
+        ICollection<CollidePointResult> collection = (ICollection<CollidePointResult>)GCHandle.FromIntPtr(userData).Target!;
+        collection.Add(*result);
     }
 }
