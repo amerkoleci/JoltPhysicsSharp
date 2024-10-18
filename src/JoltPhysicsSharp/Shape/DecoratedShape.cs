@@ -1,6 +1,7 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using static JoltPhysicsSharp.JoltApi;
 namespace JoltPhysicsSharp;
 
 public abstract class DecoratedShapeSettings : ShapeSettings
@@ -25,4 +26,6 @@ public abstract class DecoratedShape : Shape
         : base(handle)
     {
     }
+
+    public nint InnerShape => JPH_DecoratedShape_GetInnerShape(Handle);
 }

@@ -6,32 +6,23 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public unsafe class RotatedTranslatedShapeSettings : DecoratedShapeSettings
+public class RotatedTranslatedShapeSettings : DecoratedShapeSettings
 {
     public RotatedTranslatedShapeSettings(in Vector3 position, in Quaternion rotation, ShapeSettings shapeSettings)
     {
-        fixed (Vector3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
-        {
-            Handle = JPH_RotatedTranslatedShapeSettings_Create(positionPtr, rotationPtr, shapeSettings.Handle);
-        }
+        Handle = JPH_RotatedTranslatedShapeSettings_Create(in position, in rotation, shapeSettings.Handle);
     }
 
     public RotatedTranslatedShapeSettings(in Vector3 position, in Quaternion rotation, Shape shape)
     {
-        fixed (Vector3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
-        {
-            Handle = JPH_RotatedTranslatedShapeSettings_Create2(positionPtr, rotationPtr, shape.Handle);
-        }
+        Handle = JPH_RotatedTranslatedShapeSettings_Create2(in position, in rotation, shape.Handle);
     }
 
     public Vector3 Position
     {
         get
         {
-            Vector3 position;
-            JPH_RotatedTranslatedShape_GetPosition(Handle, &position);
+            JPH_RotatedTranslatedShape_GetPosition(Handle, out Vector3 position);
             return position;
         }
     }
@@ -40,8 +31,7 @@ public unsafe class RotatedTranslatedShapeSettings : DecoratedShapeSettings
     {
         get
         {
-            Quaternion rotation;
-            JPH_RotatedTranslatedShape_GetRotation(Handle, &rotation);
+            JPH_RotatedTranslatedShape_GetRotation(Handle, out Quaternion rotation);
             return rotation;
         }
     }
@@ -49,15 +39,11 @@ public unsafe class RotatedTranslatedShapeSettings : DecoratedShapeSettings
     public override Shape Create() => new RotatedTranslatedShape(this);
 }
 
-public unsafe class RotatedTranslatedShape : DecoratedShape
+public class RotatedTranslatedShape : DecoratedShape
 {
     public RotatedTranslatedShape(in Vector3 position, in Quaternion rotation, Shape shape)
     {
-        fixed (Vector3* positionPtr = &position)
-        fixed (Quaternion* rotationPtr = &rotation)
-        {
-            Handle = JPH_RotatedTranslatedShape_Create(positionPtr, rotationPtr, shape.Handle);
-        }
+        Handle = JPH_RotatedTranslatedShape_Create(in position, in rotation, shape.Handle);
     }
 
     public RotatedTranslatedShape(RotatedTranslatedShapeSettings settings)

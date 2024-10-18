@@ -506,24 +506,50 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial nint JPH_MutableCompoundShape_Create(nint settings);
 
-    /* RotatedTranslatedShape */
     [LibraryImport(LibName)]
-    public static partial nint JPH_RotatedTranslatedShapeSettings_Create(Vector3* position, Quaternion* rotation, nint shapeSettings);
+    public static partial uint JPH_MutableCompoundShape_AddShape(nint shape, in Vector3 position, in Quaternion rotation, /*const JPH_Shape**/nint child, uint userData);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MutableCompoundShape_RemoveShape(nint shape, uint index);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MutableCompoundShape_ModifyShape(nint shape, uint index, in Vector3 position, in Quaternion rotation);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MutableCompoundShape_ModifyShape2(nint shape, uint index, in Vector3 position, in Quaternion rotation, /*const JPH_Shape**/nint newShape);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MutableCompoundShape_AdjustCenterOfMass(nint shape);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_RotatedTranslatedShapeSettings_Create2(Vector3* position, Quaternion* rotation, nint shape);
+    public static partial nint JPH_DecoratedShape_GetInnerShape(nint settings);
+
+    /* RotatedTranslatedShape */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RotatedTranslatedShapeSettings_Create(in Vector3 position, in Quaternion rotation, nint shapeSettings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RotatedTranslatedShapeSettings_Create2(in Vector3 position, in Quaternion rotation, nint shape);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_RotatedTranslatedShapeSettings_CreateShape(nint settings);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_RotatedTranslatedShape_Create(Vector3* position, Quaternion* rotation, nint shape);
+    public static partial nint JPH_RotatedTranslatedShape_Create(in Vector3 position, in Quaternion rotation, nint shape);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_RotatedTranslatedShape_GetPosition(nint shape, Vector3* position);
+    public static partial nint JPH_RotatedTranslatedShape_GetPosition(nint shape, out Vector3 position);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_RotatedTranslatedShape_GetRotation(nint shape, Quaternion* rotation);
+    public static partial nint JPH_RotatedTranslatedShape_GetRotation(nint shape, out Quaternion rotation);
+
+    /* ScaledShape */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ScaledShapeSettings_Create(nint shapeSettings, in Vector3 scale);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ScaledShapeSettings_Create2(nint shape, in Vector3 scale);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ScaledShapeSettings_CreateShape(nint settings);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ScaledShape_Create(nint shape, in Vector3 scale);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ScaledShape_GetScale(nint shape, out Vector3 result);
 
     /* JPH_OffsetCenterOfMassShape */
     [LibraryImport(LibName)]
@@ -1624,7 +1650,7 @@ internal static unsafe partial class JoltApi
         JPH_CollideShapeSettings* settings,
         in Vector3 baseOffset,
         CollisionCollectorType collectorType,
-        JPH_CollideShapeResultCallback callback, 
+        JPH_CollideShapeResultCallback callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
