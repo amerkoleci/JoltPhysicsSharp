@@ -69,9 +69,9 @@ public sealed class HeightFieldShape : Shape
     public float MinHeightValue => JPH_HeightFieldShape_GetMinHeightValue(Handle);
     public float MaxHeightValue => JPH_HeightFieldShape_GetMaxHeightValue(Handle);
 
-    public /*JPH_PhysicsMaterial**/nint GetMaterial(uint x, uint y)
+    public PhysicsMaterial? GetMaterial(uint x, uint y)
     {
-        return JPH_HeightFieldShape_GetMaterial(Handle, x, y);
+        return PhysicsMaterial.GetObject(JPH_HeightFieldShape_GetMaterial(Handle, x, y));
     }
 
     public Vector3 GetPosition(uint x, uint y)

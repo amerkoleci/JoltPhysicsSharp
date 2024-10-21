@@ -26,6 +26,36 @@ public class HelloWorld : Sample
 
         BodyInterface.SetPosition(_sphere.ID, new Vector3(100.0f, 2.0f, 0.0f), Activation.Activate);
         BodyInterface.SetLinearVelocity(_sphere.ID, new Vector3(0.0f, -5.0f, 0.0f));
+        var shape = BodyInterface.GetShape(_sphere.ID);
+
+        Vector3 start = Vector3.Zero;
+        Vector3 direction = Vector3.Zero;
+        Ray ray = new(start, direction);
+
+        bool had_hit = System.NarrowPhaseQuery.CastRay(ray, out RayCastResult hit);
+
+        // Fill in results
+        var outPosition = ray.GetPointOnRay(hit.Fraction);
+        //outFraction = hit.mFraction;
+        //outID = hit.mBodyID;
+
+        // Draw results
+        if (had_hit)
+        {
+            System.BodyLockInterface.LockRead(hit.BodyID, out BodyLockRead bodyLock);
+            if (bodyLock.Succeeded)
+            {
+                Body hit_body = bodyLock.Body;
+
+                PhysicsMaterial? material2 = hit_body.GetShape().GetMaterial(hit.subShapeID2);
+
+                // Draw normal
+                var normal = hit_body.GetWorldSpaceSurfaceNormal(hit.subShapeID2, outPosition);
+                //mDebugRenderer->DrawArrow(outPosition, outPosition + normal, color, 0.01f);
+            }
+
+            System.BodyLockInterface.UnlockRead(in bodyLock);
+        }
     }
 
     public override void Run()

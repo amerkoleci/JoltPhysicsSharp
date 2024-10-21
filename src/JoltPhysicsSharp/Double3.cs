@@ -330,7 +330,6 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="xyz">The input <see cref="Vector3"/> value to cast.</param>
     public static implicit operator Double3(in Vector3 xyz) => new(xyz);
 
-
     /// <summary>
     /// Casts a <see cref="Double3"/> value to a <see cref="Vector3"/> one.
     /// </summary>

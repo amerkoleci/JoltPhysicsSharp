@@ -1,6 +1,7 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -9,7 +10,7 @@ using System.Text;
 namespace JoltPhysicsSharp;
 
 /// <summary>
-///Represents a 4x4 matrix.
+/// Represents a 4x4 matrix.
 /// </summary>
 public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
 {
@@ -144,34 +145,29 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
     /// </summary>
     public Double3 Translation
     {
-        readonly get => new Double3(M41, M42, M43);
+        readonly get => new(M41, M42, M43);
         set { M41 = value.X; M42 = value.Y; M43 = value.Z; }
     }
+
+    /// <summary>
+    /// Casts a <see cref="Matrix4x4"/> value to a <see cref="RMatrix4x4"/> one.
+    /// </summary>
+    /// <param name="xyz">The input <see cref="Matrix4x4"/> value to cast.</param>
+    public static implicit operator RMatrix4x4(in Matrix4x4 matrix) => new(in matrix);
 
     /// <summary>
     /// Casts a <see cref="RMatrix4x4"/> value to a <see cref="Matrix4x4"/> one.
     /// </summary>
     /// <param name="xyz">The input <see cref="RMatrix4x4"/> value to cast.</param>
-    public static implicit operator Matrix4x4(in RMatrix4x4 matrix) => new(
+    public static explicit operator Matrix4x4(in RMatrix4x4 matrix) => new(
         matrix.M11, matrix.M12, matrix.M13, matrix.M14,
         matrix.M21, matrix.M22, matrix.M23, matrix.M24,
         matrix.M31, matrix.M32, matrix.M33, matrix.M34,
         (float)matrix.M41, (float)matrix.M42, (float)matrix.M43, (float)matrix.M44
         );
 
-    /// <summary>
-    /// Casts a <see cref="Matrix4x4"/> value to a <see cref="RMatrix4x4"/> one.
-    /// </summary>
-    /// <param name="xyz">The input <see cref="Matrix4x4"/> value to cast.</param>
-    public static explicit operator RMatrix4x4(in Matrix4x4 matrix) => new(
-        matrix.M11, matrix.M12, matrix.M13, matrix.M14,
-        matrix.M21, matrix.M22, matrix.M23, matrix.M24,
-        matrix.M31, matrix.M32, matrix.M33, matrix.M34,
-        matrix.M41, matrix.M42, matrix.M43, matrix.M44
-        );
-
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is RMatrix4x4 value && Equals(value);
+    public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is RMatrix4x4 value && Equals(value);
 
     /// <summary>
     /// Determines whether the specified <see cref="RMatrix4x4"/> is equal to this instance.
@@ -240,7 +236,7 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
     /// <inheritdoc />
     public readonly string ToString(string? format, IFormatProvider? formatProvider)
     {
-        var separator = NumberFormatInfo.GetInstance(formatProvider).NumberGroupSeparator;
+        string separator = NumberFormatInfo.GetInstance(formatProvider).NumberGroupSeparator;
 
         return new StringBuilder()
             .Append('<')

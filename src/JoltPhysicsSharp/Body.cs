@@ -83,8 +83,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     {
         get
         {
-            BoundingBox result = default;
-            JPH_Body_GetWorldSpaceBounds(Handle, &result);
+            JPH_Body_GetWorldSpaceBounds(Handle, out BoundingBox result);
             return result;
         }
     }
@@ -302,6 +301,11 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     }
     #endregion
 
+    public void GetWorldSpaceBounds(out BoundingBox bounds)
+    {
+        JPH_Body_GetWorldSpaceBounds(Handle, out bounds);
+    }
+
     public void SetIsSensor(bool value) => JPH_Body_SetIsSensor(Handle, value);
     public void SetCollideKinematicVsNonDynamic(bool value) => JPH_Body_SetCollideKinematicVsNonDynamic(Handle, value);
     public void SetUseManifoldReduction(bool value) => JPH_Body_SetUseManifoldReduction(Handle, value);
@@ -442,11 +446,11 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     {
         if (DoublePrecision)
         {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, new Double3(in position), out normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, new Double3(in position), out normal);
         }
         else
         {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, in position, out normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in position, out normal);
         }
     }
 
@@ -454,12 +458,12 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     {
         if (DoublePrecision)
         {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, new Double3(in position), out Vector3 normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, new Double3(in position), out Vector3 normal);
             return normal;
         }
         else
         {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, in position, out Vector3 normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in position, out Vector3 normal);
             return normal;
         }
     }
@@ -469,11 +473,11 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
         {
             Vector3 sPosition = (Vector3)position;
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, in sPosition, out normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in sPosition, out normal);
         }
         else
         {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, in position, out normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in position, out normal);
         }
     }
 
@@ -482,15 +486,20 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
         if (!DoublePrecision)
         {
             Vector3 sPosition = (Vector3)position;
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, in sPosition, out Vector3 normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in sPosition, out Vector3 normal);
             return normal;
 
         }
         else
         {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, in subShapeID, in position, out Vector3 normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in position, out Vector3 normal);
             return normal;
         }
+    }
+
+    public TransformedShape GetTransformedShape()
+    {
+        return JPH_Body_GetTransformedShape(Handle);
     }
 
     public void AddForce(in Vector3 force)

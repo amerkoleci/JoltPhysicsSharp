@@ -69,6 +69,16 @@ public abstract class DebugRenderer : NativeObject
         JPH_DebugRenderer_DrawWireBox(Handle, in box, color.PackedValue);
     }
 
+    public void DrawWireBox(in Matrix4x4 matrix, in BoundingBox box, Color color)
+    {
+        JPH_DebugRenderer_DrawWireBox2(Handle, matrix, in box, color.PackedValue);
+    }
+
+    public void DrawWireBox(in RMatrix4x4 matrix, in BoundingBox box, Color color)
+    {
+        JPH_DebugRenderer_DrawWireBox2(Handle, matrix, in box, color.PackedValue);
+    }
+
     protected abstract void DrawLine(Vector3 from, Vector3 to, Color color);
 
     protected virtual void DrawTriangle(Vector3 v1, Vector3 v2, Vector3 v3, Color color, CastShadow castShadow = CastShadow.Off)

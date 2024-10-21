@@ -609,9 +609,19 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         return JPH_BodyInterface_GetGravityFactor(Handle, bodyId);
     }
 
-    public void InvalidateContactCache(in BodyID bodyId)
+    public void SetUseManifoldReduction(in BodyID bodyId, bool value)
     {
-        JPH_BodyInterface_InvalidateContactCache(Handle, bodyId);
+        JPH_BodyInterface_SetUseManifoldReduction(Handle, bodyId, value);
+    }
+
+    public bool GetUseManifoldReduction(in BodyID bodyId)
+    {
+        return JPH_BodyInterface_GetUseManifoldReduction(Handle, bodyId);
+    }
+
+    public TransformedShape GetTransformedShape(in BodyID bodyId)
+    {
+        return JPH_BodyInterface_GetTransformedShape(Handle, bodyId);
     }
 
     public ulong GetUserData(in BodyID bodyId)
@@ -622,5 +632,15 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
     public void SetUserData(in BodyID bodyId, ulong userData)
     {
         JPH_BodyInterface_SetUserData(Handle, bodyId, userData);
+    }
+
+    public PhysicsMaterial? GetMaterial(in BodyID bodyId, SubShapeID subShapeID)
+    {
+        return PhysicsMaterial.GetObject(JPH_BodyInterface_GetMaterial(Handle, bodyId, subShapeID));
+    }
+
+    public void InvalidateContactCache(in BodyID bodyId)
+    {
+        JPH_BodyInterface_InvalidateContactCache(Handle, bodyId);
     }
 }
