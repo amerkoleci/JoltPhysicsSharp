@@ -333,6 +333,8 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         JPH_BodyInterface_SetShape(Handle, bodyId, shape.Handle, updateMassProperties, activationMode);
     }
 
+    public Shape? GetShape(in BodyID bodyId) => Shape.GetObject(JPH_BodyInterface_GetShape(Handle, bodyId));
+
     public void NotifyShapeChanged(in BodyID bodyId, in Vector3 previousCenterOfMass, bool updateMassProperties, Activation activationMode)
     {
         JPH_BodyInterface_NotifyShapeChanged(Handle, bodyId, in previousCenterOfMass, updateMassProperties, activationMode);

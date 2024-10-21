@@ -28,22 +28,23 @@ public readonly unsafe struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
 
     #region CastRay
     public bool CastRay(
-        in Vector3 origin,
-        in Vector3 direction,
+        in Ray ray,
         out RayCastResult hit,
-        BroadPhaseLayerFilter broadPhaseFilter,
-        ObjectLayerFilter objectLayerFilter,
-        BodyFilter bodyFilter)
+        BroadPhaseLayerFilter? broadPhaseFilter = default,
+        ObjectLayerFilter? objectLayerFilter = default,
+        BodyFilter? bodyFilter = default)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(CastRay)}");
 
-        return JPH_NarrowPhaseQuery_CastRay(Handle, in origin, in direction, out hit, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
+        return JPH_NarrowPhaseQuery_CastRay(Handle, in ray.Position, in ray.Direction, out hit,
+            broadPhaseFilter?.Handle ?? 0,
+            objectLayerFilter?.Handle ?? 0,
+            bodyFilter?.Handle ?? 0);
     }
 
     public bool CastRay(
-        in Vector3 origin,
-        in Vector3 direction,
+        in Ray ray,
         CastRayCollector callback,
         nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
@@ -54,7 +55,7 @@ public readonly unsafe struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(CastRay)}");
 
-        return JPH_NarrowPhaseQuery_CastRay2(Handle, in origin, in direction,
+        return JPH_NarrowPhaseQuery_CastRay2(Handle, in ray.Position, in ray.Direction,
             null,
             callback, userData,
             broadPhaseFilter?.Handle ?? 0,
@@ -64,8 +65,7 @@ public readonly unsafe struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     }
 
     public bool CastRay(
-        in Vector3 origin,
-        in Vector3 direction,
+        in Ray ray,
         RayCastSettings settings,
         CastRayCollector callback,
         nint userData = 0,
@@ -77,7 +77,8 @@ public readonly unsafe struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(CastRay)}");
 
-        return JPH_NarrowPhaseQuery_CastRay2(Handle, in origin, in direction,
+        return JPH_NarrowPhaseQuery_CastRay2(Handle,
+            in ray.Position, in ray.Direction,
             &settings,
             callback, userData,
             broadPhaseFilter?.Handle ?? 0,
@@ -87,8 +88,7 @@ public readonly unsafe struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
     }
 
     public bool CastRay(
-        in Vector3 origin,
-        in Vector3 direction,
+        in Ray ray,
         RayCastSettings settings,
         CollisionCollectorType collectorType,
         ICollection<RayCastResult> results,
@@ -101,7 +101,7 @@ public readonly unsafe struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(CastRay)}");
 
         GCHandle callbackHandle = GCHandle.Alloc(results);
-        bool callbackResult = JPH_NarrowPhaseQuery_CastRay3(Handle, in origin, in direction,
+        bool callbackResult = JPH_NarrowPhaseQuery_CastRay3(Handle, in ray.Position, in ray.Direction,
             &settings,
             collectorType, &OnCastRayResultCallback, GCHandle.ToIntPtr(callbackHandle),
             broadPhaseFilter?.Handle ?? 0,

@@ -588,10 +588,10 @@ internal static unsafe partial class JoltApi
     public static partial bool JPH_Shape_MustBeStatic(nint shape);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetCenterOfMass(nint handle, Vector3* result);
+    public static partial void JPH_Shape_GetCenterOfMass(nint handle, out Vector3 result);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetLocalBounds(nint shape, BoundingBox* box);
+    public static partial void JPH_Shape_GetLocalBounds(nint shape, out BoundingBox box);
 
     [LibraryImport(LibName)]
     public static partial uint JPH_Shape_GetSubShapeIDBitsRecursive(nint shape);
@@ -603,19 +603,19 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_Shape_GetVolume(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetMassProperties(nint shape, MassProperties* properties);
+    public static partial void JPH_Shape_GetMassProperties(nint shape, out MassProperties properties);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, Matrix4x4* centerOfMassTransform, Vector3* scale, BoundingBox* result);
+    public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, in Matrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_Shape_GetWorldSpaceBounds))]
-    public static partial void JPH_Shape_GetWorldSpaceBoundsDouble(nint shape, RMatrix4x4* centerOfMassTransform, Vector3* scale, BoundingBox* result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, in RMatrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_Shape_GetMaterial(nint shape, SubShapeID subShapeID);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetSurfaceNormal(nint shape, SubShapeID subShapeID, Vector3* localPosition, Vector3* normal);
+    public static partial void JPH_Shape_GetSurfaceNormal(nint shape, SubShapeID subShapeID, in Vector3 localPosition, out Vector3 normal);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
@@ -1111,11 +1111,17 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PhysicsSystem_DrawConstraintReferenceFrame(nint system, nint renderer);
 
     /* Material */
-    [LibraryImport(LibName)]
-    public static partial nint JPH_PhysicsMaterial_Create();
+    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
+    public static partial nint JPH_PhysicsMaterial_Create(string name, uint color);
 
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsMaterial_Destroy(nint handle);
+
+    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
+    public static partial string? JPH_PhysicsMaterial_GetDebugName(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_PhysicsMaterial_GetDebugColor(nint handle);
 
     /* BodyInterface */
     [LibraryImport(LibName)]
@@ -1745,11 +1751,11 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_Body_GetWorldSpaceBounds(nint body, BoundingBox* box);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_Body_GetWorldSpaceSurfaceNormal))]
+    [LibraryImport(LibName)]
     public static partial void JPH_Body_GetWorldSpaceSurfaceNormal(nint body, in SubShapeID subShapeID, in Vector3 position, out Vector3 normal);
 
-    [LibraryImport(LibName, EntryPoint = nameof(JPH_Body_GetWorldSpaceSurfaceNormal))]
-    public static partial void JPH_Body_GetWorldSpaceSurfaceNormalDouble(nint body, in SubShapeID subShapeID, in Double3 position, out Vector3 normal);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_GetWorldSpaceSurfaceNormal(nint body, in SubShapeID subShapeID, in Double3 position, out Vector3 normal);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
@@ -2309,6 +2315,32 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_DebugRenderer_NextFrame(nint renderer);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawLine(nint renderer, in Vector3 from, in Vector3 to, uint color);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawLine(nint renderer, in Double3 from, in Double3 to, uint color);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawWireBox(nint renderer, in BoundingBox box, uint color);
+
+ //[LibraryImport(LibName)]
+ //   public static partial void JPH_DebugRenderer_DrawWireBox2(nint renderer, const JPH_RMatrix4x4* matrix, const JPH_AABox* box, const JPH_RVec3* v3, JPH_Color color);
+ //[LibraryImport(LibName)]
+ //   public static partial void JPH_DebugRenderer_DrawMarker(nint renderer, const JPH_RVec3* position, JPH_Color color, float size);
+ //   [LibraryImport(LibName)]
+ //   public static partial void JPH_DebugRenderer_DrawArrow(nint renderer, const JPH_RVec3* from, const JPH_RVec3* to, JPH_Color color, float size);
+ //   [LibraryImport(LibName)]
+ //   public static partial void JPH_DebugRenderer_DrawCoordinateSystem(nint renderer, const JPH_RMatrix4x4* matrix, float size);
+ //   [LibraryImport(LibName)]
+ //   public static partial void JPH_DebugRenderer_DrawPlane(nint renderer, const JPH_RVec3* point, const JPH_Vec3* normal, JPH_Color color, float size);
+ //   [LibraryImport(LibName)]
+ //   public static partial void JPH_DebugRenderer_DrawWireTriangle(nint renderer, const JPH_RVec3* v1, const JPH_RVec3* v2, const JPH_RVec3* v3, JPH_Color color);
+ //[LibraryImport(LibName)]
+ //   public static partial void JPH_DebugRenderer_DrawWireSphere(nint renderer, const JPH_RVec3* center, float radius, JPH_Color color, int level);
+ //   [LibraryImport(LibName)]
+ //   public static partial void JPH_DebugRenderer_DrawWireUnitSphere(nint renderer, const JPH_RMatrix4x4* matrix, JPH_Color color, int level);
     #endregion
 
     sealed class UTF8EncodingRelaxed : UTF8Encoding

@@ -9,11 +9,18 @@ namespace JoltPhysicsSharp;
 public abstract class DisposableObject : IDisposable
 {
     private volatile uint _isDisposed;
+    protected bool _fromFinalizer;
 
     /// <summary>Initializes a new instance of the <see cref="DisposableObject" /> class.</summary>
     protected DisposableObject()
     {
         _isDisposed = 0;
+    }
+
+    ~DisposableObject()
+    {
+        _fromFinalizer = true;
+        Dispose(disposing: false);
     }
 
     /// <summary>Gets <c>true</c> if the object has been disposed; otherwise, <c>false</c>.</summary>
@@ -22,11 +29,16 @@ public abstract class DisposableObject : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
+        DisposeInternal(); 
+    }
+
+    protected internal void DisposeInternal()
+    {
         if (Interlocked.Exchange(ref _isDisposed, 1) == 0)
         {
             Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
+        GC.SuppressFinalize(this);
     }
 
     /// <inheritdoc cref="Dispose()" />

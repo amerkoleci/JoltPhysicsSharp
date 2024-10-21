@@ -318,6 +318,25 @@ public struct Double3 : IEquatable<Double3>, IFormattable
         return Zero - value;
     }
 
+    /// <summary>
+    /// Creates a new <see cref="Double3"/> value with the same value for all its components.
+    /// </summary>
+    /// <param name="x">The value to use for the components of the new <see cref="Double3"/> instance.</param>
+    public static implicit operator Double3(double x) => new(x, x, x);
+
+    /// <summary>
+    /// Casts a <see cref="Vector3"/> value to a <see cref="Double3"/> one.
+    /// </summary>
+    /// <param name="xyz">The input <see cref="Vector3"/> value to cast.</param>
+    public static implicit operator Double3(in Vector3 xyz) => new(xyz);
+
+
+    /// <summary>
+    /// Casts a <see cref="Double3"/> value to a <see cref="Vector3"/> one.
+    /// </summary>
+    /// <param name="xyz">The input <see cref="Double3"/> value to cast.</param>
+    public static explicit operator Vector3(in Double3 xyz) => new((float)xyz.X, (float)xyz.Y, (float)xyz.Z);
+
     /// <summary>Returns a vector whose elements are the absolute values of each of the specified vector's elements.</summary>
     /// <param name="value">A vector.</param>
     /// <returns>The absolute value vector.</returns>

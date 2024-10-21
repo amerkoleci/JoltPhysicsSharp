@@ -5,10 +5,6 @@ using System.Numerics;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
-
-using unsafe JPH_RayCastBodyCollector = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
-using unsafe JPH_CollideShapeBodyCollector = delegate* unmanaged<nint, in BodyID, void>;
-
 public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
 {
     public BroadPhaseQuery(nint handle) { Handle = handle; }
@@ -28,9 +24,8 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     /// <inheritdoc/>
     public override int GetHashCode() => Handle.GetHashCode();
 
-    public unsafe bool CastRay(
-        in Vector3 origin,
-        in Vector3 direction,
+    public bool CastRay(
+        in Ray ray,
         Memory<BroadPhaseCastResult> results,
         RayCastBodyCollector callback,
         nint userData = 0,
@@ -38,13 +33,13 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
         ObjectLayerFilter? objectLayerFilter = default)
     {
         return JPH_BroadPhaseQuery_CastRay(Handle,
-            in origin, in direction,
+            in ray.Position, in ray.Direction,
             callback, userData,
             broadPhaseFilter?.Handle ?? 0,
             objectLayerFilter?.Handle ?? 0);
     }
 
-    public unsafe bool CollideAABox(
+    public bool CollideAABox(
         in BoundingBox box,
         CollideShapeBodyCollector callback,
         nint userData = 0,
@@ -58,7 +53,7 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
             objectLayerFilter?.Handle ?? 0);
     }
 
-    public unsafe bool CollideSphere(
+    public bool CollideSphere(
         in BoundingSphere sphere,
         CollideShapeBodyCollector callback,
         nint userData = 0,

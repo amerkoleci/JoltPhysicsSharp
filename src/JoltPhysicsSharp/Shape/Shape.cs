@@ -42,7 +42,7 @@ public abstract class ShapeSettings : NativeObject
 }
 
 
-public abstract unsafe class Shape : NativeObject
+public class Shape : NativeObject
 {
     protected Shape()
     {
@@ -79,8 +79,7 @@ public abstract unsafe class Shape : NativeObject
     {
         get
         {
-            BoundingBox result = default;
-            JPH_Shape_GetLocalBounds(Handle, &result);
+            JPH_Shape_GetLocalBounds(Handle, out BoundingBox result);
             return result;
         }
     }
@@ -91,8 +90,7 @@ public abstract unsafe class Shape : NativeObject
     {
         get
         {
-            MassProperties properties;
-            JPH_Shape_GetMassProperties(Handle, &properties);
+            JPH_Shape_GetMassProperties(Handle, out MassProperties properties);
             return properties;
         }
     }
@@ -104,30 +102,25 @@ public abstract unsafe class Shape : NativeObject
     {
         get
         {
-            Vector3 result;
-            JPH_Shape_GetCenterOfMass(Handle, &result);
+            JPH_Shape_GetCenterOfMass(Handle, out Vector3 result);
             return result;
         }
     }
 
     public void GetCenterOfMass(out Vector3 result)
     {
-        Unsafe.SkipInit(out result);
-
-        fixed (Vector3* resultPtr = &result)
-        {
-            JPH_Shape_GetCenterOfMass(Handle, resultPtr);
-        }
+        JPH_Shape_GetCenterOfMass(Handle, out result);
     }
+
+    public void GetLocalBounds(out BoundingBox result)
+    {
+        JPH_Shape_GetLocalBounds(Handle, out result);
+    }
+
 
     public void GetMassProperties(out MassProperties properties)
     {
-        Unsafe.SkipInit(out properties);
-
-        fixed (MassProperties* resultPtr = &properties)
-        {
-            JPH_Shape_GetMassProperties(Handle, resultPtr);
-        }
+        JPH_Shape_GetMassProperties(Handle, out properties);
     }
 
 
@@ -136,14 +129,7 @@ public abstract unsafe class Shape : NativeObject
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceBounds)}");
 
-        Unsafe.SkipInit(out result);
-
-        fixed (Matrix4x4* centerOfMassTransformPtr = &centerOfMassTransform)
-        fixed (Vector3* scalePtr = &scale)
-        fixed (BoundingBox* resultPtr = &result)
-        {
-            JPH_Shape_GetWorldSpaceBounds(Handle, centerOfMassTransformPtr, scalePtr, resultPtr);
-        }
+        JPH_Shape_GetWorldSpaceBounds(Handle, in centerOfMassTransform, in scale, out result);
     }
 
     public void GetRWorldSpaceBounds(in RMatrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result)
@@ -151,53 +137,36 @@ public abstract unsafe class Shape : NativeObject
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldSpaceBounds)}");
 
-        Unsafe.SkipInit(out result);
-
-        fixed (RMatrix4x4* centerOfMassTransformPtr = &centerOfMassTransform)
-        fixed (Vector3* scalePtr = &scale)
-        fixed (BoundingBox* resultPtr = &result)
-        {
-            JPH_Shape_GetWorldSpaceBoundsDouble(Handle, centerOfMassTransformPtr, scalePtr, resultPtr);
-        }
+        JPH_Shape_GetWorldSpaceBounds(Handle, in centerOfMassTransform, in scale, out result);
     }
 
-    public nint GetMaterial(SubShapeID subShapeID) => JPH_Shape_GetMaterial(Handle, subShapeID);
+    public PhysicsMaterial? GetMaterial(SubShapeID subShapeID) => PhysicsMaterial.GetObject(JPH_Shape_GetMaterial(Handle, subShapeID));
 
     public Vector3 GetSurfaceNormal(SubShapeID subShapeID, in Vector3 localPosition)
     {
-        fixed (Vector3* localPositionPtr = &localPosition)
-        {
-            Vector3 normal;
-            JPH_Shape_GetSurfaceNormal(Handle, subShapeID, localPositionPtr, &normal);
-            return normal;
-        }
+        JPH_Shape_GetSurfaceNormal(Handle, subShapeID, in localPosition, out Vector3 normal);
+        return normal;
     }
 
     public void GetSurfaceNormal(SubShapeID subShapeID, in Vector3 localPosition, out Vector3 normal)
     {
-        Unsafe.SkipInit(out normal);
-
-        fixed (Vector3* localPositionPtr = &localPosition)
-        fixed (Vector3* normalPtr = &normal)
-        {
-            JPH_Shape_GetSurfaceNormal(Handle, subShapeID, localPositionPtr, normalPtr);
-        }
+        JPH_Shape_GetSurfaceNormal(Handle, subShapeID, in localPosition, out normal);
     }
 
-    public bool CastRay(in Vector3 origin, in Vector3 direction, out RayCastResult hit)
+    public bool CastRay(in Ray ray, out RayCastResult hit)
     {
-        return JPH_Shape_CastRay(Handle, in origin, in direction, out hit);
+        return JPH_Shape_CastRay(Handle, in ray.Position, in ray.Direction, out hit);
     }
 
-    public bool CastRay(in Vector3 origin, in Vector3 direction, CollisionCollectorType collectorType, ICollection<RayCastResult> result)
+    public bool CastRay(in Ray ray, CollisionCollectorType collectorType, ICollection<RayCastResult> result)
     {
-        return CastRay(in origin, in direction, new RayCastSettings(), collectorType, result);
+        return CastRay(in ray, new RayCastSettings(), collectorType, result);
     }
 
-    public bool CastRay(in Vector3 origin, in Vector3 direction, in RayCastSettings rayCastSettings, CollisionCollectorType collectorType, ICollection<RayCastResult> result)
+    public unsafe bool CastRay(in Ray ray, in RayCastSettings rayCastSettings, CollisionCollectorType collectorType, ICollection<RayCastResult> result)
     {
         GCHandle callbackHandle = GCHandle.Alloc(result);
-        bool callbackResult = JPH_Shape_CastRay2(Handle, in origin, in direction, in rayCastSettings, collectorType, &OnCastRayResultCallback, GCHandle.ToIntPtr(callbackHandle));
+        bool callbackResult = JPH_Shape_CastRay2(Handle, in ray.Position, in ray.Direction, in rayCastSettings, collectorType, &OnCastRayResultCallback, GCHandle.ToIntPtr(callbackHandle));
         callbackHandle.Free();
         return callbackResult;
     }
@@ -207,7 +176,7 @@ public abstract unsafe class Shape : NativeObject
         return JPH_Shape_CollidePoint(Handle, in point);
     }
 
-    public bool CollidePoint(in Vector3 point, CollisionCollectorType collectorType, ICollection<CollidePointResult> result)
+    public unsafe bool CollidePoint(in Vector3 point, CollisionCollectorType collectorType, ICollection<CollidePointResult> result)
     {
         GCHandle callbackHandle = GCHandle.Alloc(result);
         bool callbackResult = JPH_Shape_CollidePoint2(Handle, in point, collectorType, &OnCollidePointCallback, GCHandle.ToIntPtr(callbackHandle));
@@ -227,5 +196,10 @@ public abstract unsafe class Shape : NativeObject
     {
         ICollection<CollidePointResult> collection = (ICollection<CollidePointResult>)GCHandle.FromIntPtr(userData).Target!;
         collection.Add(*result);
+    }
+
+    internal static Shape? GetObject(nint handle)
+    {
+        return GetOrAddObject(handle, (nint h) => new Shape(h));
     }
 }
