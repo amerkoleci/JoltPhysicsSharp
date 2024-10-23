@@ -8,6 +8,10 @@ using System.Text;
 
 namespace JoltPhysicsSharp;
 
+using unsafe JPH_JobFunction = delegate* unmanaged<nint, void>;
+using unsafe JPH_QueueJobCallback = delegate* unmanaged<nint, /*JPH_JobFunction*/delegate* unmanaged<nint, void>, nint, void>;
+using unsafe JPH_QueueJobsCallback = delegate* unmanaged<nint, /*JPH_JobFunction**/delegate* unmanaged<nint, void>, void**, uint, void>;
+
 using unsafe JPH_CastRayResultCallback = delegate* unmanaged<nint, RayCastResult*, void>;
 using unsafe JPH_CollidePointResultCallback = delegate* unmanaged<nint, CollidePointResult*, void>;
 using unsafe JPH_CollideShapeResultCallback = delegate* unmanaged<nint, CollideShapeResult*, void>;
@@ -142,7 +146,30 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_SetAssertFailureHandler(delegate* unmanaged<byte*, byte*, byte*, uint, Bool8> callback);
 
-    //  BroadPhaseLayerInterface
+    // JobSystem
+    public struct JPH_JobSystemConfig
+    {
+        public nint context;
+        public JPH_QueueJobCallback queueJob;
+        public JPH_QueueJobsCallback queueJobs;
+        public uint maxConcurrency;
+        public uint maxBarriers;
+    }
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_JobSystemThreadPool_Create(JobSystemThreadPoolConfig* config);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_JobSystemThreadPool_Create(in JobSystemThreadPoolConfig config);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_JobSystemCallback_Create(JPH_JobSystemConfig* config);
+
+    // JobSystem
+    [LibraryImport(LibName)]
+    public static partial void JPH_JobSystem_Destroy(nint jobSystem);
+
+    // BroadPhaseLayerInterface
     [LibraryImport(LibName)]
     public static partial nint JPH_BroadPhaseLayerInterfaceMask_Create(uint numBroadPhaseLayers);
 
@@ -244,6 +271,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial uint JPH_ShapeFilter_GetBodyID2(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ShapeFilter_SetBodyID2(nint handle, uint id);
 
     //  BodyDrawFilter
     public struct JPH_BodyDrawFilter_Procs
@@ -623,15 +653,15 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_CastRay2(nint shape, in Vector3 origin, in Vector3 direction, in RayCastSettings settings, CollisionCollectorType collectorType, JPH_CastRayResultCallback callback, nint userData);
+    public static partial bool JPH_Shape_CastRay2(nint shape, in Vector3 origin, in Vector3 direction, in RayCastSettings settings, CollisionCollectorType collectorType, JPH_CastRayResultCallback callback, nint userData, nint shapeFilter);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_CollidePoint(nint shape, in Vector3 point);
+    public static partial bool JPH_Shape_CollidePoint(nint shape, in Vector3 point, nint shapeFilter);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_CollidePoint2(nint shape, in Vector3 point, CollisionCollectorType collectorType, JPH_CollidePointResultCallback callback, nint userData);
+    public static partial bool JPH_Shape_CollidePoint2(nint shape, in Vector3 point, CollisionCollectorType collectorType, JPH_CollidePointResultCallback callback, nint userData, nint shapeFilter);
 
     /* SphereShape */
     [LibraryImport(LibName)]
@@ -701,70 +731,6 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_SoftBodyCreationSettings_Destroy(nint settings);
-
-    /* JPH_TransformedShape */
-    [LibraryImport(LibName)]
-    public static partial uint JPH_TransformedShape_GetBodyID(nint shape);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_TransformedShape_CastRay(nint shape, in Vector3 origin, in Vector3 direction, out RayCastResult hit);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_TransformedShape_CastRay(nint shape, in Double3 origin, in Vector3 direction, out RayCastResult hit);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_TransformedShape_CastRay2(nint shape, in Vector3 origin, in Vector3 direction, RayCastSettings* rayCastSettings, CollisionCollectorType collectorType, JPH_CastRayResultCallback callback, nint userData, nint shapeFilter);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_TransformedShape_CastRay2(nint shape, in Double3 origin, in Vector3 direction, RayCastSettings* rayCastSettings, CollisionCollectorType collectorType, JPH_CastRayResultCallback callback, nint userData, nint shapeFilter);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetShapeScale(nint shape, out Vector3 result);
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_SetShapeScale(nint shape, in Vector3 value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetCenterOfMassTransform(nint shape, out Matrix4x4 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetCenterOfMassTransform(nint shape, out RMatrix4x4 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetInverseCenterOfMassTransform(nint shape, out Matrix4x4 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetInverseCenterOfMassTransform(nint shape, out RMatrix4x4 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_SetWorldTransform(nint shape, in Matrix4x4 value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_SetWorldTransform(nint shape, in RMatrix4x4 value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_SetWorldTransform2(nint shape, in Vector3 position, in Quaternion rotation, in Vector3 scale);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_SetWorldTransform2(nint shape, in Double3 position, in Quaternion rotation, in Vector3 scale);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetWorldTransform(nint shape, out Matrix4x4 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetWorldTransform(nint shape, out RMatrix4x4 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetWorldSpaceBounds(nint shape, out BoundingBox result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetWorldSpaceSurfaceNormal(nint shape, uint subShapeID, in Vector3 position, out Vector3 normal);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_TransformedShape_GetWorldSpaceSurfaceNormal(nint shape, uint subShapeID, in Double3 position, out Vector3 normal);
 
     #region JPH_Constraint
     /* JPH_Constraint */
@@ -1121,7 +1087,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PhysicsSystem_OptimizeBroadPhase(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial PhysicsUpdateError JPH_PhysicsSystem_Update(nint handle, float deltaTime, int collisionSteps);
+    public static partial PhysicsUpdateError JPH_PhysicsSystem_Update(nint handle, float deltaTime, int collisionSteps, nint jobSystem);
 
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_SetContactListener(nint system, nint listener);
@@ -1424,9 +1390,6 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BodyInterface_GetUseManifoldReduction(nint handle, uint bodyId);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_BodyInterface_GetTransformedShape(nint handle, uint bodyId);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_SetUserData(nint handle, uint bodyId, ulong userData);
@@ -1833,9 +1796,6 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_Body_GetWorldSpaceSurfaceNormal(nint body, uint subShapeID, in Double3 position, out Vector3 normal);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_Body_GetTransformedShape(nint body);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]

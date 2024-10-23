@@ -118,7 +118,7 @@ public class AlternativeCollissionFilteringSample : Sample
             const int collisionSteps = 1;
 
             // Step the world
-            PhysicsUpdateError error = System.Update(deltaTime, collisionSteps);
+            PhysicsUpdateError error = System.Update(deltaTime, collisionSteps, JobSystem);
             Debug.Assert(error == PhysicsUpdateError.None);
         }
     }

@@ -60,9 +60,10 @@ public class Shape : NativeObject
 
     protected override void Dispose(bool disposing)
     {
-        if (disposing)
+        if (Handle != 0)
         {
             JPH_Shape_Destroy(Handle);
+            Handle = 0;
         }
     }
 
@@ -72,16 +73,6 @@ public class Shape : NativeObject
     {
         get => JPH_Shape_GetUserData(Handle);
         set => JPH_Shape_SetUserData(Handle, value);
-    }
-
-
-    public BoundingBox LocalBounds
-    {
-        get
-        {
-            JPH_Shape_GetLocalBounds(Handle, out BoundingBox result);
-            return result;
-        }
     }
 
     public uint SubShapeIDBitsRecursive => JPH_Shape_GetSubShapeIDBitsRecursive(Handle);
@@ -107,6 +98,15 @@ public class Shape : NativeObject
         }
     }
 
+    public BoundingBox LocalBounds
+    {
+        get
+        {
+            JPH_Shape_GetLocalBounds(Handle, out BoundingBox result);
+            return result;
+        }
+    }
+
     public void GetCenterOfMass(out Vector3 result)
     {
         JPH_Shape_GetCenterOfMass(Handle, out result);
@@ -117,12 +117,19 @@ public class Shape : NativeObject
         JPH_Shape_GetLocalBounds(Handle, out result);
     }
 
-
     public void GetMassProperties(out MassProperties properties)
     {
         JPH_Shape_GetMassProperties(Handle, out properties);
     }
 
+    public BoundingBox GetWorldSpaceBounds(in Matrix4x4 centerOfMassTransform, in Vector3 scale)
+    {
+        if (DoublePrecision)
+            throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceBounds)}");
+
+        JPH_Shape_GetWorldSpaceBounds(Handle, in centerOfMassTransform, in scale, out BoundingBox result);
+        return result;
+    }
 
     public void GetWorldSpaceBounds(in Matrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result)
     {
@@ -130,6 +137,15 @@ public class Shape : NativeObject
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceBounds)}");
 
         JPH_Shape_GetWorldSpaceBounds(Handle, in centerOfMassTransform, in scale, out result);
+    }
+
+    public BoundingBox GetRWorldSpaceBounds(in RMatrix4x4 centerOfMassTransform, in Vector3 scale)
+    {
+        if (!DoublePrecision)
+            throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetWorldSpaceBounds)}");
+
+        JPH_Shape_GetWorldSpaceBounds(Handle, in centerOfMassTransform, in scale, out BoundingBox result);
+        return result;
     }
 
     public void GetRWorldSpaceBounds(in RMatrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result)
@@ -163,23 +179,32 @@ public class Shape : NativeObject
         return CastRay(in ray, new RayCastSettings(), collectorType, result);
     }
 
-    public unsafe bool CastRay(in Ray ray, in RayCastSettings rayCastSettings, CollisionCollectorType collectorType, ICollection<RayCastResult> result)
+    public unsafe bool CastRay(in Ray ray, in RayCastSettings rayCastSettings, CollisionCollectorType collectorType, ICollection<RayCastResult> result, ShapeFilter? shapeFilter = default)
     {
         GCHandle callbackHandle = GCHandle.Alloc(result);
-        bool callbackResult = JPH_Shape_CastRay2(Handle, in ray.Position, in ray.Direction, in rayCastSettings, collectorType, &OnCastRayResultCallback, GCHandle.ToIntPtr(callbackHandle));
+        bool callbackResult = JPH_Shape_CastRay2(Handle, in ray.Position, in ray.Direction,
+            in rayCastSettings,
+            collectorType,
+            &OnCastRayResultCallback,
+            GCHandle.ToIntPtr(callbackHandle),
+            shapeFilter?.Handle ?? 0);
         callbackHandle.Free();
         return callbackResult;
     }
 
-    public bool CollidePoint(in Vector3 point)
+    public bool CollidePoint(in Vector3 point, ShapeFilter? shapeFilter = default)
     {
-        return JPH_Shape_CollidePoint(Handle, in point);
+        return JPH_Shape_CollidePoint(Handle, in point, shapeFilter?.Handle ?? 0);
     }
 
-    public unsafe bool CollidePoint(in Vector3 point, CollisionCollectorType collectorType, ICollection<CollidePointResult> result)
+    public unsafe bool CollidePoint(in Vector3 point, CollisionCollectorType collectorType, ICollection<CollidePointResult> result, ShapeFilter? shapeFilter = default)
     {
         GCHandle callbackHandle = GCHandle.Alloc(result);
-        bool callbackResult = JPH_Shape_CollidePoint2(Handle, in point, collectorType, &OnCollidePointCallback, GCHandle.ToIntPtr(callbackHandle));
+        bool callbackResult = JPH_Shape_CollidePoint2(Handle, in point,
+            collectorType,
+            &OnCollidePointCallback,
+            GCHandle.ToIntPtr(callbackHandle),
+            shapeFilter?.Handle ?? 0);
         callbackHandle.Free();
         return callbackResult;
     }

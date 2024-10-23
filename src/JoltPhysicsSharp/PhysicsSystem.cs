@@ -196,9 +196,10 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_OptimizeBroadPhase(Handle);
     }
 
-    public PhysicsUpdateError Step(float deltaTime, int collisionSteps) => Update(deltaTime, collisionSteps);
-
-    public PhysicsUpdateError Update(float deltaTime, int collisionSteps) => JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps);
+    public PhysicsUpdateError Update(float deltaTime, int collisionSteps, JobSystem jobSystem)
+    {
+        return JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, jobSystem.Handle);
+    }
 
     public Vector3 Gravity
     {

@@ -43,10 +43,15 @@ public abstract class Sample : IDisposable
             MaxContactConstraints = MaxContactConstraints,
             NumBodyMutexes = NumBodyMutexes,
         };
+
+        JobSystem = new JobSystemThreadPool();
     }
 
+    public JobSystem JobSystem { get; set; }
     public PhysicsSystem? System { get; private set; }
-    public BodyInterface BodyInterface { get; private set; }
+    public BodyInterface BodyInterface => System!.BodyInterface;
+    public BodyLockInterface BodyLockInterface => System!.BodyLockInterface;
+
     public virtual void Dispose()
     {
         foreach (Body body in _bodies)
@@ -55,6 +60,7 @@ public abstract class Sample : IDisposable
         }
         _bodies.Clear();
 
+        JobSystem.Dispose();
         System?.Dispose();
     }
 
@@ -62,7 +68,6 @@ public abstract class Sample : IDisposable
     {
         SetupCollisionFiltering();
         System = new(_settings);
-        BodyInterface = System.BodyInterface;
 
         // ContactListener
         System.OnContactValidate += OnContactValidate;
@@ -134,7 +139,6 @@ public abstract class Sample : IDisposable
         _bodies.Add(body);
         return body;
     }
-
 
     protected virtual ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, nint collisionResult)
     {

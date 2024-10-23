@@ -21,7 +21,12 @@ public abstract class ShapeFilter : NativeObject
         Handle = JPH_ShapeFilter_Create(_bodyFilter_Procs, context);
     }
 
-    public BodyID BodyID2 => JPH_ShapeFilter_GetBodyID2(Handle);
+    public BodyID BodyID2
+    {
+        get => JPH_ShapeFilter_GetBodyID2(Handle);
+        set => JPH_ShapeFilter_SetBodyID2(Handle, value);
+    }
+    
 
     /// <summary>
     /// Finalizes an instance of the <see cref="ShapeFilter" /> class.

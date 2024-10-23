@@ -619,9 +619,20 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         return JPH_BodyInterface_GetUseManifoldReduction(Handle, bodyId);
     }
 
-    public TransformedShape GetTransformedShape(in BodyID bodyId)
+    public TransformedShape GetTransformedShape(in BodyLockInterface bodyLockInterface, in BodyID bodyId)
     {
-        return JPH_BodyInterface_GetTransformedShape(Handle, bodyId);
+        bodyLockInterface.LockRead(in bodyId, out BodyLockRead @lock);
+        try
+        {
+            if (@lock.Succeeded)
+                return @lock.Body.GetTransformedShape();
+
+            return default;
+        }
+        finally
+        {
+            bodyLockInterface.UnlockRead(@lock);
+        }
     }
 
     public ulong GetUserData(in BodyID bodyId)

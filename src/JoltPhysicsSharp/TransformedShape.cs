@@ -7,303 +7,122 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public readonly unsafe struct TransformedShape : IEquatable<TransformedShape>
+public unsafe record struct TransformedShape
 {
-    public TransformedShape(nint handle) { Handle = handle; }
-    public nint Handle { get; }
-    public bool IsNull => Handle == 0;
-    public static TransformedShape Null => new(0);
-    public static implicit operator TransformedShape(nint handle) => new(handle);
-    public static bool operator ==(TransformedShape left, TransformedShape right) => left.Handle == right.Handle;
-    public static bool operator !=(TransformedShape left, TransformedShape right) => left.Handle != right.Handle;
-    public static bool operator ==(TransformedShape left, nint right) => left.Handle == right;
-    public static bool operator !=(TransformedShape left, nint right) => left.Handle != right;
-    public bool Equals(TransformedShape other) => Handle == other.Handle;
+    public TransformedShape(in Vector3 positionCOM, in Quaternion rotation, Shape? shape, in BodyID bodyID)
+    {
+        ShapePositionCOM = positionCOM;
+        ShapeRotation = rotation;
+        Shape = shape;
+        BodyID = bodyID;
+    }
 
-    /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is TransformedShape handle && Equals(handle);
+    public Vector3 ShapePositionCOM { get; set; }
+    public Quaternion ShapeRotation { get; set; }
+    public Shape? Shape { get; }
+    public BodyID BodyID { get; }
 
-    /// <inheritdoc/>
-    public override int GetHashCode() => Handle.GetHashCode();
+    public Vector3 ShapeScale { get; set; } = Vector3.One;
 
-    public BodyID ID => JPH_TransformedShape_GetBodyID(Handle);
-
-    public Vector3 ShapeScale
+    public readonly Matrix4x4 CenterOfMassTransform => Matrix4x4.CreateFromQuaternion(ShapeRotation) * Matrix4x4.CreateTranslation(ShapePositionCOM);
+    public readonly Matrix4x4 InverseCenterOfMassTransform
     {
         get
         {
-            JPH_TransformedShape_GetShapeScale(Handle, out Vector3 result);
+            _ = Matrix4x4.Invert(CenterOfMassTransform, out Matrix4x4 result);
             return result;
         }
-        set => JPH_TransformedShape_SetShapeScale(Handle, in value);
     }
 
-    #region GetCenterOfMassTransform
-    public Matrix4x4 GetCenterOfMassTransform()
+    public Matrix4x4 WorldTransform
     {
-        if (DoublePrecision)
+        readonly get
         {
-            JPH_TransformedShape_GetCenterOfMassTransform(Handle, out RMatrix4x4 dResult);
-            return (Matrix4x4)dResult;
+            Matrix4x4 transform = Matrix4x4.CreateScale(ShapeScale) * Matrix4x4.CreateFromQuaternion(ShapeRotation);
+            transform.Translation = ShapePositionCOM - Vector3.Transform(Shape.CenterOfMass, transform);
+            return transform;
         }
-
-        JPH_TransformedShape_GetCenterOfMassTransform(Handle, out Matrix4x4 result);
-        return result;
-    }
-
-    public void GetCenterOfMassTransform(out Matrix4x4 result)
-    {
-        if (DoublePrecision)
+        set
         {
-            JPH_TransformedShape_GetCenterOfMassTransform(Handle, out RMatrix4x4 dResult);
-            result = (Matrix4x4)dResult;
-            return;
+            Matrix4x4.Decompose(value, out Vector3 scale, out Quaternion rotation, out Vector3 translation);
+            SetWorldTransform(translation, rotation, scale);
         }
-
-        JPH_TransformedShape_GetCenterOfMassTransform(Handle, out result);
-    }
-
-    public RMatrix4x4 GetRCenterOfMassTransform()
-    {
-        if (!DoublePrecision)
-        {
-            JPH_TransformedShape_GetCenterOfMassTransform(Handle, out Matrix4x4 sResult);
-            return sResult;
-        }
-
-        JPH_TransformedShape_GetCenterOfMassTransform(Handle, out RMatrix4x4 result);
-        return result;
-    }
-
-    public void GetRCenterOfMassTransform(out RMatrix4x4 result)
-    {
-        if (!DoublePrecision)
-        {
-            JPH_TransformedShape_GetCenterOfMassTransform(Handle, out Matrix4x4 sResult);
-            result = sResult;
-            return;
-        }
-
-        JPH_TransformedShape_GetCenterOfMassTransform(Handle, out result);
-    }
-    #endregion
-
-
-    #region GetCenterOfMassTransform
-    public Matrix4x4 GetInverseCenterOfMassTransform()
-    {
-        if (DoublePrecision)
-        {
-            JPH_TransformedShape_GetInverseCenterOfMassTransform(Handle, out RMatrix4x4 dResult);
-            return (Matrix4x4)dResult;
-        }
-
-        JPH_TransformedShape_GetInverseCenterOfMassTransform(Handle, out Matrix4x4 result);
-        return result;
-    }
-
-    public void GetInverseCenterOfMassTransform(out Matrix4x4 result)
-    {
-        if (DoublePrecision)
-        {
-            JPH_TransformedShape_GetInverseCenterOfMassTransform(Handle, out RMatrix4x4 dResult);
-            result = (Matrix4x4)dResult;
-            return;
-        }
-
-        JPH_TransformedShape_GetInverseCenterOfMassTransform(Handle, out result);
-    }
-
-    public RMatrix4x4 GetRInverseCenterOfMassTransform()
-    {
-        if (!DoublePrecision)
-        {
-            JPH_TransformedShape_GetInverseCenterOfMassTransform(Handle, out Matrix4x4 sResult);
-            return sResult;
-        }
-
-        JPH_TransformedShape_GetInverseCenterOfMassTransform(Handle, out RMatrix4x4 result);
-        return result;
-    }
-
-    public void GetRInverseCenterOfMassTransform(out RMatrix4x4 result)
-    {
-        if (!DoublePrecision)
-        {
-            JPH_TransformedShape_GetInverseCenterOfMassTransform(Handle, out Matrix4x4 sResult);
-            result = sResult;
-            return;
-        }
-
-        JPH_TransformedShape_GetInverseCenterOfMassTransform(Handle, out result);
-    }
-    #endregion
-
-
-    #region GetWorldTransform
-    public Matrix4x4 GetWorldTransform()
-    {
-        if (DoublePrecision)
-            return (Matrix4x4)GetRWorldTransform();
-
-        JPH_TransformedShape_GetWorldTransform(Handle, out Matrix4x4 result);
-        return result;
-    }
-
-    public void GetWorldTransform(out Matrix4x4 result)
-    {
-        if (DoublePrecision)
-        {
-            JPH_TransformedShape_GetWorldTransform(Handle, out RMatrix4x4 dResult);
-            result = (Matrix4x4)dResult;
-            return;
-        }
-
-        JPH_TransformedShape_GetWorldTransform(Handle, out result);
-    }
-
-    public RMatrix4x4 GetRWorldTransform()
-    {
-        if (!DoublePrecision)
-            return GetWorldTransform();
-
-        JPH_TransformedShape_GetWorldTransform(Handle, out RMatrix4x4 result);
-        return result;
-    }
-
-    public void GetRWorldTransform(out RMatrix4x4 result)
-    {
-        if (!DoublePrecision)
-        {
-            JPH_TransformedShape_GetWorldTransform(Handle, out Matrix4x4 sResult);
-            result = sResult;
-            return;
-        }
-
-        JPH_TransformedShape_GetWorldTransform(Handle, out result);
-    }
-
-    public void SetWorldTransform(in Matrix4x4 result)
-    {
-        if (DoublePrecision)
-        {
-            JPH_TransformedShape_SetWorldTransform(Handle, (RMatrix4x4)result);
-            return;
-        }
-
-        JPH_TransformedShape_SetWorldTransform(Handle, in result);
-    }
-
-    public void SetWorldTransform(in RMatrix4x4 result)
-    {
-        if (!DoublePrecision)
-        {
-            JPH_TransformedShape_SetWorldTransform(Handle, (Matrix4x4)result);
-            return;
-        }
-
-        JPH_TransformedShape_SetWorldTransform(Handle, in result);
     }
 
     public void SetWorldTransform(in Vector3 position, in Quaternion rotation, in Vector3 scale)
     {
-        if (DoublePrecision)
-        {
-            JPH_TransformedShape_SetWorldTransform2(Handle, (Double3)position, rotation, scale);
-            return;
-        }
-
-        JPH_TransformedShape_SetWorldTransform2(Handle, in position, in rotation, in scale);
+        ShapePositionCOM = Vector3.Transform(position, rotation) * (scale * Shape.CenterOfMass);
+        ShapeRotation = rotation;
+        ShapeScale = scale;
     }
-
-    public void SetWorldTransform(in Double3 position, in Quaternion rotation, in Vector3 scale)
-    {
-        if (!DoublePrecision)
-        {
-            JPH_TransformedShape_SetWorldTransform2(Handle, (Vector3)position, rotation, scale);
-            return;
-        }
-
-        JPH_TransformedShape_SetWorldTransform2(Handle, in position, in rotation, in scale);
-    }
-    #endregion
 
     public BoundingBox WorldSpaceBounds
     {
         get
         {
-            JPH_TransformedShape_GetWorldSpaceBounds(Handle, out BoundingBox result);
-            return result;
+            if (Shape == null)
+                return default;
+
+            return Shape.GetWorldSpaceBounds(CenterOfMassTransform, ShapeScale);
         }
     }
 
     public void GetWorldSpaceBounds(out BoundingBox bounds)
     {
-        JPH_TransformedShape_GetWorldSpaceBounds(Handle, out bounds);
+        if (Shape == null)
+        {
+            bounds = default;
+            return;
+        }
+
+        Shape.GetWorldSpaceBounds(CenterOfMassTransform, ShapeScale, out bounds);
     }
 
     public void GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Vector3 position, out Vector3 normal)
     {
-        if (DoublePrecision)
-        {
-            JPH_TransformedShape_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, new Double3(in position), out normal);
-        }
-        else
-        {
-            JPH_TransformedShape_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in position, out normal);
-        }
+        // MakeSubShapeIDRelativeToShape?
+        Matrix4x4 inv_com = InverseCenterOfMassTransform;
+        Vector3 shapePosition = Vector3.Transform(position, inv_com) / ShapeScale;
+        Shape!.GetSurfaceNormal(subShapeID, in shapePosition, out normal);
+
+        // return inv_com.Multiply3x3Transposed(mShape->GetSurfaceNormal(MakeSubShapeIDRelativeToShape(inSubShapeID), Vec3(inv_com * inPosition) / scale) / scale).Normalized();
+        normal = Vector3.Normalize(Vector3.Transform(normal / ShapeScale, Matrix4x4.Transpose(inv_com)));
     }
 
     public Vector3 GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Vector3 position)
     {
-        if (DoublePrecision)
-        {
-            JPH_TransformedShape_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, new Double3(in position), out Vector3 normal);
-            return normal;
-        }
-        else
-        {
-            JPH_TransformedShape_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in position, out Vector3 normal);
-            return normal;
-        }
-    }
-
-    public void GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Double3 position, out Vector3 normal)
-    {
-        if (!DoublePrecision)
-        {
-            Vector3 sPosition = (Vector3)position;
-            JPH_TransformedShape_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in sPosition, out normal);
-        }
-        else
-        {
-            JPH_TransformedShape_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in position, out normal);
-        }
-    }
-
-    public Vector3 GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Double3 position)
-    {
-        if (!DoublePrecision)
-        {
-            Vector3 sPosition = (Vector3)position;
-            JPH_TransformedShape_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in sPosition, out Vector3 normal);
-            return normal;
-
-        }
-        else
-        {
-            JPH_TransformedShape_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, in position, out Vector3 normal);
-            return normal;
-        }
+        GetWorldSpaceSurfaceNormal(in subShapeID, in position, out Vector3 result);
+        return result;
     }
 
     #region CastRay
     public bool CastRay(in Ray ray, out RayCastResult hit)
     {
-        if (DoublePrecision)
-            return JPH_TransformedShape_CastRay(Handle, new Double3(in ray.Position), in ray.Direction, out hit);
+        if (Shape == null)
+        {
+            hit = default;
+            return false;
+        }
 
-        return JPH_TransformedShape_CastRay(Handle, in ray.Position, in ray.Direction, out hit);
+        // Transform the ray to local space, note that this drops precision which is possible because we're in local space now
+        Ray newRay = Ray.Transform(in ray, InverseCenterOfMassTransform);
+
+        // Scale the ray
+        Vector3 inv_scale = new Vector3(1.0f) / ShapeScale;
+        newRay.Position *= inv_scale;
+        newRay.Direction *= inv_scale;
+
+        // Cast the ray on the shape
+        //SubShapeIDCreator sub_shape_id(mSubShapeIDCreator);
+        if (Shape.CastRay(newRay, out hit))
+        {
+            // Set body ID on the hit result
+            hit.BodyID = BodyID;
+
+            return true;
+        }
+
+        return false;
     }
 
     public bool CastRay(
@@ -313,36 +132,57 @@ public readonly unsafe struct TransformedShape : IEquatable<TransformedShape>
         ICollection<RayCastResult> results,
         ShapeFilter? shapeFilter = default)
     {
-        GCHandle callbackHandle = GCHandle.Alloc(results);
-        bool callbackResult;
+        if (Shape == null)
+            return false;
 
-        if (DoublePrecision)
+        if (shapeFilter != null)
         {
-            callbackResult = JPH_TransformedShape_CastRay2(Handle,
-                new Double3(in ray.Position), in ray.Direction,
-                &settings,
-                collectorType, &OnCastRayResultCallback, GCHandle.ToIntPtr(callbackHandle),
-                shapeFilter?.Handle ?? 0);
-        }
-        else
-        {
-            callbackResult = JPH_TransformedShape_CastRay2(Handle,
-                in ray.Position, in ray.Direction,
-                &settings,
-                collectorType, &OnCastRayResultCallback, GCHandle.ToIntPtr(callbackHandle),
-                shapeFilter?.Handle ?? 0);
+            shapeFilter.BodyID2 = BodyID;
         }
 
-        callbackHandle.Free();
-        return callbackResult;
-    }
+        // Transform the ray to local space, note that this drops precision which is possible because we're in local space now
+        Ray newRay = Ray.Transform(in ray, InverseCenterOfMassTransform);
 
-    [UnmanagedCallersOnly]
-    private static unsafe void OnCastRayResultCallback(nint userData, RayCastResult* result)
-    {
-        ICollection<RayCastResult> collection = (ICollection<RayCastResult>)GCHandle.FromIntPtr(userData).Target!;
-        collection.Add(*result);
+        // Scale the ray
+        Vector3 inv_scale = new Vector3(1.0f) / ShapeScale;
+        newRay.Position *= inv_scale;
+        newRay.Direction *= inv_scale;
+
+        return Shape.CastRay(in newRay, in settings, collectorType, results, shapeFilter);
+
     }
     #endregion
 
+    public bool CollidePoint(in Vector3 point, ShapeFilter? shapeFilter = default)
+    {
+        if (Shape == null)
+            return false;
+
+        if (shapeFilter != null)
+        {
+            shapeFilter.BodyID2 = BodyID;
+        }
+
+        // Transform and scale the point to local space
+        Vector3 shapePoint = Vector3.Transform(point, InverseCenterOfMassTransform) / ShapeScale;
+
+        // Do point collide on the shape
+        return Shape!.CollidePoint(in shapePoint, shapeFilter);
+    }
+
+    public bool CollidePoint(in Vector3 point, CollisionCollectorType collectorType, ICollection<CollidePointResult> result, ShapeFilter? shapeFilter = default)
+    {
+        if (Shape == null)
+            return false;
+
+        if (shapeFilter != null)
+        {
+            shapeFilter.BodyID2 = BodyID;
+        }
+
+        // Transform and scale the point to local space
+        Vector3 shapePoint = Vector3.Transform(point, InverseCenterOfMassTransform) / ShapeScale;
+
+        return Shape!.CollidePoint(in shapePoint, collectorType, result, shapeFilter);
+    }
 }

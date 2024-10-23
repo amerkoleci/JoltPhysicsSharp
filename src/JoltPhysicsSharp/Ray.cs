@@ -10,19 +10,19 @@ namespace JoltPhysicsSharp;
 /// <summary>
 /// Defines a ray.
 /// </summary>
-public readonly struct Ray
+public struct Ray
     : IEquatable<Ray>
     , IFormattable
 {
     /// <summary>
     /// The position (origin) in three dimensional space where the ray starts.
     /// </summary>
-    public readonly Vector3 Position;
+    public Vector3 Position;
 
     /// <summary>
     /// The normalized direction in which the ray points.
     /// </summary>
-    public readonly Vector3 Direction;
+    public Vector3 Direction;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Ray"/> struct.
@@ -60,10 +60,10 @@ public readonly struct Ray
     /// </summary>
     /// <param name="transform"></param>
     /// <returns></returns>
-	public Ray Transformed(in Matrix4x4 transform)
+	public static Ray Transform(in Ray ray, in Matrix4x4 transform)
     {
-        Vector3 rayOrigin = Vector3.Transform(Position, transform);
-        Vector3 rayDirection = (Vector3.Transform(Position + Direction, transform) - rayOrigin);
+        Vector3 rayOrigin = Vector3.Transform(ray.Position, transform);
+        Vector3 rayDirection = Vector3.Transform(ray.Position + ray.Direction, transform) - rayOrigin;
         return new(rayOrigin, rayDirection);
     }
 

@@ -499,7 +499,9 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
 
     public TransformedShape GetTransformedShape()
     {
-        return JPH_Body_GetTransformedShape(Handle);
+        // JPH_ASSERT(BodyAccess::sCheckRights(BodyAccess::sPositionAccess(), BodyAccess::EAccess::Read)); 
+        // return TransformedShape(mPosition, mRotation, mShape, mID);
+        return new TransformedShape(CenterOfMassPosition, Rotation, GetShape(), ID);
     }
 
     public void AddForce(in Vector3 force)
