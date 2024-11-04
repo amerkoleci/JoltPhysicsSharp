@@ -11,7 +11,7 @@
 
   <!-- Version -->
   <PropertyGroup>
-    <VersionPrefix>2.10.1</VersionPrefix>
+    <VersionPrefix>2.10.2</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
   </PropertyGroup>
 
@@ -47,7 +47,7 @@
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)linux-arm64\libjoltc.so">
-      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <PackagePath>runtimes\linux-arm64\native</PackagePath>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
