@@ -6,11 +6,12 @@
     <PackageTags>physics standard game gamedev jolt</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IsPackable>true</IsPackable>
+    <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
 
   <!-- Version -->
   <PropertyGroup>
-    <VersionPrefix>2.10.0</VersionPrefix>
+    <VersionPrefix>2.10.1</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
   </PropertyGroup>
 

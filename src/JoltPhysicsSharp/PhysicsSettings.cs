@@ -5,6 +5,7 @@ namespace JoltPhysicsSharp;
 
 public record struct PhysicsSettings
 {
+
     public int MaxInFlightBodyPairs;
     public int StepListenersBatchSize;
     public int StepListenerBatchesPerJob;

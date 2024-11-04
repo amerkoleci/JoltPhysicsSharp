@@ -28,6 +28,16 @@ public static class Foundation
     /// </summary>
     public const float CapsuleProjectionSlop = 0.02f;
 
+    /// <summary>
+    /// Maximum amount of jobs to allow
+    /// </summary>
+    public const int MaxPhysicsJobs = 2048;
+
+    /// <summary>
+    /// Maximum amount of barriers to allow
+    /// </summary>
+    public const int MaxPhysicsBarriers = 8;
+
     public static bool Init(bool doublePrecision = false)
     {
         JoltApi.DoublePrecision = doublePrecision;

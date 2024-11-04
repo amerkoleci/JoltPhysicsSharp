@@ -17,13 +17,14 @@ using unsafe JPH_CollidePointResultCallback = delegate* unmanaged<nint, CollideP
 using unsafe JPH_CollideShapeResultCallback = delegate* unmanaged<nint, CollideShapeResult*, void>;
 using unsafe JPH_CastShapeResultCallback = delegate* unmanaged<nint, ShapeCastResult*, void>;
 
-public delegate float RayCastBodyCollector(nint userData, in BroadPhaseCastResult result);
-public delegate void CollideShapeBodyCollector(nint userData, in BodyID result);
+using unsafe JPH_RayCastBodyCollector = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
+//public delegate float RayCastBodyCollector(nint userData, in BroadPhaseCastResult result);
+using unsafe JPH_CollideShapeBodyCollector = delegate* unmanaged<nint, BodyID*, float>;
 
-public delegate float CastRayCollector(nint userData, in RayCastResult result);
-public delegate float CollidePointCollector(nint userData, in CollidePointResult result);
-public delegate float CollideShapeCollector(nint userData, in CollidePointResult result);
-public delegate float CastShapeCollector(nint userData, in ShapeCastResult result);
+using unsafe JPH_CastRayCollector = delegate* unmanaged<nint, RayCastResult*, float>;
+using unsafe JPH_CollidePointCollector = delegate* unmanaged<nint, CollidePointResult*, float>;
+using unsafe JPH_CollideShapeCollector = delegate* unmanaged<nint, CollideShapeResult*, float>;
+using unsafe JPH_CastShapeCollector = delegate* unmanaged<nint, ShapeCastResult*, float>;
 
 internal static unsafe partial class JoltApi
 {
@@ -147,6 +148,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_SetAssertFailureHandler(delegate* unmanaged<byte*, byte*, byte*, uint, Bool8> callback);
 
     // JobSystem
+#pragma warning disable CS0649
     public struct JPH_JobSystemConfig
     {
         public nint context;
@@ -155,6 +157,7 @@ internal static unsafe partial class JoltApi
         public uint maxConcurrency;
         public uint maxBarriers;
     }
+#pragma warning restore CS0649
 
     [LibraryImport(LibName)]
     public static partial nint JPH_JobSystemThreadPool_Create(JobSystemThreadPoolConfig* config);
@@ -1511,7 +1514,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CastRay(nint query,
         in Vector3 origin, in Vector3 direction,
-        RayCastBodyCollector callback,
+        JPH_RayCastBodyCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
@@ -1520,7 +1523,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollideAABox(nint query,
         in BoundingBox box,
-        CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
@@ -1529,7 +1532,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollideSphere(nint query,
         in Vector3 center, float radius,
-        CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
@@ -1538,7 +1541,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollidePoint(nint query,
         in Vector3 point,
-        CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
@@ -1568,7 +1571,7 @@ internal static unsafe partial class JoltApi
     public static partial bool JPH_NarrowPhaseQuery_CastRay2(nint system,
         in Vector3 origin, in Vector3 direction,
         RayCastSettings* rayCastSettings,
-        CastRayCollector callback,
+        JPH_CastRayCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
@@ -1580,7 +1583,7 @@ internal static unsafe partial class JoltApi
     public static partial bool JPH_NarrowPhaseQuery_CastRay2(nint system,
         in Double3 origin, in Vector3 direction,
         RayCastSettings* rayCastSettings,
-        CastRayCollector callback,
+        JPH_CastRayCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
@@ -1615,7 +1618,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_NarrowPhaseQuery_CollidePoint(nint query,
         in Vector3 point,
-        CollidePointCollector callback,
+        JPH_CollidePointCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
@@ -1627,7 +1630,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_NarrowPhaseQuery_CollidePoint(nint query,
         in Double3 point,
-        CollidePointCollector callback,
+        JPH_CollidePointCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
@@ -1667,7 +1670,7 @@ internal static unsafe partial class JoltApi
         nint shape, in Vector3 scale, in Matrix4x4 centerOfMassTransform,
         JPH_CollideShapeSettings* settings,
         in Vector3 baseOffset,
-        CollideShapeCollector callback,
+        JPH_CollideShapeCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
@@ -1681,7 +1684,7 @@ internal static unsafe partial class JoltApi
         nint shape, in Vector3 scale, in RMatrix4x4 centerOfMassTransform,
         JPH_CollideShapeSettings* settings,
         in Double3 baseOffset,
-        CollideShapeCollector callback,
+        JPH_CollideShapeCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
@@ -1726,7 +1729,7 @@ internal static unsafe partial class JoltApi
         in Matrix4x4 worldTransform, in Vector3 direction,
         JPH_ShapeCastSettings* settings,
         in Vector3 baseOffset,
-        CastShapeCollector callback, nint userData,
+        JPH_CastShapeCollector callback, nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,
         nint bodyFilter,
@@ -1740,7 +1743,7 @@ internal static unsafe partial class JoltApi
         in RMatrix4x4 worldTransform, in Vector3 direction,
         JPH_ShapeCastSettings* settings,
         in Double3 baseOffset,
-        CastShapeCollector callback,
+        JPH_CastShapeCollector callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter,

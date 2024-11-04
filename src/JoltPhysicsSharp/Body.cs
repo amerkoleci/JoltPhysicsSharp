@@ -501,7 +501,7 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     {
         // JPH_ASSERT(BodyAccess::sCheckRights(BodyAccess::sPositionAccess(), BodyAccess::EAccess::Read)); 
         // return TransformedShape(mPosition, mRotation, mShape, mID);
-        return new TransformedShape(CenterOfMassPosition, Rotation, GetShape(), ID);
+        return new TransformedShape(CenterOfMassPosition, Rotation, Shape, ID);
     }
 
     public void AddForce(in Vector3 force)
@@ -629,7 +629,17 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     public bool IsInBroadPhase => JPH_Body_IsInBroadPhase(Handle);
     public bool IsCollisionCacheInvalid => JPH_Body_IsCollisionCacheInvalid(Handle);
 
-    public Shape? GetShape() => Shape.GetObject(JPH_Body_GetShape(Handle));
+    public Shape Shape
+    {
+        get
+        {
+            nint shapeHandle = JPH_Body_GetShape(Handle);
+            if (shapeHandle == 0)
+                throw new InvalidOperationException("Invalid body shape");
+
+            return Shape.GetObject(shapeHandle)!;
+        }
+    }
 
     public ulong GetUserData()
     {

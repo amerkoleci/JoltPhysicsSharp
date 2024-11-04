@@ -2,14 +2,12 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
-using System.Runtime.InteropServices;
-using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
 public unsafe record struct TransformedShape
 {
-    public TransformedShape(in Vector3 positionCOM, in Quaternion rotation, Shape? shape, in BodyID bodyID)
+    public TransformedShape(in Vector3 positionCOM, in Quaternion rotation, Shape shape, in BodyID bodyID)
     {
         ShapePositionCOM = positionCOM;
         ShapeRotation = rotation;
@@ -19,7 +17,7 @@ public unsafe record struct TransformedShape
 
     public Vector3 ShapePositionCOM { get; set; }
     public Quaternion ShapeRotation { get; set; }
-    public Shape? Shape { get; }
+    public Shape Shape { get; }
     public BodyID BodyID { get; }
 
     public Vector3 ShapeScale { get; set; } = Vector3.One;
@@ -56,54 +54,33 @@ public unsafe record struct TransformedShape
         ShapeScale = scale;
     }
 
-    public BoundingBox WorldSpaceBounds
+    public readonly BoundingBox WorldSpaceBounds => Shape.GetWorldSpaceBounds(CenterOfMassTransform, ShapeScale);
+
+    public readonly void GetWorldSpaceBounds(out BoundingBox bounds)
     {
-        get
-        {
-            if (Shape == null)
-                return default;
-
-            return Shape.GetWorldSpaceBounds(CenterOfMassTransform, ShapeScale);
-        }
-    }
-
-    public void GetWorldSpaceBounds(out BoundingBox bounds)
-    {
-        if (Shape == null)
-        {
-            bounds = default;
-            return;
-        }
-
         Shape.GetWorldSpaceBounds(CenterOfMassTransform, ShapeScale, out bounds);
     }
 
-    public void GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Vector3 position, out Vector3 normal)
+    public readonly void GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Vector3 position, out Vector3 normal)
     {
         // MakeSubShapeIDRelativeToShape?
         Matrix4x4 inv_com = InverseCenterOfMassTransform;
         Vector3 shapePosition = Vector3.Transform(position, inv_com) / ShapeScale;
-        Shape!.GetSurfaceNormal(subShapeID, in shapePosition, out normal);
+        Shape.GetSurfaceNormal(subShapeID, in shapePosition, out normal);
 
         // return inv_com.Multiply3x3Transposed(mShape->GetSurfaceNormal(MakeSubShapeIDRelativeToShape(inSubShapeID), Vec3(inv_com * inPosition) / scale) / scale).Normalized();
         normal = Vector3.Normalize(Vector3.Transform(normal / ShapeScale, Matrix4x4.Transpose(inv_com)));
     }
 
-    public Vector3 GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Vector3 position)
+    public readonly Vector3 GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Vector3 position)
     {
         GetWorldSpaceSurfaceNormal(in subShapeID, in position, out Vector3 result);
         return result;
     }
 
     #region CastRay
-    public bool CastRay(in Ray ray, out RayCastResult hit)
+    public readonly bool CastRay(in Ray ray, out RayCastResult hit)
     {
-        if (Shape == null)
-        {
-            hit = default;
-            return false;
-        }
-
         // Transform the ray to local space, note that this drops precision which is possible because we're in local space now
         Ray newRay = Ray.Transform(in ray, InverseCenterOfMassTransform);
 
@@ -125,16 +102,13 @@ public unsafe record struct TransformedShape
         return false;
     }
 
-    public bool CastRay(
+    public readonly bool CastRay(
         in Ray ray,
         RayCastSettings settings,
         CollisionCollectorType collectorType,
         ICollection<RayCastResult> results,
         ShapeFilter? shapeFilter = default)
     {
-        if (Shape == null)
-            return false;
-
         if (shapeFilter != null)
         {
             shapeFilter.BodyID2 = BodyID;
@@ -153,11 +127,8 @@ public unsafe record struct TransformedShape
     }
     #endregion
 
-    public bool CollidePoint(in Vector3 point, ShapeFilter? shapeFilter = default)
+    public readonly bool CollidePoint(in Vector3 point, ShapeFilter? shapeFilter = default)
     {
-        if (Shape == null)
-            return false;
-
         if (shapeFilter != null)
         {
             shapeFilter.BodyID2 = BodyID;
@@ -170,11 +141,8 @@ public unsafe record struct TransformedShape
         return Shape!.CollidePoint(in shapePoint, shapeFilter);
     }
 
-    public bool CollidePoint(in Vector3 point, CollisionCollectorType collectorType, ICollection<CollidePointResult> result, ShapeFilter? shapeFilter = default)
+    public readonly bool CollidePoint(in Vector3 point, CollisionCollectorType collectorType, ICollection<CollidePointResult> result, ShapeFilter? shapeFilter = default)
     {
-        if (Shape == null)
-            return false;
-
         if (shapeFilter != null)
         {
             shapeFilter.BodyID2 = BodyID;

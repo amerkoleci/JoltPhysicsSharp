@@ -5,6 +5,10 @@ using System.Numerics;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
+
+using unsafe JPH_RayCastBodyCollector = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
+using unsafe JPH_CollideShapeBodyCollector = delegate* unmanaged<nint, BodyID*, float>;
+
 public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
 {
     public BroadPhaseQuery(nint handle) { Handle = handle; }
@@ -24,10 +28,10 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
     /// <inheritdoc/>
     public override int GetHashCode() => Handle.GetHashCode();
 
-    public bool CastRay(
+    public unsafe bool CastRay(
         in Ray ray,
         Memory<BroadPhaseCastResult> results,
-        RayCastBodyCollector callback,
+        JPH_RayCastBodyCollector callback,
         nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
@@ -39,9 +43,9 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
             objectLayerFilter?.Handle ?? 0);
     }
 
-    public bool CollideAABox(
+    public unsafe bool CollideAABox(
         in BoundingBox box,
-        CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollector callback,
         nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
@@ -53,9 +57,9 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
             objectLayerFilter?.Handle ?? 0);
     }
 
-    public bool CollideSphere(
+    public unsafe bool CollideSphere(
         in BoundingSphere sphere,
-        CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollector callback,
         nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
@@ -69,7 +73,7 @@ public readonly struct BroadPhaseQuery : IEquatable<BroadPhaseQuery>
 
     public unsafe bool CollidePoint(
         in Vector3 point,
-        CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollector callback,
         nint userData = 0,
         BroadPhaseLayerFilter? broadPhaseFilter = default,
         ObjectLayerFilter? objectLayerFilter = default)
