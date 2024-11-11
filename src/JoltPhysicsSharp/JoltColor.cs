@@ -16,11 +16,8 @@ namespace JoltPhysicsSharp;
 /// </summary>
 /// <remarks>Equivalent of XMUBYTEN4.</remarks>
 [StructLayout(LayoutKind.Explicit)]
-public readonly struct Color : IEquatable<Color>
+public readonly struct JoltColor : IEquatable<JoltColor>
 {
-    [FieldOffset(0)]
-    private readonly uint _packedValue;
-
     /// <summary>
     /// The red component of the color.
     /// </summary>
@@ -48,34 +45,35 @@ public readonly struct Color : IEquatable<Color>
     /// <summary>
     /// Gets or Sets the current color as a packed value.
     /// </summary>
-    public uint PackedValue => _packedValue;
+    [field: FieldOffset(0)]
+    public uint PackedValue { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Color"/> struct.
+    /// Initializes a new instance of the <see cref="JoltColor"/> struct.
     /// </summary>
     /// <param name="packedValue">The packed value to assign.</param>
-    public Color(uint packedValue)
+    public JoltColor(uint packedValue)
     {
-        _packedValue = packedValue;
+        PackedValue = packedValue;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Color"/> struct.
+    /// Initializes a new instance of the <see cref="JoltColor"/> struct.
     /// </summary>
     /// <param name="value">The value that will be assigned to all components.</param>
-    public Color(float value)
+    public JoltColor(float value)
         : this(value, value, value, value)
     {
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Color"/> struct.
+    /// Initializes a new instance of the <see cref="JoltColor"/> struct.
     /// </summary>
     /// <param name="r">Red component.</param>
     /// <param name="g">Green component.</param>
     /// <param name="b">Blue component.</param>
     /// <param name="a">Alpha component.</param>
-    public Color(float r, float g, float b, float a = 1.0f)
+    public JoltColor(float r, float g, float b, float a = 1.0f)
     {
         Vector128<float> result = Saturate(Vector128.Create(r, g, b, a));
         result = Vector128.Multiply(result, /*UByteMax*/ Vector128.Create(255.0f, 255.0f, 255.0f, 255.0f));
@@ -88,13 +86,13 @@ public readonly struct Color : IEquatable<Color>
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Color"/> struct.  Passed values are clamped within byte range.
+    /// Initializes a new instance of the <see cref="JoltColor"/> struct.  Passed values are clamped within byte range.
     /// </summary>
     /// <param name="red">The red component of the color.</param>
     /// <param name="green">The green component of the color.</param>
     /// <param name="blue">The blue component of the color.</param>
     /// <param name="alpha">The alpha component of the color</param>
-    public Color(int red, int green, int blue, int alpha = 255)
+    public JoltColor(int red, int green, int blue, int alpha = 255)
     {
         R = ToByte(red);
         G = ToByte(green);
@@ -103,20 +101,20 @@ public readonly struct Color : IEquatable<Color>
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Color"/> struct.
+    /// Initializes a new instance of the <see cref="JoltColor"/> struct.
     /// </summary>
     /// <param name="vector">The red, green, and blue components of the color.</param>
     /// <param name="alpha">The alpha component of the color.</param>
-    public Color(in Vector3 vector, float alpha = 1.0f)
+    public JoltColor(in Vector3 vector, float alpha = 1.0f)
         : this(vector.X, vector.Y, vector.Z, alpha)
     {
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Color"/> struct.
+    /// Initializes a new instance of the <see cref="JoltColor"/> struct.
     /// </summary>
     /// <param name="vector">A four-component color.</param>
-    public Color(Vector4 vector)
+    public JoltColor(Vector4 vector)
         : this(vector.X, vector.Y, vector.Z, vector.W)
     {
     }
@@ -206,57 +204,74 @@ public readonly struct Color : IEquatable<Color>
         return new(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
     }
 
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Color"/> to <see cref="Vector4"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Vector4(Color value) => value.ToVector4();
+    /// Get grayscale intensity of color
+	public byte GetIntensity() => (byte)((R * 54 + G * 183 + B * 19) >> 8);
 
     /// <summary>
-    /// Performs an explicit conversion from <see cref="Vector3"/> to <see cref="Color"/>.
+    /// Performs an implicit conversion from <see cref="JoltColor"/> to <see cref="System.Drawing.Color"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static explicit operator Color(in Vector3 value) => new(value.X, value.Y, value.Z, 1.0f);
+    public static implicit operator System.Drawing.Color(JoltColor value) => System.Drawing.Color.FromArgb(value.A, value.R, value.G, value.B);
 
     /// <summary>
-    /// Performs an explicit conversion from <see cref="Vector4"/> to <see cref="Color"/>.
+    /// Performs an explicit conversion from <see cref="System.Drawing.Color"/> to <see cref="JoltColor"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static explicit operator Color(in Vector4 value) => new(value.X, value.Y, value.Z, value.W);
+    public static explicit operator JoltColor(in System.Drawing.Color value) => new(value.R, value.G, value.B, value.A);
 
     /// <summary>
-    /// Performs an explicit conversion from <see cref="Color"/> to <see cref="int"/>.
+    /// Performs an implicit conversion from <see cref="JoltColor"/> to <see cref="Vector4"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static explicit operator int(in Color value) => value.ToRgba();
+    public static implicit operator Vector4(JoltColor value) => value.ToVector4();
 
     /// <summary>
-    /// Performs an explicit conversion from <see cref="int"/> to <see cref="Color"/>.
+    /// Performs an explicit conversion from <see cref="Vector3"/> to <see cref="JoltColor"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static explicit operator Color(int value) => new(value);
+    public static explicit operator JoltColor(in Vector3 value) => new(value.X, value.Y, value.Z, 1.0f);
 
     /// <summary>
-    /// Performs an explicit conversion from <see cref="int"/> to <see cref="Color"/>.
+    /// Performs an explicit conversion from <see cref="Vector4"/> to <see cref="JoltColor"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator Color(uint value) => new(value);
+    public static explicit operator JoltColor(in Vector4 value) => new(value.X, value.Y, value.Z, value.W);
+
+    /// <summary>
+    /// Performs an explicit conversion from <see cref="JoltColor"/> to <see cref="int"/>.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The result of the conversion.</returns>
+    public static explicit operator int(in JoltColor value) => value.ToRgba();
+
+    /// <summary>
+    /// Performs an explicit conversion from <see cref="int"/> to <see cref="JoltColor"/>.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The result of the conversion.</returns>
+    public static explicit operator JoltColor(int value) => new(value);
+
+    /// <summary>
+    /// Performs an explicit conversion from <see cref="int"/> to <see cref="JoltColor"/>.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The result of the conversion.</returns>
+    public static implicit operator JoltColor(uint value) => new(value);
 
     /// <inheritdoc/>
-    public override bool Equals([NotNullWhen(true)] object? obj) => obj is Color color && Equals(color);
+    public override bool Equals([NotNullWhen(true)] object? obj) => obj is JoltColor color && Equals(color);
 
     /// <summary>
-    /// Determines whether the specified <see cref="Color"/> is equal to this instance.
+    /// Determines whether the specified <see cref="JoltColor"/> is equal to this instance.
     /// </summary>
-    /// <param name="other">The <see cref="Color"/> to compare with this instance.</param>
+    /// <param name="other">The <see cref="JoltColor"/> to compare with this instance.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Color other)
+    public bool Equals(JoltColor other)
     {
         return R == other.R
             && G == other.G
@@ -265,26 +280,26 @@ public readonly struct Color : IEquatable<Color>
     }
 
     /// <summary>
-    /// Compares two <see cref="Color"/> objects for equality.
+    /// Compares two <see cref="JoltColor"/> objects for equality.
     /// </summary>
-    /// <param name="left">The <see cref="Color"/> on the left hand of the operand.</param>
-    /// <param name="right">The <see cref="Color"/> on the right hand of the operand.</param>
+    /// <param name="left">The <see cref="JoltColor"/> on the left hand of the operand.</param>
+    /// <param name="right">The <see cref="JoltColor"/> on the right hand of the operand.</param>
     /// <returns>
     /// True if the current left is equal to the <paramref name="right"/> parameter; otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Color left, Color right) => left.Equals(right);
+    public static bool operator ==(JoltColor left, JoltColor right) => left.Equals(right);
 
     /// <summary>
-    /// Compares two <see cref="Color"/> objects for inequality.
+    /// Compares two <see cref="JoltColor"/> objects for inequality.
     /// </summary>
-    /// <param name="left">The <see cref="Color"/> on the left hand of the operand.</param>
-    /// <param name="right">The <see cref="Color"/> on the right hand of the operand.</param>
+    /// <param name="left">The <see cref="JoltColor"/> on the left hand of the operand.</param>
+    /// <param name="right">The <see cref="JoltColor"/> on the right hand of the operand.</param>
     /// <returns>
     /// True if the current left is unequal to the <paramref name="right"/> parameter; otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Color left, Color right) => !left.Equals(right);
+    public static bool operator !=(JoltColor left, JoltColor right) => !left.Equals(right);
 
     /// <inheritdoc/>
     public override int GetHashCode() => PackedValue.GetHashCode();

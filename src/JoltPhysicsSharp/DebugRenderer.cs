@@ -64,29 +64,29 @@ public abstract class DebugRenderer : NativeObject
 
     public void NextFrame() => JPH_DebugRenderer_NextFrame(Handle);
 
-    public void DrawWireBox(in BoundingBox box, Color color)
+    public void DrawWireBox(in BoundingBox box, JoltColor color)
     {
         JPH_DebugRenderer_DrawWireBox(Handle, in box, color.PackedValue);
     }
 
-    public void DrawWireBox(in Matrix4x4 matrix, in BoundingBox box, Color color)
+    public void DrawWireBox(in Matrix4x4 matrix, in BoundingBox box, JoltColor color)
     {
         JPH_DebugRenderer_DrawWireBox2(Handle, matrix, in box, color.PackedValue);
     }
 
-    public void DrawWireBox(in RMatrix4x4 matrix, in BoundingBox box, Color color)
+    public void DrawWireBox(in RMatrix4x4 matrix, in BoundingBox box, JoltColor color)
     {
         JPH_DebugRenderer_DrawWireBox2(Handle, matrix, in box, color.PackedValue);
     }
 
-    protected abstract void DrawLine(Vector3 from, Vector3 to, Color color);
+    protected abstract void DrawLine(Vector3 from, Vector3 to, JoltColor color);
 
-    protected virtual void DrawTriangle(Vector3 v1, Vector3 v2, Vector3 v3, Color color, CastShadow castShadow = CastShadow.Off)
+    protected virtual void DrawTriangle(Vector3 v1, Vector3 v2, Vector3 v3, JoltColor color, CastShadow castShadow = CastShadow.Off)
     {
 
     }
 
-    protected abstract void DrawText3D(Vector3 position, string? text, Color color, float height = 0.5f);
+    protected abstract void DrawText3D(Vector3 position, string? text, JoltColor color, float height = 0.5f);
 
     #region DebugRendererListener
     [UnmanagedCallersOnly]

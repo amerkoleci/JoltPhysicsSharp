@@ -7,7 +7,7 @@ namespace JoltPhysicsSharp;
 
 public class PhysicsMaterial : NativeObject
 {
-    public PhysicsMaterial(string name, in Color color)
+    public PhysicsMaterial(string name, in JoltColor color)
         : base(JPH_PhysicsMaterial_Create(name, color.PackedValue))    
     {
     }
