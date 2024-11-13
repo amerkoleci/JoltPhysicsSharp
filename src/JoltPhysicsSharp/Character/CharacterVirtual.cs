@@ -172,25 +172,60 @@ public sealed class CharacterVirtual : CharacterBase
         get => JPH_CharacterVirtual_GetMaxHitsExceeded(Handle);
     }
 
+    public Vector3 ShapeOffset
+    {
+        get
+        {
+            JPH_CharacterVirtual_GetShapeOffset(Handle, out Vector3 result);
+            return result;
+        }
+        set => JPH_CharacterVirtual_SetShapeOffset(Handle, in value);
+    }
+
     public ulong UserData
     {
         get => JPH_CharacterVirtual_GetUserData(Handle);
         set => JPH_CharacterVirtual_SetUserData(Handle, value);
     }
 
-    public void Update(float deltaTime, in ObjectLayer layer, PhysicsSystem physicsSystem)
+    public BodyID InnerBodyID
     {
-        JPH_CharacterVirtual_Update(Handle, deltaTime, layer.Value, physicsSystem.Handle);
+        get => JPH_CharacterVirtual_GetInnerBodyID(Handle);
     }
 
-    public unsafe void ExtendedUpdate(float deltaTime, ExtendedUpdateSettings settings, in ObjectLayer layer, PhysicsSystem physicsSystem)
+    public void Update(float deltaTime, in ObjectLayer layer, PhysicsSystem physicsSystem,
+        BodyFilter? bodyFilter = default, ShapeFilter? shapeFilter = default)
     {
-        JPH_CharacterVirtual_ExtendedUpdate(Handle, deltaTime, &settings, layer.Value, physicsSystem.Handle);
+        JPH_CharacterVirtual_Update(Handle, deltaTime, layer.Value, physicsSystem.Handle,
+            bodyFilter?.Handle ?? 0,
+            shapeFilter?.Handle ?? 0);
     }
 
-    public void RefreshContacts(in ObjectLayer layer, PhysicsSystem physicsSystem)
+    public unsafe void ExtendedUpdate(float deltaTime,
+        ExtendedUpdateSettings settings,
+        in ObjectLayer layer,
+        PhysicsSystem physicsSystem,
+        BodyFilter? bodyFilter = default,
+        ShapeFilter? shapeFilter = default)
     {
-        JPH_CharacterVirtual_RefreshContacts(Handle, layer.Value, physicsSystem.Handle);
+        JPH_CharacterVirtual_ExtendedUpdate(Handle, deltaTime,
+            &settings,
+            layer.Value,
+            physicsSystem.Handle,
+            bodyFilter?.Handle ?? 0,
+            shapeFilter?.Handle ?? 0);
+    }
+
+    public void RefreshContacts(in ObjectLayer layer,
+        PhysicsSystem physicsSystem,
+        BodyFilter? bodyFilter = default,
+        ShapeFilter? shapeFilter = default)
+    {
+        JPH_CharacterVirtual_RefreshContacts(Handle,
+            layer.Value,
+            physicsSystem.Handle,
+            bodyFilter?.Handle ?? 0,
+            shapeFilter?.Handle ?? 0);
     }
 
     public Vector3 CancelVelocityTowardsSteepSlopes(in Vector3 desiredVelocity)
@@ -202,6 +237,50 @@ public sealed class CharacterVirtual : CharacterBase
     public void CancelVelocityTowardsSteepSlopes(in Vector3 desiredVelocity, out Vector3 velocity)
     {
         JPH_CharacterVirtual_CancelVelocityTowardsSteepSlopes(Handle, in desiredVelocity, out velocity);
+    }
+
+    public bool CanWalkStairs(in Vector3 linearVelocity)
+    {
+        return JPH_CharacterVirtual_CanWalkStairs(Handle, in linearVelocity);
+    }
+
+    public bool WalkStairs(float deltaTime,
+        in Vector3 stepUp,
+        in Vector3 stepForward,
+        in Vector3 stepForwardTest,
+        in Vector3 stepDownExtra,
+        in ObjectLayer layer,
+        PhysicsSystem system,
+        BodyFilter? bodyFilter = default,
+        ShapeFilter? shapeFilter = default)
+    {
+        return JPH_CharacterVirtual_WalkStairs(Handle, deltaTime,
+            in stepUp, in stepForward, in stepForwardTest, in stepDownExtra,
+            in layer, system.Handle,
+            bodyFilter?.Handle ?? 0,
+            shapeFilter?.Handle ?? 0
+            );
+    }
+
+    public bool StickToFloor(
+        in Vector3 stepDown,
+        in ObjectLayer layer,
+        PhysicsSystem system,
+        BodyFilter? bodyFilter = default,
+        ShapeFilter? shapeFilter = default)
+    {
+        return JPH_CharacterVirtual_StickToFloor(Handle,
+            in stepDown,
+            in layer,
+            system.Handle,
+            bodyFilter?.Handle ?? 0,
+            shapeFilter?.Handle ?? 0
+            );
+    }
+
+    public void UpdateGroundVelocity()
+    {
+        JPH_CharacterVirtual_UpdateGroundVelocity(Handle);
     }
 
     #region CharacterContactListener

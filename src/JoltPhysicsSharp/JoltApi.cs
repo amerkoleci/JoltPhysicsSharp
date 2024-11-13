@@ -2221,6 +2221,65 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Character_Activate(nint character, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
     [LibraryImport(LibName)]
     public static partial void JPH_Character_PostSimulation(nint character, float maxSeparationDistance, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetLinearAndAngularVelocity(nint character, in Vector3 linearVelocity, in Vector3 angularVelocity, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetLinearVelocity(nint character, out Vector3 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetLinearVelocity(nint character, in Vector3 value, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_AddLinearVelocity(nint character, in Vector3 value, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_AddImpulse(nint character, in Vector3 value, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_Character_GetBodyID(nint character);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetPositionAndRotation(nint character, out Vector3 position, out Quaternion rotation, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetPositionAndRotation(nint character, out Double3 position, out Quaternion rotation, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetPositionAndRotation(nint character, in Vector3 position, in Quaternion rotation, Activation activationMode, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetPositionAndRotation(nint character, in Double3 position, in Quaternion rotation, Activation activationMode, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetPosition(nint character, out Vector3 position, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetPosition(nint character, out Double3 position, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetPosition(nint character, in Vector3 position, Activation activationMode, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetPosition(nint character, in Double3 position, Activation activationMode, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetRotation(nint character, out Quaternion rotation, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetRotation(nint character, in Quaternion rotation, Activation activationMode, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetCenterOfMassPosition(nint character, out Vector3 result, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetCenterOfMassPosition(nint character, out Double3 result, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetWorldTransform(nint character, out Matrix4x4 result, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_GetWorldTransform(nint character, out RMatrix4x4 result, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial ObjectLayer JPH_Character_GetLayer(nint character);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetLayer(nint character, in ObjectLayer value, [MarshalAs(UnmanagedType.U1)] bool lockBodies /*= true*/);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Character_SetShape(nint character, /*const JPH_Shape**/nint shape, float maxPenetrationDepth, [MarshalAs(UnmanagedType.U1)] bool lockBodies /*= true*/);
     #endregion
 
     #region CharacterVirtual
@@ -2310,22 +2369,49 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_CharacterVirtual_GetMaxHitsExceeded(nint character);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_GetShapeOffset(nint character, out Vector3 result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetShapeOffset(nint character, in Vector3 value);
+
     [LibraryImport(LibName)]
     public static partial ulong JPH_CharacterVirtual_GetUserData(nint character);
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_SetUserData(nint character, ulong value);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_Update(nint handle, float deltaTime, ushort layer, nint physicsSytem);
+    public static partial uint JPH_CharacterVirtual_GetInnerBodyID(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_ExtendedUpdate(nint handle, float deltaTime, ExtendedUpdateSettings* settings, ushort layer, nint physicsSytem);
+    public static partial void JPH_CharacterVirtual_Update(nint handle, float deltaTime, ushort layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_RefreshContacts(nint handle, ushort layer, nint physicsSytem);
+    public static partial void JPH_CharacterVirtual_ExtendedUpdate(nint handle, float deltaTime, ExtendedUpdateSettings* settings, ushort layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_RefreshContacts(nint handle, ushort layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_CancelVelocityTowardsSteepSlopes(nint handle, in Vector3 desiredVelocity, out Vector3 velocity);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_CanWalkStairs(nint character, in Vector3 linearVelocity);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_WalkStairs(nint character, float deltaTime,
+        in Vector3 stepUp, in Vector3 stepForward, in Vector3 stepForwardTest, in Vector3 stepDownExtra,
+        in ObjectLayer layer, nint system, nint bodyFilter, nint shapeFilter);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_StickToFloor(nint character, in Vector3 stepDown, in ObjectLayer layer, nint system, nint bodyFilter, nint shapeFilter);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_UpdateGroundVelocity(nint character);
 
     public struct JPH_CharacterContactListener_Procs
     {
