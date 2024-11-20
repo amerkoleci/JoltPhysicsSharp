@@ -6,10 +6,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\JoltPhysicsSharp\JoltPhysicsSharp.csproj" />
-  </ItemGroup>
-
   <Import Project="$(RepoRootPath)JoltPhysicsSharp.Native.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Alimer.SampleFramework\Alimer.SampleFramework.csproj" />
+  </ItemGroup>
 
 </Project>

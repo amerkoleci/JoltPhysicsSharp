@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\JoltPhysicsSharp\JoltPhysicsSharp.csproj" />
+  </ItemGroup>
+
+  <Import Project="$(RepoRootPath)JoltPhysicsSharp.Native.targets" />
+
+</Project>
