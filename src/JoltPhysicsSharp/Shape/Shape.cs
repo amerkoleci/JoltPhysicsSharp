@@ -18,17 +18,9 @@ public abstract class ShapeSettings : NativeObject
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="ShapeSettings" /> class.
-    /// </summary>
-    ~ShapeSettings() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_ShapeSettings_Destroy(Handle);
-        }
+        JPH_ShapeSettings_Destroy(Handle);
     }
 
     public ulong UserData
@@ -47,23 +39,14 @@ public class Shape : NativeObject
     {
     }
 
-    protected Shape(nint handle)
-        : base(handle)
+    protected Shape(nint handle, bool owns = true)
+        : base(handle, owns)
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="Shape" /> class.
-    /// </summary>
-    ~Shape() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (Handle != 0)
-        {
-            JPH_Shape_Destroy(Handle);
-            Handle = 0;
-        }
+        JPH_Shape_Destroy(Handle);
     }
 
     public ShapeType Type => JPH_Shape_GetType(Handle);
@@ -224,6 +207,6 @@ public class Shape : NativeObject
 
     internal static Shape? GetObject(nint handle)
     {
-        return GetOrAddObject(handle, (nint h) => new Shape(h));
+        return GetOrAddObject(handle, (nint h) => new Shape(h, false));
     }
 }

@@ -118,17 +118,9 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         set => JPH_BodyCreationSettings_SetAllowedDOFs(Handle, value);
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BodyCreationSettings" /> class.
-    /// </summary>
-    ~BodyCreationSettings() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_BodyCreationSettings_Destroy(Handle);
-        }
+        JPH_BodyCreationSettings_Destroy(Handle);
     }
 
     public void GetLinearVelocity(out Vector3 velocity)

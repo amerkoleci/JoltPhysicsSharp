@@ -16,12 +16,6 @@ public sealed unsafe class JobSystemThreadPool : JobSystem
         : base(JPH_JobSystemThreadPool_Create(in config))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="JobSystemThreadPool" /> class.
-    /// </summary>
-    ~JobSystemThreadPool() => Dispose(disposing: false);
-
 }
 
 public struct JobSystemThreadPoolConfig

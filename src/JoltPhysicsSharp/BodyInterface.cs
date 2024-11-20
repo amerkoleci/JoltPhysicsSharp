@@ -92,7 +92,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public Body UnassignBodyID(in BodyID bodyID)
     {
-        return new(JPH_BodyInterface_UnassignBodyID(Handle, bodyID));
+        return Body.GetObject(JPH_BodyInterface_UnassignBodyID(Handle, bodyID))!;
     }
 
     public Vector3 GetLinearVelocity(in BodyID bodyID)

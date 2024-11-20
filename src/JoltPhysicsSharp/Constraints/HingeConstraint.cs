@@ -13,11 +13,6 @@ public sealed class HingeConstraintSettings : TwoBodyConstraintSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="HingeConstraintSettings" /> class.
-    /// </summary>
-    ~HingeConstraintSettings() => Dispose(disposing: false);
-
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
         return new PointConstraint(JPH_HingeConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
@@ -66,9 +61,4 @@ public sealed class HingeConstraint : TwoBodyConstraint
         : base(handle)
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="HingeConstraint" /> class.
-    /// </summary>
-    ~HingeConstraint() => Dispose(disposing: false);
 }

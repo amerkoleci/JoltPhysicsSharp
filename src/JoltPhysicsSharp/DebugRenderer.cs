@@ -52,14 +52,9 @@ public abstract class DebugRenderer : NativeObject
     {
     }
 
-    ~DebugRenderer() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_DebugRenderer_Destroy(Handle);
-        }
+        JPH_DebugRenderer_Destroy(Handle);
     }
 
     public void NextFrame() => JPH_DebugRenderer_NextFrame(Handle);

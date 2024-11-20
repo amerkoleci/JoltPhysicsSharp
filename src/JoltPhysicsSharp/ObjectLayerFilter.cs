@@ -20,17 +20,10 @@ public abstract class ObjectLayerFilter : NativeObject
         Handle = JPH_ObjectLayerFilter_Create(_objectLayerFilter_Procs, listenerContext);
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BodyFilter" /> class.
-    /// </summary>
-    ~ObjectLayerFilter() => Dispose(disposing: false);
 
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_ObjectLayerFilter_Destroy(Handle);
-        }
+        JPH_ObjectLayerFilter_Destroy(Handle);
     }
 
     protected abstract bool ShouldCollide(ObjectLayer layer);

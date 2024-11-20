@@ -18,11 +18,6 @@ public sealed class OffsetCenterOfMassShapeSettings : DecoratedShapeSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="OffsetCenterOfMassShapeSettings" /> class.
-    /// </summary>
-    ~OffsetCenterOfMassShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new OffsetCenterOfMassShape(this);
 }
 
@@ -37,11 +32,6 @@ public sealed class OffsetCenterOfMassShape : ConvexShape
         : base(JPH_OffsetCenterOfMassShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="OffsetCenterOfMassShape" /> class.
-    /// </summary>
-    ~OffsetCenterOfMassShape() => Dispose(disposing: false);
 
     public Vector3 Offset
     {

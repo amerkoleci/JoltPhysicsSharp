@@ -30,11 +30,6 @@ public sealed unsafe class ConvexHullShapeSettings : ConvexShapeSettings
         }
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="ConvexHullShapeSettings" /> class.
-    /// </summary>
-    ~ConvexHullShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new ConvexHullShape(this);
 }
 
@@ -44,11 +39,6 @@ public unsafe class ConvexHullShape : ConvexShape
         : base(JPH_ConvexHullShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="ConvexHullShape" /> class.
-    /// </summary>
-    ~ConvexHullShape() => Dispose(disposing: false);
 
     public uint GetNumPoints()
     {

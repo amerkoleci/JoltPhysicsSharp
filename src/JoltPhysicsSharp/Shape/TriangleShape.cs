@@ -13,11 +13,6 @@ public sealed class TriangleShapeSettings : ConvexShapeSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TriangleShapeSettings" /> class.
-    /// </summary>
-    ~TriangleShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new TriangleShape(this);
 }
 
@@ -32,11 +27,6 @@ public sealed unsafe class TriangleShape : ConvexShape
         : base(JPH_TriangleShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TriangleShape" /> class.
-    /// </summary>
-    ~TriangleShape() => Dispose(disposing: false);
 
     public float ConvexRadius => JPH_TriangleShape_GetConvexRadius(Handle);
 

@@ -12,11 +12,6 @@ public sealed class SphereShapeSettings : ConvexShapeSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="SphereShapeSettings" /> class.
-    /// </summary>
-    ~SphereShapeSettings() => Dispose(disposing: false);
-
     public float Radius
     {
         get => JPH_SphereShapeSettings_GetRadius(Handle);
@@ -37,11 +32,6 @@ public sealed class SphereShape : ConvexShape
         : base(JPH_SphereShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="SphereShape" /> class.
-    /// </summary>
-    ~SphereShape() => Dispose(disposing: false);
 
     public float Radius => JPH_SphereShape_GetRadius(Handle);
 }

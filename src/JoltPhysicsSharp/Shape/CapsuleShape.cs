@@ -13,11 +13,6 @@ public sealed class CapsuleShapeSettings : ConvexShapeSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="CapsuleShapeSettings" /> class.
-    /// </summary>
-    ~CapsuleShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new CapsuleShape(this);
 }
 
@@ -32,11 +27,6 @@ public sealed class CapsuleShape : ConvexShape
         : base(JPH_CapsuleShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="CapsuleShape" /> class.
-    /// </summary>
-    ~CapsuleShape() => Dispose(disposing: false);
 
     public float Radius => JPH_CapsuleShape_GetRadius(Handle);
     public float HalfHeightOfCylinder => JPH_CapsuleShape_GetHalfHeightOfCylinder(Handle);

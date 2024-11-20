@@ -12,12 +12,6 @@ public sealed class TaperedCapsuleShapeSettings : ConvexShapeSettings
         : base(JPH_TaperedCapsuleShapeSettings_Create(halfHeightOfTaperedCylinder, topRadius, bottomRadius))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TaperedCapsuleShapeSettings" /> class.
-    /// </summary>
-    ~TaperedCapsuleShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new TaperedCapsuleShape(this);
 }
 
@@ -27,11 +21,6 @@ public sealed class TaperedCapsuleShape : ConvexShape
         : base(JPH_TaperedCapsuleShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TaperedCapsuleShape" /> class.
-    /// </summary>
-    ~TaperedCapsuleShape() => Dispose(disposing: false);
 
     public float TopRadius => JPH_TaperedCapsuleShape_GetTopRadius(Handle);
     public float BottomRadius => JPH_TaperedCapsuleShape_GetBottomRadius(Handle);

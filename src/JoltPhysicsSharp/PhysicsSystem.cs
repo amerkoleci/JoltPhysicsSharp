@@ -92,20 +92,12 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="PhysicsSystem" /> class.
-    /// </summary>
-    ~PhysicsSystem() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_ContactListener_Destroy(_contactListenerHandle);
-            JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
+        JPH_ContactListener_Destroy(_contactListenerHandle);
+        JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
 
-            JPH_PhysicsSystem_Destroy(Handle);
-        }
+        JPH_PhysicsSystem_Destroy(Handle);
     }
 
     public PhysicsSettings Settings
@@ -285,7 +277,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
         if (listener.OnContactValidate != null)
         {
-            return (uint)listener.OnContactValidate(listener, new Body(body1), new Body(body2), new Double3(*baseOffset), collisionResult);
+            return (uint)listener.OnContactValidate(listener, Body.GetObject(body1)!, Body.GetObject(body2)!, new Double3(*baseOffset), collisionResult);
         }
 
         return (uint)ValidateResult.AcceptAllContactsForThisBodyPair;
@@ -298,7 +290,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
         if (listener.OnContactValidate != null)
         {
-            return (uint)listener.OnContactValidate(listener, new Body(body1), new Body(body2), *baseOffset, collisionResult);
+            return (uint)listener.OnContactValidate(listener, Body.GetObject(body1)!, Body.GetObject(body2)!, *baseOffset, collisionResult);
         }
 
         return (uint)ValidateResult.AcceptAllContactsForThisBodyPair;
@@ -311,8 +303,8 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
         listener.OnContactAdded?.Invoke(
             listener,
-            new Body(body1),
-            new Body(body2),
+            Body.GetObject(body1)!,
+            Body.GetObject(body2)!,
             new ContactManifold(manifold),
             new ContactSettings(settings)
             );
@@ -325,8 +317,8 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
         listener.OnContactPersisted?.Invoke(
             listener,
-            new Body(body1),
-            new Body(body2),
+            Body.GetObject(body1)!,
+            Body.GetObject(body2)!,
             new ContactManifold(manifold),
             new ContactSettings(settings)
             );

@@ -20,17 +20,9 @@ public abstract class BodyDrawFilter : NativeObject
         Handle = JPH_BodyDrawFilter_Create(_procs, context);
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BodyDrawFilter" /> class.
-    /// </summary>
-    ~BodyDrawFilter() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_BodyDrawFilter_Destroy(Handle);
-        }
+        JPH_BodyDrawFilter_Destroy(Handle);
     }
 
     protected abstract bool ShouldDraw(Body body);
@@ -39,6 +31,6 @@ public abstract class BodyDrawFilter : NativeObject
     private static Bool8 ShouldDrawCallback(nint context, nint body)
     {
         BodyDrawFilter listener = DelegateProxies.GetUserData<BodyDrawFilter>(context, out _);
-        return listener.ShouldDraw(body);
+        return listener.ShouldDraw(Body.GetObject(body)!);
     }
 }

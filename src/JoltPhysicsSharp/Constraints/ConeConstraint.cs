@@ -13,11 +13,6 @@ public unsafe class ConeConstraintSettings : TwoBodyConstraintSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="DistanceConstraintSettings" /> class.
-    /// </summary>
-    ~ConeConstraintSettings() => Dispose(disposing: false);
-
     public Vector3 Point1
     {
         get
@@ -92,11 +87,6 @@ public unsafe class ConeConstraint : TwoBodyConstraint
         : base(handle)
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="ConeConstraint" /> class.
-    /// </summary>
-    ~ConeConstraint() => Dispose(disposing: false);
 
     public float CosHalfConeAngle
     {

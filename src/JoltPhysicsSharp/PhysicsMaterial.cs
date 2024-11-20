@@ -8,26 +8,18 @@ namespace JoltPhysicsSharp;
 public class PhysicsMaterial : NativeObject
 {
     public PhysicsMaterial(string name, in JoltColor color)
-        : base(JPH_PhysicsMaterial_Create(name, color.PackedValue))    
+        : this(JPH_PhysicsMaterial_Create(name, color.PackedValue), true)
     {
     }
 
-    internal PhysicsMaterial(nint handle)
-        : base(handle)
+    internal PhysicsMaterial(nint handle, bool owns)
+        : base(handle, owns)
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="ShapeSettings" /> class.
-    /// </summary>
-    ~PhysicsMaterial() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_PhysicsMaterial_Destroy(Handle);
-        }
+        JPH_PhysicsMaterial_Destroy(Handle);
     }
 
     public string? DebugName => JPH_PhysicsMaterial_GetDebugName(Handle);
@@ -35,6 +27,6 @@ public class PhysicsMaterial : NativeObject
 
     internal static PhysicsMaterial? GetObject(nint handle)
     {
-        return GetOrAddObject(handle, (nint h) => new PhysicsMaterial(h));
+        return GetOrAddObject(handle, (nint h) => new PhysicsMaterial(h, false));
     }
 }

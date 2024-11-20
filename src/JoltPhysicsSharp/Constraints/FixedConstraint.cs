@@ -14,11 +14,6 @@ public unsafe class FixedConstraintSettings : TwoBodyConstraintSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="FixedConstraintSettings" /> class.
-    /// </summary>
-    ~FixedConstraintSettings() => Dispose(disposing: false);
-
     public ConstraintSpace Space
     {
         get => JPH_PointConstraintSettings_GetSpace(Handle);
@@ -129,11 +124,6 @@ public unsafe class FixedConstraint : TwoBodyConstraint
         : base(handle)
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="FixedConstraint" /> class.
-    /// </summary>
-    ~FixedConstraint() => Dispose(disposing: false);
 
     public Vector3 GetTotalLambdaPosition()
     {

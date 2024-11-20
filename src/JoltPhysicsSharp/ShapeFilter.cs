@@ -26,19 +26,10 @@ public abstract class ShapeFilter : NativeObject
         get => JPH_ShapeFilter_GetBodyID2(Handle);
         set => JPH_ShapeFilter_SetBodyID2(Handle, value);
     }
-    
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="ShapeFilter" /> class.
-    /// </summary>
-    ~ShapeFilter() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_ShapeFilter_Destroy(Handle);
-        }
+        JPH_ShapeFilter_Destroy(Handle);
     }
 
     protected virtual bool ShouldCollide(/*Shape*/nint shape2, in SubShapeID subShapeIDOfShape2)

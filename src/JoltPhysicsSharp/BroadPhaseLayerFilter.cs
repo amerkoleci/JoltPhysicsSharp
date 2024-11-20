@@ -20,17 +20,9 @@ public abstract class BroadPhaseLayerFilter : NativeObject
         Handle = JPH_BroadPhaseLayerFilter_Create(_broadPhaseLayerFilter_Procs, listenerContext);
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BodyFilter" /> class.
-    /// </summary>
-    ~BroadPhaseLayerFilter() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_BroadPhaseLayerFilter_Destroy(Handle);
-        }
+        JPH_BroadPhaseLayerFilter_Destroy(Handle);
     }
 
     protected abstract bool ShouldCollide(BroadPhaseLayer layer);

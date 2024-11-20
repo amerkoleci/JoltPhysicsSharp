@@ -2,13 +2,20 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 // see: https://github.com/mono/SkiaSharp/blob/main/binding/SkiaSharp/HandleDictionary.cs
 
+#if DEBUG
+using System.Collections.Concurrent;
+#endif
+
 namespace JoltPhysicsSharp;
 
 internal static class HandleDictionary
 {
     internal static readonly IPlatformLock s_instancesLock = PlatformLock.Create();
+
     internal static readonly Dictionary<IntPtr, WeakReference> s_instances = [];
+
 #if DEBUG
+    internal static readonly ConcurrentBag<Exception> s_exceptions = [];
     internal static readonly Dictionary<IntPtr, string> s_stackTraces = [];
 #endif
 
@@ -49,7 +56,7 @@ internal static class HandleDictionary
         s_instancesLock.EnterUpgradeableReadLock();
         try
         {
-            if (GetInstanceNoLocks<TNativeObject>(handle, out TNativeObject? instance))
+            if (GetInstanceNoLocks(handle, out TNativeObject? instance))
             {
                 return instance;
             }
@@ -78,6 +85,16 @@ internal static class HandleDictionary
         {
             if (s_instances.TryGetValue(handle, out WeakReference? oldValue) && oldValue.Target is NativeObject obj && !obj.IsDisposed)
             {
+#if DEBUG
+                if (obj.OwnsHandle)
+                {
+                    // a mostly recoverable error
+                    // if there is a managed object, then maybe something happened and the native object is dead
+                    throw new InvalidOperationException(
+                        $"A managed object already exists for the specified native object. " +
+                        $"H: {handle.ToString("x")} Type: ({obj.GetType()}, {instance.GetType()})");
+                }
+#endif
                 // this means the ownership was handed off to a native object, so clean up the managed side
                 objectToDispose = obj;
             }
@@ -115,6 +132,45 @@ internal static class HandleDictionary
                 s_stackTraces.Remove(handle);
 #endif
             }
+            else
+            {
+#if DEBUG
+                InvalidOperationException? ex = null;
+                if (!existed)
+                {
+                    // the object may have been replaced
+
+                    if (!instance.IsDisposed)
+                    {
+                        // recoverable error
+                        // there was no object there, but we are still alive
+                        ex = new InvalidOperationException(
+                            $"A managed object did not exist for the specified native object. " +
+                            $"H: {handle.ToString("x")} Type: {instance.GetType()}");
+                    }
+                }
+                else if (weak.Target is NativeObject o && o != instance)
+                {
+                    // there was an object in the dictionary, but it was NOT this object
+
+                    if (!instance.IsDisposed)
+                    {
+                        // recoverable error
+                        // there was a new living object there, but we are still alive
+                        ex = new InvalidOperationException(
+                            $"Trying to remove a different object with the same native handle. " +
+                            $"H: {handle.ToString("x")} Type: ({o.GetType()}, {instance.GetType()})");
+                    }
+                }
+                if (ex != null)
+                {
+                    if (instance.fromFinalizer)
+                        s_exceptions.Add(ex);
+                    else
+                        throw ex;
+                }
+#endif
+            }
         }
         finally
         {
@@ -137,6 +193,23 @@ internal static class HandleDictionary
                 {
                     instance = match;
                     return true;
+#if DEBUG
+                }
+                else if (weak.Target is NativeObject obj)
+                {
+                    if (!obj.IsDisposed && obj.OwnsHandle)
+                    {
+                        throw new InvalidOperationException(
+                            $"A managed object exists for the handle, but is not the expected type. " +
+                            $"H: {handle.ToString("x")} Type: ({obj.GetType()}, {typeof(TNativeObject)})");
+                    }
+                }
+                else if (weak.Target is object o)
+                {
+                    throw new InvalidOperationException(
+                        $"An unknown object exists for the handle when trying to fetch an instance. " +
+                        $"H: {handle.ToString("x")} Type: ({o.GetType()}, {typeof(TNativeObject)})");
+#endif
                 }
             }
         }

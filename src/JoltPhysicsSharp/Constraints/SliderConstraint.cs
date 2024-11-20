@@ -13,11 +13,6 @@ public sealed class SliderConstraintSettings : TwoBodyConstraintSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="SliderConstraintSettings" /> class.
-    /// </summary>
-    ~SliderConstraintSettings() => Dispose(disposing: false);
-
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
         return new SliderConstraint(JPH_SliderConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
@@ -35,9 +30,4 @@ public sealed class SliderConstraint : TwoBodyConstraint
         : base(handle)
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="SliderConstraint" /> class.
-    /// </summary>
-    ~SliderConstraint() => Dispose(disposing: false);
 }

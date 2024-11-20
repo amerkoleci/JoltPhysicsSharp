@@ -10,8 +10,13 @@ public sealed class ObjectLayerPairFilterMask : ObjectLayerPairFilter
     public const int NumBits = ObjectLayer.Bits / 2;
     public const uint Mask = (1 << NumBits) - 1;
 
+    internal ObjectLayerPairFilterMask(nint handle, bool owns)
+        : base(handle, owns)
+    {
+    }
+
     public ObjectLayerPairFilterMask()
-        : base(JPH_ObjectLayerPairFilterMask_Create())
+        : this(JPH_ObjectLayerPairFilterMask_Create(), true)
     {
     }
 

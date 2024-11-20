@@ -12,11 +12,6 @@ public sealed class TaperedCylinderShapeSettings : ConvexShapeSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TaperedCylinderShapeSettings" /> class.
-    /// </summary>
-    ~TaperedCylinderShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new TaperedCylinderShape(this);
 }
 
@@ -27,11 +22,6 @@ public sealed class TaperedCylinderShape : ConvexShape
         : base(JPH_TaperedCylinderShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TaperedCylinderShape" /> class.
-    /// </summary>
-    ~TaperedCylinderShape() => Dispose(disposing: false);
 
     public float TopRadius => JPH_TaperedCylinderShape_GetTopRadius(Handle);
     public float BottomRadius => JPH_TaperedCylinderShape_GetBottomRadius(Handle);

@@ -21,17 +21,9 @@ public abstract class BodyFilter : NativeObject
         Handle = JPH_BodyFilter_Create(_bodyFilter_Procs, context);
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BodyFilter" /> class.
-    /// </summary>
-    ~BodyFilter() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_BodyFilter_Destroy(Handle);
-        }
+        JPH_BodyFilter_Destroy(Handle);
     }
 
     protected abstract bool ShouldCollide(BodyID bodyID);
@@ -48,6 +40,6 @@ public abstract class BodyFilter : NativeObject
     private static Bool8 ShouldCollideLockedCallback(nint context, nint body)
     {
         BodyFilter listener = DelegateProxies.GetUserData<BodyFilter>(context, out _);
-        return listener.ShouldCollideLocked(body);
+        return listener.ShouldCollideLocked(Body.GetObject(body)!);
     }
 }

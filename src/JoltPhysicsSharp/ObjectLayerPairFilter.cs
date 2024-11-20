@@ -5,8 +5,8 @@ namespace JoltPhysicsSharp;
 
 public abstract class ObjectLayerPairFilter : NativeObject
 {
-    protected ObjectLayerPairFilter(nint handle)
-        : base(handle)
+    protected ObjectLayerPairFilter(nint handle, bool owns)
+        : base(handle, owns)
     {
     }
 }

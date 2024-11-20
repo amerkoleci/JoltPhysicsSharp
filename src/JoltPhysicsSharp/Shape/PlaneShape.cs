@@ -40,11 +40,6 @@ public sealed class PlaneShape : Shape
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BoxShape" /> class.
-    /// </summary>
-    ~PlaneShape() => Dispose(disposing: false);
-
     public Plane Plane
     {
         get

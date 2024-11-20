@@ -12,11 +12,6 @@ public sealed class SwingTwistConstraintSettings : TwoBodyConstraintSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="SwingTwistConstraintSettings" /> class.
-    /// </summary>
-    ~SwingTwistConstraintSettings() => Dispose(disposing: false);
-
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
         return new SliderConstraint(JPH_SwingTwistConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
@@ -29,11 +24,6 @@ public sealed class SwingTwistConstraint : TwoBodyConstraint
         : base(handle)
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="SwingTwistConstraint" /> class.
-    /// </summary>
-    ~SwingTwistConstraint() => Dispose(disposing: false);
 
     public float GetNormalHalfConeAngle() => JPH_SwingTwistConstraint_GetNormalHalfConeAngle(Handle);
 }

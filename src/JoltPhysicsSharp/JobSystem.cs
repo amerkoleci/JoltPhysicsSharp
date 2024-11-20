@@ -13,12 +13,8 @@ public abstract class JobSystem : NativeObject
     }
 
 
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (Handle != 0)
-        {
-            JPH_JobSystem_Destroy(Handle);
-            Handle = 0;
-        }
+        JPH_JobSystem_Destroy(Handle);
     }
 }

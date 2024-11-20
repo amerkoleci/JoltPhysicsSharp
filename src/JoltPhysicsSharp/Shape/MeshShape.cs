@@ -54,11 +54,6 @@ public sealed unsafe class MeshShapeSettings : ConvexShapeSettings
         }
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TriangleShapeSettings" /> class.
-    /// </summary>
-    ~MeshShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new MeshShape(this);
 
     public void Sanitize() => JPH_MeshShapeSettings_Sanitize(Handle);

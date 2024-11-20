@@ -20,7 +20,7 @@ public sealed class CharacterVirtual : CharacterBase
 
     public delegate void AdjustBodyVelocityHandler(CharacterVirtual character, in Body body2, Vector3 linearVelocity, Vector3 angularVelocity);
     public delegate bool ContactValidateHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2);
-    public delegate void ContactAddedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2,in Double3 contactPosition, in Vector3 contactNornal, ref CharacterContactSettings settings);
+    public delegate void ContactAddedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNornal, ref CharacterContactSettings settings);
     public delegate void ContactSolveHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2,
         in Double3 contactPosition,
         in Vector3 contactNornal,
@@ -59,14 +59,9 @@ public sealed class CharacterVirtual : CharacterBase
         _listenerHandle = JPH_CharacterContactListener_Create(_listener_Procs, listenerContext);
     }
 
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_CharacterContactListener_Destroy(_listenerHandle);
-        }
-
-        base.Dispose(disposing);
+        JPH_CharacterContactListener_Destroy(_listenerHandle);
     }
 
     public Vector3 LinearVelocity
@@ -291,7 +286,7 @@ public sealed class CharacterVirtual : CharacterBase
 
         if (listener.OnAdjustBodyVelocity != null)
         {
-            listener.OnAdjustBodyVelocity(listener, new Body(body2), *linearVelocity, *angularVelocity);
+            listener.OnAdjustBodyVelocity(listener, Body.GetObject(body2)!, *linearVelocity, *angularVelocity);
         }
     }
 

@@ -13,11 +13,6 @@ public unsafe class DistanceConstraintSettings : TwoBodyConstraintSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="DistanceConstraintSettings" /> class.
-    /// </summary>
-    ~DistanceConstraintSettings() => Dispose(disposing: false);
-
     public ConstraintSpace Space
     {
         get => JPH_DistanceConstraintSettings_GetSpace(Handle);
@@ -62,11 +57,6 @@ public unsafe class DistanceConstraint : TwoBodyConstraint
         : base(handle)
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="DistanceConstraint" /> class.
-    /// </summary>
-    ~DistanceConstraint() => Dispose(disposing: false);
 
     public float MinDisptance => JPH_DistanceConstraint_GetMinDistance(Handle);
     public float MaxDisptance => JPH_DistanceConstraint_GetMaxDistance(Handle);

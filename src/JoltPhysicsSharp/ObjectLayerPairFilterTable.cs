@@ -7,8 +7,13 @@ namespace JoltPhysicsSharp;
 
 public sealed class ObjectLayerPairFilterTable : ObjectLayerPairFilter
 {
+    internal ObjectLayerPairFilterTable(nint handle, bool owns)
+        : base(handle, owns)
+    {
+    }
+
     public ObjectLayerPairFilterTable(uint numObjectLayers)
-        : base(JPH_ObjectLayerPairFilterTable_Create(numObjectLayers))
+        : this(JPH_ObjectLayerPairFilterTable_Create(numObjectLayers), true)
     {
     }
 

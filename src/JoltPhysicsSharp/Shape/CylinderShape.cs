@@ -12,11 +12,6 @@ public sealed class CylinderShapeSettings : ConvexShapeSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="CylinderShapeSettings" /> class.
-    /// </summary>
-    ~CylinderShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new CylinderShape(this);
 }
 
@@ -32,11 +27,6 @@ public sealed class CylinderShape : ConvexShape
         : base(JPH_CylinderShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="CylinderShape" /> class.
-    /// </summary>
-    ~CylinderShape() => Dispose(disposing: false);
 
     public float Radius => JPH_CylinderShape_GetRadius(Handle);
     public float HalfHeight => JPH_CylinderShape_GetHalfHeight(Handle);

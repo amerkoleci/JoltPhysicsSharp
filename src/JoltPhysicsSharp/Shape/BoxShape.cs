@@ -13,11 +13,6 @@ public sealed class BoxShapeSettings : ConvexShapeSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BoxShapeSettings" /> class.
-    /// </summary>
-    ~BoxShapeSettings() => Dispose(disposing: false);
-
     public override Shape Create() => new BoxShape(this);
 }
 
@@ -32,11 +27,6 @@ public sealed class BoxShape : ConvexShape
         : base(JPH_BoxShapeSettings_CreateShape(settings.Handle))
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="BoxShape" /> class.
-    /// </summary>
-    ~BoxShape() => Dispose(disposing: false);
 
     public Vector3 HalfExtent
     {

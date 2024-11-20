@@ -14,11 +14,6 @@ public sealed unsafe class PointConstraintSettings : TwoBodyConstraintSettings
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="PointConstraintSettings" /> class.
-    /// </summary>
-    ~PointConstraintSettings() => Dispose(disposing: false);
-
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
         return new PointConstraint(JPH_PointConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
@@ -81,11 +76,6 @@ public sealed unsafe class PointConstraint : TwoBodyConstraint
         : base(handle)
     {
     }
-
-    /// <summary>
-    /// Finalizes an instance of the <see cref="PointConstraint" /> class.
-    /// </summary>
-    ~PointConstraint() => Dispose(disposing: false);
 
     public void SetPoint1(ConstraintSpace space, in Vector3 value)
     {

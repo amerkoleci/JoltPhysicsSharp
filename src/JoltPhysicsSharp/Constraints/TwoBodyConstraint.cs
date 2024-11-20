@@ -24,19 +24,14 @@ public abstract unsafe class TwoBodyConstraint : Constraint
     {
     }
 
-    /// <summary>
-    /// Finalizes an instance of the <see cref="TwoBodyConstraint" /> class.
-    /// </summary>
-    ~TwoBodyConstraint() => Dispose(disposing: false);
-
     public Body Body1
     {
-        get => JPH_TwoBodyConstraint_GetBody1(Handle);
+        get => Body.GetObject(JPH_TwoBodyConstraint_GetBody1(Handle))!;
     }
 
     public Body Body2
     {
-        get => JPH_TwoBodyConstraint_GetBody2(Handle);
+        get => Body.GetObject(JPH_TwoBodyConstraint_GetBody2(Handle))!;
     }
 
     public Matrix4x4 GetConstraintToBody1Matrix()

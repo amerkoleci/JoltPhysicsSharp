@@ -17,14 +17,9 @@ public abstract class CharacterBase : NativeObject
     {
     }
 
-    ~CharacterBase() => Dispose(disposing: false);
-
-    protected override void Dispose(bool disposing)
+    protected override void DisposeNative()
     {
-        if (disposing)
-        {
-            JPH_CharacterBase_Destroy(Handle);
-        }
+        JPH_CharacterBase_Destroy(Handle);
     }
 
     public float CosMaxSlopeAngle => JPH_CharacterBase_GetCosMaxSlopeAngle(Handle);

@@ -7,26 +7,14 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public unsafe readonly struct Body(nint handle) : IEquatable<Body>
+public sealed class Body : NativeObject
 {
-    public nint Handle { get; } = handle;
-    public readonly bool IsNull => Handle == 0;
-    public readonly bool IsNotNull => Handle != 0;
+    internal Body(nint handle)
+        : base(handle)
+    {
 
-    public static Body Null => new(0);
-    public static implicit operator Body(nint handle) => new(handle);
-    public static bool operator ==(Body left, Body right) => left.Handle == right.Handle;
-    public static bool operator !=(Body left, Body right) => left.Handle != right.Handle;
-    public static bool operator ==(Body left, nint right) => left.Handle == right;
-    public static bool operator !=(Body left, nint right) => left.Handle != right;
-    public readonly bool Equals(Body other) => Handle == other.Handle;
-
-    /// <inheritdoc/>
-    public override readonly bool Equals(object? obj) => obj is Body handle && Equals(handle);
-
-    /// <inheritdoc/>
-    public override readonly int GetHashCode() => Handle.GetHashCode();
-
+    }
+    
     public BodyID ID => JPH_Body_GetID(Handle);
 
     /// <summary>
@@ -649,5 +637,10 @@ public unsafe readonly struct Body(nint handle) : IEquatable<Body>
     public void SetUserData(ulong userData)
     {
         JPH_Body_SetUserData(Handle, userData);
+    }
+
+    internal static Body? GetObject(nint handle)
+    {
+        return GetOrAddObject(handle, (nint h) => new Body(h));
     }
 }
