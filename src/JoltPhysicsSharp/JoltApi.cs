@@ -4,6 +4,7 @@
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 
 namespace JoltPhysicsSharp;
@@ -634,6 +635,16 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial float JPH_Shape_GetVolume(nint handle);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Shape_IsValidScale(nint handle, in Vector3 scale);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_MakeScaleValid(nint handle, in Vector3 scale, out Vector3 result);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Shape_ScaleShape(nint handle, in Vector3 scale);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Shape_GetMassProperties(nint shape, out MassProperties properties);
@@ -2208,7 +2219,7 @@ internal static unsafe partial class JoltApi
 
     /* Character */
     [LibraryImport(LibName)]
-    public static partial nint JPH_Character_Create(JPH_CharacterSettings* settings, /*const JPH_RVec3**/ in Vector3 position, in Quaternion rotation, ulong userData,/*JPH_PhysicsSystem**/ nint system);
+    public static partial nint JPH_Character_Create(JPH_CharacterSettings* settings, in Vector3 position, in Quaternion rotation, ulong userData,/*JPH_PhysicsSystem**/ nint system);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_Character_Create(JPH_CharacterSettings* settings, in Double3 position, in Quaternion rotation, ulong userData, nint physicsSystem);
@@ -2275,9 +2286,9 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_Character_GetWorldTransform(nint character, out RMatrix4x4 result, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
     [LibraryImport(LibName)]
-    public static partial ObjectLayer JPH_Character_GetLayer(nint character);
+    public static partial /*ObjectLayer*/ushort JPH_Character_GetLayer(nint character);
     [LibraryImport(LibName)]
-    public static partial void JPH_Character_SetLayer(nint character, in ObjectLayer value, [MarshalAs(UnmanagedType.U1)] bool lockBodies /*= true*/);
+    public static partial void JPH_Character_SetLayer(nint character, /*ObjectLayer*/ ushort value, [MarshalAs(UnmanagedType.U1)] bool lockBodies /*= true*/);
     [LibraryImport(LibName)]
     public static partial void JPH_Character_SetShape(nint character, /*const JPH_Shape**/nint shape, float maxPenetrationDepth, [MarshalAs(UnmanagedType.U1)] bool lockBodies /*= true*/);
     #endregion
@@ -2412,6 +2423,18 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_UpdateGroundVelocity(nint character);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_SetShape(
+        nint character,
+        nint shape, float maxPenetrationDepth,
+        /*ObjectLayer*/ushort layer,
+        nint system, nint bodyFilter,
+        nint shapeFilter);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_SetInnerBodyShape(nint character, nint shape);
 
     public struct JPH_CharacterContactListener_Procs
     {

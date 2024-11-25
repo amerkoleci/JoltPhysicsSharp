@@ -21,9 +21,9 @@ public readonly struct ObjectLayer : IEquatable<ObjectLayer>
     public bool IsValid => Value != ObjectLayerInvalid;
     public bool IsInvalid => Value == ObjectLayerInvalid;
 
-    public static ObjectLayer Invalid = new ObjectLayer(ObjectLayerInvalid);
+    public static ObjectLayer Invalid => new(ObjectLayerInvalid);
 
-    public static implicit operator ObjectLayer(byte id) => new(id);
+    public static implicit operator ObjectLayer(ushort id) => new(id);
     public static implicit operator ushort(in ObjectLayer id) => id.Value;
 
     public static bool operator ==(ObjectLayer left, ObjectLayer right) => left.Value == right.Value;

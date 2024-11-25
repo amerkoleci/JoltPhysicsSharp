@@ -151,6 +151,25 @@ public class Shape : NativeObject
         JPH_Shape_GetSurfaceNormal(Handle, subShapeID, in localPosition, out normal);
     }
 
+    public bool IsValidScale(in Vector3 scale) => JPH_Shape_IsValidScale(Handle, in scale);
+
+    public Vector3 MakeScaleValid(in Vector3 scale)
+    {
+        JPH_Shape_MakeScaleValid(Handle, in scale, out Vector3 result);
+        return result;
+    }
+
+    public void MakeScaleValid(in Vector3 scale, out Vector3 result) => JPH_Shape_MakeScaleValid(Handle, in scale, out result);
+
+    public Shape? ScaleShape(in Vector3 scale)
+    {
+        nint shape = JPH_Shape_ScaleShape(Handle, in scale);
+        if (shape == 0)
+            return default;
+
+        return new(shape);
+    }
+
     public bool CastRay(in Ray ray, out RayCastResult hit)
     {
         return JPH_Shape_CastRay(Handle, in ray.Position, in ray.Direction, out hit);

@@ -278,6 +278,29 @@ public sealed class CharacterVirtual : CharacterBase
         JPH_CharacterVirtual_UpdateGroundVelocity(Handle);
     }
 
+    public bool SetShape(float deltaTime,
+        Shape shape,
+        float maxPenetrationDepth,
+        in ObjectLayer layer,
+        PhysicsSystem system,
+        BodyFilter? bodyFilter = default,
+        ShapeFilter? shapeFilter = default)
+    {
+        return JPH_CharacterVirtual_SetShape(Handle,
+            shape.Handle,
+            maxPenetrationDepth,
+            layer.Value,
+            system.Handle,
+            bodyFilter?.Handle ?? 0,
+            shapeFilter?.Handle ?? 0
+            );
+    }
+
+    public void SetInnerBodyShape(Shape shape)
+    {
+        JPH_CharacterVirtual_SetInnerBodyShape(Handle, shape.Handle);
+    }
+
     #region CharacterContactListener
     [UnmanagedCallersOnly]
     private static unsafe void OnAdjustBodyVelocityCallback(nint context, nint character, nint body2, Vector3* linearVelocity, Vector3* angularVelocity)

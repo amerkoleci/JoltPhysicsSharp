@@ -154,4 +154,20 @@ public sealed class Character : CharacterBase
     {
         get => JPH_Character_GetBodyID(Handle);
     }
+
+    public ObjectLayer Layer
+    {
+        get => JPH_Character_GetLayer(Handle);
+        set => JPH_Character_SetLayer(Handle, value, true);
+    }
+
+    public void SetLayer(in ObjectLayer layer, bool lockBodies = true)
+    {
+        JPH_Character_SetLayer(Handle, layer.Value, lockBodies);
+    }
+
+    public void SetShape(Shape shape, float maxPenetrationDepth, bool lockBodies = true)
+    {
+        JPH_Character_SetShape(Handle, shape.Handle, maxPenetrationDepth, lockBodies);
+    }
 }
