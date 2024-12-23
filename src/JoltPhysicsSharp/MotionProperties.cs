@@ -69,8 +69,7 @@ public readonly unsafe struct MotionProperties(nint handle) : IEquatable<MotionP
 
     public void SetMassProperties(AllowedDOFs allowedDOFs, in MassProperties massProperties)
     {
-        fixed (MassProperties* massPropertiesPtr = &massProperties)
-            JPH_MotionProperties_SetMassProperties(Handle, allowedDOFs, massPropertiesPtr);
+        JPH_MotionProperties_SetMassProperties(Handle, allowedDOFs, in massProperties);
     }
 
     public void SetInverseMass(float inverseMass)
@@ -85,4 +84,8 @@ public readonly unsafe struct MotionProperties(nint handle) : IEquatable<MotionP
             JPH_MotionProperties_SetInverseInertia(Handle, diagonalPtr, rotationPtr);
     }
 
+    public void ScaleToMass(float mass)
+    {
+        JPH_MotionProperties_ScaleToMass(Handle, mass);
+    }
 }

@@ -23,9 +23,9 @@ public sealed class MutableCompoundShape : CompoundShape
     {
     }
 
-    public uint AddShape(in Vector3 position, in Quaternion rotation, Shape child, uint userData = 0)
+    public uint AddShape(in Vector3 position, in Quaternion rotation, Shape child, uint userData = 0, uint index = uint.MaxValue)
     {
-        return JPH_MutableCompoundShape_AddShape(Handle, in position, in rotation, child.Handle, userData);
+        return JPH_MutableCompoundShape_AddShape(Handle, in position, in rotation, child.Handle, userData, index);
     }
 
     public void RemoveShape(uint index)

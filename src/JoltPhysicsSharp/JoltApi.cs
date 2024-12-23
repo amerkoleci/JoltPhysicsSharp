@@ -541,7 +541,7 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_MutableCompoundShape_Create(nint settings);
 
     [LibraryImport(LibName)]
-    public static partial uint JPH_MutableCompoundShape_AddShape(nint shape, in Vector3 position, in Quaternion rotation, /*const JPH_Shape**/nint child, uint userData);
+    public static partial uint JPH_MutableCompoundShape_AddShape(nint shape, in Vector3 position, in Quaternion rotation, /*const JPH_Shape**/nint child, uint userData, uint index);
     [LibraryImport(LibName)]
     public static partial void JPH_MutableCompoundShape_RemoveShape(nint shape, uint index);
     [LibraryImport(LibName)]
@@ -728,6 +728,16 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyCreationSettings_SetAngularVelocity(nint settings, Vector3* velocity);
 
     [LibraryImport(LibName)]
+    public static partial ulong JPH_BodyCreationSettings_GetUserData(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetUserData(nint settings, ulong value);
+
+    [LibraryImport(LibName)]
+    public static partial ObjectLayer JPH_BodyCreationSettings_GetObjectLayer(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetObjectLayer(nint settings, in ObjectLayer value);
+
+    [LibraryImport(LibName)]
     public static partial MotionType JPH_BodyCreationSettings_GetMotionType(nint settings);
 
     [LibraryImport(LibName)]
@@ -738,6 +748,121 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyCreationSettings_SetAllowedDOFs(nint settings, AllowedDOFs value);
+
+    [LibraryImport(LibName)]
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyCreationSettings_GetAllowDynamicOrKinematic(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetAllowDynamicOrKinematic(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyCreationSettings_GetIsSensor(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetIsSensor(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyCreationSettings_GetCollideKinematicVsNonDynamic(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetCollideKinematicVsNonDynamic(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyCreationSettings_GetUseManifoldReduction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetUseManifoldReduction(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyCreationSettings_GetApplyGyroscopicForce(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetApplyGyroscopicForce(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+    public static partial MotionQuality JPH_BodyCreationSettings_GetMotionQuality(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetMotionQuality(nint settings, in MotionQuality value);
+
+    [LibraryImport(LibName)]
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyCreationSettings_GetEnhancedInternalEdgeRemoval(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetEnhancedInternalEdgeRemoval(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyCreationSettings_GetAllowSleeping(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetAllowSleeping(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_BodyCreationSettings_GetFriction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetFriction(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_BodyCreationSettings_GetRestitution(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetRestitution(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_BodyCreationSettings_GetLinearDamping(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetLinearDamping(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_BodyCreationSettings_GetAngularDamping(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetAngularDamping(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_BodyCreationSettings_GetMaxLinearVelocity(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetMaxLinearVelocity(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_BodyCreationSettings_GetMaxAngularVelocity(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetMaxAngularVelocity(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_BodyCreationSettings_GetGravityFactor(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetGravityFactor(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_BodyCreationSettings_GetNumVelocityStepsOverride(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetNumVelocityStepsOverride(nint settings, uint value);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_BodyCreationSettings_GetNumPositionStepsOverride(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetNumPositionStepsOverride(nint settings, uint value);
+
+    [LibraryImport(LibName)]
+    public static partial OverrideMassProperties JPH_BodyCreationSettings_GetOverrideMassProperties(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetOverrideMassProperties(nint settings, OverrideMassProperties value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_BodyCreationSettings_GetInertiaMultiplier(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetInertiaMultiplier(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_GetMassPropertiesOverride(nint settings, out MassProperties result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetMassPropertiesOverride(nint settings, MassProperties* massProperties);
 
     /* SoftBodyCreationSettings */
     [LibraryImport(LibName)]
@@ -1456,7 +1581,7 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_MotionProperties_GetInverseMassUnchecked(nint properties);
 
     [LibraryImport(LibName)]
-    public static partial float JPH_MotionProperties_SetMassProperties(nint properties, AllowedDOFs allowedDOFs, MassProperties* massProperties);
+    public static partial float JPH_MotionProperties_SetMassProperties(nint properties, AllowedDOFs allowedDOFs, in MassProperties massProperties);
 
     [LibraryImport(LibName)]
     public static partial void JPH_MotionProperties_SetInverseMass(nint properties, float inverseMass);
@@ -1466,6 +1591,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_MotionProperties_GetInertiaRotation(nint properties, Quaternion* result);
     [LibraryImport(LibName)]
     public static partial void JPH_MotionProperties_SetInverseInertia(nint properties, Vector3* diagonal, Quaternion* rot);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotionProperties_ScaleToMass(nint properties, float mass);
 
     [LibraryImport(LibName)]
     public static partial void JPH_MassProperties_DecomposePrincipalMomentsOfInertia(in MassProperties properties, out Matrix4x4 rotation, out Vector3 diagonal);

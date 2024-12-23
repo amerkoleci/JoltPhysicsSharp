@@ -106,6 +106,18 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         set => JPH_BodyCreationSettings_SetAngularVelocity(Handle, &value);
     }
 
+    public ulong UserData
+    {
+        get => JPH_BodyCreationSettings_GetUserData(Handle);
+        set => JPH_BodyCreationSettings_SetUserData(Handle, value);
+    }
+
+    public ObjectLayer ObjectLayer
+    {
+        get => JPH_BodyCreationSettings_GetObjectLayer(Handle);
+        set => JPH_BodyCreationSettings_SetObjectLayer(Handle, value);
+    }
+
     public MotionType MotionType
     {
         get => JPH_BodyCreationSettings_GetMotionType(Handle);
@@ -116,6 +128,130 @@ public sealed unsafe class BodyCreationSettings : NativeObject
     {
         get => JPH_BodyCreationSettings_GetAllowedDOFs(Handle);
         set => JPH_BodyCreationSettings_SetAllowedDOFs(Handle, value);
+    }
+
+    public bool AllowDynamicOrKinematic
+    {
+        get => JPH_BodyCreationSettings_GetAllowDynamicOrKinematic(Handle);
+        set => JPH_BodyCreationSettings_SetAllowDynamicOrKinematic(Handle, value);
+    }
+
+    public bool IsSensor
+    {
+        get => JPH_BodyCreationSettings_GetIsSensor(Handle);
+        set => JPH_BodyCreationSettings_SetIsSensor(Handle, value);
+    }
+
+    public bool CollideKinematicVsNonDynamic
+    {
+        get => JPH_BodyCreationSettings_GetCollideKinematicVsNonDynamic(Handle);
+        set => JPH_BodyCreationSettings_SetCollideKinematicVsNonDynamic(Handle, value);
+    }
+
+    public bool UseManifoldReduction
+    {
+        get => JPH_BodyCreationSettings_GetUseManifoldReduction(Handle);
+        set => JPH_BodyCreationSettings_SetUseManifoldReduction(Handle, value);
+    }
+
+    public bool ApplyGyroscopicForce
+    {
+        get => JPH_BodyCreationSettings_GetApplyGyroscopicForce(Handle);
+        set => JPH_BodyCreationSettings_SetApplyGyroscopicForce(Handle, value);
+    }
+
+    public MotionQuality MotionQuality
+    {
+        get => JPH_BodyCreationSettings_GetMotionQuality(Handle);
+        set => JPH_BodyCreationSettings_SetMotionQuality(Handle, value);
+    }
+
+    public bool EnhancedInternalEdgeRemoval
+    {
+        get => JPH_BodyCreationSettings_GetEnhancedInternalEdgeRemoval(Handle);
+        set => JPH_BodyCreationSettings_SetEnhancedInternalEdgeRemoval(Handle, value);
+    }
+
+    public bool AllowSleeping
+    {
+        get => JPH_BodyCreationSettings_GetAllowSleeping(Handle);
+        set => JPH_BodyCreationSettings_SetAllowSleeping(Handle, value);
+    }
+
+    public float Friction
+    {
+        get => JPH_BodyCreationSettings_GetFriction(Handle);
+        set => JPH_BodyCreationSettings_SetFriction(Handle, value);
+    }
+
+    public float Restitution
+    {
+        get => JPH_BodyCreationSettings_GetRestitution(Handle);
+        set => JPH_BodyCreationSettings_SetRestitution(Handle, value);
+    }
+
+    public float LinearDamping
+    {
+        get => JPH_BodyCreationSettings_GetLinearDamping(Handle);
+        set => JPH_BodyCreationSettings_SetLinearDamping(Handle, value);
+    }
+
+    public float AngularDamping
+    {
+        get => JPH_BodyCreationSettings_GetAngularDamping(Handle);
+        set => JPH_BodyCreationSettings_SetAngularDamping(Handle, value);
+    }
+
+    public float MaxLinearVelocity
+    {
+        get => JPH_BodyCreationSettings_GetMaxLinearVelocity(Handle);
+        set => JPH_BodyCreationSettings_SetMaxLinearVelocity(Handle, value);
+    }
+
+    public float MaxAngularVelocity
+    {
+        get => JPH_BodyCreationSettings_GetMaxAngularVelocity(Handle);
+        set => JPH_BodyCreationSettings_SetMaxAngularVelocity(Handle, value);
+    }
+
+    public float GravityFactor
+    {
+        get => JPH_BodyCreationSettings_GetGravityFactor(Handle);
+        set => JPH_BodyCreationSettings_SetGravityFactor(Handle, value);
+    }
+
+    public uint NumVelocityStepsOverride
+    {
+        get => JPH_BodyCreationSettings_GetNumVelocityStepsOverride(Handle);
+        set => JPH_BodyCreationSettings_SetNumVelocityStepsOverride(Handle, value);
+    }
+
+    public uint NumPositionStepsOverride
+    {
+        get => JPH_BodyCreationSettings_GetNumPositionStepsOverride(Handle);
+        set => JPH_BodyCreationSettings_SetNumPositionStepsOverride(Handle, value);
+    }
+
+    public OverrideMassProperties OverrideMassProperties
+    {
+        get => JPH_BodyCreationSettings_GetOverrideMassProperties(Handle);
+        set => JPH_BodyCreationSettings_SetOverrideMassProperties(Handle, value);
+    }
+
+    public float InertiaMultiplier
+    {
+        get => JPH_BodyCreationSettings_GetInertiaMultiplier(Handle);
+        set => JPH_BodyCreationSettings_SetInertiaMultiplier(Handle, value);
+    }
+
+    public MassProperties MassPropertiesOverride
+    {
+        get
+        {
+            JPH_BodyCreationSettings_GetMassPropertiesOverride(Handle, out MassProperties result);
+            return result;
+        }
+        set => JPH_BodyCreationSettings_SetMassPropertiesOverride(Handle, &value);
     }
 
     protected override void DisposeNative()
