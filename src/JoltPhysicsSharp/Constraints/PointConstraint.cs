@@ -77,6 +77,11 @@ public sealed unsafe class PointConstraint : TwoBodyConstraint
     {
     }
 
+    public PointConstraint(PointConstraintSettings settings, in Body body1, in Body body2)
+        : base(JPH_PointConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
+    {
+    }
+
     public void SetPoint1(ConstraintSpace space, in Vector3 value)
     {
         fixed (Vector3* valuePtr = &value)
@@ -89,10 +94,23 @@ public sealed unsafe class PointConstraint : TwoBodyConstraint
             JPH_PointConstraint_SetPoint2(Handle, space, valuePtr);
     }
 
-    public Vector3 GetTotalLambdaPosition()
+    public Vector3 TotalLambdaPosition
     {
-        Vector3 result;
-        JPH_PointConstraint_GetTotalLambdaPosition(Handle, &result);
-        return result;
+        get
+        {
+            Vector3 result;
+            JPH_PointConstraint_GetTotalLambdaPosition(Handle, &result);
+            return result;
+        }
+    }
+
+    public void GetTotalLambdaPosition(out Vector3 result)
+    {
+        Unsafe.SkipInit(out result);
+
+        fixed (Vector3* resultPtr = &result)
+        {
+            JPH_PointConstraint_GetTotalLambdaPosition(Handle, resultPtr);
+        }
     }
 }

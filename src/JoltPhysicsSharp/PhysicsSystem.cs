@@ -218,32 +218,26 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_RemoveConstraint(Handle, constraint.Handle);
     }
 
-    public void AddConstraints(Constraint[] constraints)
+    public void AddConstraints(params Span<Constraint> constraints)
     {
-        unsafe
+        int count = constraints.Length;
+        nint* constraintsPtr = stackalloc nint[count];
+        for (int i = 0; i < count; i++)
         {
-            int count = constraints.Length;
-            IntPtr* constraintsPtr = stackalloc IntPtr[count];
-            for (int i = 0; i < count; i++)
-            {
-                constraintsPtr[i] = constraints[i].Handle;
-            }
-            JPH_PhysicsSystem_AddConstraints(Handle, constraintsPtr, (uint)count);
+            constraintsPtr[i] = constraints[i].Handle;
         }
+        JPH_PhysicsSystem_AddConstraints(Handle, constraintsPtr, (uint)count);
     }
 
-    public void RemoveConstraints(Constraint[] constraints)
+    public void RemoveConstraints(params Span<Constraint> constraints)
     {
-        unsafe
+        int count = constraints.Length;
+        nint* constraintsPtr = stackalloc nint[count];
+        for (int i = 0; i < count; i++)
         {
-            int count = constraints.Length;
-            IntPtr* constraintsPtr = stackalloc IntPtr[count];
-            for (int i = 0; i < count; i++)
-            {
-                constraintsPtr[i] = constraints[i].Handle;
-            }
-            JPH_PhysicsSystem_RemoveConstraints(Handle, constraintsPtr, (uint)count);
+            constraintsPtr[i] = constraints[i].Handle;
         }
+        JPH_PhysicsSystem_RemoveConstraints(Handle, constraintsPtr, (uint)count);
     }
 
     public void DrawBodies(in DrawSettings settings, DebugRenderer renderer, BodyDrawFilter? bodyDrawFilter = default)

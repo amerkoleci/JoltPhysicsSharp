@@ -9,7 +9,7 @@ namespace JoltPhysicsSharp;
 
 public abstract class TwoBodyConstraintSettings : ConstraintSettings
 {
-    protected TwoBodyConstraintSettings(IntPtr handle)
+    protected TwoBodyConstraintSettings(nint handle)
         : base(handle)
     {
     }
@@ -19,7 +19,7 @@ public abstract class TwoBodyConstraintSettings : ConstraintSettings
 
 public abstract unsafe class TwoBodyConstraint : Constraint
 {
-    protected TwoBodyConstraint(IntPtr handle)
+    protected TwoBodyConstraint(nint handle)
         : base(handle)
     {
     }
@@ -34,33 +34,31 @@ public abstract unsafe class TwoBodyConstraint : Constraint
         get => Body.GetObject(JPH_TwoBodyConstraint_GetBody2(Handle))!;
     }
 
-    public Matrix4x4 GetConstraintToBody1Matrix()
+    public Matrix4x4 ConstraintToBody1Matrix
     {
-        Matrix4x4 result;
-        JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, &result);
-        return result;
+        get
+        {
+            JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, out Matrix4x4 result);
+            return result;
+        }
+    }
+
+    public Matrix4x4 ConstraintToBody2Matrix
+    {
+        get
+        {
+            JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, out Matrix4x4 result);
+            return result;
+        }
     }
 
     public void GetConstraintToBody1Matrix(out Matrix4x4 result)
     {
-        Unsafe.SkipInit(out result);
-
-        fixed (Matrix4x4* resultPtr = &result)
-            JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, resultPtr);
-    }
-
-    public Matrix4x4 GetConstraintToBody2Matrix()
-    {
-        Matrix4x4 result;
-        JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, &result);
-        return result;
+        JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, out result);
     }
 
     public void GetConstraintToBody2Matrix(out Matrix4x4 result)
     {
-        Unsafe.SkipInit(out result);
-
-        fixed (Matrix4x4* resultPtr = &result)
-            JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, resultPtr);
+        JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, out result);
     }
 }

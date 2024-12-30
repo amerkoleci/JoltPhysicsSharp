@@ -8,8 +8,8 @@ namespace JoltPhysicsSharp;
 
 public unsafe class ConeConstraintSettings : TwoBodyConstraintSettings
 {
-    internal ConeConstraintSettings(nint handle)
-        : base(handle)
+    public ConeConstraintSettings()
+        : base(JPH_ConeConstraintSettings_Create())
     {
     }
 
@@ -88,6 +88,11 @@ public unsafe class ConeConstraint : TwoBodyConstraint
     {
     }
 
+    public ConeConstraint(ConeConstraintSettings settings, in Body body1, in Body body2)
+        : base(JPH_ConeConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
+    {
+    }
+
     public float CosHalfConeAngle
     {
         get => JPH_ConeConstraint_GetCosHalfConeAngle(Handle);
@@ -104,11 +109,5 @@ public unsafe class ConeConstraint : TwoBodyConstraint
         }
     }
 
-    public float TotalLambdaRotation
-    {
-        get
-        {
-            return JPH_ConeConstraint_GetTotalLambdaRotation(Handle);
-        }
-    }
+    public float TotalLambdaRotation => JPH_ConeConstraint_GetTotalLambdaRotation(Handle);
 }

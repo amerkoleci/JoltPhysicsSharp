@@ -6,13 +6,13 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public abstract class ConstraintSettings : NativeObject
+public class ConstraintSettings : NativeObject
 {
     protected ConstraintSettings()
     {
     }
 
-    protected ConstraintSettings(nint handle)
+    internal ConstraintSettings(nint handle)
         : base(handle)
     {
     }
@@ -21,11 +21,52 @@ public abstract class ConstraintSettings : NativeObject
     {
         JPH_ConstraintSettings_Destroy(Handle);
     }
+
+    public bool Enabled
+    {
+        get => JPH_ConstraintSettings_GetEnabled(Handle);
+        set => JPH_ConstraintSettings_SetEnabled(Handle, value);
+    }
+
+    public uint ConstraintPriority
+    {
+        get => JPH_ConstraintSettings_GetConstraintPriority(Handle);
+        set => JPH_ConstraintSettings_SetConstraintPriority(Handle, value);
+    }
+
+    public uint NumVelocityStepsOverride
+    {
+        get => JPH_ConstraintSettings_GetNumVelocityStepsOverride(Handle);
+        set => JPH_ConstraintSettings_SetNumVelocityStepsOverride(Handle, value);
+    }
+
+    public uint NumPositionStepsOverride
+    {
+        get => JPH_ConstraintSettings_GetNumPositionStepsOverride(Handle);
+        set => JPH_ConstraintSettings_SetNumPositionStepsOverride(Handle, value);
+    }
+
+    public float DrawConstraintSize
+    {
+        get => JPH_ConstraintSettings_GetDrawConstraintSize(Handle);
+        set => JPH_ConstraintSettings_SetDrawConstraintSize(Handle, value);
+    }
+
+    public ulong UserData
+    {
+        get => JPH_ConstraintSettings_GetUserData(Handle);
+        set => JPH_ConstraintSettings_SetUserData(Handle, value);
+    }
+
+    internal static ConstraintSettings? GetObject(nint handle)
+    {
+        return GetOrAddObject(handle, (nint h) => new ConstraintSettings(h));
+    }
 }
 
 public abstract class Constraint : NativeObject
 {
-    protected Constraint(IntPtr handle)
+    protected Constraint(nint handle)
         : base(handle)
     {
     }
@@ -45,10 +86,9 @@ public abstract class Constraint : NativeObject
         get => JPH_Constraint_GetSubType(Handle);
     }
 
-    // TODO: Handle type of settings here stuff here
-    public nint ConstraintSettings
+    public ConstraintSettings? ConstraintSettings
     {
-        get => JPH_Constraint_GetConstraintSettings(Handle);
+        get => ConstraintSettings.GetObject(JPH_Constraint_GetConstraintSettings(Handle));
     }
 
     public bool Enabled
@@ -69,11 +109,8 @@ public abstract class Constraint : NativeObject
         set => JPH_Constraint_SetUserData(Handle, value);
     }
 
-    public unsafe void NotifyShapeChanged(in BodyID bodyID, in Vector3 deltaCOM)
+    public void NotifyShapeChanged(in BodyID bodyID, in Vector3 deltaCOM)
     {
-        fixed (Vector3* deltaCOMPtr = &deltaCOM)
-        {
-            JPH_Constraint_NotifyShapeChanged(Handle, bodyID, deltaCOMPtr);
-        }
+        JPH_Constraint_NotifyShapeChanged(Handle, bodyID, in deltaCOM);
     }
 }

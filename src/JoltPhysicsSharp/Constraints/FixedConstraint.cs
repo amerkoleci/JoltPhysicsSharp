@@ -125,23 +125,35 @@ public unsafe class FixedConstraint : TwoBodyConstraint
     {
     }
 
-    public Vector3 GetTotalLambdaPosition()
+    public FixedConstraint(FixedConstraintSettings settings, in Body body1, in Body body2)
+        : base(JPH_FixedConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
     {
-        Vector3 result;
-        JPH_FixedConstraint_GetTotalLambdaPosition(Handle, &result);
-        return result;
     }
 
-    public Vector3 GetTotalLambdaRotation()
+    public Vector3 TotalLambdaPosition
     {
-        Vector3 result;
-        JPH_FixedConstraint_GetTotalLambdaRotation(Handle, &result);
-        return result;
+        get
+        {
+            Vector3 result;
+            JPH_FixedConstraint_GetTotalLambdaPosition(Handle, &result);
+            return result;
+        }
+    }
+
+    public Vector3 TotalLambdaRotation
+    {
+        get
+        {
+            Vector3 result;
+            JPH_FixedConstraint_GetTotalLambdaRotation(Handle, &result);
+            return result;
+        }
     }
 
     public void GetTotalLambdaPosition(out Vector3 result)
     {
         Unsafe.SkipInit(out result);
+
         fixed (Vector3* resultPtr = &result)
         {
             JPH_FixedConstraint_GetTotalLambdaPosition(Handle, resultPtr);
@@ -151,6 +163,7 @@ public unsafe class FixedConstraint : TwoBodyConstraint
     public void GetTotalLambdaRotation(out Vector3 result)
     {
         Unsafe.SkipInit(out result);
+
         fixed (Vector3* resultPtr = &result)
         {
             JPH_FixedConstraint_GetTotalLambdaRotation(Handle, resultPtr);

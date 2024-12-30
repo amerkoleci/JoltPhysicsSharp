@@ -30,4 +30,9 @@ public sealed class SliderConstraint : TwoBodyConstraint
         : base(handle)
     {
     }
+
+    public SliderConstraint(SliderConstraintSettings settings, in Body body1, in Body body2)
+        : base(JPH_SliderConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
+    {
+    }
 }
