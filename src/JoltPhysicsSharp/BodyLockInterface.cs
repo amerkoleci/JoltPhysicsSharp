@@ -43,4 +43,26 @@ public readonly struct BodyLockInterface : IEquatable<BodyLockInterface>
     {
         JPH_BodyLockInterface_UnlockWrite(Handle, in @lock);
     }
+
+    public unsafe BodyLockMultiRead LockMultiRead(Span<BodyID> bodyIDs)
+    {
+        uint* bodyIDsPtr = stackalloc uint[bodyIDs.Length];
+        for (int i = 0; i < bodyIDs.Length; i++)
+        {
+            bodyIDsPtr[i] = bodyIDs[i];
+        }
+
+        return JPH_BodyLockInterface_LockMultiRead(Handle, bodyIDsPtr, (uint)bodyIDs.Length);
+    }
+
+    public unsafe BodyLockMultiWrite LockMultiWrite(Span<BodyID> bodyIDs)
+    {
+        uint* bodyIDsPtr = stackalloc uint[bodyIDs.Length];
+        for (int i = 0; i < bodyIDs.Length; i++)
+        {
+            bodyIDsPtr[i] = bodyIDs[i];
+        }
+
+        return JPH_BodyLockInterface_LockMultiWrite(Handle, bodyIDsPtr, (uint)bodyIDs.Length);
+    }
 }

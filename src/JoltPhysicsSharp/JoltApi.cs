@@ -1666,6 +1666,20 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_BodyLockInterface_UnlockWrite(nint lockInterface, in BodyLockWrite @lock);
 
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyLockInterface_LockMultiRead(nint lockInterface, uint* bodyIDs, uint count);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyLockMultiRead_Destroy(nint ioLock);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyLockMultiRead_GetBody(nint ioLock, uint bodyIndex);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyLockInterface_LockMultiWrite(nint lockInterface, uint* bodyIDs, uint count);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyLockMultiWrite_Destroy(nint ioLock);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyLockMultiWrite_GetBody(nint ioLock, uint bodyIndex);
+
     /* JPH_MotionProperties */
     [LibraryImport(LibName)]
     public static partial AllowedDOFs JPH_MotionProperties_GetAllowedDOFs(nint properties);
