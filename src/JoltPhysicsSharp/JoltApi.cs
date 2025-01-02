@@ -2458,6 +2458,7 @@ internal static unsafe partial class JoltApi
         public float mass;
         public float friction;
         public float gravityFactor;
+        public AllowedDOFs allowedDOFs;
     }
 
     /* CharacterSettings */
@@ -2683,12 +2684,26 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_SetInnerBodyShape(nint character, nint shape);
 
+    [LibraryImport(LibName)]
+    public static partial uint JPH_CharacterVirtual_GetNumContacts(nint character);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_HasCollidedWithBody(nint character, in BodyID bodyId);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_HasCollidedWith(nint character, nint other);
+
     public struct JPH_CharacterContactListener_Procs
     {
         public delegate* unmanaged<nint, nint, nint, Vector3*, Vector3*, void> OnAdjustBodyVelocity;
         public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Bool8> OnContactValidate;
+        public delegate* unmanaged<nint, nint, nint, SubShapeID, Bool8> OnCharacterContactValidate;
         public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, CharacterContactSettings*, void> OnContactAdded;
+        public delegate* unmanaged<nint, nint, nint, SubShapeID, Vector3*, Vector3*, CharacterContactSettings*, void> OnCharacterContactAdded;
         public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, Vector3*, nint, Vector3*, Vector3*, void> OnContactSolve;
+        public delegate* unmanaged<nint, nint, nint, SubShapeID, Vector3*, Vector3*, Vector3*, nint, Vector3*, Vector3*, void> OnCharacterContactSolve;
     }
 
     [LibraryImport(LibName)]

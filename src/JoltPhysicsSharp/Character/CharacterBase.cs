@@ -12,8 +12,13 @@ public abstract class CharacterBase : NativeObject
     {
     }
 
-    protected CharacterBase(IntPtr handle)
+    protected CharacterBase(nint handle)
         : base(handle)
+    {
+    }
+
+    protected CharacterBase(nint handle, bool owns)
+        : base(handle, owns)
     {
     }
 

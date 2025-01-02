@@ -14,25 +14,41 @@ public sealed class CharacterVirtual : CharacterBase
     {
         OnAdjustBodyVelocity = &OnAdjustBodyVelocityCallback,
         OnContactValidate = &OnContactValidateCallback,
+        OnCharacterContactValidate = &OnCharacterContactValidateCallback,
         OnContactAdded = &OnContactAddedCallback,
-        OnContactSolve = &OnContactSolveCallback
+        OnCharacterContactAdded = &OnCharacterContactAddedCallback,
+        OnContactSolve = &OnContactSolveCallback,
+        OnCharacterContactSolve = &OnCharacterContactSolveCallback,
     };
 
-    public delegate void AdjustBodyVelocityHandler(CharacterVirtual character, in Body body2, Vector3 linearVelocity, Vector3 angularVelocity);
+    public delegate void AdjustBodyVelocityHandler(CharacterVirtual character, in Body body2, ref Vector3 linearVelocity, ref Vector3 angularVelocity);
     public delegate bool ContactValidateHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2);
+    public delegate bool CharacterContactValidateHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2);
     public delegate void ContactAddedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNornal, ref CharacterContactSettings settings);
+    public delegate void CharacterContactAddedHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNornal, ref CharacterContactSettings settings);
     public delegate void ContactSolveHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2,
         in Double3 contactPosition,
         in Vector3 contactNornal,
         in Vector3 contactVelocity,
-        /*JPH_PhysicsMaterial*/nint contactMaterial,
+        PhysicsMaterial? contactMaterial,
         in Vector3 characterVelocity,
-        out Vector3 newCharacterVelocity);
+        ref Vector3 ioNewCharacterVelocity);
+
+    public delegate void CharacterContactSolveHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2,
+        in Double3 contactPosition,
+        in Vector3 contactNornal,
+        in Vector3 contactVelocity,
+        PhysicsMaterial? contactMaterial,
+        in Vector3 characterVelocity,
+        ref Vector3 ioNewCharacterVelocity);
 
     public event AdjustBodyVelocityHandler? OnAdjustBodyVelocity;
     public event ContactValidateHandler? OnContactValidate;
+    public event CharacterContactValidateHandler? OnCharacterContactValidate;
     public event ContactAddedHandler? OnContactAdded;
+    public event CharacterContactAddedHandler? OnCharacterContactAdded;
     public event ContactSolveHandler? OnContactSolve;
+    public event CharacterContactSolveHandler? OnCharacterContactSolve;
 
     public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
     {
@@ -57,6 +73,11 @@ public sealed class CharacterVirtual : CharacterBase
 
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listener_Procs, listenerContext);
+    }
+
+    internal CharacterVirtual(nint handle, bool owns)
+        : base(handle, owns)
+    {
     }
 
     protected override void DisposeNative()
@@ -301,15 +322,40 @@ public sealed class CharacterVirtual : CharacterBase
         JPH_CharacterVirtual_SetInnerBodyShape(Handle, shape.Handle);
     }
 
+    public uint GetNumContacts()
+    {
+        return JPH_CharacterVirtual_GetNumContacts(Handle);
+    }
+
+    public bool HasCollidedWith(in BodyID bodyID)
+    {
+        return JPH_CharacterVirtual_HasCollidedWithBody(Handle, in bodyID);
+    }
+
+    public bool HasCollidedWith(CharacterVirtual other)
+    {
+        return JPH_CharacterVirtual_HasCollidedWith(Handle, other.Handle);
+    }
+
+    internal static CharacterVirtual? GetObject(nint handle)
+    {
+        return GetOrAddObject(handle, (nint h) => new CharacterVirtual(h, false));
+    }
+
     #region CharacterContactListener
     [UnmanagedCallersOnly]
-    private static unsafe void OnAdjustBodyVelocityCallback(nint context, nint character, nint body2, Vector3* linearVelocity, Vector3* angularVelocity)
+    private static unsafe void OnAdjustBodyVelocityCallback(nint context,
+        nint character, nint body2, Vector3* ioLinearVelocity, Vector3* ioAngularVelocity)
     {
         CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
 
         if (listener.OnAdjustBodyVelocity != null)
         {
-            listener.OnAdjustBodyVelocity(listener, Body.GetObject(body2)!, *linearVelocity, *angularVelocity);
+            Vector3 linearVelocity = *ioLinearVelocity;
+            Vector3 angularVelocity = *ioAngularVelocity;
+            listener.OnAdjustBodyVelocity(listener, Body.GetObject(body2)!, ref linearVelocity, ref angularVelocity);
+            *ioLinearVelocity = linearVelocity;
+            *ioAngularVelocity = angularVelocity;
         }
     }
 
@@ -321,6 +367,19 @@ public sealed class CharacterVirtual : CharacterBase
         if (listener.OnContactValidate != null)
         {
             return listener.OnContactValidate(listener, bodyID2, subShapeID2);
+        }
+
+        return true;
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe Bool8 OnCharacterContactValidateCallback(nint context, nint character, nint otherCharacter, SubShapeID subShapeID2)
+    {
+        CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
+
+        if (listener.OnCharacterContactValidate != null)
+        {
+            return listener.OnCharacterContactValidate(listener, GetObject(otherCharacter)!, subShapeID2);
         }
 
         return true;
@@ -344,6 +403,29 @@ public sealed class CharacterVirtual : CharacterBase
     }
 
     [UnmanagedCallersOnly]
+    private static unsafe void OnCharacterContactAddedCallback(nint context, nint character,
+        nint otherCharacter,
+        SubShapeID subShapeID2,
+        Vector3* contactPosition, // JPH_RVec3
+        Vector3* contactNormal,
+        CharacterContactSettings* ioSettings)
+    {
+        CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
+
+        if (listener.OnCharacterContactAdded != null)
+        {
+            CharacterContactSettings settings = *ioSettings;
+            listener.OnCharacterContactAdded(listener,
+                GetObject(otherCharacter)!,
+                subShapeID2,
+                new Double3(*contactPosition),
+                *contactNormal,
+                ref settings);
+            *ioSettings = settings;
+        }
+    }
+
+    [UnmanagedCallersOnly]
     private static unsafe void OnContactSolveCallback(nint context, nint character,
         BodyID bodyID2, SubShapeID subShapeID2,
         Vector3* contactPosition, // JPH_RVec3
@@ -351,19 +433,51 @@ public sealed class CharacterVirtual : CharacterBase
         Vector3* contactVelocity,
         nint contactMaterial, // JPH_PhysicsMaterial
         Vector3* characterVelocity,
-        Vector3* newCharacterVelocity)
+        Vector3* ioNewCharacterVelocity)
     {
         CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
 
         if (listener.OnContactSolve != null)
         {
-            Vector3 newCharacterVelocityIn = *newCharacterVelocity;
+            Vector3 newCharacterVelocity = *ioNewCharacterVelocity;
             listener.OnContactSolve(listener, bodyID2, subShapeID2,
                 new Double3(*contactPosition),
                 *contactNormal,
                 *contactVelocity,
-                contactMaterial, *characterVelocity, out newCharacterVelocityIn);
-            *newCharacterVelocity = newCharacterVelocityIn;
+                PhysicsMaterial.GetObject(contactMaterial),
+                *characterVelocity,
+                ref newCharacterVelocity);
+
+            *ioNewCharacterVelocity = newCharacterVelocity;
+        }
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe void OnCharacterContactSolveCallback(nint context, nint character,
+        nint otherCharacter,
+        SubShapeID subShapeID2,
+        Vector3* contactPosition, // JPH_RVec3
+        Vector3* contactNormal,
+        Vector3* contactVelocity,
+        nint contactMaterial, // JPH_PhysicsMaterial
+        Vector3* characterVelocity,
+        Vector3* ioNewCharacterVelocity)
+    {
+        CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
+
+        if (listener.OnCharacterContactSolve != null)
+        {
+            Vector3 newCharacterVelocity = *ioNewCharacterVelocity;
+            listener.OnCharacterContactSolve(listener, GetObject(otherCharacter)!,
+                subShapeID2,
+                new Double3(*contactPosition),
+                *contactNormal,
+                *contactVelocity,
+                PhysicsMaterial.GetObject(contactMaterial),
+                *characterVelocity,
+                ref newCharacterVelocity);
+
+            *ioNewCharacterVelocity = newCharacterVelocity;
         }
     }
     #endregion

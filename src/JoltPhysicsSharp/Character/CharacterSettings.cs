@@ -19,6 +19,7 @@ public sealed class CharacterSettings : CharacterBaseSettings
         Mass = native.mass;
         Friction = native.friction;
         GravityFactor = native.gravityFactor;
+        AllowedDOFs = native.allowedDOFs;
     }
 
     public ObjectLayer Layer { get; set; }
@@ -28,6 +29,8 @@ public sealed class CharacterSettings : CharacterBaseSettings
     public float Friction { get; set; }
 
     public float GravityFactor { get; set; }
+
+    public AllowedDOFs AllowedDOFs { get; set; }
 
     internal unsafe void ToNative(JPH_CharacterSettings* native)
     {
@@ -41,6 +44,7 @@ public sealed class CharacterSettings : CharacterBaseSettings
         native->mass = Mass;
         native->friction = Friction;
         native->gravityFactor = GravityFactor;
+        native->allowedDOFs = AllowedDOFs;
     }
 }
 
