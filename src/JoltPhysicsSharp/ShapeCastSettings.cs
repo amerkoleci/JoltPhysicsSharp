@@ -11,7 +11,6 @@ namespace JoltPhysicsSharp;
 public unsafe struct ShapeCastSettings
 {
     // CollideSettingsBase
-
     /// <summary>
     /// How active edges (edges that a moving object should bump into) are handled
     /// </summary>
@@ -74,7 +73,23 @@ public unsafe struct ShapeCastSettings
         ReturnDeepestPoint = native.returnDeepestPoint;
     }
 
-    internal void ToNative(JPH_ShapeCastSettings* native)
+    internal static ShapeCastSettings FromNative(in JPH_ShapeCastSettings native)
+    {
+        ShapeCastSettings result = default;
+        result.ActiveEdgeMode = native.@base.activeEdgeMode;
+        result.CollectFacesMode = native.@base.collectFacesMode;
+        result.CollisionTolerance = native.@base.collisionTolerance;
+        result.PenetrationTolerance = native.@base.penetrationTolerance;
+        result.ActiveEdgeMovementDirection = native.@base.activeEdgeMovementDirection;
+
+        result.BackFaceModeTriangles = native.backFaceModeTriangles;
+        result.BackFaceModeConvex = native.backFaceModeConvex;
+        result.UseShrunkenShapeAndConvexRadius = native.useShrunkenShapeAndConvexRadius;
+        result.ReturnDeepestPoint = native.returnDeepestPoint;
+        return result;
+    }
+
+    internal readonly void ToNative(JPH_ShapeCastSettings* native)
     {
         native->@base.activeEdgeMode = ActiveEdgeMode;
         native->@base.collectFacesMode = CollectFacesMode;

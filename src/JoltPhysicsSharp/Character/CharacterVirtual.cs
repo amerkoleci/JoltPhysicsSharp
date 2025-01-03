@@ -58,8 +58,10 @@ public sealed class CharacterVirtual : CharacterBase
         JPH_CharacterVirtualSettings nativeSettings;
         settings.ToNative(&nativeSettings);
         Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listener_Procs, listenerContext);
+        JPH_CharacterVirtual_SetListener(Handle, _listenerHandle);
     }
 
     public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Double3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
@@ -73,6 +75,7 @@ public sealed class CharacterVirtual : CharacterBase
 
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listener_Procs, listenerContext);
+        JPH_CharacterVirtual_SetListener(Handle, _listenerHandle);
     }
 
     internal CharacterVirtual(nint handle, bool owns)
@@ -83,6 +86,18 @@ public sealed class CharacterVirtual : CharacterBase
     protected override void DisposeNative()
     {
         JPH_CharacterContactListener_Destroy(_listenerHandle);
+    }
+
+    public void SetCharacterVsCharacterCollision(CharacterVsCharacterCollision? characterVsCharacterCollision)
+    {
+        if (characterVsCharacterCollision is not null)
+        {
+            JPH_CharacterVirtual_SetCharacterVsCharacterCollision(Handle, characterVsCharacterCollision.Handle);
+        }
+        else
+        {
+            JPH_CharacterVirtual_SetCharacterVsCharacterCollision(Handle, 0);
+        }
     }
 
     public Vector3 LinearVelocity

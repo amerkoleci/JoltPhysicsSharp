@@ -8,7 +8,7 @@ using static JoltPhysicsSharp.JoltApi;
 namespace JoltPhysicsSharp;
 
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
-public unsafe struct CollideShapeSettings
+public struct CollideShapeSettings
 {
     // CollideSettingsBase
 
@@ -47,7 +47,7 @@ public unsafe struct CollideShapeSettings
     /// </summary>
     public BackFaceMode BackFaceMode;
 
-    public CollideShapeSettings()
+    public unsafe CollideShapeSettings()
     {
         JPH_CollideShapeSettings native;
         JPH_CollideShapeSettings_Init(&native);
@@ -62,7 +62,20 @@ public unsafe struct CollideShapeSettings
         BackFaceMode = native.backFaceMode;
     }
 
-    internal void ToNative(JPH_CollideShapeSettings* native)
+    internal static CollideShapeSettings FromNative(in JPH_CollideShapeSettings native)
+    {
+        CollideShapeSettings result = default;
+        result.ActiveEdgeMode = native.@base.activeEdgeMode;
+        result.CollectFacesMode = native.@base.collectFacesMode;
+        result.CollisionTolerance = native.@base.collisionTolerance;
+        result.PenetrationTolerance = native.@base.penetrationTolerance;
+        result.ActiveEdgeMovementDirection = native.@base.activeEdgeMovementDirection;
+        result.MaxSeparationDistance = native.maxSeparationDistance;
+        result.BackFaceMode = native.backFaceMode;
+        return result;
+    }
+
+    internal readonly unsafe void ToNative(JPH_CollideShapeSettings* native)
     {
         native->@base.activeEdgeMode = ActiveEdgeMode;
         native->@base.collectFacesMode = CollectFacesMode;

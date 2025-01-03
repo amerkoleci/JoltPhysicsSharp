@@ -19,9 +19,9 @@ using unsafe JPH_CollidePointResultCallback = delegate* unmanaged<nint, CollideP
 using unsafe JPH_CollideShapeResultCallback = delegate* unmanaged<nint, CollideShapeResult*, void>;
 using unsafe JPH_CastShapeResultCallback = delegate* unmanaged<nint, ShapeCastResult*, void>;
 
-using unsafe JPH_RayCastBodyCollector = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
+using unsafe JPH_RayCastBodyCollectorCallback = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
 //public delegate float RayCastBodyCollector(nint userData, in BroadPhaseCastResult result);
-using unsafe JPH_CollideShapeBodyCollector = delegate* unmanaged<nint, BodyID*, float>;
+using unsafe JPH_CollideShapeBodyCollectorCallback = delegate* unmanaged<nint, BodyID*, float>;
 
 using unsafe JPH_CastRayCollector = delegate* unmanaged<nint, RayCastResult*, float>;
 using unsafe JPH_CollidePointCollector = delegate* unmanaged<nint, CollidePointResult*, float>;
@@ -1863,7 +1863,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CastRay(nint query,
         in Vector3 origin, in Vector3 direction,
-        JPH_RayCastBodyCollector callback,
+        JPH_RayCastBodyCollectorCallback callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
@@ -1872,7 +1872,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollideAABox(nint query,
         in BoundingBox box,
-        JPH_CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollectorCallback callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
@@ -1881,7 +1881,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollideSphere(nint query,
         in Vector3 center, float radius,
-        JPH_CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollectorCallback callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
@@ -1890,7 +1890,7 @@ internal static unsafe partial class JoltApi
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_BroadPhaseQuery_CollidePoint(nint query,
         in Vector3 point,
-        JPH_CollideShapeBodyCollector callback,
+        JPH_CollideShapeBodyCollectorCallback callback,
         nint userData,
         nint broadPhaseLayerFilter,
         nint objectLayerFilter);
@@ -2665,6 +2665,12 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings, in Double3 position, in Quaternion rotation, ulong userData, nint physicsSystem);
 
     [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterVirtual_SetListener(nint settings, nint listener);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterVirtual_SetCharacterVsCharacterCollision(nint settings, nint listener);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_GetLinearVelocity(nint handle, out Vector3 velocity);
 
     [LibraryImport(LibName)]
@@ -2802,6 +2808,29 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterContactListener_Destroy(nint listener);
+    #endregion
+
+    #region CharacterVsCharacterCollision
+    public struct JPH_CharacterVsCharacterCollision_Procs
+    {
+        public delegate* unmanaged<nint, nint, Matrix4x4*, JPH_CollideShapeSettings*, Vector3*, void> CollideCharacter;
+        public delegate* unmanaged<nint, nint, Matrix4x4*, Vector3*, JPH_ShapeCastSettings*, Vector3*, void> CastCharacter;
+    }
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterVsCharacterCollision_Create(JPH_CharacterVsCharacterCollision_Procs procs, nint userData);
+
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterVsCharacterCollision_CreateSimple();
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVsCharacterCollisionSimple_AddCharacter(nint characterVsCharacter, nint character);
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVsCharacterCollisionSimple_RemoveCharacter(nint characterVsCharacter, nint character);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVsCharacterCollision_Destroy(nint handle);
     #endregion
 
     #region DebugRenderer
