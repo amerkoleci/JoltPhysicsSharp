@@ -9,75 +9,61 @@ namespace JoltPhysicsSharp;
 public unsafe class ConeConstraintSettings : TwoBodyConstraintSettings
 {
     public ConeConstraintSettings()
-        : base(JPH_ConeConstraintSettings_Create())
     {
+        JPH_ConeConstraintSettings native;
+        JPH_ConeConstraintSettings_Init(&native);
+
+        FromNative(native);
     }
 
-    public Vector3 Point1
+    internal ConeConstraintSettings(in JPH_ConeConstraintSettings native)
     {
-        get
-        {
-            Vector3 result;
-            JPH_ConeConstraintSettings_GetPoint1(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_ConeConstraintSettings_SetPoint1(Handle, &value);
-        }
+        FromNative(native);
     }
 
-    public Vector3 Point2
-    {
-        get
-        {
-            Vector3 result;
-            JPH_ConeConstraintSettings_GetPoint2(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_ConeConstraintSettings_SetPoint2(Handle, &value);
-        }
-    }
+    public ConstraintSpace Space { get; set; }
 
-    public Vector3 TwistAxis1
-    {
-        get
-        {
-            Vector3 result;
-            JPH_ConeConstraintSettings_GetTwistAxis1(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_ConeConstraintSettings_SetTwistAxis1(Handle, &value);
-        }
-    }
-
-    public Vector3 TwistAxis2
-    {
-        get
-        {
-            Vector3 result;
-            JPH_ConeConstraintSettings_GetTwistAxis2(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_ConeConstraintSettings_SetTwistAxis2(Handle, &value);
-        }
-    }
-
-    public float CosHalfConeAngle
-    {
-        get => JPH_ConeConstraintSettings_GetHalfConeAngle(Handle);
-        set => JPH_ConeConstraintSettings_SetHalfConeAngle(Handle, value);
-    }
+    public Vector3 Point1 { get; set; }
+    public Vector3 TwistAxis1 { get; set; }
+    public Vector3 Point2 { get; set; }
+    public Vector3 TwistAxis2 { get; set; }
+    public float HalfConeAngle { get; set; }
 
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
-        return new ConeConstraint(JPH_ConeConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
+        return new ConeConstraint(CreateConstraintNative(in body1, in body2));
+    }
+
+    internal nint CreateConstraintNative(in Body body1, in Body body2)
+    {
+        JPH_ConeConstraintSettings nativeSettings;
+        ToNative(&nativeSettings);
+
+        return JPH_ConeConstraint_Create(&nativeSettings, body1.Handle, body2.Handle);
+    }
+
+    private void FromNative(in JPH_ConeConstraintSettings native)
+    {
+        FromNative(native.baseSettings);
+
+        Space = native.space;
+        Point1 = native.point1;
+        TwistAxis1 = native.twistAxis1;
+        Point2 = native.point2;
+        TwistAxis2 = native.twistAxis2;
+        HalfConeAngle = native.halfConeAngle;
+    }
+
+    internal void ToNative(JPH_ConeConstraintSettings* native)
+    {
+        ToNative(ref native->baseSettings);
+
+        native->space = Space;
+        native->point1 = Point1;
+        native->twistAxis1 = TwistAxis1;
+        native->point2 = Point2;
+        native->twistAxis2 = TwistAxis2;
+        native->halfConeAngle = HalfConeAngle;
     }
 }
 
@@ -89,8 +75,17 @@ public unsafe class ConeConstraint : TwoBodyConstraint
     }
 
     public ConeConstraint(ConeConstraintSettings settings, in Body body1, in Body body2)
-        : base(JPH_ConeConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
+        : base(settings.CreateConstraintNative(in body1, in body2))
     {
+    }
+
+    public ConeConstraintSettings Settings
+    {
+        get
+        {
+            JPH_ConeConstraint_GetSettings(Handle, out JPH_ConeConstraintSettings native);
+            return new(native);
+        }
     }
 
     public float CosHalfConeAngle
@@ -103,8 +98,7 @@ public unsafe class ConeConstraint : TwoBodyConstraint
     {
         get
         {
-            Vector3 result;
-            JPH_ConeConstraint_GetTotalLambdaPosition(Handle, &result);
+            JPH_ConeConstraint_GetTotalLambdaPosition(Handle, out Vector3 result);
             return result;
         }
     }

@@ -3,6 +3,7 @@
 
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text;
@@ -872,52 +873,166 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_SoftBodyCreationSettings_Destroy(nint settings);
 
     #region JPH_Constraint
+    public struct JPH_ConstraintSettings
+    {
+        public Bool8 enabled;
+        public uint constraintPriority;
+        public uint numVelocityStepsOverride;
+        public uint numPositionStepsOverride;
+        public float drawConstraintSize;
+        public ulong userData;
+    }
+
+    public struct JPH_FixedConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Bool8 autoDetectPoint;
+        public Vector3 point1; /* JPH_RVec3 */
+        public Vector3 axisX1;
+        public Vector3 axisY1;
+        public Vector3 point2; /* JPH_RVec3 */
+        public Vector3 axisX2;
+        public Vector3 axisY2;
+    }
+
+    public struct JPH_DistanceConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Vector3 point1;                /* JPH_RVec3 */
+        public Vector3 point2;                /* JPH_RVec3 */
+        public float minDistance;
+        public float maxDistance;
+        public SpringSettings limitsSpringSettings;
+    }
+
+    public struct JPH_PointConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Vector3 point1;                /* JPH_RVec3 */
+        public Vector3 point2;                /* JPH_RVec3 */
+    }
+
+    public struct JPH_HingeConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Vector3 point1;                /* JPH_RVec3 */
+        public Vector3 hingeAxis1;
+        public Vector3 normalAxis1;
+        public Vector3 point2;                /* JPH_RVec3 */
+        public Vector3 hingeAxis2;
+        public Vector3 normalAxis2;
+        public float limitsMin;
+        public float limitsMax;
+        public SpringSettings limitsSpringSettings;
+        public float maxFrictionTorque;
+        public MotorSettings motorSettings;
+    }
+
+    public struct JPH_SliderConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Bool8 autoDetectPoint;
+        public Vector3 point1;                /* JPH_RVec3 */
+        public Vector3 sliderAxis1;
+        public Vector3 normalAxis1;
+        public Vector3 point2;                /* JPH_RVec3 */
+        public Vector3 sliderAxis2;
+        public Vector3 normalAxis2;
+        public float limitsMin;
+        public float limitsMax;
+        public SpringSettings limitsSpringSettings;
+        public float maxFrictionForce;
+        public MotorSettings motorSettings;
+    }
+
+    public struct JPH_ConeConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Vector3 point1;                /* JPH_RVec3 */
+        public Vector3 twistAxis1;
+        public Vector3 point2;                /* JPH_RVec3 */
+        public Vector3 twistAxis2;
+        public float halfConeAngle;
+    }
+
+    public struct JPH_SwingTwistConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Vector3 position1;             /* JPH_RVec3 */
+        public Vector3 twistAxis1;
+        public Vector3 planeAxis1;
+        public Vector3 position2;             /* JPH_RVec3 */
+        public Vector3 twistAxis2;
+        public Vector3 planeAxis2;
+        public SwingType swingType;
+        public float normalHalfConeAngle;
+        public float planeHalfConeAngle;
+        public float twistMinAngle;
+        public float twistMaxAngle;
+        public float maxFrictionTorque;
+        public MotorSettings swingMotorSettings;
+        public MotorSettings twistMotorSettings;
+    }
+
+    public struct JPH_SixDOFConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Vector3 position1;             /* JPH_RVec3 */
+        public Vector3 axisX1;
+        public Vector3 axisY1;
+        public Vector3 position2;             /* JPH_RVec3 */
+        public Vector3 axisX2;
+        public Vector3 axisY2;
+        public fixed float maxFriction[(int)SixDOFConstraintAxis.Count];
+        public SwingType swingType;
+        public fixed float limitMin[(int)SixDOFConstraintAxis.Count];
+        public fixed float limitMax[(int)SixDOFConstraintAxis.Count];
+
+        public limitsSpringSettings__FixedBuffer limitsSpringSettings;
+        public motorSettings__FixedBuffer motorSettings;
+
+        [InlineArray((int)SixDOFConstraintAxis.NumTranslation)]
+        public partial struct limitsSpringSettings__FixedBuffer
+        {
+            public SpringSettings e0;
+        }
+
+        [InlineArray((int)SixDOFConstraintAxis.Count)]
+        public partial struct motorSettings__FixedBuffer
+        {
+            public MotorSettings e0;
+        }
+    }
+
+    public struct JPH_GearConstraintSettings
+    {
+        public JPH_ConstraintSettings baseSettings;    /* Inherics JPH_ConstraintSettings */
+
+        public ConstraintSpace space;
+        public Vector3 hingeAxis1;
+        public Vector3 hingeAxis2;
+        public float ratio;
+    }
+
     /* JPH_Constraint */
     [LibraryImport(LibName)]
-    public static partial void JPH_ConstraintSettings_Destroy(nint handle);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_ConstraintSettings_GetEnabled(nint handle);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConstraintSettings_SetEnabled(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
-
-    [LibraryImport(LibName)]
-    public static partial uint JPH_ConstraintSettings_GetConstraintPriority(nint handle);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConstraintSettings_SetConstraintPriority(nint handle, uint value);
-
-    [LibraryImport(LibName)]
-    public static partial uint JPH_ConstraintSettings_GetNumVelocityStepsOverride(nint handle);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConstraintSettings_SetNumVelocityStepsOverride(nint handle, uint value);
-
-    [LibraryImport(LibName)]
-    public static partial uint JPH_ConstraintSettings_GetNumPositionStepsOverride(nint handle);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConstraintSettings_SetNumPositionStepsOverride(nint handle, uint value);
-
-    [LibraryImport(LibName)]
-    public static partial float JPH_ConstraintSettings_GetDrawConstraintSize(nint handle);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConstraintSettings_SetDrawConstraintSize(nint handle, float value);
-
-    [LibraryImport(LibName)]
-    public static partial ulong JPH_ConstraintSettings_GetUserData(nint handle);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConstraintSettings_SetUserData(nint handle, ulong value);
-
-    [LibraryImport(LibName)]
     public static partial void JPH_Constraint_Destroy(nint constraint);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_Constraint_GetConstraintSettings(nint constraint);
 
     [LibraryImport(LibName)]
     public static partial ConstraintType JPH_Constraint_GetType(nint constraint);
@@ -930,6 +1045,15 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_Constraint_SetConstraintPriority(nint handle, uint value);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_Constraint_GetNumVelocityStepsOverride(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_SetNumVelocityStepsOverride(nint constraint, uint value);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_Constraint_GetNumPositionStepsOverride(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_SetNumPositionStepsOverride(nint constraint, uint value);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
@@ -946,6 +1070,22 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_Constraint_NotifyShapeChanged(nint constraint, uint bodyID, in Vector3 deltaCOM);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_ResetWarmStart(nint constraint);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Constraint_IsActive(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_SetupVelocityConstraint(nint constraint, float deltaTime);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Constraint_WarmStartVelocityConstraint(nint constraint, float warmStartImpulseRatio);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Constraint_SolveVelocityConstraint(nint constraint, float deltaTime);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Constraint_SolvePositionConstraint(nint constraint, float deltaTime, float baumgarte);
     #endregion
 
     #region JPH_TwoBodyConstraint
@@ -964,59 +1104,13 @@ internal static unsafe partial class JoltApi
 
     #region JPH_FixedConstraint
     [LibraryImport(LibName)]
-    public static partial nint JPH_FixedConstraintSettings_Create();
+    public static partial void JPH_FixedConstraintSettings_Init(JPH_FixedConstraintSettings* settings);
 
     [LibraryImport(LibName)]
-    public static partial ConstraintSpace JPH_FixedConstraintSettings_GetSpace(nint handle);
+    public static partial nint JPH_FixedConstraint_Create(JPH_FixedConstraintSettings* settings, nint body1, nint body2);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetSpace(nint handle, ConstraintSpace value);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_FixedConstraintSettings_GetAutoDetectPoint(nint handle);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetAutoDetectPoint(nint handle, [MarshalAs(UnmanagedType.U1)] bool value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_GetPoint1(nint handle, Vector3* result); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetPoint1(nint handle, Vector3* value); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_GetAxisX1(nint handle, Vector3* result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetAxisX1(nint handle, Vector3* value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_GetAxisY1(nint handle, Vector3* result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetAxisY1(nint handle, Vector3* value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_GetPoint2(nint handle, Vector3* result); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetPoint2(nint handle, Vector3* value); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_GetAxisX2(nint handle, Vector3* result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetAxisX2(nint handle, Vector3* value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_GetAxisY2(nint handle, Vector3* result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_FixedConstraintSettings_SetAxisY2(nint handle, Vector3* value);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_FixedConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    public static partial void JPH_FixedConstraint_GetSettings(nint constraint, out JPH_FixedConstraintSettings settings);
 
     [LibraryImport(LibName)]
     public static partial void JPH_FixedConstraint_GetTotalLambdaPosition(nint handle, Vector3* result);
@@ -1028,41 +1122,13 @@ internal static unsafe partial class JoltApi
     #region JPH_DistanceConstraint
     /* JPH_DistanceConstraint */
     [LibraryImport(LibName)]
-    public static partial nint JPH_DistanceConstraintSettings_Create();
+    public static partial void JPH_DistanceConstraintSettings_Init(JPH_DistanceConstraintSettings* settings);
 
     [LibraryImport(LibName)]
-    public static partial ConstraintSpace JPH_DistanceConstraintSettings_GetSpace(nint handle);
+    public static partial nint JPH_DistanceConstraint_Create(JPH_DistanceConstraintSettings* settings, nint body1, nint body2);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_SetSpace(nint handle, ConstraintSpace value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_GetPoint1(nint handle, out Vector3 result); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_SetPoint1(nint handle, in Vector3 value); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_GetPoint2(nint handle, out Vector3 result); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_SetPoint2(nint handle, in Vector3 value); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial float JPH_DistanceConstraintSettings_GetMinDistance(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_SetMinDistance(nint settings, float value);
-    [LibraryImport(LibName)]
-    public static partial float JPH_DistanceConstraintSettings_GetMaxDistance(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_SetMaxDistance(nint settings, float value);
-    [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_GetLimitsSpringSettings(nint settings, SpringSettings* result);
-    [LibraryImport(LibName)]
-    public static partial void JPH_DistanceConstraintSettings_SetLimitsSpringSettings(nint settings, SpringSettings* limitsSpringSettings);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_DistanceConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    public static partial void JPH_DistanceConstraint_GetSettings(nint constraint, out JPH_DistanceConstraintSettings settings);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_DistanceConstraint_SetDistance(nint constraint, float minDistance, float maxDistance);
@@ -1082,28 +1148,13 @@ internal static unsafe partial class JoltApi
 
     #region JPH_PointConstraint
     [LibraryImport(LibName)]
-    public static partial nint JPH_PointConstraintSettings_Create();
+    public static partial void JPH_PointConstraintSettings_Init(JPH_PointConstraintSettings* settings);
 
     [LibraryImport(LibName)]
-    public static partial ConstraintSpace JPH_PointConstraintSettings_GetSpace(nint handle);
+    public static partial nint JPH_PointConstraint_Create(JPH_PointConstraintSettings* settings, nint body1, nint body2);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_PointConstraintSettings_SetSpace(nint handle, ConstraintSpace value);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_PointConstraintSettings_GetPoint1(nint handle, Vector3* result); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_PointConstraintSettings_SetPoint1(nint handle, Vector3* value); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_PointConstraintSettings_GetPoint2(nint handle, Vector3* result); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_PointConstraintSettings_SetPoint2(nint handle, Vector3* value); // RVec3
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_PointConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    public static partial void JPH_PointConstraint_GetSettings(nint constraint, out JPH_PointConstraintSettings settings);
 
     [LibraryImport(LibName)]
     public static partial void JPH_PointConstraint_SetPoint1(nint handle, ConstraintSpace space, Vector3* value); // RVec3
@@ -1117,51 +1168,26 @@ internal static unsafe partial class JoltApi
 
     #region JPH_HingeConstraint
     [LibraryImport(LibName)]
-    public static partial nint JPH_HingeConstraintSettings_Create();
+    public static partial void JPH_HingeConstraintSettings_Init(JPH_HingeConstraintSettings* settings);
 
     [LibraryImport(LibName)]
-    public static partial ConstraintSpace JPH_HingeConstraintSettings_GetSpace(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_SetSpace(nint settings, ConstraintSpace space);
+    public static partial nint JPH_HingeConstraint_Create(JPH_HingeConstraintSettings* settings, nint body1, nint body2);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_GetPoint1(nint handle, out Vector3 result); // RVec3
+    public static partial void JPH_HingeConstraint_GetSettings(nint constraint, out JPH_HingeConstraintSettings settings);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_SetPoint1(nint handle, in Vector3 value); // RVec3
-
+    public static partial void JPH_HingeConstraint_GetLocalSpacePoint1(nint constraint, out Vector3 result);
     [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_GetPoint2(nint handle, out Vector3 result); // RVec3
-
+    public static partial void JPH_HingeConstraint_GetLocalSpacePoint2(nint constraint, out Vector3 result);
     [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_SetPoint2(nint handle, in Vector3 value); // RVec3
-
+    public static partial void JPH_HingeConstraint_GetLocalSpaceHingeAxis1(nint constraint, out Vector3 result);
     [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_GetHingeAxis1(nint handle, out Vector3 result);
-
+    public static partial void JPH_HingeConstraint_GetLocalSpaceHingeAxis2(nint constraint, out Vector3 result);
     [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_SetHingeAxis1(nint handle, in Vector3 result);
-
+    public static partial void JPH_HingeConstraint_GetLocalSpaceNormalAxis1(nint constraint, out Vector3 result);
     [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_GetNormalAxis1(nint handle, out Vector3 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_SetNormalAxis1(nint handle, in Vector3 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_GetHingeAxis2(nint handle, out Vector3 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_SetHingeAxis2(nint handle, in Vector3 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_GetNormalAxis2(nint handle, out Vector3 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraintSettings_SetNormalAxis2(nint handle, in Vector3 result);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_HingeConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    public static partial void JPH_HingeConstraint_GetLocalSpaceNormalAxis2(nint constraint, out Vector3 result);
 
     [LibraryImport(LibName)]
     public static partial float JPH_HingeConstraint_GetCurrentAngle(nint constraint);
@@ -1201,7 +1227,7 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_HingeConstraint_GetTotalLambdaPosition(nint constraint, out Vector3 result);
     [LibraryImport(LibName)]
-    public static partial void JPH_HingeConstraint_GetTotalLambdaRotation(nint constraint, out float x, out float y);
+    public static partial void JPH_HingeConstraint_GetTotalLambdaRotation(nint constraint, out Vector2 rotation);
     [LibraryImport(LibName)]
     public static partial float JPH_HingeConstraint_GetTotalLambdaRotationLimits(nint constraint);
     [LibraryImport(LibName)]
@@ -1210,21 +1236,89 @@ internal static unsafe partial class JoltApi
 
     #region JPH_SliderConstraint
     [LibraryImport(LibName)]
-    public static partial nint JPH_SliderConstraintSettings_Create();
+    public static partial void JPH_SliderConstraintSettings_Init(JPH_SliderConstraintSettings* settings);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_SliderConstraintSettings_SetSliderAxis(nint handle, Vector3* value);
+    public static partial void JPH_SliderConstraintSettings_SetSliderAxis(JPH_SliderConstraintSettings* settings, in Vector3 value);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_SliderConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    public static partial nint JPH_SliderConstraint_Create(JPH_SliderConstraintSettings* settings, nint body1, nint body2);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_GetSettings(nint constraint, out JPH_SliderConstraintSettings settings);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SliderConstraint_GetCurrentPosition(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_SetMaxFrictionForce(nint constraint, float frictionForce);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SliderConstraint_GetMaxFrictionForce(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_SetMotorSettings(nint constraint, MotorSettings* settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_GetMotorSettings(nint constraint, out MotorSettings result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_SetMotorState(nint constraint, MotorState state);
+    [LibraryImport(LibName)]
+    public static partial MotorState JPH_SliderConstraint_GetMotorState(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_SetTargetVelocity(nint constraint, float velocity);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SliderConstraint_GetTargetVelocity(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_SetTargetPosition(nint constraint, float position);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SliderConstraint_GetTargetPosition(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_SetLimits(nint constraint, float inLimitsMin, float inLimitsMax);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SliderConstraint_GetLimitsMin(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SliderConstraint_GetLimitsMax(nint constraint);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SliderConstraint_HasLimits(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_GetLimitsSpringSettings(nint constraint, out SpringSettings result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_SetLimitsSpringSettings(nint constraint, SpringSettings* settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_GetTotalLambdaPosition(nint constraint, out Vector2 position);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SliderConstraint_GetTotalLambdaPositionLimits(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SliderConstraint_GetTotalLambdaRotation(nint constraint, out Vector3 result);
+    [LibraryImport(LibName)]
+    public static partial float JPH_SliderConstraint_GetTotalLambdaMotor(nint constraint);
+    #endregion
+
+    #region JPH_ConeConstraint
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraintSettings_Init(JPH_ConeConstraintSettings* settings);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ConeConstraint_Create(JPH_ConeConstraintSettings* settings, nint body1, nint body2);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraint_GetSettings(nint constraint, out JPH_ConeConstraintSettings settings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraint_SetHalfConeAngle(nint constraint, float halfConeAngle);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ConeConstraint_GetCosHalfConeAngle(nint constraint);
+    [LibraryImport(LibName)]
+    public static partial void JPH_ConeConstraint_GetTotalLambdaPosition(nint constraint, out Vector3 result);
+    [LibraryImport(LibName)]
+    public static partial float JPH_ConeConstraint_GetTotalLambdaRotation(nint constraint);
     #endregion
 
     #region JPH_SwingTwistConstraint
     [LibraryImport(LibName)]
-    public static partial nint JPH_SwingTwistConstraintSettings_Create();
+    public static partial void JPH_SwingTwistConstraintSettings_Init(JPH_SwingTwistConstraintSettings* settings);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_SwingTwistConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    public static partial nint JPH_SwingTwistConstraint_Create(JPH_SwingTwistConstraintSettings* settings, nint body1, nint body2);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SwingTwistConstraint_GetSettings(nint constraint, out JPH_SwingTwistConstraintSettings settings);
 
     [LibraryImport(LibName)]
     public static partial float JPH_SwingTwistConstraint_GetNormalHalfConeAngle(nint handle);
@@ -1244,10 +1338,26 @@ internal static unsafe partial class JoltApi
 
     #region JPH_SixDOFConstraint
     [LibraryImport(LibName)]
-    public static partial nint JPH_SixDOFConstraintSettings_Create();
+    public static partial void JPH_SixDOFConstraintSettings_Init(JPH_SixDOFConstraintSettings* settings);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_SixDOFConstraintSettings_CreateConstraint(nint handle, nint body1, nint body2);
+    public static partial void JPH_SixDOFConstraintSettings_MakeFreeAxis(JPH_SixDOFConstraintSettings* settings, SixDOFConstraintAxis axis);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SixDOFConstraintSettings_IsFreeAxis(JPH_SixDOFConstraintSettings* settings, SixDOFConstraintAxis axis);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SixDOFConstraintSettings_MakeFixedAxis(JPH_SixDOFConstraintSettings* settings, SixDOFConstraintAxis axis);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SixDOFConstraintSettings_IsFixedAxis(JPH_SixDOFConstraintSettings* settings, SixDOFConstraintAxis axis);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SixDOFConstraintSettings_SetLimitedAxis(JPH_SixDOFConstraintSettings* settings, SixDOFConstraintAxis axis, float min, float max);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SixDOFConstraint_Create(JPH_SixDOFConstraintSettings* settings, nint body1, nint body2);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SixDOFConstraint_GetSettings(nint constraint, out JPH_SixDOFConstraintSettings settings);
 
     [LibraryImport(LibName)]
     public static partial float JPH_SixDOFConstraint_GetLimitsMin(nint handle, uint axis);
@@ -1265,40 +1375,21 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_SixDOFConstraint_GetTotalLambdaMotorRotation(nint constraint, out Vector3 result);
     #endregion
 
-    #region JPH_ConeConstraint
+    #region JPH_GearConstraint
     [LibraryImport(LibName)]
-    public static partial nint JPH_ConeConstraintSettings_Create();
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_GetPoint1(nint settings, Vector3* result); // RVec3
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_SetPoint1(nint settings, Vector3* value); // RVec3
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_GetPoint2(nint settings, Vector3* result); // RVec3
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_SetPoint2(nint settings, Vector3* value); // RVec3
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_SetTwistAxis1(nint settings, Vector3* value);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_GetTwistAxis1(nint settings, Vector3* result);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_SetTwistAxis2(nint settings, Vector3* value);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_GetTwistAxis2(nint settings, Vector3* result);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraintSettings_SetHalfConeAngle(nint settings, float halfConeAngle);
-    [LibraryImport(LibName)]
-    public static partial float JPH_ConeConstraintSettings_GetHalfConeAngle(nint settings);
-    [LibraryImport(LibName)]
-    public static partial nint JPH_ConeConstraintSettings_CreateConstraint(nint settings, nint body1, nint body2);
+    public static partial void JPH_GearConstraintSettings_Init(JPH_GearConstraintSettings* settings);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraint_SetHalfConeAngle(nint constraint, float halfConeAngle);
+    public static partial nint JPH_GearConstraint_Create(JPH_GearConstraintSettings* settings, nint body1, nint body2);
+
     [LibraryImport(LibName)]
-    public static partial float JPH_ConeConstraint_GetCosHalfConeAngle(nint constraint);
+    public static partial void JPH_GearConstraint_GetSettings(nint constraint, out JPH_GearConstraintSettings settings);
+
     [LibraryImport(LibName)]
-    public static partial void JPH_ConeConstraint_GetTotalLambdaPosition(nint constraint, Vector3* result);
+    public static partial void JPH_GearConstraint_SetConstraints(nint handle, nint gear1, nint gear2);
+
     [LibraryImport(LibName)]
-    public static partial float JPH_ConeConstraint_GetTotalLambdaRotation(nint constraint);
+    public static partial float JPH_GearConstraint_GetTotalLambda(nint handle);
     #endregion
 
     /* PhysicsSystem */

@@ -9,71 +9,64 @@ namespace JoltPhysicsSharp;
 public unsafe class DistanceConstraintSettings : TwoBodyConstraintSettings
 {
     public DistanceConstraintSettings()
-        : base(JPH_DistanceConstraintSettings_Create())
     {
+        JPH_DistanceConstraintSettings native;
+        JPH_DistanceConstraintSettings_Init(&native);
+
+        FromNative(native);
     }
 
-    public ConstraintSpace Space
+    internal DistanceConstraintSettings(in JPH_DistanceConstraintSettings native)
     {
-        get => JPH_DistanceConstraintSettings_GetSpace(Handle);
-        set => JPH_DistanceConstraintSettings_SetSpace(Handle, value);
+        FromNative(native);
     }
 
-    public Vector3 Point1
-    {
-        get
-        {
-            JPH_DistanceConstraintSettings_GetPoint1(Handle, out Vector3 result);
-            return result;
-        }
-        set
-        {
-            JPH_DistanceConstraintSettings_SetPoint1(Handle, in value);
-        }
-    }
+    public ConstraintSpace Space { get; set; }
 
-    public Vector3 Point2
-    {
-        get
-        {
-            JPH_DistanceConstraintSettings_GetPoint2(Handle, out Vector3 result);
-            return result;
-        }
-        set
-        {
-            JPH_DistanceConstraintSettings_SetPoint2(Handle, in value);
-        }
-    }
+    public Vector3 Point1 { get; set; }
 
-    public float MinDistance
-    {
-        get => JPH_DistanceConstraintSettings_GetMinDistance(Handle);
-        set => JPH_DistanceConstraintSettings_SetMinDistance(Handle, value);
-    }
+    public Vector3 Point2 { get; set; }
 
-    public float MaxDistance
-    {
-        get => JPH_DistanceConstraintSettings_GetMaxDistance(Handle);
-        set => JPH_DistanceConstraintSettings_SetMaxDistance(Handle, value);
-    }
+    public float MinDistance { get; set; }
+    public float MaxDistance { get; set; }
 
-    public SpringSettings LimitsSpringSettings
-    {
-        get
-        {
-            SpringSettings result;
-            JPH_DistanceConstraintSettings_GetLimitsSpringSettings(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_DistanceConstraintSettings_SetLimitsSpringSettings(Handle, &value);
-        }
-    }
+    public SpringSettings LimitsSpringSettings { get; set; }
 
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
-        return new DistanceConstraint(JPH_DistanceConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
+        return new DistanceConstraint(CreateConstraintNative(in body1, in body2));
+    }
+
+    internal nint CreateConstraintNative(in Body body1, in Body body2)
+    {
+        JPH_DistanceConstraintSettings nativeSettings;
+        ToNative(&nativeSettings);
+
+        return JPH_DistanceConstraint_Create(&nativeSettings, body1.Handle, body2.Handle);
+    }
+
+    private void FromNative(in JPH_DistanceConstraintSettings native)
+    {
+        FromNative(native.baseSettings);
+
+        Space = native.space;
+        Point1 = native.point1;
+        Point2 = native.point2;
+        MinDistance = native.minDistance;
+        MaxDistance = native.maxDistance;
+        LimitsSpringSettings = native.limitsSpringSettings;
+    }
+
+    internal void ToNative(JPH_DistanceConstraintSettings* native)
+    {
+        ToNative(ref native->baseSettings);
+
+        native->space = Space;
+        native->point1 = Point1;
+        native->point2 = Point2;
+        native->minDistance = MinDistance;
+        native->maxDistance = MaxDistance;
+        native->limitsSpringSettings = LimitsSpringSettings;
     }
 }
 
@@ -85,8 +78,17 @@ public unsafe class DistanceConstraint : TwoBodyConstraint
     }
 
     public DistanceConstraint(DistanceConstraintSettings settings, in Body body1, in Body body2)
-        : base(JPH_DistanceConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
+        : base(settings.CreateConstraintNative(in body1, in body2))
     {
+    }
+
+    public DistanceConstraintSettings Settings
+    {
+        get
+        {
+            JPH_DistanceConstraint_GetSettings(Handle, out JPH_DistanceConstraintSettings native);
+            return new(native);
+        }
     }
 
     public float MinDistance => JPH_DistanceConstraint_GetMinDistance(Handle);

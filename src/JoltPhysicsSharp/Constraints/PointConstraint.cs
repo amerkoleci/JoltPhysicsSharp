@@ -10,63 +10,52 @@ namespace JoltPhysicsSharp;
 public sealed unsafe class PointConstraintSettings : TwoBodyConstraintSettings
 {
     public PointConstraintSettings()
-        : base(JPH_PointConstraintSettings_Create())
     {
+        JPH_PointConstraintSettings native;
+        JPH_PointConstraintSettings_Init(&native);
+
+        FromNative(native);
+
     }
+
+    internal PointConstraintSettings(in JPH_PointConstraintSettings native)
+    {
+        FromNative(native);
+    }
+
+    public ConstraintSpace Space { get; set; }
+    public Vector3 Point1 { get; set; }
+    public Vector3 Point2 { get; set; }
 
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
-        return new PointConstraint(JPH_PointConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
+        return new PointConstraint(CreateConstraintNative(in body1, in body2));
     }
 
-    public ConstraintSpace Space
+    internal nint CreateConstraintNative(in Body body1, in Body body2)
     {
-        get => JPH_FixedConstraintSettings_GetSpace(Handle);
-        set => JPH_FixedConstraintSettings_SetSpace(Handle, value);
+        JPH_PointConstraintSettings nativeSettings;
+        ToNative(&nativeSettings);
+
+        return JPH_PointConstraint_Create(&nativeSettings, body1.Handle, body2.Handle);
     }
 
-    public Vector3 Point1
+    private void FromNative(in JPH_PointConstraintSettings native)
     {
-        get
-        {
-            Vector3 result;
-            JPH_PointConstraintSettings_GetPoint1(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_PointConstraintSettings_SetPoint1(Handle, &value);
-        }
+        FromNative(native.baseSettings);
+
+        Space = native.space;
+        Point1 = native.point1;
+        Point2 = native.point2;
     }
 
-    public Vector3 Point2
+    internal void ToNative(JPH_PointConstraintSettings* native)
     {
-        get
-        {
-            Vector3 result;
-            JPH_PointConstraintSettings_GetPoint2(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_PointConstraintSettings_SetPoint2(Handle, &value);
-        }
-    }
+        ToNative(ref native->baseSettings);
 
-    public void GetPoint1(out Vector3 value)
-    {
-        Unsafe.SkipInit(out value);
-
-        fixed (Vector3* valuePtr = &value)
-            JPH_PointConstraintSettings_GetPoint1(Handle, valuePtr);
-    }
-
-    public void GetPoint2(out Vector3 value)
-    {
-        Unsafe.SkipInit(out value);
-
-        fixed (Vector3* valuePtr = &value)
-            JPH_PointConstraintSettings_GetPoint2(Handle, valuePtr);
+        native->space = Space;
+        native->point1 = Point1;
+        native->point2 = Point2;
     }
 }
 
@@ -78,8 +67,17 @@ public sealed unsafe class PointConstraint : TwoBodyConstraint
     }
 
     public PointConstraint(PointConstraintSettings settings, in Body body1, in Body body2)
-        : base(JPH_PointConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
+        : base(settings.CreateConstraintNative(in body1, in body2))
     {
+    }
+
+    public PointConstraintSettings Settings
+    {
+        get
+        {
+            JPH_PointConstraint_GetSettings(Handle, out JPH_PointConstraintSettings native);
+            return new(native);
+        }
     }
 
     public void SetPoint1(ConstraintSpace space, in Vector3 value)

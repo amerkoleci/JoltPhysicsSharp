@@ -9,11 +9,6 @@ namespace JoltPhysicsSharp;
 
 public abstract class TwoBodyConstraintSettings : ConstraintSettings
 {
-    protected TwoBodyConstraintSettings(nint handle)
-        : base(handle)
-    {
-    }
-
     public abstract TwoBodyConstraint CreateConstraint(in Body body1, in Body body2);
 }
 

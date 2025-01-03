@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Diagnostics;
 using System.Numerics;
 using NUnit.Framework;
 
@@ -14,6 +15,24 @@ public abstract class BaseTest : IDisposable
         {
             return;
         }
+
+        Foundation.SetTraceHandler((message) =>
+        {
+            Console.WriteLine(message);
+        });
+
+#if DEBUG
+        Foundation.SetAssertFailureHandler((inExpression, inMessage, inFile, inLine) =>
+        {
+            string message = inMessage ?? inExpression;
+
+            string outMessage = $"[JoltPhysics] Assertion failure at {inFile}:{inLine}: {message}";
+
+            Debug.WriteLine(outMessage);
+
+            throw new Exception(outMessage);
+        });
+#endif
     }
 
     public void Dispose()

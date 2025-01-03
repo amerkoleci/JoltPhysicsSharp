@@ -6,110 +6,85 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public sealed class HingeConstraintSettings : TwoBodyConstraintSettings
+public unsafe class HingeConstraintSettings : TwoBodyConstraintSettings
 {
     public HingeConstraintSettings()
-        : base(JPH_HingeConstraintSettings_Create())
     {
+        JPH_HingeConstraintSettings native;
+        JPH_HingeConstraintSettings_Init(&native);
+
+        FromNative(native);
     }
+
+    internal HingeConstraintSettings(in JPH_HingeConstraintSettings native)
+    {
+        FromNative(native);
+    }
+
+    public ConstraintSpace Space { get; set; }
+
+    public Vector3 Point1 { get; set; }
+
+    public Vector3 Point2 { get; set; }
+
+    public Vector3 HingeAxis1 { get; set; }
+
+    public Vector3 NormalAxis1 { get; set; }
+    public Vector3 HingeAxis2 { get; set; }
+    public Vector3 NormalAxis2 { get; set; }
+    public float LimitsMin { get; set; }
+    public float LimitsMax { get; set; }
+    public SpringSettings LimitsSpringSettings { get; set; }
+    public float MaxFrictionTorque { get; set; }
+    public MotorSettings MotorSettings { get; set; }
 
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
-        return new HingeConstraint(JPH_HingeConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
+        return new HingeConstraint(CreateConstraintNative(in body1, in body2));
     }
 
-    public ConstraintSpace Space
+    internal nint CreateConstraintNative(in Body body1, in Body body2)
     {
-        get => JPH_FixedConstraintSettings_GetSpace(Handle);
-        set => JPH_FixedConstraintSettings_SetSpace(Handle, value);
+        JPH_HingeConstraintSettings nativeSettings;
+        ToNative(&nativeSettings);
+
+        return JPH_HingeConstraint_Create(&nativeSettings, body1.Handle, body2.Handle);
     }
 
-    public Vector3 Point1
+    private void FromNative(in JPH_HingeConstraintSettings native)
     {
-        get
-        {
-            JPH_HingeConstraintSettings_GetPoint1(Handle, out Vector3 value);
-            return value;
-        }
-        set
-        {
-            JPH_HingeConstraintSettings_SetPoint1(Handle, value);
-        }
+        FromNative(native.baseSettings);
+
+        Space = native.space;
+        Point1 = native.point1;
+        HingeAxis1 = native.hingeAxis1;
+        NormalAxis1 = native.normalAxis1;
+        Point2 = native.point2;
+        HingeAxis2 = native.hingeAxis2;
+        NormalAxis2 = native.normalAxis2;
+        LimitsMin = native.limitsMin;
+        LimitsMax = native.limitsMax;
+        LimitsSpringSettings = native.limitsSpringSettings;
+        MaxFrictionTorque = native.maxFrictionTorque;
+        MotorSettings = native.motorSettings;
     }
 
-    public Vector3 Point2
+    internal void ToNative(JPH_HingeConstraintSettings* native)
     {
-        get
-        {
-            JPH_HingeConstraintSettings_GetPoint2(Handle, out Vector3 value);
-            return value;
-        }
-        set
-        {
-            JPH_HingeConstraintSettings_SetPoint2(Handle, value);
-        }
-    }
+        ToNative(ref native->baseSettings);
 
-    public Vector3 HingeAxis1
-    {
-        get
-        {
-            JPH_HingeConstraintSettings_GetHingeAxis1(Handle, out Vector3 value);
-            return value;
-        }
-        set
-        {
-            JPH_HingeConstraintSettings_SetHingeAxis1(Handle, value);
-        }
-    }
-
-    public Vector3 NormalAxis1
-    {
-        get
-        {
-            JPH_HingeConstraintSettings_GetNormalAxis1(Handle, out Vector3 value);
-            return value;
-        }
-        set
-        {
-            JPH_HingeConstraintSettings_SetNormalAxis1(Handle, value);
-        }
-    }
-
-    public Vector3 HingeAxis2
-    {
-        get
-        {
-            JPH_HingeConstraintSettings_GetHingeAxis2(Handle, out Vector3 value);
-            return value;
-        }
-        set
-        {
-            JPH_HingeConstraintSettings_SetHingeAxis2(Handle, value);
-        }
-    }
-
-    public Vector3 NormalAxis2
-    {
-        get
-        {
-            JPH_HingeConstraintSettings_GetNormalAxis2(Handle, out Vector3 value);
-            return value;
-        }
-        set
-        {
-            JPH_HingeConstraintSettings_SetNormalAxis2(Handle, value);
-        }
-    }
-
-    public void GetPoint1(out Vector3 value)
-    {
-        JPH_HingeConstraintSettings_GetPoint1(Handle, out value);
-    }
-
-    public void GetPoint2(out Vector3 value)
-    {
-        JPH_HingeConstraintSettings_GetPoint2(Handle, out value);
+        native->space = Space;
+        native->point1 = Point1;
+        native->hingeAxis1 = HingeAxis1;
+        native->normalAxis1 = NormalAxis1;
+        native->point2 = Point2;
+        native->hingeAxis2 = HingeAxis2;
+        native->normalAxis2 = NormalAxis2;
+        native->limitsMin = LimitsMin;
+        native->limitsMax = LimitsMax;
+        native->limitsSpringSettings = LimitsSpringSettings;
+        native->maxFrictionTorque = MaxFrictionTorque;
+        native->motorSettings = MotorSettings;
     }
 }
 
@@ -121,8 +96,71 @@ public sealed unsafe class HingeConstraint : TwoBodyConstraint
     }
 
     public HingeConstraint(HingeConstraintSettings settings, in Body body1, in Body body2)
-        : base(JPH_HingeConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
+        : base(settings.CreateConstraintNative(in body1, in body2))
     {
+    }
+
+    public HingeConstraintSettings Settings
+    {
+        get
+        {
+            JPH_HingeConstraint_GetSettings(Handle, out JPH_HingeConstraintSettings native);
+            return new(native);
+        }
+    }
+
+    public Vector3 LocalSpacePoint1
+    {
+        get
+        {
+            JPH_HingeConstraint_GetLocalSpacePoint1(Handle, out Vector3 result);
+            return result;
+        }
+    }
+
+    public Vector3 LocalSpacePoint2
+    {
+        get
+        {
+            JPH_HingeConstraint_GetLocalSpacePoint2(Handle, out Vector3 result);
+            return result;
+        }
+    }
+
+    public Vector3 LocalSpaceHingeAxis1
+    {
+        get
+        {
+            JPH_HingeConstraint_GetLocalSpaceHingeAxis1(Handle, out Vector3 result);
+            return result;
+        }
+    }
+
+    public Vector3 LocalSpaceHingeAxis2
+    {
+        get
+        {
+            JPH_HingeConstraint_GetLocalSpaceHingeAxis2(Handle, out Vector3 result);
+            return result;
+        }
+    }
+
+    public Vector3 LocalSpaceNormalAxis1
+    {
+        get
+        {
+            JPH_HingeConstraint_GetLocalSpaceNormalAxis1(Handle, out Vector3 result);
+            return result;
+        }
+    }
+
+    public Vector3 LocalSpaceNormalAxis2
+    {
+        get
+        {
+            JPH_HingeConstraint_GetLocalSpaceNormalAxis2(Handle, out Vector3 result);
+            return result;
+        }
     }
 
     public float CurrentAngle => JPH_HingeConstraint_GetCurrentAngle(Handle);
@@ -193,8 +231,8 @@ public sealed unsafe class HingeConstraint : TwoBodyConstraint
     {
         get
         {
-            JPH_HingeConstraint_GetTotalLambdaRotation(Handle, out float x, out float y);
-            return new(x, y);
+            JPH_HingeConstraint_GetTotalLambdaRotation(Handle, out Vector2 rotation);
+            return rotation;
         }
     }
 

@@ -6,62 +6,39 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class ConstraintSettings : NativeObject
+public abstract class ConstraintSettings
 {
-    protected ConstraintSettings()
+
+    internal void FromNative(in JPH_ConstraintSettings settings)
     {
+        Enabled = settings.enabled;
+        ConstraintPriority = settings.constraintPriority;
+        NumVelocityStepsOverride = settings.numVelocityStepsOverride;
+        NumPositionStepsOverride = settings.numPositionStepsOverride;
+        DrawConstraintSize = settings.drawConstraintSize;
+        UserData = settings.userData;
     }
 
-    internal ConstraintSettings(nint handle)
-        : base(handle)
+    internal void ToNative(ref JPH_ConstraintSettings native)
     {
+        native.enabled = Enabled;
+        native.constraintPriority = ConstraintPriority;
+        native.numVelocityStepsOverride = NumVelocityStepsOverride;
+        native.numPositionStepsOverride = NumPositionStepsOverride;
+        native.drawConstraintSize = DrawConstraintSize;
+        native.userData = UserData;
     }
 
-    protected override void DisposeNative()
-    {
-        JPH_ConstraintSettings_Destroy(Handle);
-    }
+    public bool Enabled { get; set; }
 
-    public bool Enabled
-    {
-        get => JPH_ConstraintSettings_GetEnabled(Handle);
-        set => JPH_ConstraintSettings_SetEnabled(Handle, value);
-    }
+    public uint ConstraintPriority { get; set; }
 
-    public uint ConstraintPriority
-    {
-        get => JPH_ConstraintSettings_GetConstraintPriority(Handle);
-        set => JPH_ConstraintSettings_SetConstraintPriority(Handle, value);
-    }
+    public uint NumVelocityStepsOverride { get; set; }
+    public uint NumPositionStepsOverride { get; set; }
 
-    public uint NumVelocityStepsOverride
-    {
-        get => JPH_ConstraintSettings_GetNumVelocityStepsOverride(Handle);
-        set => JPH_ConstraintSettings_SetNumVelocityStepsOverride(Handle, value);
-    }
+    public float DrawConstraintSize { get; set; }
 
-    public uint NumPositionStepsOverride
-    {
-        get => JPH_ConstraintSettings_GetNumPositionStepsOverride(Handle);
-        set => JPH_ConstraintSettings_SetNumPositionStepsOverride(Handle, value);
-    }
-
-    public float DrawConstraintSize
-    {
-        get => JPH_ConstraintSettings_GetDrawConstraintSize(Handle);
-        set => JPH_ConstraintSettings_SetDrawConstraintSize(Handle, value);
-    }
-
-    public ulong UserData
-    {
-        get => JPH_ConstraintSettings_GetUserData(Handle);
-        set => JPH_ConstraintSettings_SetUserData(Handle, value);
-    }
-
-    internal static ConstraintSettings? GetObject(nint handle)
-    {
-        return GetOrAddObject(handle, (nint h) => new ConstraintSettings(h));
-    }
+    public ulong UserData { get; set; }
 }
 
 public abstract class Constraint : NativeObject
@@ -76,19 +53,20 @@ public abstract class Constraint : NativeObject
         JPH_Constraint_Destroy(Handle);
     }
 
-    public ConstraintType Type
+    public ConstraintType Type => JPH_Constraint_GetType(Handle);
+
+    public ConstraintSubType SubType => JPH_Constraint_GetSubType(Handle);
+
+    public uint NumVelocityStepsOverride
     {
-        get => JPH_Constraint_GetType(Handle);
+        get => JPH_Constraint_GetNumVelocityStepsOverride(Handle);
+        set => JPH_Constraint_SetNumVelocityStepsOverride(Handle, value);
     }
 
-    public ConstraintSubType SubType
+    public uint NumPositionStepsOverride
     {
-        get => JPH_Constraint_GetSubType(Handle);
-    }
-
-    public ConstraintSettings? ConstraintSettings
-    {
-        get => ConstraintSettings.GetObject(JPH_Constraint_GetConstraintSettings(Handle));
+        get => JPH_Constraint_GetNumPositionStepsOverride(Handle);
+        set => JPH_Constraint_SetNumPositionStepsOverride(Handle, value);
     }
 
     public bool Enabled
@@ -112,5 +90,30 @@ public abstract class Constraint : NativeObject
     public void NotifyShapeChanged(in BodyID bodyID, in Vector3 deltaCOM)
     {
         JPH_Constraint_NotifyShapeChanged(Handle, bodyID, in deltaCOM);
+    }
+
+    public void ResetWarmStart()
+    {
+        JPH_Constraint_ResetWarmStart(Handle);
+    }
+
+    public void SetupVelocityConstraint(float deltaTime)
+    {
+        JPH_Constraint_SetupVelocityConstraint(Handle, deltaTime);
+    }
+
+    public void WarmStartVelocityConstraint(float warmStartImpulseRatio)
+    {
+        JPH_Constraint_WarmStartVelocityConstraint(Handle, warmStartImpulseRatio);
+    }
+
+    public bool SolveVelocityConstraint(float deltaTime)
+    {
+        return JPH_Constraint_SolveVelocityConstraint(Handle, deltaTime);
+    }
+
+    public bool SolvePositionConstraint(float deltaTime, float baumgarte)
+    {
+        return JPH_Constraint_SolvePositionConstraint(Handle, deltaTime, baumgarte);
     }
 }

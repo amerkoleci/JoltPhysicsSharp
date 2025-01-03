@@ -10,111 +10,73 @@ namespace JoltPhysicsSharp;
 public unsafe class FixedConstraintSettings : TwoBodyConstraintSettings
 {
     public FixedConstraintSettings()
-        : base(JPH_FixedConstraintSettings_Create())
     {
+        JPH_FixedConstraintSettings native;
+        JPH_FixedConstraintSettings_Init(&native);
+
+        FromNative(native);
     }
 
-    public ConstraintSpace Space
+    internal FixedConstraintSettings(in JPH_FixedConstraintSettings native)
     {
-        get => JPH_PointConstraintSettings_GetSpace(Handle);
-        set => JPH_PointConstraintSettings_SetSpace(Handle, value);
+        FromNative(native);
     }
 
-    public bool AutoDetectPoint
-    {
-        get => JPH_FixedConstraintSettings_GetAutoDetectPoint(Handle);
-        set => JPH_FixedConstraintSettings_SetAutoDetectPoint(Handle, value);
-    }
+    public ConstraintSpace Space { get; set; }
 
-    public Vector3 Point1
-    {
-        get
-        {
-            Vector3 result;
-            JPH_FixedConstraintSettings_GetPoint1(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_FixedConstraintSettings_SetPoint1(Handle, &value);
-        }
-    }
+    public bool AutoDetectPoint { get; set; }
 
-    public Vector3 AxisX1
-    {
-        get
-        {
-            Vector3 result;
-            JPH_FixedConstraintSettings_GetAxisX1(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_FixedConstraintSettings_SetAxisX1(Handle, &value);
-        }
-    }
+    public Vector3 Point1 { get; set; }
 
-    public Vector3 AxisY1
-    {
-        get
-        {
-            Vector3 result;
-            JPH_FixedConstraintSettings_GetAxisY1(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_FixedConstraintSettings_SetAxisY1(Handle, &value);
-        }
-    }
+    public Vector3 AxisX1 { get; set; }
 
-    public Vector3 Point2
-    {
-        get
-        {
-            Vector3 result;
-            JPH_FixedConstraintSettings_GetPoint2(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_FixedConstraintSettings_SetPoint2(Handle, &value);
-        }
-    }
+    public Vector3 AxisY1 { get; set; }
 
+    public Vector3 Point2 { get; set; }
 
+    public Vector3 AxisX2 { get; set; }
 
-    public Vector3 AxisX2
-    {
-        get
-        {
-            Vector3 result;
-            JPH_FixedConstraintSettings_GetAxisX2(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_FixedConstraintSettings_SetAxisX2(Handle, &value);
-        }
-    }
-
-    public Vector3 AxisY2
-    {
-        get
-        {
-            Vector3 result;
-            JPH_FixedConstraintSettings_GetAxisY2(Handle, &result);
-            return result;
-        }
-        set
-        {
-            JPH_FixedConstraintSettings_SetAxisY2(Handle, &value);
-        }
-    }
+    public Vector3 AxisY2 { get; set; }
 
     public override TwoBodyConstraint CreateConstraint(in Body body1, in Body body2)
     {
-        return new FixedConstraint(JPH_FixedConstraintSettings_CreateConstraint(Handle, body1.Handle, body2.Handle));
+        return new FixedConstraint(CreateConstraintNative(in body1, in body2));
+    }
+
+    internal nint CreateConstraintNative(in Body body1, in Body body2)
+    {
+        JPH_FixedConstraintSettings nativeSettings;
+        ToNative(&nativeSettings);
+
+        return JPH_FixedConstraint_Create(&nativeSettings, body1.Handle, body2.Handle);
+    }
+
+    private void FromNative(in JPH_FixedConstraintSettings native)
+    {
+        FromNative(native.baseSettings);
+
+        Space = native.space;
+        AutoDetectPoint = native.autoDetectPoint;
+        Point1 = native.point1;
+        AxisX1 = native.axisX1;
+        AxisY1 = native.axisY1;
+        Point2 = native.point2;
+        AxisX2 = native.axisX2;
+        AxisY2 = native.axisY2;
+    }
+
+    internal void ToNative(JPH_FixedConstraintSettings* native)
+    {
+        ToNative(ref native->baseSettings);
+
+        native->space = Space;
+        native->autoDetectPoint = AutoDetectPoint;
+        native->point1 = Point1;
+        native->axisX1 = AxisX1;
+        native->axisY1 = AxisY1;
+        native->point2 = Point2;
+        native->axisX2 = AxisX2;
+        native->axisY2 = AxisY2;
     }
 }
 
@@ -126,9 +88,19 @@ public unsafe class FixedConstraint : TwoBodyConstraint
     }
 
     public FixedConstraint(FixedConstraintSettings settings, in Body body1, in Body body2)
-        : base(JPH_FixedConstraintSettings_CreateConstraint(settings.Handle, body1.Handle, body2.Handle))
+        : base(settings.CreateConstraintNative(in body1, in body2))
     {
     }
+
+    public FixedConstraintSettings Settings
+    {
+        get
+        {
+            JPH_FixedConstraint_GetSettings(Handle, out JPH_FixedConstraintSettings native);
+            return new(native);
+        }
+    }
+
 
     public Vector3 TotalLambdaPosition
     {
