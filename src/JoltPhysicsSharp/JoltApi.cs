@@ -2651,6 +2651,7 @@ internal static unsafe partial class JoltApi
         public float hitReductionCosMaxAngle;
         public float penetrationRecoverySpeed;
         public /*const JPH_Shape**/nint innerBodyShape;
+        public BodyID innerBodyIDOverride;
         public ObjectLayer innerBodyLayer;
     }
 

@@ -28,7 +28,9 @@ public sealed class CharacterVirtualSettings : CharacterBaseSettings
         MaxNumHits = native.maxNumHits;
         HitReductionCosMaxAngle = native.hitReductionCosMaxAngle;
         PenetrationRecoverySpeed = native.penetrationRecoverySpeed;
-        innerBodyLayer = native.innerBodyLayer;
+        InnerBodyShape = native.innerBodyShape != 0 ? Shape.GetObject(native.innerBodyShape) : null;
+        InnerBodyIDOverride = native.innerBodyIDOverride;
+        InnerBodyLayer = native.innerBodyLayer;
     }
 
     public float Mass { get; set; }
@@ -58,7 +60,8 @@ public sealed class CharacterVirtualSettings : CharacterBaseSettings
     public float PenetrationRecoverySpeed { get; set; }
 
     public Shape? InnerBodyShape { get; set; }
-    public ObjectLayer innerBodyLayer { get; set; }
+    public BodyID InnerBodyIDOverride { get; set; }
+    public ObjectLayer InnerBodyLayer { get; set; }
 
     internal unsafe void ToNative(JPH_CharacterVirtualSettings* native)
     {
@@ -82,7 +85,8 @@ public sealed class CharacterVirtualSettings : CharacterBaseSettings
         native->hitReductionCosMaxAngle = HitReductionCosMaxAngle;
         native->penetrationRecoverySpeed = PenetrationRecoverySpeed;
         native->innerBodyShape = InnerBodyShape != null ? InnerBodyShape.Handle : 0;
-        native->innerBodyLayer = innerBodyLayer;
+        native->innerBodyIDOverride = InnerBodyIDOverride;
+        native->innerBodyLayer = InnerBodyLayer;
     }
 }
 
