@@ -15,6 +15,7 @@ public sealed class CharacterVirtualSettings : CharacterBaseSettings
 
         FromNative(native.baseSettings);
 
+        ID = native.ID;
         Mass = native.mass;
         MaxStrength = native.maxStrength;
         ShapeOffset = native.shapeOffset;
@@ -33,6 +34,7 @@ public sealed class CharacterVirtualSettings : CharacterBaseSettings
         InnerBodyLayer = native.innerBodyLayer;
     }
 
+    public CharacterID ID { get; set; }
     public float Mass { get; set; }
 
     public float MaxStrength { get; set; }
@@ -71,6 +73,7 @@ public sealed class CharacterVirtualSettings : CharacterBaseSettings
         native->baseSettings.enhancedInternalEdgeRemoval = EnhancedInternalEdgeRemoval;
         native->baseSettings.shape = Shape != null ? Shape.Handle : 0;
 
+        native->ID = ID;
         native->mass = Mass;
         native->maxStrength = MaxStrength;
         native->shapeOffset = ShapeOffset;

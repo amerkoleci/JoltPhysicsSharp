@@ -2637,6 +2637,7 @@ internal static unsafe partial class JoltApi
     public struct JPH_CharacterVirtualSettings     /* Inherics JPH_CharacterBaseSettings */
     {
         public JPH_CharacterBaseSettings baseSettings;
+        public CharacterID ID;
         public float mass;
         public float maxStrength;
         public Vector3 shapeOffset;
@@ -2666,10 +2667,13 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_CharacterVirtual_Create(JPH_CharacterVirtualSettings* settings, in Double3 position, in Quaternion rotation, ulong userData, nint physicsSystem);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_CharacterVirtual_SetListener(nint settings, nint listener);
+    public static partial CharacterID JPH_CharacterVirtual_GetID(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_CharacterVirtual_SetCharacterVsCharacterCollision(nint settings, nint listener);
+    public static partial nint JPH_CharacterVirtual_SetListener(nint handle, nint listener);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterVirtual_SetCharacterVsCharacterCollision(nint handle, nint listener);
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_GetLinearVelocity(nint handle, out Vector3 velocity);
@@ -2754,6 +2758,12 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_CharacterVirtual_CancelVelocityTowardsSteepSlopes(nint handle, in Vector3 desiredVelocity, out Vector3 velocity);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_StartTrackingContactChanges(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_FinishTrackingContactChanges(nint handle);
+
+    [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_CharacterVirtual_CanWalkStairs(nint character, in Vector3 linearVelocity);
 
@@ -2791,7 +2801,11 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_CharacterVirtual_HasCollidedWith(nint character, nint other);
+    public static partial bool JPH_CharacterVirtual_HasCollidedWith(nint character, CharacterID other);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_CharacterVirtual_HasCollidedWithCharacter(nint character, nint other);
 
     public struct JPH_CharacterContactListener_Procs
     {
@@ -2799,7 +2813,11 @@ internal static unsafe partial class JoltApi
         public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Bool8> OnContactValidate;
         public delegate* unmanaged<nint, nint, nint, SubShapeID, Bool8> OnCharacterContactValidate;
         public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, CharacterContactSettings*, void> OnContactAdded;
+        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, CharacterContactSettings*, void> OnContactPersisted;
+        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, void> OnContactRemoved;
         public delegate* unmanaged<nint, nint, nint, SubShapeID, Vector3*, Vector3*, CharacterContactSettings*, void> OnCharacterContactAdded;
+        public delegate* unmanaged<nint, nint, nint, SubShapeID, Vector3*, Vector3*, CharacterContactSettings*, void> OnCharacterContactPersisted;
+        public delegate* unmanaged<nint, nint, CharacterID, SubShapeID, void> OnCharacterContactRemoved;
         public delegate* unmanaged<nint, nint, BodyID, SubShapeID, Vector3*, Vector3*, Vector3*, nint, Vector3*, Vector3*, void> OnContactSolve;
         public delegate* unmanaged<nint, nint, nint, SubShapeID, Vector3*, Vector3*, Vector3*, nint, Vector3*, Vector3*, void> OnCharacterContactSolve;
     }

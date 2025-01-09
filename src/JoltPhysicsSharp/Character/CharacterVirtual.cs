@@ -16,7 +16,11 @@ public sealed class CharacterVirtual : CharacterBase
         OnContactValidate = &OnContactValidateCallback,
         OnCharacterContactValidate = &OnCharacterContactValidateCallback,
         OnContactAdded = &OnContactAddedCallback,
+        OnContactPersisted = &OnContactPersistedCallback,
+        OnContactRemoved = &OnContactRemovedCallback,
         OnCharacterContactAdded = &OnCharacterContactAddedCallback,
+        OnCharacterContactPersisted = &OnCharacterContactPersistedCallback,
+        OnCharacterContactRemoved = &OnCharacterContactRemovedCallback,
         OnContactSolve = &OnContactSolveCallback,
         OnCharacterContactSolve = &OnCharacterContactSolveCallback,
     };
@@ -24,11 +28,44 @@ public sealed class CharacterVirtual : CharacterBase
     public delegate void AdjustBodyVelocityHandler(CharacterVirtual character, in Body body2, ref Vector3 linearVelocity, ref Vector3 angularVelocity);
     public delegate bool ContactValidateHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2);
     public delegate bool CharacterContactValidateHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2);
-    public delegate void ContactAddedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNornal, ref CharacterContactSettings settings);
-    public delegate void CharacterContactAddedHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNornal, ref CharacterContactSettings settings);
+
+    /// <summary>
+    /// Callback called when contact is added or persisted.
+    /// </summary>
+    /// <param name="character">Character that is being solved</param>
+    /// <param name="bodyID2">Body ID of body that is being hit</param>
+    /// <param name="subShapeID2">Sub shape ID of shape that is being hit</param>
+    /// <param name="contactPosition">World space contact position</param>
+    /// <param name="contactNormal">World space contact normal</param>
+    /// <param name="settings">Settings returned by the contact callback to indicate how the character should behave</param>
+    public delegate void ContactAddedPersistedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNormal, ref CharacterContactSettings settings);
+
+    /// <summary>
+    /// Callback called whenever the character loses contact with a body.
+    /// </summary>
+    /// <param name="character">Character that is being solved</param>
+    /// <param name="bodyID2">Body ID of body that is being hit</param>
+    /// <param name="subShapeID2">Sub shape ID of shape that is being hit</param>
+    public delegate void ContactRemovedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2);
+
+    public delegate void CharacterContactAddedPersistedHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNormal, ref CharacterContactSettings settings);
+    public delegate void CharacterContactRemovedHandler(CharacterVirtual character, CharacterID otherCharacterID, SubShapeID subShapeID2);
+
+    /// <summary>
+    /// Called whenever a contact is being used by the solver. Allows the listener to override the resulting character velocity (e.g. by preventing sliding along certain surfaces).
+    /// </summary>
+    /// <param name="character">Character that is being solved</param>
+    /// <param name="bodyID2">Body ID of body that is being hit</param>
+    /// <param name="subShapeID2">Sub shape ID of shape that is being hit</param>
+    /// <param name="contactPosition">World space contact position</param>
+    /// <param name="contactNormal">World space contact normal</param>
+    /// <param name="contactVelocity">World space velocity of contact point (e.g. for a moving platform)</param>
+    /// <param name="contactMaterial">Material of contact point</param>
+    /// <param name="characterVelocity">World space velocity of the character prior to hitting this contact</param>
+    /// <param name="ioNewCharacterVelocity">Contains the calculated world space velocity of the character after hitting this contact, this velocity slides along the surface of the contact. Can be modified by the listener to provide an alternative velocity.</param>
     public delegate void ContactSolveHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2,
         in Double3 contactPosition,
-        in Vector3 contactNornal,
+        in Vector3 contactNormal,
         in Vector3 contactVelocity,
         PhysicsMaterial? contactMaterial,
         in Vector3 characterVelocity,
@@ -36,18 +73,73 @@ public sealed class CharacterVirtual : CharacterBase
 
     public delegate void CharacterContactSolveHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2,
         in Double3 contactPosition,
-        in Vector3 contactNornal,
+        in Vector3 contactNormal,
         in Vector3 contactVelocity,
         PhysicsMaterial? contactMaterial,
         in Vector3 characterVelocity,
         ref Vector3 ioNewCharacterVelocity);
 
+    /// <summary>
+    /// Callback to adjust the velocity of a body as seen by the character.
+    /// Can be adjusted to e.g. implement a conveyor belt or an inertial dampener system of a sci-fi space ship.
+    /// </summary>
+    /// <remarks>
+    /// Note that body2 is locked during the callback so you can read its properties freely.
+    /// </remarks>
     public event AdjustBodyVelocityHandler? OnAdjustBodyVelocity;
+
+    /// <summary>
+    /// Checks if a character can collide with specified body. Return true if the contact is valid.
+    /// </summary>
     public event ContactValidateHandler? OnContactValidate;
+
+    /// <summary>
+    /// Same as <see cref="OnContactValidate"/> but when colliding with a <see cref="CharacterVirtual"/>
+    /// </summary>
     public event CharacterContactValidateHandler? OnCharacterContactValidate;
-    public event ContactAddedHandler? OnContactAdded;
-    public event CharacterContactAddedHandler? OnCharacterContactAdded;
+
+    /// <summary>
+    /// Called whenever the character collides with a body for the first time.
+    /// </summary>
+    public event ContactAddedPersistedHandler? OnContactAdded;
+
+    /// <summary>
+    /// Called whenever the character persists colliding with a body.
+    /// </summary>
+    public event ContactAddedPersistedHandler? OnContactPersisted;
+
+    /// <summary>
+    /// Called whenever the character loses contact with a body.
+    /// </summary>
+    public event ContactRemovedHandler? OnContactRemoved;
+
+    /// <summary>
+    /// Same as <see cref="OnContactAdded"/> but when colliding with a <see cref="CharacterVirtual"/>
+    /// </summary>
+    public event CharacterContactAddedPersistedHandler? OnCharacterContactAdded;
+
+    /// <summary>
+    /// Same as <see cref="OnContactPersisted"/> but when colliding with a <see cref="CharacterVirtual"/>
+    /// </summary>
+    public event CharacterContactAddedPersistedHandler? OnCharacterContactPersisted;
+
+    /// <summary>
+    /// Same as <see cref="OnContactRemoved"/> but when colliding with a <see cref="CharacterVirtual"/>
+    /// </summary>
+    /// <remarks>
+    /// Note that otherCharacterID can be the ID of a character that has been deleted.
+    /// This happens if the character was in contact with this character during the last update, but has been deleted since.
+    /// </remarks>
+    public event CharacterContactRemovedHandler? OnCharacterContactRemoved;
+
+    /// <summary>
+    /// Called whenever a contact is being used by the solver. Allows the listener to override the resulting character velocity (e.g. by preventing sliding along certain surfaces).
+    /// </summary>
     public event ContactSolveHandler? OnContactSolve;
+
+    /// <summary>
+    /// Same as <see cref="OnContactSolve"/> but when colliding with a <see cref="CharacterVirtual"/>
+    /// </summary>
     public event CharacterContactSolveHandler? OnCharacterContactSolve;
 
     public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
@@ -99,6 +191,8 @@ public sealed class CharacterVirtual : CharacterBase
             JPH_CharacterVirtual_SetCharacterVsCharacterCollision(Handle, 0);
         }
     }
+
+    public CharacterID ID => JPH_CharacterVirtual_GetID(Handle);
 
     public Vector3 LinearVelocity
     {
@@ -270,6 +364,16 @@ public sealed class CharacterVirtual : CharacterBase
         JPH_CharacterVirtual_CancelVelocityTowardsSteepSlopes(Handle, in desiredVelocity, out velocity);
     }
 
+    public void StartTrackingContactChanges()
+    {
+        JPH_CharacterVirtual_StartTrackingContactChanges(Handle);
+    }
+
+    public void FinishTrackingContactChanges()
+    {
+        JPH_CharacterVirtual_FinishTrackingContactChanges(Handle);
+    }
+
     public bool CanWalkStairs(in Vector3 linearVelocity)
     {
         return JPH_CharacterVirtual_CanWalkStairs(Handle, in linearVelocity);
@@ -347,9 +451,14 @@ public sealed class CharacterVirtual : CharacterBase
         return JPH_CharacterVirtual_HasCollidedWithBody(Handle, in bodyID);
     }
 
+    public bool HasCollidedWith(CharacterID characterID)
+    {
+        return JPH_CharacterVirtual_HasCollidedWith(Handle, characterID);
+    }
+
     public bool HasCollidedWith(CharacterVirtual other)
     {
-        return JPH_CharacterVirtual_HasCollidedWith(Handle, other.Handle);
+        return JPH_CharacterVirtual_HasCollidedWithCharacter(Handle, other.Handle);
     }
 
     internal static CharacterVirtual? GetObject(nint handle)
@@ -418,6 +527,32 @@ public sealed class CharacterVirtual : CharacterBase
     }
 
     [UnmanagedCallersOnly]
+    private static unsafe void OnContactPersistedCallback(nint context, nint character,
+        BodyID bodyID2, SubShapeID subShapeID2,
+        Vector3* contactPosition, // JPH_RVec3
+        Vector3* contactNormal,
+        CharacterContactSettings* ioSettings)
+    {
+        CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
+
+        if (listener.OnContactPersisted != null)
+        {
+            CharacterContactSettings settings = *ioSettings;
+            listener.OnContactPersisted(listener, bodyID2, subShapeID2, new Double3(*contactPosition), *contactNormal, ref settings);
+            *ioSettings = settings;
+        }
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe void OnContactRemovedCallback(nint context, nint character,
+        BodyID bodyID2, SubShapeID subShapeID2)
+    {
+        CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
+
+        listener.OnContactRemoved?.Invoke(listener, bodyID2, subShapeID2);
+    }
+
+    [UnmanagedCallersOnly]
     private static unsafe void OnCharacterContactAddedCallback(nint context, nint character,
         nint otherCharacter,
         SubShapeID subShapeID2,
@@ -438,6 +573,39 @@ public sealed class CharacterVirtual : CharacterBase
                 ref settings);
             *ioSettings = settings;
         }
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe void OnCharacterContactPersistedCallback(nint context, nint character,
+        nint otherCharacter,
+        SubShapeID subShapeID2,
+        Vector3* contactPosition, // JPH_RVec3
+        Vector3* contactNormal,
+        CharacterContactSettings* ioSettings)
+    {
+        CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
+
+        if (listener.OnCharacterContactPersisted != null)
+        {
+            CharacterContactSettings settings = *ioSettings;
+            listener.OnCharacterContactPersisted(listener,
+                GetObject(otherCharacter)!,
+                subShapeID2,
+                new Double3(*contactPosition),
+                *contactNormal,
+                ref settings);
+            *ioSettings = settings;
+        }
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe void OnCharacterContactRemovedCallback(nint context, nint character,
+        CharacterID otherCharacterID,
+        SubShapeID subShapeID2)
+    {
+        CharacterVirtual listener = DelegateProxies.GetUserData<CharacterVirtual>(context, out _);
+
+        listener.OnCharacterContactRemoved?.Invoke(listener, otherCharacterID, subShapeID2);
     }
 
     [UnmanagedCallersOnly]
