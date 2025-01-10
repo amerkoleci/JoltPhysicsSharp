@@ -96,19 +96,13 @@ public sealed unsafe class PointConstraint : TwoBodyConstraint
     {
         get
         {
-            Vector3 result;
-            JPH_PointConstraint_GetTotalLambdaPosition(Handle, &result);
+            JPH_PointConstraint_GetTotalLambdaPosition(Handle, out Vector3 result);
             return result;
         }
     }
 
     public void GetTotalLambdaPosition(out Vector3 result)
     {
-        Unsafe.SkipInit(out result);
-
-        fixed (Vector3* resultPtr = &result)
-        {
-            JPH_PointConstraint_GetTotalLambdaPosition(Handle, resultPtr);
-        }
+        JPH_PointConstraint_GetTotalLambdaPosition(Handle, out result);
     }
 }

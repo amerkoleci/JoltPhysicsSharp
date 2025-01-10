@@ -1163,7 +1163,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PointConstraint_SetPoint2(nint handle, ConstraintSpace space, Vector3* value); // RVec3
 
     [LibraryImport(LibName)]
-    public static partial void JPH_PointConstraint_GetTotalLambdaPosition(nint handle, Vector3* result);
+    public static partial void JPH_PointConstraint_GetTotalLambdaPosition(nint handle, out Vector3 result);
     #endregion
 
     #region JPH_HingeConstraint
@@ -2792,8 +2792,33 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_SetInnerBodyShape(nint character, nint shape);
 
+    public struct JPH_CharacterVirtualContact
+    {
+        public ulong hash;
+        public BodyID bodyB;
+        public CharacterID characterIDB;
+        public SubShapeID subShapeIDB;
+        public Vector3 position; /*  JPH_RVec3 */
+        public Vector3 linearVelocity;
+        public Vector3 contactNormal;
+        public Vector3 surfaceNormal;
+        public float distance;
+        public float fraction;
+        public MotionType motionTypeB;
+        public Bool8 isSensorB;
+        public /*const JPH_CharacterVirtual**/nint characterB;
+        public ulong userData;
+        public /*const JPH_PhysicsMaterial**/nint material;
+        public Bool8 hadCollision;
+        public Bool8 wasDiscarded;
+        public Bool8 canPushCharacter;
+    }
+
     [LibraryImport(LibName)]
-    public static partial uint JPH_CharacterVirtual_GetNumContacts(nint character);
+    public static partial int JPH_CharacterVirtual_GetNumActiveContacts(nint character);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_CharacterVirtual_GetActiveContact(nint character, int index, JPH_CharacterVirtualContact* result);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
