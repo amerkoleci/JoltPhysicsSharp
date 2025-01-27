@@ -2,19 +2,17 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
 public sealed class Body : NativeObject
 {
-    internal Body(nint handle)
-        : base(handle)
+    internal Body(nint handle, bool owns = true)
+        : base(handle, owns)
     {
-
     }
-    
+
     public BodyID ID => JPH_Body_GetID(Handle);
 
     /// <summary>
@@ -639,8 +637,5 @@ public sealed class Body : NativeObject
         JPH_Body_SetUserData(Handle, userData);
     }
 
-    internal static Body? GetObject(nint handle)
-    {
-        return GetOrAddObject(handle, (nint h) => new Body(h));
-    }
+    internal static Body? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new Body(h, false));
 }

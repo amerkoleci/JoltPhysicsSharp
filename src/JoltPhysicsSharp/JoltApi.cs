@@ -292,7 +292,7 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_BodyDrawFilter_Destroy(nint handle);
 
-    /* ShapeSettings */
+    #region Shape/ShapeSettings
     [LibraryImport(LibName)]
     public static partial void JPH_ShapeSettings_Destroy(nint settings);
 
@@ -302,15 +302,91 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_ShapeSettings_SetUserData(nint settings, ulong userData);
 
-    /* ConvexShape */
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_Destroy(nint shape);
 
+    [LibraryImport(LibName)]
+    public static partial ShapeType JPH_Shape_GetType(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial ShapeSubType JPH_Shape_GetSubType(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial ulong JPH_Shape_GetUserData(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_SetUserData(nint shape, ulong userData);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Shape_MustBeStatic(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetCenterOfMass(nint handle, out Vector3 result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetLocalBounds(nint shape, out BoundingBox box);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_Shape_GetSubShapeIDBitsRecursive(nint shape);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_Shape_GetInnerRadius(nint handle);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_Shape_GetVolume(nint handle);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Shape_IsValidScale(nint handle, in Vector3 scale);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_MakeScaleValid(nint handle, in Vector3 scale, out Vector3 result);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Shape_ScaleShape(nint handle, in Vector3 scale);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetMassProperties(nint shape, out MassProperties properties);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, in Matrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, in RMatrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Shape_GetMaterial(nint shape, SubShapeID subShapeID);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_GetSurfaceNormal(nint shape, SubShapeID subShapeID, in Vector3 localPosition, out Vector3 normal);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Shape_CastRay(nint shape, in Vector3 origin, in Vector3 direction, out RayCastResult hit);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Shape_CastRay2(nint shape, in Vector3 origin, in Vector3 direction, in RayCastSettings settings, CollisionCollectorType collectorType, JPH_CastRayResultCallback callback, nint userData, nint shapeFilter);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Shape_CollidePoint(nint shape, in Vector3 point, nint shapeFilter);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Shape_CollidePoint2(nint shape, in Vector3 point, CollisionCollectorType collectorType, JPH_CollidePointResultCallback callback, nint userData, nint shapeFilter);
+    #endregion
+
+    #region ConvexShape
     [LibraryImport(LibName)]
     public static partial float JPH_ConvexShape_GetDensity(nint shape);
 
     [LibraryImport(LibName)]
     public static partial void JPH_ConvexShape_SetDensity(nint shape, float value);
+    #endregion
 
-    /* BoxShapeSettings */
+    #region BoxShape/BoxShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_BoxShapeSettings_Create(in Vector3 halfExtent, float convexRadius);
 
@@ -325,8 +401,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial float JPH_BoxShape_GetConvexRadius(nint handle);
+    #endregion
 
-    /* SphereShape */
+    #region SphereShape/SphereShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_SphereShapeSettings_Create(float radius);
 
@@ -339,7 +416,14 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_SphereShapeSettings_SetRadius(nint shape, float radius);
 
-    /* PlaneShape */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SphereShape_Create(float radius);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SphereShape_GetRadius(nint shape);
+    #endregion
+
+    #region PlaneShape/PlaneShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_PlaneShapeSettings_Create(in Plane plane, nint material, float halfExtent);
 
@@ -354,8 +438,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial float JPH_PlaneShape_GetHalfExtent(nint handle);
+    #endregion
 
-    /* TriangleShape */
+    #region TriangleShape/TriangleShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_TriangleShapeSettings_Create(in Vector3 v1, in Vector3 v2, in Vector3 v3, float convexRadius);
 
@@ -376,8 +461,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_TriangleShape_GetVertex3(nint handle, Vector3* result);
+    #endregion
 
-    /* CapsuleShape */
+    #region CapsuleShape/CapsuleShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_CapsuleShapeSettings_Create(float halfHeightOfCylinder, float radius);
 
@@ -392,8 +478,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial float JPH_CapsuleShape_GetHalfHeightOfCylinder(nint handle);
+    #endregion
 
-    /* CylinderShape */
+    #region CylinderShape/CylinderShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_CylinderShapeSettings_Create(float halfHeight, float radius, float convexRadius);
 
@@ -408,8 +495,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial float JPH_CylinderShape_GetHalfHeight(nint handle);
+    #endregion
 
-    /* TaperedCylinderShape */
+    #region TaperedCylinderShape/TaperedCylinderShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_TaperedCylinderShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius, float convexRadius, nint material);
 
@@ -427,8 +515,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial float JPH_TaperedCylinderShape_GetHalfHeight(nint shape);
+    #endregion
 
-    /* ConvexHullShape */
+    #region ConvexHullShape/ConvexHullShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_ConvexHullShapeSettings_Create(Vector3* points, int pointsCount, float maxConvexRadius);
 
@@ -456,8 +545,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_ConvexShapeSettings_SetDensity(nint shape, float value);
+    #endregion
 
-    /* MeshShape  */
+    #region MeshShape/MeshShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_MeshShapeSettings_Create(Triangle* triangle, int triangleCount);
 
@@ -465,12 +555,34 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_MeshShapeSettings_Create2(Vector3* vertices, int verticesCount, IndexedTriangle* triangles, int triangleCount);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_MeshShapeSettings_Sanitize(nint shape);
+    public static partial uint JPH_MeshShapeSettings_GetMaxTrianglesPerLeaf(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MeshShapeSettings_SetMaxTrianglesPerLeaf(nint settings, uint value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MeshShapeSettings_GetActiveEdgeCosThresholdAngle(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MeshShapeSettings_SetActiveEdgeCosThresholdAngle(nint settings, float value);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_MeshShapeSettings_GetPerTriangleUserData(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MeshShapeSettings_SetPerTriangleUserData(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+    [LibraryImport(LibName)]
+    public static partial MeshShapeBuildQuality JPH_MeshShapeSettings_GetBuildQuality(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MeshShapeSettings_SetBuildQuality(nint settings, MeshShapeBuildQuality value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_MeshShapeSettings_Sanitize(nint settings);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_MeshShapeSettings_CreateShape(nint settings);
 
-    /* HeightFieldShape  */
+    [LibraryImport(LibName)]
+    public static partial uint JPH_MeshShape_GetTriangleUserData(nint shape, SubShapeID id);
+    #endregion
+
+    #region HeightFieldShape/HeightFieldShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_HeightFieldShapeSettings_Create(float* samples, in Vector3 offset, in Vector3 scale, int sampleCount);
 
@@ -501,8 +613,9 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_HeightFieldShape_GetMinHeightValue(nint shape);
     [LibraryImport(LibName)]
     public static partial float JPH_HeightFieldShape_GetMaxHeightValue(nint shape);
+    #endregion
 
-    /* JPH_TaperedCapsuleShape */
+    #region TaperedCapsuleShape/TaperedCapsuleShapeSettings
     [LibraryImport(LibName)]
     public static partial nint JPH_TaperedCapsuleShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius);
 
@@ -517,6 +630,7 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial float JPH_TaperedCapsuleShape_GetHalfHeight(nint shape);
+    #endregion
 
     /* CompoundShape */
     [LibraryImport(LibName)]
@@ -602,88 +716,13 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_OffsetCenterOfMassShape_GetOffset(nint handle, out Vector3 offset);
 
-    /* Shape */
+    #region EmptyShape/EmptyShapeSettings
     [LibraryImport(LibName)]
-    public static partial void JPH_Shape_Destroy(nint shape);
+    public static partial nint JPH_EmptyShapeSettings_Create(in Vector3 centerOfMass);
 
     [LibraryImport(LibName)]
-    public static partial ShapeType JPH_Shape_GetType(nint shape);
-
-    [LibraryImport(LibName)]
-    public static partial ShapeSubType JPH_Shape_GetSubType(nint shape);
-
-    [LibraryImport(LibName)]
-    public static partial ulong JPH_Shape_GetUserData(nint shape);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_Shape_SetUserData(nint shape, ulong userData);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_MustBeStatic(nint shape);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetCenterOfMass(nint handle, out Vector3 result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetLocalBounds(nint shape, out BoundingBox box);
-
-    [LibraryImport(LibName)]
-    public static partial uint JPH_Shape_GetSubShapeIDBitsRecursive(nint shape);
-
-    [LibraryImport(LibName)]
-    public static partial float JPH_Shape_GetInnerRadius(nint handle);
-
-    [LibraryImport(LibName)]
-    public static partial float JPH_Shape_GetVolume(nint handle);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_IsValidScale(nint handle, in Vector3 scale);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_Shape_MakeScaleValid(nint handle, in Vector3 scale, out Vector3 result);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_Shape_ScaleShape(nint handle, in Vector3 scale);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetMassProperties(nint shape, out MassProperties properties);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, in Matrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, in RMatrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_Shape_GetMaterial(nint shape, SubShapeID subShapeID);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_Shape_GetSurfaceNormal(nint shape, SubShapeID subShapeID, in Vector3 localPosition, out Vector3 normal);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_CastRay(nint shape, in Vector3 origin, in Vector3 direction, out RayCastResult hit);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_CastRay2(nint shape, in Vector3 origin, in Vector3 direction, in RayCastSettings settings, CollisionCollectorType collectorType, JPH_CastRayResultCallback callback, nint userData, nint shapeFilter);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_CollidePoint(nint shape, in Vector3 point, nint shapeFilter);
-
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Shape_CollidePoint2(nint shape, in Vector3 point, CollisionCollectorType collectorType, JPH_CollidePointResultCallback callback, nint userData, nint shapeFilter);
-
-    /* SphereShape */
-    [LibraryImport(LibName)]
-    public static partial nint JPH_SphereShape_Create(float radius);
-
-    [LibraryImport(LibName)]
-    public static partial float JPH_SphereShape_GetRadius(nint shape);
+    public static partial nint JPH_EmptyShapeSettings_CreateShape(nint settings);
+    #endregion
 
     /* BodyCreationSettings */
     [LibraryImport(LibName)]
@@ -2924,6 +2963,78 @@ internal static unsafe partial class JoltApi
     //   public static partial void JPH_DebugRenderer_DrawWireSphere(nint renderer, const JPH_RVec3* center, float radius, JPH_Color color, int level);
     //   [LibraryImport(LibName)]
     //   public static partial void JPH_DebugRenderer_DrawWireUnitSphere(nint renderer, const JPH_RMatrix4x4* matrix, JPH_Color color, int level);
+    #endregion
+
+    #region Skeleton
+    public readonly struct SkeletonJoint
+    {
+        public readonly byte* name;
+        public readonly byte* parentName;
+        public readonly int parentJointIndex;
+    }
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Skeleton_Create();
+    [LibraryImport(LibName)]
+    public static partial void JPH_Skeleton_Destroy(nint skeleton);
+
+    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
+    public static partial uint JPH_Skeleton_AddJoint(nint skeleton, string name);
+    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
+    public static partial uint JPH_Skeleton_AddJoint2(nint skeleton, string name, int parentIndex);
+    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
+    public static partial uint JPH_Skeleton_AddJoint3(nint skeleton, string name, string parentName);
+    [LibraryImport(LibName)]
+    public static partial int JPH_Skeleton_GetJointCount(nint skeleton);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Skeleton_GetJoint(nint skeleton, int index, out SkeletonJoint joint);
+    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int JPH_Skeleton_GetJointIndex(nint skeleton, string name);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Skeleton_CalculateParentJointIndices(nint skeleton);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Skeleton_AreJointsCorrectlyOrdered(nint skeleton);
+    #endregion
+
+    #region Ragdoll
+    /* Ragdoll */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RagdollSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RagdollSettings_GetSkeleton(nint character);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_SetSkeleton(nint character, nint skeleton);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_RagdollSettings_Stabilize(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_DisableParentChildCollisions(nint settings, Matrix4x4* jointMatrices /*=nullptr*/, float minSeparationDistance/* = 0.0f*/);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_CalculateBodyIndexToConstraintIndex(nint settings);
+    [LibraryImport(LibName)]
+    public static partial int JPH_RagdollSettings_GetConstraintIndexForBodyIndex(nint settings, int bodyIndex);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_CalculateConstraintIndexToBodyIdxPair(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_RagdollSettings_CreateRagdoll(nint settings, nint system, uint collisionGroup, ulong userData);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_Destroy(nint ragdoll);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_AddToPhysicsSystem(nint ragdoll, Activation activationMode /*= JPH_ActivationActivate */, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_RemoveFromPhysicsSystem(nint ragdoll, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_Activate(nint ragdoll, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Ragdoll_IsActive(nint ragdoll, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_ResetWarmStart(nint ragdoll);
     #endregion
 
     sealed class UTF8EncodingRelaxed : UTF8Encoding
