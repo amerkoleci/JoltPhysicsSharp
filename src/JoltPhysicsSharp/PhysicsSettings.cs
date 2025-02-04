@@ -5,7 +5,6 @@ namespace JoltPhysicsSharp;
 
 public record struct PhysicsSettings
 {
-
     public int MaxInFlightBodyPairs;
     public int StepListenersBatchSize;
     public int StepListenerBatchesPerJob;
@@ -14,7 +13,7 @@ public record struct PhysicsSettings
     public float PenetrationSlop;
     public float LinearCastThreshold;
     public float LinearCastMaxPenetration;
-    public float ManifoldToleranceSq;
+    public float ManifoldTolerance;
     public float MaxPenetrationDistance;
     public float BodyPairCacheMaxDeltaPositionSq;
     public float BodyPairCacheCosMaxDeltaRotationDiv2;
