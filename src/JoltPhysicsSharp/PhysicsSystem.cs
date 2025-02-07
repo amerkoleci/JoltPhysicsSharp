@@ -67,7 +67,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
                 OnContactRemoved = &OnContactRemovedCallback
             };
 
-            _contactListenerHandle = JPH_ContactListener_Create(_contactListener_Procs, listenerContext);
+            _contactListenerHandle = JPH_ContactListener_Create(in _contactListener_Procs, listenerContext);
         }
         else
         {
@@ -78,7 +78,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
                 OnContactPersisted = &OnContactPersistedCallback,
                 OnContactRemoved = &OnContactRemovedCallback
             };
-            _contactListenerHandle = JPH_ContactListener_Create(_contactListener_ProcsDouble, listenerContext);
+            _contactListenerHandle = JPH_ContactListener_Create(in _contactListener_ProcsDouble, listenerContext);
         }
 
         _bodyActivationListener_Procs = new JPH_BodyActivationListener_Procs
@@ -86,7 +86,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
             OnBodyActivated = &OnBodyActivatedCallback,
             OnBodyDeactivated = &OnBodyDeactivatedCallback
         };
-        _bodyActivationListenerHandle = JPH_BodyActivationListener_Create(_bodyActivationListener_Procs, listenerContext);
+        _bodyActivationListenerHandle = JPH_BodyActivationListener_Create(in _bodyActivationListener_Procs, listenerContext);
 
         JPH_PhysicsSystem_SetContactListener(Handle, _contactListenerHandle);
         JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);

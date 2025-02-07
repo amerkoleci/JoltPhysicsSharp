@@ -34,7 +34,7 @@ public abstract class DebugRenderer : NativeObject
     }
 
 
-    private readonly unsafe JPH_DebugRenderer_Procs _listener_Procs = new()
+    private readonly unsafe JPH_DebugRenderer_Procs _procs = new()
     {
         DrawLine = &OnDrawLine,
         DrawTriangle = &OnDrawTriangle,
@@ -44,7 +44,7 @@ public abstract class DebugRenderer : NativeObject
     protected DebugRenderer()
     {
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        Handle = JPH_DebugRenderer_Create(_listener_Procs, listenerContext);
+        Handle = JPH_DebugRenderer_Create(in _procs, listenerContext);
     }
 
     protected DebugRenderer(nint handle)

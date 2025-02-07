@@ -8,17 +8,17 @@ namespace JoltPhysicsSharp;
 
 public abstract class ShapeFilter : NativeObject
 {
-    private readonly JPH_ShapeFilter_Procs _bodyFilter_Procs;
+    private readonly JPH_ShapeFilter_Procs _procs;
 
     public unsafe ShapeFilter()
     {
         nint context = DelegateProxies.CreateUserData(this, true);
-        _bodyFilter_Procs = new JPH_ShapeFilter_Procs
+        _procs = new JPH_ShapeFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback,
             ShouldCollide2 = &ShouldCollide2Callback,
         };
-        Handle = JPH_ShapeFilter_Create(_bodyFilter_Procs, context);
+        Handle = JPH_ShapeFilter_Create(in _procs, context);
     }
 
     public BodyID BodyID2

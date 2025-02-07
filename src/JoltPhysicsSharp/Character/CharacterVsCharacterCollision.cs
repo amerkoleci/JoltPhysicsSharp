@@ -22,7 +22,7 @@ public abstract class CharacterVsCharacterCollision : NativeObject
 
 public abstract class CharacterVsCharacterCollisionListener : NativeObject
 {
-    private readonly unsafe JPH_CharacterVsCharacterCollision_Procs _listener_Procs = new()
+    private readonly unsafe JPH_CharacterVsCharacterCollision_Procs _procs = new()
     {
         CollideCharacter = &OnCollideCharacterCallback,
         CastCharacter = &OnCastCharacterCallback,
@@ -31,7 +31,7 @@ public abstract class CharacterVsCharacterCollisionListener : NativeObject
     public CharacterVsCharacterCollisionListener()
     {
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        Handle = JPH_CharacterVsCharacterCollision_Create(_listener_Procs, listenerContext);
+        Handle = JPH_CharacterVsCharacterCollision_Create(in _procs, listenerContext);
     }
 
     protected abstract void CollideCharacter(

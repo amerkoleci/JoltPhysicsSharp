@@ -8,16 +8,16 @@ namespace JoltPhysicsSharp;
 
 public abstract class ObjectLayerFilter : NativeObject
 {
-    private readonly JPH_ObjectLayerFilter_Procs _objectLayerFilter_Procs;
+    private readonly JPH_ObjectLayerFilter_Procs _procs;
 
     public ObjectLayerFilter()
     {
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        _objectLayerFilter_Procs = new JPH_ObjectLayerFilter_Procs
+        _procs = new JPH_ObjectLayerFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback,
         };
-        Handle = JPH_ObjectLayerFilter_Create(_objectLayerFilter_Procs, listenerContext);
+        Handle = JPH_ObjectLayerFilter_Create(in _procs, listenerContext);
     }
 
 

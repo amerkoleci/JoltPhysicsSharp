@@ -17,7 +17,7 @@ public abstract class BodyDrawFilter : NativeObject
         {
             ShouldDraw = &ShouldDrawCallback,
         };
-        Handle = JPH_BodyDrawFilter_Create(_procs, context);
+        Handle = JPH_BodyDrawFilter_Create(in _procs, context);
     }
 
     protected override void DisposeNative()

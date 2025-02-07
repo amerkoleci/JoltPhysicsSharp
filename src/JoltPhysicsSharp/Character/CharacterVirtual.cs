@@ -153,7 +153,7 @@ public sealed class CharacterVirtual : CharacterBase
         Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
 
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        _listenerHandle = JPH_CharacterContactListener_Create(_listener_Procs, listenerContext);
+        _listenerHandle = JPH_CharacterContactListener_Create(in _listener_Procs, listenerContext);
         JPH_CharacterVirtual_SetListener(Handle, _listenerHandle);
     }
 
@@ -167,7 +167,7 @@ public sealed class CharacterVirtual : CharacterBase
         Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
 
         nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        _listenerHandle = JPH_CharacterContactListener_Create(_listener_Procs, listenerContext);
+        _listenerHandle = JPH_CharacterContactListener_Create(in _listener_Procs, listenerContext);
         JPH_CharacterVirtual_SetListener(Handle, _listenerHandle);
     }
 
