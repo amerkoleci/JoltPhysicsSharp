@@ -2426,7 +2426,7 @@ internal static unsafe partial class JoltApi
     // ContactListener
     public struct JPH_ContactListener_Procs
     {
-        public delegate* unmanaged<nint, nint, nint, Vector3*, nint, uint> OnContactValidate;
+        public delegate* unmanaged<nint, nint, nint, Vector3*, CollideShapeResult*, uint> OnContactValidate;
         public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactAdded;
         public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactPersisted;
         public delegate* unmanaged<nint, SubShapeIDPair*, void> OnContactRemoved;
@@ -2434,7 +2434,7 @@ internal static unsafe partial class JoltApi
 
     public struct JPH_ContactListener_ProcsDouble
     {
-        public delegate* unmanaged<nint, nint, nint, Double3*, nint, uint> OnContactValidate;
+        public delegate* unmanaged<nint, nint, nint, Double3*, CollideShapeResult*, uint> OnContactValidate;
         public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactAdded;
         public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactPersisted;
         public delegate* unmanaged<nint, SubShapeIDPair*, void> OnContactRemoved;
@@ -3036,6 +3036,9 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_Ragdoll_ResetWarmStart(nint ragdoll);
     #endregion
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_EstimateCollisionResponse(nint body1, nint body2, nint manifold, float combinedFriction, float combinedRestitution, float minVelocityForRestitution, int numIterations, CollisionEstimationResult* result);
 
     sealed class UTF8EncodingRelaxed : UTF8Encoding
     {

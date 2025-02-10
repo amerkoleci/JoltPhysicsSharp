@@ -8,7 +8,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, nint collisionResult);
+public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, in CollideShapeResult collisionResult);
 public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings);
 public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings);
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
@@ -265,26 +265,26 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
     #region ContactListener
     [UnmanagedCallersOnly]
-    private static unsafe uint OnContactValidateCallback(nint context, nint body1, nint body2, Vector3* baseOffset, nint collisionResult)
+    private static unsafe uint OnContactValidateCallback(nint context, nint body1, nint body2, Vector3* baseOffset, CollideShapeResult* collisionResult)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 
         if (listener.OnContactValidate != null)
         {
-            return (uint)listener.OnContactValidate(listener, Body.GetObject(body1)!, Body.GetObject(body2)!, new Double3(*baseOffset), collisionResult);
+            return (uint)listener.OnContactValidate(listener, Body.GetObject(body1)!, Body.GetObject(body2)!, new Double3(*baseOffset), *collisionResult);
         }
 
         return (uint)ValidateResult.AcceptAllContactsForThisBodyPair;
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe uint OnContactValidateCallbackDouble(nint context, nint body1, nint body2, Double3* baseOffset, nint collisionResult)
+    private static unsafe uint OnContactValidateCallbackDouble(nint context, nint body1, nint body2, Double3* baseOffset, CollideShapeResult* collisionResult)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 
         if (listener.OnContactValidate != null)
         {
-            return (uint)listener.OnContactValidate(listener, Body.GetObject(body1)!, Body.GetObject(body2)!, *baseOffset, collisionResult);
+            return (uint)listener.OnContactValidate(listener, Body.GetObject(body1)!, Body.GetObject(body2)!, *baseOffset, *collisionResult);
         }
 
         return (uint)ValidateResult.AcceptAllContactsForThisBodyPair;

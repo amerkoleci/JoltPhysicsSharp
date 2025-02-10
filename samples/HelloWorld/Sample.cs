@@ -135,7 +135,7 @@ public abstract class Sample : IDisposable
         return body;
     }
 
-    protected virtual ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, nint collisionResult)
+    protected virtual ValidateResult OnContactValidate(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, in CollideShapeResult collisionResult)
     {
         Console.WriteLine("Contact validate callback");
 
