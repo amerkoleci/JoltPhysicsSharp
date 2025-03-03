@@ -172,6 +172,11 @@ public sealed unsafe class PhysicsSystem : NativeObject
     public event BodyActivationHandler? OnBodyDeactivated;
     #endregion Events
 
+    public void SetSimShapeFilter(SimShapeFilter? filter)
+    {
+        JPH_PhysicsSystem_SetSimShapeFilter(Handle, filter != null ? filter.Handle : 0);
+    }
+
     public BodyInterface BodyInterface => new(JPH_PhysicsSystem_GetBodyInterface(Handle));
     public BodyInterface BodyInterfaceNoLock => new(JPH_PhysicsSystem_GetBodyInterfaceNoLock(Handle));
 

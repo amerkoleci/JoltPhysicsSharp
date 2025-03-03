@@ -47,7 +47,7 @@ internal static class HandleDictionary
     /// Retrieve or create an instance for the native handle.
     /// </summary>
     /// <returns>The instance, or null if the handle was null.</returns>
-    public static TNativeObject? GetOrAddObject<TNativeObject>(nint handle, bool unrefExisting, Func<IntPtr, TNativeObject> objectFactory)
+    public static TNativeObject? GetOrAddObject<TNativeObject>(nint handle, Func<IntPtr, TNativeObject> objectFactory)
         where TNativeObject : NativeObject
     {
         if (handle == 0)

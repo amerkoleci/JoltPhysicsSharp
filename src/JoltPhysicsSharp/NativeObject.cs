@@ -163,6 +163,6 @@ public abstract class NativeObject : IDisposable
             return null;
         }
 
-        return HandleDictionary.GetOrAddObject(handle, unrefExisting: true, objectFactory);
+        return HandleDictionary.GetOrAddObject(handle, objectFactory);
     }
 }

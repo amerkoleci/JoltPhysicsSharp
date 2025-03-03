@@ -32,12 +32,12 @@ public abstract class ShapeFilter : NativeObject
         JPH_ShapeFilter_Destroy(Handle);
     }
 
-    protected virtual bool ShouldCollide(/*Shape*/nint shape2, in SubShapeID subShapeIDOfShape2)
+    protected virtual bool ShouldCollide(Shape shape2, in SubShapeID subShapeIDOfShape2)
     {
         return true;
     }
 
-    protected virtual bool ShouldCollide(/*Shape*/nint shape1, in SubShapeID subShapeIDOfShape1, /*Shape*/nint shape2, in SubShapeID subShapeIDOfShape2)
+    protected virtual bool ShouldCollide(Shape shape1, in SubShapeID subShapeIDOfShape1, Shape shape2, in SubShapeID subShapeIDOfShape2)
     {
         return true;
     }
@@ -47,8 +47,7 @@ public abstract class ShapeFilter : NativeObject
     {
         // TODO: Add cache for Shape
         ShapeFilter listener = DelegateProxies.GetUserData<ShapeFilter>(context, out _);
-        //return listener.ShouldCollide(new Shape(shape2), *subShapeIDOfShape2);
-        return listener.ShouldCollide(shape2, *subShapeIDOfShape2);
+        return listener.ShouldCollide(Shape.GetObject(shape2)!, *subShapeIDOfShape2);
     }
 
     [UnmanagedCallersOnly]
@@ -56,6 +55,6 @@ public abstract class ShapeFilter : NativeObject
     {
         // TODO: Add cache for Shape
         ShapeFilter listener = DelegateProxies.GetUserData<ShapeFilter>(context, out _);
-        return listener.ShouldCollide(shape1, *subShapeIDOfShape1, shape2, *subShapeIDOfShape2);
+        return listener.ShouldCollide(Shape.GetObject(shape1)!, *subShapeIDOfShape1, Shape.GetObject(shape2)!, *subShapeIDOfShape2);
     }
 }

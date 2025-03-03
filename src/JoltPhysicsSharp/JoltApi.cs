@@ -280,6 +280,18 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_ShapeFilter_SetBodyID2(nint handle, uint id);
 
+    //  SimShapeFilter
+    public struct JPH_SimShapeFilter_Procs
+    {
+        public delegate* unmanaged<nint, nint, nint, SubShapeID*, nint, nint, SubShapeID*, Bool8> ShouldCollide;
+    }
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SimShapeFilter_Create(in JPH_SimShapeFilter_Procs procs, nint userData);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SimShapeFilter_Destroy(nint handle);
+
     //  BodyDrawFilter
     public struct JPH_BodyDrawFilter_Procs
     {
@@ -1468,6 +1480,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_SetBodyActivationListener(nint system, nint listener);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_SetSimShapeFilter(nint system, nint shapeFilter);
 
     [LibraryImport(LibName)]
     public static partial uint JPH_PhysicsSystem_GetNumBodies(nint system);
