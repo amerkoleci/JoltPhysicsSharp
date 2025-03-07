@@ -22,16 +22,30 @@ public abstract class CharacterVsCharacterCollision : NativeObject
 
 public abstract class CharacterVsCharacterCollisionListener : NativeObject
 {
-    private readonly unsafe JPH_CharacterVsCharacterCollision_Procs _procs = new()
+    private static readonly JPH_CharacterVsCharacterCollision_Procs _procs;
+    private readonly nint _listenerUserData;
+
+    static unsafe CharacterVsCharacterCollisionListener()
     {
-        CollideCharacter = &OnCollideCharacterCallback,
-        CastCharacter = &OnCastCharacterCallback,
-    };
+        _procs = new()
+        {
+            CollideCharacter = &OnCollideCharacterCallback,
+            CastCharacter = &OnCastCharacterCallback,
+        };
+        JPH_CharacterVsCharacterCollision_SetProcs(in _procs);
+    }
 
     public CharacterVsCharacterCollisionListener()
     {
-        nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        Handle = JPH_CharacterVsCharacterCollision_Create(in _procs, listenerContext);
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        Handle = JPH_CharacterVsCharacterCollision_Create(_listenerUserData);
+    }
+
+    protected override void DisposeNative()
+    {
+        DelegateProxies.GetUserData<CharacterVsCharacterCollisionListener>(_listenerUserData, out GCHandle gch);
+        base.DisposeNative();
+        gch.Free();
     }
 
     protected abstract void CollideCharacter(

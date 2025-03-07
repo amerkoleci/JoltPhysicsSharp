@@ -59,6 +59,8 @@ public class HelloWorld : Sample
             // Step the world
             PhysicsUpdateError error = System.Update(deltaTime, collisionSteps, JobSystem);
             Debug.Assert(error == PhysicsUpdateError.None);
+
+            GC.Collect();
         }
     }
 }

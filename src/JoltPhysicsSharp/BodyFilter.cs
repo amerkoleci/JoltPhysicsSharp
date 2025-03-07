@@ -8,22 +8,31 @@ namespace JoltPhysicsSharp;
 
 public abstract class BodyFilter : NativeObject
 {
-    private readonly JPH_BodyFilter_Procs _procs;
+    private static readonly JPH_BodyFilter_Procs _procs;
+    private readonly nint _listenerUserData;
 
-    public BodyFilter()
+    static BodyFilter()
     {
-        nint context = DelegateProxies.CreateUserData(this, true);
         _procs = new JPH_BodyFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback,
             ShouldCollideLocked = &ShouldCollideLockedCallback,
         };
-        Handle = JPH_BodyFilter_Create(in _procs, context);
+        JPH_BodyFilter_SetProcs(in _procs);
+    }
+
+    public BodyFilter()
+    {
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        Handle = JPH_BodyFilter_Create(_listenerUserData);
     }
 
     protected override void DisposeNative()
     {
+        DelegateProxies.GetUserData<BodyFilter>(_listenerUserData, out GCHandle gch);
+
         JPH_BodyFilter_Destroy(Handle);
+        gch.Free();
     }
 
     protected abstract bool ShouldCollide(BodyID bodyID);

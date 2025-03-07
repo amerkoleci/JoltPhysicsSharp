@@ -2,7 +2,6 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
@@ -10,21 +9,9 @@ namespace JoltPhysicsSharp;
 
 public sealed class CharacterVirtual : CharacterBase
 {
+    private static readonly JPH_CharacterContactListener_Procs _procs;
     private readonly nint _listenerHandle;
-    private readonly unsafe JPH_CharacterContactListener_Procs _listener_Procs = new JPH_CharacterContactListener_Procs
-    {
-        OnAdjustBodyVelocity = &OnAdjustBodyVelocityCallback,
-        OnContactValidate = &OnContactValidateCallback,
-        OnCharacterContactValidate = &OnCharacterContactValidateCallback,
-        OnContactAdded = &OnContactAddedCallback,
-        OnContactPersisted = &OnContactPersistedCallback,
-        OnContactRemoved = &OnContactRemovedCallback,
-        OnCharacterContactAdded = &OnCharacterContactAddedCallback,
-        OnCharacterContactPersisted = &OnCharacterContactPersistedCallback,
-        OnCharacterContactRemoved = &OnCharacterContactRemovedCallback,
-        OnContactSolve = &OnContactSolveCallback,
-        OnCharacterContactSolve = &OnCharacterContactSolveCallback,
-    };
+    private readonly nint _listenerUserData;
 
     public delegate void AdjustBodyVelocityHandler(CharacterVirtual character, in Body body2, ref Vector3 linearVelocity, ref Vector3 angularVelocity);
     public delegate bool ContactValidateHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2);
@@ -143,6 +130,25 @@ public sealed class CharacterVirtual : CharacterBase
     /// </summary>
     public event CharacterContactSolveHandler? OnCharacterContactSolve;
 
+    static unsafe CharacterVirtual()
+    {
+        _procs = new JPH_CharacterContactListener_Procs
+        {
+            OnAdjustBodyVelocity = &OnAdjustBodyVelocityCallback,
+            OnContactValidate = &OnContactValidateCallback,
+            OnCharacterContactValidate = &OnCharacterContactValidateCallback,
+            OnContactAdded = &OnContactAddedCallback,
+            OnContactPersisted = &OnContactPersistedCallback,
+            OnContactRemoved = &OnContactRemovedCallback,
+            OnCharacterContactAdded = &OnCharacterContactAddedCallback,
+            OnCharacterContactPersisted = &OnCharacterContactPersistedCallback,
+            OnCharacterContactRemoved = &OnCharacterContactRemovedCallback,
+            OnContactSolve = &OnContactSolveCallback,
+            OnCharacterContactSolve = &OnCharacterContactSolveCallback,
+        };
+        JPH_CharacterContactListener_SetProcs(in _procs);
+    }
+
     public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
     {
         if (DoublePrecision)
@@ -152,8 +158,8 @@ public sealed class CharacterVirtual : CharacterBase
         settings.ToNative(&nativeSettings);
         Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
 
-        nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        _listenerHandle = JPH_CharacterContactListener_Create(in _listener_Procs, listenerContext);
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        _listenerHandle = JPH_CharacterContactListener_Create(_listenerUserData);
         JPH_CharacterVirtual_SetListener(Handle, _listenerHandle);
     }
 
@@ -166,8 +172,8 @@ public sealed class CharacterVirtual : CharacterBase
         settings.ToNative(&nativeSettings);
         Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
 
-        nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        _listenerHandle = JPH_CharacterContactListener_Create(in _listener_Procs, listenerContext);
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        _listenerHandle = JPH_CharacterContactListener_Create(_listenerUserData);
         JPH_CharacterVirtual_SetListener(Handle, _listenerHandle);
     }
 
@@ -178,7 +184,11 @@ public sealed class CharacterVirtual : CharacterBase
 
     protected override void DisposeNative()
     {
+        DelegateProxies.GetUserData<CharacterVirtual>(_listenerUserData, out GCHandle gch);
+        JPH_CharacterVirtual_SetListener(Handle, 0);
         JPH_CharacterContactListener_Destroy(_listenerHandle);
+        base.DisposeNative();
+        gch.Free();
     }
 
     public void SetCharacterVsCharacterCollision(CharacterVsCharacterCollision? characterVsCharacterCollision)

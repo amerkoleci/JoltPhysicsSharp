@@ -8,22 +8,30 @@ namespace JoltPhysicsSharp;
 
 public abstract class ObjectLayerFilter : NativeObject
 {
-    private readonly JPH_ObjectLayerFilter_Procs _procs;
+    private static readonly JPH_ObjectLayerFilter_Procs _procs;
+    private readonly nint _listenerUserData;
 
-    public ObjectLayerFilter()
+    static ObjectLayerFilter()
     {
-        nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _procs = new JPH_ObjectLayerFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback,
         };
-        Handle = JPH_ObjectLayerFilter_Create(in _procs, listenerContext);
+        JPH_ObjectLayerFilter_SetProcs(in _procs);
     }
 
+    public ObjectLayerFilter()
+    {
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        Handle = JPH_ObjectLayerFilter_Create(_listenerUserData);
+    }
 
     protected override void DisposeNative()
     {
+        DelegateProxies.GetUserData<ObjectLayerFilter>(_listenerUserData, out GCHandle gch);
+
         JPH_ObjectLayerFilter_Destroy(Handle);
+        gch.Free();
     }
 
     protected abstract bool ShouldCollide(ObjectLayer layer);

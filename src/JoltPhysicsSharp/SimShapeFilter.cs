@@ -8,21 +8,29 @@ namespace JoltPhysicsSharp;
 
 public abstract class SimShapeFilter : NativeObject
 {
-    private readonly JPH_SimShapeFilter_Procs _procs;
+    private static readonly JPH_SimShapeFilter_Procs _procs;
+    private readonly nint _listenerUserData;
 
-    public unsafe SimShapeFilter()
+    static unsafe SimShapeFilter()
     {
-        nint context = DelegateProxies.CreateUserData(this, true);
         _procs = new JPH_SimShapeFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback
         };
-        Handle = JPH_SimShapeFilter_Create(in _procs, context);
+        JPH_SimShapeFilter_SetProcs(in _procs);
+    }
+
+    public SimShapeFilter()
+    {
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        Handle = JPH_SimShapeFilter_Create(_listenerUserData);
     }
 
     protected override void DisposeNative()
     {
+        DelegateProxies.GetUserData<SimShapeFilter>(_listenerUserData, out GCHandle gch);
         JPH_SimShapeFilter_Destroy(Handle);
+        gch.Free();
     }
 
     protected virtual bool ShouldCollide(

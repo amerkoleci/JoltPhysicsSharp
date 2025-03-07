@@ -25,8 +25,8 @@ public abstract class ConvexShapeSettings : ShapeSettings
 
 public abstract class ConvexShape : Shape
 {
-    internal ConvexShape(nint handle)
-        : base(handle)
+    internal ConvexShape(nint handle, bool owns = true)
+        : base(handle, owns)
     {
     }
 

@@ -39,7 +39,7 @@ public class Shape : NativeObject
     {
     }
 
-    protected Shape(nint handle, bool owns = true)
+    internal Shape(nint handle, bool owns = true)
         : base(handle, owns)
     {
     }

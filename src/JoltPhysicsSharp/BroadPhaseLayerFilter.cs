@@ -8,21 +8,30 @@ namespace JoltPhysicsSharp;
 
 public abstract class BroadPhaseLayerFilter : NativeObject
 {
-    private readonly JPH_BroadPhaseLayerFilter_Procs _procs;
+    private static readonly JPH_BroadPhaseLayerFilter_Procs _procs;
+    private readonly nint _listenerUserData;
 
-    public BroadPhaseLayerFilter()
+    static BroadPhaseLayerFilter()
     {
-        nint listenerContext = DelegateProxies.CreateUserData(this, true);
         _procs = new JPH_BroadPhaseLayerFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback,
         };
-        Handle = JPH_BroadPhaseLayerFilter_Create(in _procs, listenerContext);
+        JPH_BroadPhaseLayerFilter_SetProcs(in _procs);
+    }
+
+    public BroadPhaseLayerFilter()
+    {
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        Handle = JPH_BroadPhaseLayerFilter_Create(_listenerUserData);
     }
 
     protected override void DisposeNative()
     {
+        DelegateProxies.GetUserData<BroadPhaseLayerFilter>(_listenerUserData, out GCHandle gch);
+
         JPH_BroadPhaseLayerFilter_Destroy(Handle);
+        gch.Free();
     }
 
     protected abstract bool ShouldCollide(BroadPhaseLayer layer);

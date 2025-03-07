@@ -231,7 +231,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_BroadPhaseLayerFilter_Create(in JPH_BroadPhaseLayerFilter_Procs procs, nint userData);
+    public static partial void JPH_BroadPhaseLayerFilter_SetProcs(in JPH_BroadPhaseLayerFilter_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BroadPhaseLayerFilter_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BroadPhaseLayerFilter_Destroy(nint handle);
@@ -243,7 +246,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_ObjectLayerFilter_Create(in JPH_ObjectLayerFilter_Procs procs, nint userData);
+    public static partial void JPH_ObjectLayerFilter_SetProcs(in JPH_ObjectLayerFilter_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ObjectLayerFilter_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_ObjectLayerFilter_Destroy(nint handle);
@@ -256,7 +262,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_BodyFilter_Create(in JPH_BodyFilter_Procs procs, nint userData);
+    public static partial void JPH_BodyFilter_SetProcs(in JPH_BodyFilter_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyFilter_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyFilter_Destroy(nint handle);
@@ -269,7 +278,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_ShapeFilter_Create(in JPH_ShapeFilter_Procs procs, nint userData);
+    public static partial void JPH_ShapeFilter_SetProcs(in JPH_ShapeFilter_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ShapeFilter_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_ShapeFilter_Destroy(nint handle);
@@ -287,7 +299,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_SimShapeFilter_Create(in JPH_SimShapeFilter_Procs procs, nint userData);
+    public static partial void JPH_SimShapeFilter_SetProcs(in JPH_SimShapeFilter_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SimShapeFilter_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_SimShapeFilter_Destroy(nint handle);
@@ -299,7 +314,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_BodyDrawFilter_Create(in JPH_BodyDrawFilter_Procs procs, nint userData);
+    public static partial void JPH_BodyDrawFilter_SetProcs(in JPH_BodyDrawFilter_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyDrawFilter_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyDrawFilter_Destroy(nint handle);
@@ -2456,10 +2474,13 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_ContactListener_Create(in JPH_ContactListener_Procs procs, nint userData);
+    public static partial void JPH_ContactListener_SetProcs(in JPH_ContactListener_Procs procs);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_ContactListener_Create(in JPH_ContactListener_ProcsDouble procs, nint userData);
+    public static partial nint JPH_ContactListener_SetProcs(in JPH_ContactListener_ProcsDouble procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_ContactListener_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_ContactListener_Destroy(nint handle);
@@ -2472,7 +2493,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_BodyActivationListener_Create(in JPH_BodyActivationListener_Procs procs, nint userData);
+    public static partial void JPH_BodyActivationListener_SetProcs(in JPH_BodyActivationListener_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyActivationListener_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyActivationListener_Destroy(nint handle);
@@ -2902,7 +2926,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_CharacterContactListener_Create(in JPH_CharacterContactListener_Procs procs, nint userData);
+    public static partial void JPH_CharacterContactListener_SetProcs(in JPH_CharacterContactListener_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterContactListener_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterContactListener_Destroy(nint listener);
@@ -2916,7 +2943,11 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_CharacterVsCharacterCollision_Create(in JPH_CharacterVsCharacterCollision_Procs procs, nint userData);
+    public static partial void JPH_CharacterVsCharacterCollision_SetProcs(in JPH_CharacterVsCharacterCollision_Procs procs);
+
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_CharacterVsCharacterCollision_Create(nint userData);
 
 
     [LibraryImport(LibName)]
@@ -2940,7 +2971,10 @@ internal static unsafe partial class JoltApi
     }
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_DebugRenderer_Create(in JPH_DebugRenderer_Procs procs, nint userData);
+    public static partial void JPH_DebugRenderer_SetProcs(in JPH_DebugRenderer_Procs procs);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_DebugRenderer_Create(nint userData);
 
     [LibraryImport(LibName)]
     public static partial void JPH_DebugRenderer_Destroy(nint renderer);

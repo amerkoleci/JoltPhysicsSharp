@@ -10,6 +10,6 @@
     <ProjectReference Include="..\..\src\JoltPhysicsSharp\JoltPhysicsSharp.csproj" />
   </ItemGroup>
 
-  <Import Project="$(RepoRootPath)JoltPhysicsSharp.Native.targets" />
+  <!--<Import Project="$(RepoRootPath)JoltPhysicsSharp.Native.targets" />-->
 
 </Project>

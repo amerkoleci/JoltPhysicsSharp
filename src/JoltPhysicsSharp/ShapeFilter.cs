@@ -8,17 +8,23 @@ namespace JoltPhysicsSharp;
 
 public abstract class ShapeFilter : NativeObject
 {
-    private readonly JPH_ShapeFilter_Procs _procs;
+    private static readonly JPH_ShapeFilter_Procs _procs;
+    private readonly nint _listenerUserData;
 
-    public unsafe ShapeFilter()
+    static unsafe ShapeFilter()
     {
-        nint context = DelegateProxies.CreateUserData(this, true);
         _procs = new JPH_ShapeFilter_Procs
         {
             ShouldCollide = &ShouldCollideCallback,
             ShouldCollide2 = &ShouldCollide2Callback,
         };
-        Handle = JPH_ShapeFilter_Create(in _procs, context);
+        JPH_ShapeFilter_SetProcs(in _procs);
+    }
+
+    public unsafe ShapeFilter()
+    {
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        Handle = JPH_ShapeFilter_Create(_listenerUserData);
     }
 
     public BodyID BodyID2
@@ -29,7 +35,9 @@ public abstract class ShapeFilter : NativeObject
 
     protected override void DisposeNative()
     {
+        DelegateProxies.GetUserData<ShapeFilter>(_listenerUserData, out GCHandle gch);
         JPH_ShapeFilter_Destroy(Handle);
+        gch.Free();
     }
 
     protected virtual bool ShouldCollide(Shape shape2, in SubShapeID subShapeIDOfShape2)

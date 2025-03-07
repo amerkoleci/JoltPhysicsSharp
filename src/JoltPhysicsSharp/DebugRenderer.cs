@@ -9,6 +9,9 @@ namespace JoltPhysicsSharp;
 
 public abstract class DebugRenderer : NativeObject
 {
+    private static readonly  JPH_DebugRenderer_Procs _procs;
+    private readonly nint _listenerUserData;
+
     public enum CastShadow : uint
     {
         /// <summary>
@@ -33,18 +36,21 @@ public abstract class DebugRenderer : NativeObject
         Wireframe = 1,
     }
 
-
-    private readonly unsafe JPH_DebugRenderer_Procs _procs = new()
+    static unsafe DebugRenderer()
     {
-        DrawLine = &OnDrawLine,
-        DrawTriangle = &OnDrawTriangle,
-        DrawText3D = &OnDrawText3D,
-    };
+        _procs = new()
+        {
+            DrawLine = &OnDrawLine,
+            DrawTriangle = &OnDrawTriangle,
+            DrawText3D = &OnDrawText3D,
+        };
+        JPH_DebugRenderer_SetProcs(in _procs);
+    }
 
     protected DebugRenderer()
     {
-        nint listenerContext = DelegateProxies.CreateUserData(this, true);
-        Handle = JPH_DebugRenderer_Create(in _procs, listenerContext);
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        Handle = JPH_DebugRenderer_Create(_listenerUserData);
     }
 
     protected DebugRenderer(nint handle)
@@ -54,7 +60,9 @@ public abstract class DebugRenderer : NativeObject
 
     protected override void DisposeNative()
     {
+        DelegateProxies.GetUserData<DebugRenderer>(_listenerUserData, out GCHandle gch);
         JPH_DebugRenderer_Destroy(Handle);
+        gch.Free();
     }
 
     public void NextFrame() => JPH_DebugRenderer_NextFrame(Handle);
