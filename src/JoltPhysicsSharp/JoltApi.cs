@@ -2983,6 +2983,12 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_DebugRenderer_NextFrame(nint renderer);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_SetCameraPos(nint renderer, in Vector3 position);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_SetCameraPos(nint renderer, in Double3 position);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_DebugRenderer_DrawLine(nint renderer, in Vector3 from, in Vector3 to, uint color);
 
     [LibraryImport(LibName)]
@@ -2997,21 +3003,44 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_DebugRenderer_DrawWireBox2(nint renderer, in RMatrix4x4 matrix, in BoundingBox box, uint color);
 
-
-    //[LibraryImport(LibName)]
-    //   public static partial void JPH_DebugRenderer_DrawMarker(nint renderer, const JPH_RVec3* position, JPH_Color color, float size);
-    //   [LibraryImport(LibName)]
-    //   public static partial void JPH_DebugRenderer_DrawArrow(nint renderer, const JPH_RVec3* from, const JPH_RVec3* to, JPH_Color color, float size);
-    //   [LibraryImport(LibName)]
-    //   public static partial void JPH_DebugRenderer_DrawCoordinateSystem(nint renderer, const JPH_RMatrix4x4* matrix, float size);
-    //   [LibraryImport(LibName)]
-    //   public static partial void JPH_DebugRenderer_DrawPlane(nint renderer, const JPH_RVec3* point, const JPH_Vec3* normal, JPH_Color color, float size);
-    //   [LibraryImport(LibName)]
-    //   public static partial void JPH_DebugRenderer_DrawWireTriangle(nint renderer, const JPH_RVec3* v1, const JPH_RVec3* v2, const JPH_RVec3* v3, JPH_Color color);
-    //[LibraryImport(LibName)]
-    //   public static partial void JPH_DebugRenderer_DrawWireSphere(nint renderer, const JPH_RVec3* center, float radius, JPH_Color color, int level);
-    //   [LibraryImport(LibName)]
-    //   public static partial void JPH_DebugRenderer_DrawWireUnitSphere(nint renderer, const JPH_RMatrix4x4* matrix, JPH_Color color, int level);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawMarker(nint renderer, /*RVec3*/ in Vector3 position, uint color, float size);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawArrow(nint renderer, /*RVec3*/ in Vector3 from, /*RVec3*/ in Vector3 to, uint color, float size);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawCoordinateSystem(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, float size);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawPlane(nint renderer, /*RVec3*/ in Vector3 point, in Vector3 normal, uint color, float size);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawWireTriangle(nint renderer, /*RVec3*/ in Vector3 v1, /*RVec3*/ in Vector3 v2, /*RVec3*/ in Vector3 v3, uint color);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawWireSphere(nint renderer, /*RVec3*/ in Vector3 center, float radius, uint color, int level);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawWireUnitSphere(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, uint color, int level);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawTriangle(nint renderer, /*RVec3*/ in Vector3 v1, /*RVec3*/ in Vector3 v2, /*RVec3*/ in Vector3 v3, uint color, DebugRenderer.CastShadow castShadow);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawBox(nint renderer, in BoundingBox box, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawBox2(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, in BoundingBox box, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawSphere(nint renderer, /*RVec3*/ in Vector3 center, float radius, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawUnitSphere(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawCapsule(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, float halfHeightOfCylinder, float radius, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawCylinder(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, float halfHeight, float radius, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawOpenCone(nint renderer, /*RVec3*/ in Vector3 top, in Vector3 axis, in Vector3 perpendicular, float halfAngle, float length, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawSwingConeLimits(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, float swingYHalfAngle, float swingZHalfAngle, float edgeLength, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawSwingPyramidLimits(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, float minSwingYAngle, float maxSwingYAngle, float minSwingZAngle, float maxSwingZAngle, float edgeLength, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawPie(nint renderer, /*RVec3*/ in Vector3 center, float radius, in Vector3 normal, in Vector3 axis, float minAngle, float maxAngle, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
+    [LibraryImport(LibName)]
+    public static partial void JPH_DebugRenderer_DrawTaperedCylinder(nint renderer, /*RMatrix4x4*/ in Matrix4x4 matrix, float top, float bottom, float topRadius, float bottomRadius, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
     #endregion
 
     #region Skeleton
