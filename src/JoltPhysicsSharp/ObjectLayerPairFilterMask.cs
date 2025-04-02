@@ -8,7 +8,7 @@ namespace JoltPhysicsSharp;
 public sealed class ObjectLayerPairFilterMask : ObjectLayerPairFilter
 {
     public const int NumBits = ObjectLayer.Bits / 2;
-    public const uint Mask = (1 << NumBits) - 1;
+    public const int Mask = (1 << NumBits) - 1;
 
     internal ObjectLayerPairFilterMask(nint handle, bool owns)
         : base(handle, owns)

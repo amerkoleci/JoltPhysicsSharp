@@ -5,28 +5,24 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 
 namespace JoltPhysicsSharp;
 
-using unsafe JPH_JobFunction = delegate* unmanaged<nint, void>;
-using unsafe JPH_QueueJobCallback = delegate* unmanaged<nint, /*JPH_JobFunction*/delegate* unmanaged<nint, void>, nint, void>;
-using unsafe JPH_QueueJobsCallback = delegate* unmanaged<nint, /*JPH_JobFunction**/delegate* unmanaged<nint, void>, void**, uint, void>;
-
+using JPH_ObjectLayer = uint;
+using unsafe JPH_CastRayCollector = delegate* unmanaged<nint, RayCastResult*, float>;
 using unsafe JPH_CastRayResultCallback = delegate* unmanaged<nint, RayCastResult*, void>;
-using unsafe JPH_CollidePointResultCallback = delegate* unmanaged<nint, CollidePointResult*, void>;
-using unsafe JPH_CollideShapeResultCallback = delegate* unmanaged<nint, CollideShapeResult*, void>;
+using unsafe JPH_CastShapeCollector = delegate* unmanaged<nint, ShapeCastResult*, float>;
 using unsafe JPH_CastShapeResultCallback = delegate* unmanaged<nint, ShapeCastResult*, void>;
-
-using unsafe JPH_RayCastBodyCollectorCallback = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
+using unsafe JPH_CollidePointCollector = delegate* unmanaged<nint, CollidePointResult*, float>;
+using unsafe JPH_CollidePointResultCallback = delegate* unmanaged<nint, CollidePointResult*, void>;
 //public delegate float RayCastBodyCollector(nint userData, in BroadPhaseCastResult result);
 using unsafe JPH_CollideShapeBodyCollectorCallback = delegate* unmanaged<nint, BodyID*, float>;
-
-using unsafe JPH_CastRayCollector = delegate* unmanaged<nint, RayCastResult*, float>;
-using unsafe JPH_CollidePointCollector = delegate* unmanaged<nint, CollidePointResult*, float>;
 using unsafe JPH_CollideShapeCollector = delegate* unmanaged<nint, CollideShapeResult*, float>;
-using unsafe JPH_CastShapeCollector = delegate* unmanaged<nint, ShapeCastResult*, float>;
+using unsafe JPH_CollideShapeResultCallback = delegate* unmanaged<nint, CollideShapeResult*, void>;
+using unsafe JPH_QueueJobCallback = delegate* unmanaged<nint, /*JPH_JobFunction*/delegate* unmanaged<nint, void>, nint, void>;
+using unsafe JPH_QueueJobsCallback = delegate* unmanaged<nint, /*JPH_JobFunction**/delegate* unmanaged<nint, void>, void**, uint, void>;
+using unsafe JPH_RayCastBodyCollectorCallback = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
 
 internal static unsafe partial class JoltApi
 {
@@ -759,16 +755,16 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_BodyCreationSettings_Create();
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create2))]
-    public static partial nint JPH_BodyCreationSettings_Create2(nint shapeSettings, Vector3* position, Quaternion* rotation, MotionType motionType, ushort objectLayer);
+    public static partial nint JPH_BodyCreationSettings_Create2(nint shapeSettings, Vector3* position, Quaternion* rotation, MotionType motionType, JPH_ObjectLayer objectLayer);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create2))]
-    public static partial nint JPH_BodyCreationSettings_Create2Double(nint shapeSettings, Double3* position, Quaternion* rotation, MotionType motionType, ushort objectLayer);
+    public static partial nint JPH_BodyCreationSettings_Create2Double(nint shapeSettings, Double3* position, Quaternion* rotation, MotionType motionType, JPH_ObjectLayer objectLayer);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create3))]
-    public static partial nint JPH_BodyCreationSettings_Create3(nint shape, Vector3* position, Quaternion* rotation, MotionType motionType, ushort objectLayer);
+    public static partial nint JPH_BodyCreationSettings_Create3(nint shape, Vector3* position, Quaternion* rotation, MotionType motionType, JPH_ObjectLayer objectLayer);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyCreationSettings_Create3))]
-    public static partial nint JPH_BodyCreationSettings_Create3Double(nint shape, Double3* position, Quaternion* rotation, MotionType motionType, ushort objectLayer);
+    public static partial nint JPH_BodyCreationSettings_Create3Double(nint shape, Double3* position, Quaternion* rotation, MotionType motionType, JPH_ObjectLayer objectLayer);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyCreationSettings_Destroy(nint settings);
@@ -1709,10 +1705,10 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_DeactivateBody(nint handle, uint bodyId);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_SetObjectLayer(nint handle, uint bodyId, ushort layer);
+    public static partial void JPH_BodyInterface_SetObjectLayer(nint handle, uint bodyId, JPH_ObjectLayer layer);
 
     [LibraryImport(LibName)]
-    public static partial ushort JPH_BodyInterface_GetObjectLayer(nint handle, uint bodyId);
+    public static partial JPH_ObjectLayer JPH_BodyInterface_GetObjectLayer(nint handle, uint bodyId);
 
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_GetWorldTransform))]
     public static partial void JPH_BodyInterface_GetWorldTransform(nint handle, uint bodyId, Matrix4x4* result);
@@ -2703,9 +2699,9 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_Character_GetWorldTransform(nint character, out RMatrix4x4 result, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
     [LibraryImport(LibName)]
-    public static partial /*ObjectLayer*/ushort JPH_Character_GetLayer(nint character);
+    public static partial JPH_ObjectLayer JPH_Character_GetLayer(nint character);
     [LibraryImport(LibName)]
-    public static partial void JPH_Character_SetLayer(nint character, /*ObjectLayer*/ ushort value, [MarshalAs(UnmanagedType.U1)] bool lockBodies /*= true*/);
+    public static partial void JPH_Character_SetLayer(nint character, JPH_ObjectLayer value, [MarshalAs(UnmanagedType.U1)] bool lockBodies /*= true*/);
     [LibraryImport(LibName)]
     public static partial void JPH_Character_SetShape(nint character, /*const JPH_Shape**/nint shape, float maxPenetrationDepth, [MarshalAs(UnmanagedType.U1)] bool lockBodies /*= true*/);
     #endregion
@@ -2824,13 +2820,13 @@ internal static unsafe partial class JoltApi
     public static partial uint JPH_CharacterVirtual_GetInnerBodyID(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_Update(nint handle, float deltaTime, ushort layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
+    public static partial void JPH_CharacterVirtual_Update(nint handle, float deltaTime, JPH_ObjectLayer layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_ExtendedUpdate(nint handle, float deltaTime, ExtendedUpdateSettings* settings, ushort layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
+    public static partial void JPH_CharacterVirtual_ExtendedUpdate(nint handle, float deltaTime, ExtendedUpdateSettings* settings, JPH_ObjectLayer layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_CharacterVirtual_RefreshContacts(nint handle, ushort layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
+    public static partial void JPH_CharacterVirtual_RefreshContacts(nint handle, JPH_ObjectLayer layer, nint physicsSytem, nint bodyFilter, nint shapeFilter);
 
     [LibraryImport(LibName)]
     public static partial void JPH_CharacterVirtual_CancelVelocityTowardsSteepSlopes(nint handle, in Vector3 desiredVelocity, out Vector3 velocity);
@@ -2863,7 +2859,7 @@ internal static unsafe partial class JoltApi
     public static partial bool JPH_CharacterVirtual_SetShape(
         nint character,
         nint shape, float maxPenetrationDepth,
-        /*ObjectLayer*/ushort layer,
+        JPH_ObjectLayer layer,
         nint system, nint bodyFilter,
         nint shapeFilter);
 
