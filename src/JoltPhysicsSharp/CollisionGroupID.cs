@@ -9,6 +9,8 @@ public readonly partial struct CollisionGroupID(uint value) : IComparable, IComp
 {
     public readonly uint Value = value;
 
+    public static CollisionGroupID Invalid => new(~0U);
+
     public static bool operator ==(CollisionGroupID left, CollisionGroupID right) => left.Value == right.Value;
 
     public static bool operator !=(CollisionGroupID left, CollisionGroupID right) => left.Value != right.Value;

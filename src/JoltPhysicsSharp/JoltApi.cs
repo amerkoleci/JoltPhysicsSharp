@@ -318,6 +318,32 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_BodyDrawFilter_Destroy(nint handle);
 
+    #region GroupFilter
+    public struct JPH_CollisionGroup
+    {
+        public nint groupFilter;
+        public CollisionGroupID groupID;
+        public CollisionSubGroupID subGroupID;
+    }
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_GroupFilter_Destroy(nint groupFilter);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_GroupFilter_CanCollide(nint groupFilter, JPH_CollisionGroup* group1, JPH_CollisionGroup* group2);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_GroupFilterTable_Create(uint numSubGroups/* = 0*/);
+    [LibraryImport(LibName)]
+    public static partial void JPH_GroupFilterTable_DisableCollision(nint table, CollisionSubGroupID subGroup1, CollisionSubGroupID subGroup2);
+    [LibraryImport(LibName)]
+    public static partial void JPH_GroupFilterTable_EnableCollision(nint table, CollisionSubGroupID subGroup1, CollisionSubGroupID subGroup2);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_GroupFilterTable_IsCollisionEnabled(nint table, CollisionSubGroupID subGroup1, CollisionSubGroupID subGroup2);
+    #endregion
+
     #region Shape/ShapeSettings
     [LibraryImport(LibName)]
     public static partial void JPH_ShapeSettings_Destroy(nint settings);
@@ -802,6 +828,12 @@ internal static unsafe partial class JoltApi
     public static partial ObjectLayer JPH_BodyCreationSettings_GetObjectLayer(nint settings);
     [LibraryImport(LibName)]
     public static partial void JPH_BodyCreationSettings_SetObjectLayer(nint settings, in ObjectLayer value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_GetCollissionGroup(nint settings, out JPH_CollisionGroup result);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyCreationSettings_SetCollissionGroup(nint settings, in JPH_CollisionGroup value);
 
     [LibraryImport(LibName)]
     public static partial MotionType JPH_BodyCreationSettings_GetMotionType(nint settings);
@@ -1690,6 +1722,11 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_SetPositionRotationAndVelocity(nint handle, uint bodyID, in Double3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_GetCollissionGroup(nint handle, uint bodyId, out JPH_CollisionGroup result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetCollissionGroup(nint handle, uint bodyId, in JPH_CollisionGroup* group);
+
+    [LibraryImport(LibName)]
     public static partial nint JPH_BodyInterface_GetShape(nint handle, uint bodyId);
 
     [LibraryImport(LibName)]
@@ -2296,6 +2333,10 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial ObjectLayer JPH_Body_GetObjectLayer(nint handle);
 
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_GetCollissionGroup(nint body, out JPH_CollisionGroup result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_SetCollissionGroup(nint body, in JPH_CollisionGroup value);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]

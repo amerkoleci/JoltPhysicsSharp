@@ -118,6 +118,20 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         set => JPH_BodyCreationSettings_SetObjectLayer(Handle, value);
     }
 
+    public CollisionGroup CollisionGroup
+    {
+        get
+        {
+            JPH_BodyCreationSettings_GetCollissionGroup(Handle, out JPH_CollisionGroup groupNative);
+            return CollisionGroup.FromNative(groupNative);
+        }
+        set
+        {
+            value.ToNative(out JPH_CollisionGroup groupNative);
+            JPH_BodyCreationSettings_SetCollissionGroup(Handle, in groupNative);
+        }
+    }
+
     public MotionType MotionType
     {
         get => JPH_BodyCreationSettings_GetMotionType(Handle);
