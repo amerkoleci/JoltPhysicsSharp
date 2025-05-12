@@ -3164,9 +3164,9 @@ internal static unsafe partial class JoltApi
         }
     }
 
-    #region Wheel/WheelSettings
+    #region WheelWV/WheelSettingsWV
     [LibraryImport(LibName)]
-    public static partial nint JPH_WheelSettings_Create(
+    public static partial nint JPH_WheelSettingsWV_Create(
         in Vector3 position,
         in Vector3 suspensionForcePoint,
         in Vector3 suspensionDirection,
@@ -3179,23 +3179,79 @@ internal static unsafe partial class JoltApi
         in SpringSettings suspensionSpring,
         float radius,
         float width,
-        [MarshalAs(UnmanagedType.U1)] bool enableSuspensionForcePoint);
+        [MarshalAs(UnmanagedType.U1)] bool enableSuspensionForcePoint,
+        float inertia,
+        float angularDamping,
+        float maxSteerAngle,
+        //LinearCurve longitudinalFriction, // NOTE: BGE: just using default values for now.
+        //LinearCurve lateralFriction,      // NOTE: BGE: just using default values for now.
+        float maxBrakeTorque,
+        float maxHandBrakeTorque);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_WheelSettings_Destroy(nint settings);
+    public static partial void JPH_WheelSettingsWV_Destroy(nint settings);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_Wheel_Create(nint settings);
+    public static partial nint JPH_WheelWV_Create(nint wheelSettingsWV);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Wheel_Destroy(nint wheel);
+    public static partial void JPH_WheelWV_Destroy(nint wheel);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Wheel_HasContact(nint wheel);
+    public static partial bool JPH_WheelWV_HasContact(nint wheel);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Wheel_HasHitHardPoint(nint wheel);
+    public static partial bool JPH_WheelWV_HasHitHardPoint(nint wheel);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleEngineSettings_Create(
+        float maxTorque,
+        float minRPM,
+        float maxRPM,
+        //LinearCurve normalizedTorque, // NOTE: BGE: just using default values for now.
+        float inertia,
+        float angularDamping);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleEngineSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleTransmissionSettings_Create(
+        TransmissionMode mode,
+        //Array<float> gearRatios,		    // NOTE: BGE: just using default values for now.
+        //Array<float> reverseGearRatios,   // NOTE: BGE: just using default values for now.
+        float switchTime,
+        float clutchReleaseTime,
+        float switchLatency,
+        float shiftUpRPM,
+        float shiftDownRPM,
+        float clutchStrength);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleTransmissionSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraintSettings_Create(
+        in Vector3 up,
+        in Vector3 forward,
+        float maxPitchRollAngle,
+        //Array<Ref<WheelSettings>> wheels,     // NOTE: BGE: just using default values for now.
+        //VehicleAntiRollBars antiRollBars,     // NOTE: BGE: just using default values for now.
+        nint wheeledVehicleControllerSettings); // NOTE: BGE: making this too specific of a pointer type for now.
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraintSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheeledVehicleControllerSettings_Create(
+        nint engine,
+        nint transmission,
+        //Array<VehicleDifferentialSettings> differentials,	// NOTE: BGE: just using default values for now.
+        float differentialLimitedSlipRatio);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleControllerSettings_Destroy(nint settings);
     #endregion
 }

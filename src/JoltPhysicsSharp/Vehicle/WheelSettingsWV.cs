@@ -7,9 +7,9 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public abstract class WheelSettings : NativeObject
+public class WheelSettingsWV : NativeObject
 {
-    public WheelSettings(
+    public WheelSettingsWV(
         in Vector3 position,
         in Vector3 suspensionForcePoint,
         in Vector3 suspensionDirection,
@@ -22,9 +22,16 @@ public abstract class WheelSettings : NativeObject
         in SpringSettings suspensionSpring,
         float radius,
         float width,
-        bool enableSuspensionForcePoint)
+        bool enableSuspensionForcePoint,
+        float inertia,
+        float angularDamping,
+        float maxSteerAngle,
+        //LinearCurve longitudinalFriction, // NOTE: BGE: just using default values for now.
+        //LinearCurve lateralFriction,      // NOTE: BGE: just using default values for now.
+        float maxBrakeTorque,
+        float maxHandBrakeTorque)
         : base(
-            JPH_WheelSettings_Create(
+            JPH_WheelSettingsWV_Create(
                 position,
                 suspensionForcePoint,
                 suspensionDirection,
@@ -37,17 +44,24 @@ public abstract class WheelSettings : NativeObject
                 suspensionSpring,
                 radius,
                 width,
-                enableSuspensionForcePoint))
+                enableSuspensionForcePoint,
+                inertia,
+                angularDamping,
+                maxSteerAngle,
+                //longitudinalFriction, // NOTE: BGE: just using default values for now.
+                //lateralFriction,      // NOTE: BGE: just using default values for now.
+                maxBrakeTorque,
+                maxHandBrakeTorque))
     {
     }
 
-    protected WheelSettings(nint handle)
+    protected WheelSettingsWV(nint handle)
         : base(handle)
     {
     }
 
     protected override void DisposeNative()
     {
-        JPH_WheelSettings_Destroy(Handle);
+        JPH_WheelSettingsWV_Destroy(Handle);
     }
 }
