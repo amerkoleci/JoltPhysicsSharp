@@ -3163,4 +3163,39 @@ internal static unsafe partial class JoltApi
         {
         }
     }
+
+    #region Wheel/WheelSettings
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheelSettings_Create(
+        in Vector3 position,
+        in Vector3 suspensionForcePoint,
+        in Vector3 suspensionDirection,
+        in Vector3 steeringAxis,
+        in Vector3 wheelUp,
+        in Vector3 wheelForward,
+        float suspensionMinLength,
+        float suspensionMaxLength,
+        float suspensionPreloadLength,
+        in SpringSettings suspensionSpring,
+        float radius,
+        float width,
+        [MarshalAs(UnmanagedType.U1)] bool enableSuspensionForcePoint);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheelSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Wheel_Create(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Wheel_Destroy(nint wheel);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Wheel_HasContact(nint wheel);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_Wheel_HasHitHardPoint(nint wheel);
+    #endregion
 }
