@@ -15,7 +15,7 @@ public class VehicleConstraintSettings : NativeObject
         float maxPitchRollAngle,
         //Array<Ref<WheelSettings>> wheels,         // NOTE: BGE: just using default values for now.
         //VehicleAntiRollBars antiRollBars,         // NOTE: BGE: just using default values for now.
-        WheeledVehicleControllerSettings settings)  // NOTE: BGE: making this too specific of a pointer type for now.
+        VehicleControllerSettings settings)
         : base(
             JPH_VehicleConstraintSettings_Create(
                 up,

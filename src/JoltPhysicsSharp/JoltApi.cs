@@ -3239,7 +3239,7 @@ internal static unsafe partial class JoltApi
         float maxPitchRollAngle,
         //Array<Ref<WheelSettings>> wheels,     // NOTE: BGE: just using default values for now.
         //VehicleAntiRollBars antiRollBars,     // NOTE: BGE: just using default values for now.
-        nint wheeledVehicleControllerSettings); // NOTE: BGE: making this too specific of a pointer type for now.
+        nint vehicleControllerSettings);
 
     [LibraryImport(LibName)]
     public static partial void JPH_VehicleConstraintSettings_Destroy(nint settings);

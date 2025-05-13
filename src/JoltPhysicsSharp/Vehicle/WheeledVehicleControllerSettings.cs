@@ -7,7 +7,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class WheeledVehicleControllerSettings : NativeObject
+public class WheeledVehicleControllerSettings : VehicleControllerSettings
 {
     public WheeledVehicleControllerSettings(
 	    VehicleEngineSettings engine,
