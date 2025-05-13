@@ -23,4 +23,9 @@ public class WheeledVehicleController : NativeObject
     {
         JPH_WheeledVehicleController_Destroy(Handle);
     }
+
+    public void SetDriverInput(float forward, float right, float brake, float handBrake)
+    {
+        JPH_WheeledVehicleController_SetDriverInput(Handle, forward, right, brake, handBrake);
+    }
 }

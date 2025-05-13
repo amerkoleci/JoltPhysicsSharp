@@ -3259,5 +3259,8 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_WheeledVehicleController_Destroy(nint controller);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleController_SetDriverInput(nint controller, float forward, float right, float brake, float handBrake);
     #endregion
 }
