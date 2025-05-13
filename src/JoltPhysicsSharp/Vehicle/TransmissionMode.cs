@@ -9,6 +9,6 @@ namespace JoltPhysicsSharp;
 
 public enum TransmissionMode
 {
-    Automatic = 0,
+    Auto = 0,
     Manual = 1
 }

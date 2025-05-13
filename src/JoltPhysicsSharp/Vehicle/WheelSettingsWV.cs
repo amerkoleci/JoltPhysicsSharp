@@ -10,16 +10,16 @@ namespace JoltPhysicsSharp;
 public class WheelSettingsWV : NativeObject
 {
     public WheelSettingsWV(
-        in Vector3 position,
-        in Vector3 suspensionForcePoint,
-        in Vector3 suspensionDirection,
-        in Vector3 steeringAxis,
-        in Vector3 wheelUp,
-        in Vector3 wheelForward,
+        Vector3 position,
+        Vector3 suspensionForcePoint,
+        Vector3 suspensionDirection,
+        Vector3 steeringAxis,
+        Vector3 wheelUp,
+        Vector3 wheelForward,
         float suspensionMinLength,
         float suspensionMaxLength,
         float suspensionPreloadLength,
-        in SpringSettings suspensionSpring,
+        SpringSettings suspensionSpring,
         float radius,
         float width,
         bool enableSuspensionForcePoint,

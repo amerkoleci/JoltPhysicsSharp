@@ -10,8 +10,8 @@ namespace JoltPhysicsSharp;
 public class VehicleConstraintSettings : NativeObject
 {
     public VehicleConstraintSettings(
-        in Vector3 up,
-        in Vector3 forward,
+        Vector3 up,
+        Vector3 forward,
         float maxPitchRollAngle,
         //Array<Ref<WheelSettings>> wheels,         // NOTE: BGE: just using default values for now.
         //VehicleAntiRollBars antiRollBars,         // NOTE: BGE: just using default values for now.
