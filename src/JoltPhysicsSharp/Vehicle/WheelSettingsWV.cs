@@ -30,7 +30,7 @@ public class WheelSettingsWV : NativeObject
         //LinearCurve lateralFriction,      // NOTE: BGE: just using default values for now.
         float maxBrakeTorque,
         float maxHandBrakeTorque)
-        : base(
+        : this(
             JPH_WheelSettingsWV_Create(
                 position,
                 suspensionForcePoint,

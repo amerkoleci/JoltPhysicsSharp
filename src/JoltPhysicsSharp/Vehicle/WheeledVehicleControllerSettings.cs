@@ -14,7 +14,7 @@ public class WheeledVehicleControllerSettings : VehicleControllerSettings
 	    VehicleTransmissionSettings transmission,
 	    //Array<VehicleDifferentialSettings> differentials,	// NOTE: BGE: just using default values for now.
 	    float differentialLimitedSlipRatio)
-        : base(
+        : this(
             JPH_WheeledVehicleControllerSettings_Create(
                 engine.Handle,
                 transmission.Handle,

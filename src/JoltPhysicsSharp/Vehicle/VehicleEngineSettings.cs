@@ -16,7 +16,7 @@ public class VehicleEngineSettings : NativeObject
         //LinearCurve normalizedTorque, // NOTE: BGE: just using default values for now.
         float inertia,
         float angularDamping)
-        : base(
+        : this(
             JPH_VehicleEngineSettings_Create(
                 maxTorque,
                 minRPM,

@@ -37,7 +37,7 @@ public class VehicleConstraintSettings : NativeObject
         Span<WheelSettingsWV> wheels,       // NOTE: BGE: just using an overly-specific type for now.
         //VehicleAntiRollBars antiRollBars, // NOTE: BGE: just using default values for now.
         VehicleControllerSettings settings)
-        : base(
+        : this(
             Ctor(
                 up,
                 forward,

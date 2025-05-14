@@ -3239,6 +3239,24 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_VehicleTransmissionSettings_Destroy(nint settings);
 
     [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleCollisionTesterRay_Create(ObjectLayer layer, in Vector3 up, float maxSlopeAngle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleCollisionTesterRay_Destroy(nint tester);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleCollisionTesterCastSphere_Create(ObjectLayer layer, float radius, in Vector3 up, float maxSlopeAngle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleCollisionTesterCastSphere_Destroy(nint tester);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleCollisionTesterCastCylinder_Create(ObjectLayer layer, float convexRadiusFraction);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleCollisionTesterCastCylinder_Destroy(nint tester);
+
+    [LibraryImport(LibName)]
     public static partial nint JPH_VehicleConstraintSettings_Create(
         in Vector3 up,
         in Vector3 forward,
@@ -3250,6 +3268,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_VehicleConstraintSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraint_SetVehicleCollisionTester(nint constraint, nint tester);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_WheeledVehicleControllerSettings_Create(

@@ -13,4 +13,9 @@ public class VehicleConstraint : Constraint
         : base(handle)
     {
     }
+
+    public void SetVehicleCollisionTester(VehicleCollisionTester tester)
+    {
+        JPH_VehicleConstraint_SetVehicleCollisionTester(Handle, tester.Handle);
+    }
 }

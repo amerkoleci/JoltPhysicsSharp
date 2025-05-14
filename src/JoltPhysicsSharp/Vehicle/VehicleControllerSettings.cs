@@ -7,7 +7,7 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class VehicleControllerSettings : NativeObject
+public abstract class VehicleControllerSettings : NativeObject
 {
     protected VehicleControllerSettings(nint handle)
         : base(handle)

@@ -19,7 +19,7 @@ public class VehicleTransmissionSettings : NativeObject
         float shiftUpRPM,
         float shiftDownRPM,
         float clutchStrength)
-        : base(
+        : this(
             JPH_VehicleTransmissionSettings_Create(
                 mode,
                 //gearRatios,		    // NOTE: BGE: just using default values for now.
@@ -40,6 +40,6 @@ public class VehicleTransmissionSettings : NativeObject
 
     protected override void DisposeNative()
     {
-        JPH_WheelSettingsWV_Destroy(Handle);
+        JPH_VehicleTransmissionSettings_Destroy(Handle);
     }
 }

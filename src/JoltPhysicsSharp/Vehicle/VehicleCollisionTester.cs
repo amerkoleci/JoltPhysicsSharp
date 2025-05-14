@@ -7,20 +7,10 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class WheelWV : NativeObject
+public abstract class VehicleCollisionTester : NativeObject
 {
-    public WheelWV(WheelSettingsWV settingsWV)
-        : this(JPH_WheelWV_Create(settingsWV.Handle))
-    {
-    }
-
-    protected WheelWV(nint handle)
+    protected VehicleCollisionTester(nint handle)
         : base(handle)
     {
-    }
-
-    protected override void DisposeNative()
-    {
-        JPH_WheelWV_Destroy(Handle);
     }
 }

@@ -10,7 +10,7 @@ namespace JoltPhysicsSharp;
 public class WheeledVehicleController : NativeObject
 {
     public WheeledVehicleController(Body body, WheeledVehicleControllerSettings controllerSettings, VehicleConstraintSettings constraintSettings)
-        : base(JPH_WheeledVehicleController_Create(body.Handle, controllerSettings.Handle, constraintSettings.Handle))
+        : this(JPH_WheeledVehicleController_Create(body.Handle, controllerSettings.Handle, constraintSettings.Handle))
     {
     }
 
