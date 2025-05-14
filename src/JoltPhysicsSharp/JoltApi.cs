@@ -3170,7 +3170,6 @@ internal static unsafe partial class JoltApi
         }
     }
 
-    #region WheelWV/WheelSettingsWV
     [LibraryImport(LibName)]
     public static partial nint JPH_WheelSettingsWV_Create(
         in Vector3 position,
@@ -3293,5 +3292,4 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_WheeledVehicleController_SetDriverInput(nint controller, float forward, float right, float brake, float handBrake);
-    #endregion
 }
