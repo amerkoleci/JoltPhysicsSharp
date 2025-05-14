@@ -9,21 +9,42 @@ namespace JoltPhysicsSharp;
 
 public class VehicleConstraintSettings : NativeObject
 {
+    protected static unsafe nint Ctor(
+        Vector3 up,
+        Vector3 forward,
+        float maxPitchRollAngle,
+        Span<WheelSettingsWV> wheels,       // NOTE: BGE: just using an overly-specific type for now.
+        //VehicleAntiRollBars antiRollBars, // NOTE: BGE: just using default values for now.
+        VehicleControllerSettings settings)
+    {
+        int count = wheels.Length;
+        nint* wheelsArray = stackalloc nint[count];
+        for (int i = 0; i < count; i++) wheelsArray[i] = wheels[i].Handle;
+        return JPH_VehicleConstraintSettings_Create(
+            up,
+            forward,
+            maxPitchRollAngle,
+            wheelsArray,
+            wheels.Length,
+            //antiRollBars, // NOTE: BGE: just using default values for now.
+            settings.Handle);
+    }
+
     public VehicleConstraintSettings(
         Vector3 up,
         Vector3 forward,
         float maxPitchRollAngle,
-        //Array<Ref<WheelSettings>> wheels,         // NOTE: BGE: just using default values for now.
-        //VehicleAntiRollBars antiRollBars,         // NOTE: BGE: just using default values for now.
+        Span<WheelSettingsWV> wheels,       // NOTE: BGE: just using an overly-specific type for now.
+        //VehicleAntiRollBars antiRollBars, // NOTE: BGE: just using default values for now.
         VehicleControllerSettings settings)
         : base(
-            JPH_VehicleConstraintSettings_Create(
+            Ctor(
                 up,
                 forward,
                 maxPitchRollAngle,
-                //wheels,         // NOTE: BGE: just using default values for now.
-                //antiRollBars,   // NOTE: BGE: just using default values for now.
-                settings.Handle))
+                wheels,
+                //antiRollBars, // NOTE: BGE: just using default values for now.
+                settings))
     {
     }
 

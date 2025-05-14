@@ -1561,6 +1561,12 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PhysicsSystem_RemoveConstraints(nint handle, nint* constraints, uint count);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_AddStepListener(nint handle, nint listener);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_RemoveStepListener(nint handle, nint listener);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_GetBodies(nint handle, BodyID* ids, uint count);
 
     [LibraryImport(LibName)]
@@ -3237,8 +3243,9 @@ internal static unsafe partial class JoltApi
         in Vector3 up,
         in Vector3 forward,
         float maxPitchRollAngle,
-        //Array<Ref<WheelSettings>> wheels,     // NOTE: BGE: just using default values for now.
-        //VehicleAntiRollBars antiRollBars,     // NOTE: BGE: just using default values for now.
+        nint* wheels,
+        int wheelsCount,
+        //VehicleAntiRollBars antiRollBars, // NOTE: BGE: just using default values for now.
         nint vehicleControllerSettings);
 
     [LibraryImport(LibName)]
@@ -3259,6 +3266,9 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_WheeledVehicleController_Destroy(nint controller);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheeledVehicleController_GetConstraint(nint controller);
 
     [LibraryImport(LibName)]
     public static partial void JPH_WheeledVehicleController_SetDriverInput(nint controller, float forward, float right, float brake, float handBrake);
