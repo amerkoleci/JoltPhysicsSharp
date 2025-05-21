@@ -12,6 +12,7 @@ public class WheelWV : NativeObject
     public WheelWV(WheelSettingsWV settingsWV)
         : this(JPH_WheelWV_Create(settingsWV.Handle))
     {
+        OwnedObjects.TryAdd(settingsWV.Handle, settingsWV);
     }
 
     protected WheelWV(nint handle)

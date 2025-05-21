@@ -46,6 +46,8 @@ public class VehicleConstraintSettings : NativeObject
                 //antiRollBars, // NOTE: BGE: just using default values for now.
                 settings))
     {
+        foreach (var wheel in wheels) OwnedObjects.TryAdd(wheel.Handle, wheel);
+        OwnedObjects.TryAdd(settings.Handle, settings);
     }
 
     protected VehicleConstraintSettings(nint handle)

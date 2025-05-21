@@ -12,6 +12,8 @@ public class WheeledVehicleController : NativeObject
     public WheeledVehicleController(Body body, WheeledVehicleControllerSettings controllerSettings, VehicleConstraintSettings constraintSettings)
         : this(JPH_WheeledVehicleController_Create(body.Handle, controllerSettings.Handle, constraintSettings.Handle))
     {
+        OwnedObjects.TryAdd(controllerSettings.Handle, controllerSettings);
+        OwnedObjects.TryAdd(constraintSettings.Handle, constraintSettings);
     }
 
     protected WheeledVehicleController(nint handle)
@@ -26,11 +28,27 @@ public class WheeledVehicleController : NativeObject
 
     public VehicleConstraint Constraint
     {
-        get { return new VehicleConstraint(JPH_WheeledVehicleController_GetConstraint(Handle)); }
+        // NOTE: BGE: we exposed and used the ctor overload to specify that the given handle isn't owned in this new object.
+        get { return new VehicleConstraint(JPH_WheeledVehicleController_GetConstraint(Handle), false); }
     }
 
-    public void SetDriverInput(float forward, float right, float brake, float handBrake)
+    public void SetForwardInput(float forward)
     {
-        JPH_WheeledVehicleController_SetDriverInput(Handle, forward, right, brake, handBrake);
+        JPH_WheeledVehicleController_SetForwardInput(Handle, forward);
+    }
+
+    public void SetRightInput(float right)
+    {
+        JPH_WheeledVehicleController_SetRightInput(Handle, right);
+    }
+
+    public void SetBrakeInput(float brake)
+    {
+        JPH_WheeledVehicleController_SetBrakeInput(Handle, brake);
+    }
+
+    public void SetHandBrakeInput(float handBrake)
+    {
+        JPH_WheeledVehicleController_SetHandBrakeInput(Handle, handBrake);
     }
 }

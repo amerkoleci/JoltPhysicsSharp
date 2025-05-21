@@ -21,6 +21,8 @@ public class WheeledVehicleControllerSettings : VehicleControllerSettings
                 //differentials, // NOTE: BGE: just using default values for now.
                 differentialLimitedSlipRatio))
         {
+            OwnedObjects.TryAdd(engine.Handle, engine);
+            OwnedObjects.TryAdd(transmission.Handle, transmission);
         }
 
     protected WheeledVehicleControllerSettings(nint handle)

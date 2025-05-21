@@ -9,8 +9,8 @@ namespace JoltPhysicsSharp;
 
 public class VehicleConstraint : Constraint
 {
-    public VehicleConstraint(nint handle)
-        : base(handle)
+    public VehicleConstraint(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
     {
     }
 
