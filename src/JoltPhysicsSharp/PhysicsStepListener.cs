@@ -9,8 +9,8 @@ namespace JoltPhysicsSharp;
 
 public class PhysicsStepListener : NativeObject
 {
-    public PhysicsStepListener(nint handle)
-        : base(handle, false)
+    public PhysicsStepListener(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
     {
     }
 }

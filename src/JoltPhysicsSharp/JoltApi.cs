@@ -3269,6 +3269,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_VehicleConstraintSettings_Destroy(nint settings);
 
     [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraint_AsPhysicsStepListener(nint constraint);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_VehicleConstraint_SetVehicleCollisionTester(nint constraint, nint tester);
 
     [LibraryImport(LibName)]

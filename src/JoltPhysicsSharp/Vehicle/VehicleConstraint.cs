@@ -14,6 +14,11 @@ public class VehicleConstraint : Constraint
     {
     }
 
+    public PhysicsStepListener AsPhysicsStepListener
+    {
+        get { return new PhysicsStepListener(JPH_VehicleConstraint_AsPhysicsStepListener(Handle), false); }
+    }
+
     public void SetVehicleCollisionTester(VehicleCollisionTester tester)
     {
         JPH_VehicleConstraint_SetVehicleCollisionTester(Handle, tester.Handle);
