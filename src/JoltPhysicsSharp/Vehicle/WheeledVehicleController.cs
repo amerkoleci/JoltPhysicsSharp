@@ -9,27 +9,9 @@ namespace JoltPhysicsSharp;
 
 public class WheeledVehicleController : NativeObject
 {
-    public WheeledVehicleController(Body body, WheeledVehicleControllerSettings controllerSettings, VehicleConstraintSettings constraintSettings)
-        : this(JPH_WheeledVehicleController_Create(body.Handle, controllerSettings.Handle, constraintSettings.Handle))
+    public WheeledVehicleController(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
     {
-        OwnedObjects.TryAdd(controllerSettings.Handle, controllerSettings);
-        OwnedObjects.TryAdd(constraintSettings.Handle, constraintSettings);
-    }
-
-    protected WheeledVehicleController(nint handle)
-        : base(handle)
-    {
-    }
-
-    protected override void DisposeNative()
-    {
-        JPH_WheeledVehicleController_Destroy(Handle);
-    }
-
-    public VehicleConstraint Constraint
-    {
-        // NOTE: BGE: we exposed and used the ctor overload to specify that the given handle isn't owned in this new object.
-        get { return new VehicleConstraint(JPH_WheeledVehicleController_GetConstraint(Handle), false); }
     }
 
     public void SetForwardInput(float forward)

@@ -3269,7 +3269,16 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_VehicleConstraintSettings_Destroy(nint settings);
 
     [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraint_Create(nint body, nint constraintSettings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraint_Destroy(nint controller);
+
+    [LibraryImport(LibName)]
     public static partial nint JPH_VehicleConstraint_AsPhysicsStepListener(nint constraint);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraint_GetWheeledVehicleController(nint constraint);
 
     [LibraryImport(LibName)]
     public static partial void JPH_VehicleConstraint_SetVehicleCollisionTester(nint constraint, nint tester);
@@ -3283,12 +3292,6 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_WheeledVehicleControllerSettings_Destroy(nint settings);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_WheeledVehicleController_Create(nint body, nint controllerSettings, nint constraintSettings);
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_WheeledVehicleController_Destroy(nint controller);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_WheeledVehicleController_GetConstraint(nint controller);
