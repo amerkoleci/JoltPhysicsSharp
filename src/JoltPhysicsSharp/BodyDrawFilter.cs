@@ -13,17 +13,20 @@ public abstract class BodyDrawFilter : NativeObject
 
     static BodyDrawFilter()
     {
-        _procs = new JPH_BodyDrawFilter_Procs
+        unsafe
         {
-            ShouldDraw = &ShouldDrawCallback,
-        };
-        JPH_BodyDrawFilter_SetProcs(in _procs);
+            _procs = new JPH_BodyDrawFilter_Procs
+            {
+                ShouldDraw = &ShouldDrawCallback,
+            };
+            JPH_BodyDrawFilter_SetProcs(in _procs);
+        }
     }
 
     public BodyDrawFilter()
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
-        
+
         Handle = JPH_BodyDrawFilter_Create(_listenerUserData);
     }
 

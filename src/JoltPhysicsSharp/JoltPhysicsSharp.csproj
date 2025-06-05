@@ -23,54 +23,65 @@
   <ItemGroup>
     <Content Include="$(NativeLibDirectory)win-x64\joltc.dll">
       <PackagePath>runtimes/win-x64/native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>true</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)win-x64\joltc_double.dll">
       <PackagePath>runtimes/win-x64/native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>true</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)win-arm64\joltc.dll">
       <PackagePath>runtimes/win-arm64/native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)win-arm64\joltc_double.dll">
       <PackagePath>runtimes/win-arm64/native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)linux-x64\libjoltc.so">
       <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)linux-arm64\libjoltc.so">
       <PackagePath>runtimes\linux-arm64\native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)osx\libjoltc.dylib">
       <PackagePath>runtimes\osx\native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)android-arm\libjoltc.so">
       <PackagePath>runtimes/android-arm/native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)android-arm64\libjoltc.so">
       <PackagePath>runtimes/android-arm64/native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
     <Content Include="$(NativeLibDirectory)android-x64\libjoltc.so">
       <PackagePath>runtimes/android-x64/native</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>True</Pack>
       <Visible>False</Visible>
     </Content>
   </ItemGroup>
+
 
 </Project>

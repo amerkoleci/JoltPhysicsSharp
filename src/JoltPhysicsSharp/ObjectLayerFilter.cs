@@ -13,11 +13,14 @@ public abstract class ObjectLayerFilter : NativeObject
 
     static ObjectLayerFilter()
     {
-        _procs = new JPH_ObjectLayerFilter_Procs
+        unsafe
         {
-            ShouldCollide = &ShouldCollideCallback,
-        };
-        JPH_ObjectLayerFilter_SetProcs(in _procs);
+            _procs = new JPH_ObjectLayerFilter_Procs
+            {
+                ShouldCollide = &ShouldCollideCallback,
+            };
+            JPH_ObjectLayerFilter_SetProcs(in _procs);
+        }
     }
 
     public ObjectLayerFilter()

@@ -13,11 +13,14 @@ public abstract class BroadPhaseLayerFilter : NativeObject
 
     static BroadPhaseLayerFilter()
     {
-        _procs = new JPH_BroadPhaseLayerFilter_Procs
+        unsafe
         {
-            ShouldCollide = &ShouldCollideCallback,
-        };
-        JPH_BroadPhaseLayerFilter_SetProcs(in _procs);
+            _procs = new JPH_BroadPhaseLayerFilter_Procs
+            {
+                ShouldCollide = &ShouldCollideCallback,
+            };
+            JPH_BroadPhaseLayerFilter_SetProcs(in _procs);
+        }
     }
 
     public BroadPhaseLayerFilter()

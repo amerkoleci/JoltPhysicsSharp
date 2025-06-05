@@ -13,12 +13,15 @@ public abstract class BodyFilter : NativeObject
 
     static BodyFilter()
     {
-        _procs = new JPH_BodyFilter_Procs
+        unsafe
         {
-            ShouldCollide = &ShouldCollideCallback,
-            ShouldCollideLocked = &ShouldCollideLockedCallback,
-        };
-        JPH_BodyFilter_SetProcs(in _procs);
+            _procs = new JPH_BodyFilter_Procs
+            {
+                ShouldCollide = &ShouldCollideCallback,
+                ShouldCollideLocked = &ShouldCollideLockedCallback,
+            };
+            JPH_BodyFilter_SetProcs(in _procs);
+        }
     }
 
     public BodyFilter()
