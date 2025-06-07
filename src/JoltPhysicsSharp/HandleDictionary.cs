@@ -100,9 +100,9 @@ internal static class HandleDictionary
             }
 
             s_instances[handle] = new WeakReference(instance);
-#if DEBUG
-            s_stackTraces[handle] = Environment.StackTrace;
-#endif
+//#if DEBUG // NOTE: BGE: dummied out because it kills performance when debug drawing.
+//            s_stackTraces[handle] = Environment.StackTrace;
+//#endif
         }
         finally
         {

@@ -262,6 +262,16 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_RemoveConstraints(Handle, constraintsPtr, (uint)count);
     }
 
+    public void AddStepListener(PhysicsStepListener listener)
+    {
+        JPH_PhysicsSystem_AddStepListener(Handle, listener.Handle);
+    }
+
+    public void RemoveStepListener(PhysicsStepListener listener)
+    {
+        JPH_PhysicsSystem_RemoveStepListener(Handle, listener.Handle);
+    }
+
     public void DrawBodies(in DrawSettings settings, DebugRenderer renderer, BodyDrawFilter? bodyDrawFilter = default)
     {
         fixed (DrawSettings* settingsPtr = &settings)

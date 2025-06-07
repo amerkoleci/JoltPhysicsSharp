@@ -43,8 +43,13 @@ public abstract class ConstraintSettings
 
 public abstract class Constraint : NativeObject
 {
+    protected Constraint(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
+    {
+    }
+
     protected Constraint(nint handle)
-        : base(handle)
+        : this(handle, true)
     {
     }
 

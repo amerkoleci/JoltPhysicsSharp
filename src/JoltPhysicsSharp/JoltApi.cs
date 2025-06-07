@@ -1561,6 +1561,12 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PhysicsSystem_RemoveConstraints(nint handle, nint* constraints, uint count);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_AddStepListener(nint handle, nint listener);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_RemoveStepListener(nint handle, nint listener);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_GetBodies(nint handle, BodyID* ids, uint count);
 
     [LibraryImport(LibName)]
@@ -3163,4 +3169,142 @@ internal static unsafe partial class JoltApi
         {
         }
     }
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheelSettingsWV_Create(
+        in Vector3 position,
+        in Vector3 suspensionForcePoint,
+        in Vector3 suspensionDirection,
+        in Vector3 steeringAxis,
+        in Vector3 wheelUp,
+        in Vector3 wheelForward,
+        float suspensionMinLength,
+        float suspensionMaxLength,
+        float suspensionPreloadLength,
+        in SpringSettings suspensionSpring,
+        float radius,
+        float width,
+        [MarshalAs(UnmanagedType.U1)] bool enableSuspensionForcePoint,
+        float inertia,
+        float angularDamping,
+        float maxSteerAngle,
+        //LinearCurve longitudinalFriction, // NOTE: BGE: just using default values for now.
+        //LinearCurve lateralFriction,      // NOTE: BGE: just using default values for now.
+        float maxBrakeTorque,
+        float maxHandBrakeTorque);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheelSettingsWV_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheelWV_Create(nint wheelSettingsWV);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheelWV_Destroy(nint wheel);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_WheelWV_HasContact(nint wheel);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_WheelWV_HasHitHardPoint(nint wheel);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleEngineSettings_Create(
+        float maxTorque,
+        float minRPM,
+        float maxRPM,
+        //LinearCurve normalizedTorque, // NOTE: BGE: just using default values for now.
+        float inertia,
+        float angularDamping);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleEngineSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleTransmissionSettings_Create(
+        TransmissionMode mode,
+        //Array<float> gearRatios,		    // NOTE: BGE: just using default values for now.
+        //Array<float> reverseGearRatios,   // NOTE: BGE: just using default values for now.
+        float switchTime,
+        float clutchReleaseTime,
+        float switchLatency,
+        float shiftUpRPM,
+        float shiftDownRPM,
+        float clutchStrength);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleTransmissionSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleCollisionTesterRay_Create(ObjectLayer layer, in Vector3 up, float maxSlopeAngle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleCollisionTesterRay_Destroy(nint tester);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleCollisionTesterCastSphere_Create(ObjectLayer layer, float radius, in Vector3 up, float maxSlopeAngle);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleCollisionTesterCastSphere_Destroy(nint tester);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleCollisionTesterCastCylinder_Create(ObjectLayer layer, float convexRadiusFraction);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleCollisionTesterCastCylinder_Destroy(nint tester);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraintSettings_Create(
+        in Vector3 up,
+        in Vector3 forward,
+        float maxPitchRollAngle,
+        nint* wheels,
+        int wheelsCount,
+        //VehicleAntiRollBars antiRollBars, // NOTE: BGE: just using default values for now.
+        nint vehicleControllerSettings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraintSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraint_Create(nint body, nint constraintSettings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraint_Destroy(nint controller);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraint_AsPhysicsStepListener(nint constraint);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraint_GetWheeledVehicleController(nint constraint);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraint_SetVehicleCollisionTester(nint constraint, nint tester);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheeledVehicleControllerSettings_Create(
+        nint engine,
+        nint transmission,
+        //Array<VehicleDifferentialSettings> differentials,	// NOTE: BGE: just using default values for now.
+        float differentialLimitedSlipRatio);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleControllerSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheeledVehicleController_GetConstraint(nint controller);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleController_SetForwardInput(nint controller, float forward);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleController_SetRightInput(nint controller, float right);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleController_SetBrakeInput(nint controller, float brake);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleController_SetHandBrakeInput(nint controller, float handBrake);
 }
