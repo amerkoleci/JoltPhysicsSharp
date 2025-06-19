@@ -8,7 +8,6 @@ namespace JoltPhysicsSharp;
 
 public abstract class ConstraintSettings
 {
-
     internal void FromNative(in JPH_ConstraintSettings settings)
     {
         Enabled = settings.enabled;
@@ -43,13 +42,8 @@ public abstract class ConstraintSettings
 
 public abstract class Constraint : NativeObject
 {
-    protected Constraint(nint handle, bool ownsHandle)
+    protected Constraint(nint handle, bool ownsHandle = true)
         : base(handle, ownsHandle)
-    {
-    }
-
-    protected Constraint(nint handle)
-        : this(handle, true)
     {
     }
 

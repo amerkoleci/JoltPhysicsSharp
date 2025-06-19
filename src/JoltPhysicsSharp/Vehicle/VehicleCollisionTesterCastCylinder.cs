@@ -10,17 +10,12 @@ namespace JoltPhysicsSharp;
 public class VehicleCollisionTesterCastCylinder : VehicleCollisionTester
 {
     public VehicleCollisionTesterCastCylinder(ObjectLayer layer, float convexRadiusFraction)
-        : this(JPH_VehicleCollisionTesterCastCylinder_Create(layer, convexRadiusFraction))
+        : base(JPH_VehicleCollisionTesterCastCylinder_Create(layer, convexRadiusFraction), true)
     {
     }
 
-    protected VehicleCollisionTesterCastCylinder(nint handle)
-        : base(handle)
+    internal VehicleCollisionTesterCastCylinder(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
     {
-    }
-
-    protected override void DisposeNative()
-    {
-        JPH_VehicleCollisionTesterCastCylinder_Destroy(Handle);
     }
 }

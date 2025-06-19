@@ -2,37 +2,65 @@
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class VehicleConstraint : Constraint
+public class VehicleConstraint : Constraint, IPhysicsStepListener
 {
-    public VehicleConstraint(Body body, VehicleConstraintSettings constraintSettings)
-        : this(JPH_VehicleConstraint_Create(body.Handle, constraintSettings.Handle))
-    {
-        OwnedObjects.TryAdd(constraintSettings.Handle, constraintSettings);
-    }
-
-    protected VehicleConstraint(nint handle)
-        : base(handle)
+    public VehicleConstraint(Body body, VehicleConstraintSettings settings)
+        : base(settings.CreateConstraintNative(body))
     {
     }
 
-    public WheeledVehicleController WheeledVehicleController
+    internal VehicleConstraint(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
     {
-        // NOTE: BGE: we exposed and used the ctor overload to specify that the given handle isn't owned in this new object.
-        get { return new WheeledVehicleController(JPH_VehicleConstraint_GetWheeledVehicleController(Handle), false); }
     }
 
-    public PhysicsStepListener AsPhysicsStepListener
+
+    public Body VehicleBody
     {
-        get { return new PhysicsStepListener(JPH_VehicleConstraint_AsPhysicsStepListener(Handle), false); }
+        get => Body.GetObject(JPH_VehicleConstraint_GetVehicleBody(Handle))!;
+    }
+
+    public VehicleController? Controller
+    {
+        get => VehicleController.GetObject(JPH_VehicleConstraint_GetController(Handle));
+    }
+
+    public void SetMaxPitchRollAngle(float maxPitchRollAngle)
+    {
+        JPH_VehicleConstraint_SetMaxPitchRollAngle(Handle, maxPitchRollAngle);
     }
 
     public void SetVehicleCollisionTester(VehicleCollisionTester tester)
     {
         JPH_VehicleConstraint_SetVehicleCollisionTester(Handle, tester.Handle);
     }
+
+    public void OverrideGravity(in Vector3 gravity)
+    {
+        JPH_VehicleConstraint_OverrideGravity(Handle, in gravity);
+    }
+
+    public bool IsGravityOverridden() => JPH_VehicleConstraint_IsGravityOverridden(Handle);
+
+    public Vector3 GetGravityOverride()
+    {
+        JPH_VehicleConstraint_GetGravityOverride(Handle, out Vector3 gravity);
+        return gravity;
+    }
+
+    public void GetGravityOverride(out Vector3 gravity)
+    {
+        JPH_VehicleConstraint_GetGravityOverride(Handle, out gravity);
+    }
+
+    public void ResetGravityOverride()
+    {
+        JPH_VehicleConstraint_ResetGravityOverride(Handle);
+    }
+
+    internal static VehicleConstraint? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new VehicleConstraint(h, false));
 }

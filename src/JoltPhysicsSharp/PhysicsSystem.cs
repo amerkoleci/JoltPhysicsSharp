@@ -106,6 +106,11 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
     }
 
+    internal PhysicsSystem(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
+    {
+    }
+
     protected override void DisposeNative()
     {
         DelegateProxies.GetUserData<PhysicsSystem>(_listenerUserData, out GCHandle gch);
@@ -262,12 +267,12 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_RemoveConstraints(Handle, constraintsPtr, (uint)count);
     }
 
-    public void AddStepListener(PhysicsStepListener listener)
+    public void AddStepListener(IPhysicsStepListener listener)
     {
         JPH_PhysicsSystem_AddStepListener(Handle, listener.Handle);
     }
 
-    public void RemoveStepListener(PhysicsStepListener listener)
+    public void RemoveStepListener(IPhysicsStepListener listener)
     {
         JPH_PhysicsSystem_RemoveStepListener(Handle, listener.Handle);
     }
@@ -294,6 +299,8 @@ public sealed unsafe class PhysicsSystem : NativeObject
     {
         JPH_PhysicsSystem_DrawConstraintReferenceFrame(Handle, renderer.Handle);
     }
+
+    internal static PhysicsSystem? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new PhysicsSystem(h, false));
 
     #region ContactListener
     [UnmanagedCallersOnly]

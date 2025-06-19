@@ -7,10 +7,23 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public abstract class VehicleCollisionTester : NativeObject
+public class VehicleCollisionTester : NativeObject
 {
-    protected VehicleCollisionTester(nint handle)
-        : base(handle)
+    internal VehicleCollisionTester(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
     {
     }
+
+    protected override void DisposeNative()
+    {
+        JPH_VehicleCollisionTester_Destroy(Handle);
+    }
+
+    public ObjectLayer objectLayer
+    {
+        get => JPH_VehicleCollisionTester_GetObjectLayer(Handle);
+        set => JPH_VehicleCollisionTester_SetObjectLayer(Handle, value);
+    }
+
+    internal static VehicleCollisionTester? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new VehicleCollisionTester(h, false));
 }

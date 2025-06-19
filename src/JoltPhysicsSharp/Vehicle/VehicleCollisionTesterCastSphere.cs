@@ -10,17 +10,22 @@ namespace JoltPhysicsSharp;
 public class VehicleCollisionTesterCastSphere : VehicleCollisionTester
 {
     public VehicleCollisionTesterCastSphere(ObjectLayer layer, float radius, in Vector3 up, float maxSlopeAngle)
-        : this(JPH_VehicleCollisionTesterCastSphere_Create(layer, radius, up, maxSlopeAngle))
+        : base(JPH_VehicleCollisionTesterCastSphere_Create(layer, radius, up, maxSlopeAngle), true)
     {
     }
 
-    protected VehicleCollisionTesterCastSphere(nint handle)
-        : base(handle)
+    public VehicleCollisionTesterCastSphere(ObjectLayer layer, float radius, in Vector3 up)
+        : this(layer, radius, up, MathUtil.DegreesToRadians(80.0f))
     {
     }
 
-    protected override void DisposeNative()
+    public VehicleCollisionTesterCastSphere(ObjectLayer layer, float radius)
+        : this(layer, radius, Vector3.UnitY, MathUtil.DegreesToRadians(80.0f))
     {
-        JPH_VehicleCollisionTesterCastSphere_Destroy(Handle);
+    }
+
+    internal VehicleCollisionTesterCastSphere(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
+    {
     }
 }

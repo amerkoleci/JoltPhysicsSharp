@@ -7,10 +7,21 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public abstract class VehicleControllerSettings : NativeObject
+public class VehicleControllerSettings : NativeObject
 {
-    protected VehicleControllerSettings(nint handle)
-        : base(handle)
+    protected VehicleControllerSettings()
     {
     }
+
+    internal VehicleControllerSettings(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
+    {
+    }
+
+    protected override void DisposeNative()
+    {
+        JPH_VehicleControllerSettings_Destroy(Handle);
+    }
+
+    internal static VehicleControllerSettings? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new VehicleControllerSettings(h, false));
 }

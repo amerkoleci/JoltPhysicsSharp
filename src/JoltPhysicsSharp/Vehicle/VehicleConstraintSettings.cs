@@ -1,62 +1,115 @@
 ﻿// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class VehicleConstraintSettings : NativeObject
+public unsafe class VehicleConstraintSettings : ConstraintSettings
 {
-    protected static unsafe nint Ctor(
-        Vector3 up,
-        Vector3 forward,
-        float maxPitchRollAngle,
-        Span<WheelSettingsWV> wheels,       // NOTE: BGE: just using an overly-specific type for now.
-        //VehicleAntiRollBars antiRollBars, // NOTE: BGE: just using default values for now.
-        VehicleControllerSettings settings)
+    public VehicleConstraintSettings()
     {
-        int count = wheels.Length;
-        nint* wheelsArray = stackalloc nint[count];
-        for (int i = 0; i < count; i++) wheelsArray[i] = wheels[i].Handle;
-        return JPH_VehicleConstraintSettings_Create(
-            up,
-            forward,
-            maxPitchRollAngle,
-            wheelsArray,
-            wheels.Length,
-            //antiRollBars, // NOTE: BGE: just using default values for now.
-            settings.Handle);
+        JPH_VehicleConstraintSettings native;
+        JPH_VehicleConstraintSettings_Init(&native);
+
+        FromNative(native);
     }
 
-    public VehicleConstraintSettings(
-        Vector3 up,
-        Vector3 forward,
-        float maxPitchRollAngle,
-        Span<WheelSettingsWV> wheels,       // NOTE: BGE: just using an overly-specific type for now.
-        //VehicleAntiRollBars antiRollBars, // NOTE: BGE: just using default values for now.
-        VehicleControllerSettings settings)
-        : this(
-            Ctor(
-                up,
-                forward,
-                maxPitchRollAngle,
-                wheels,
-                //antiRollBars, // NOTE: BGE: just using default values for now.
-                settings))
+    public Vector3 Up { get; set; }
+    public Vector3 Forward { get; set; }
+    public float MaxPitchRollAngle { get; set; }
+    public WheelSettings[]? Wheels { get; set; }
+    public VehicleAntiRollBar[]? AntiRollBars { get; set; }
+    public VehicleControllerSettings? Controller { get; set; }
+
+    private void FromNative(in JPH_VehicleConstraintSettings native)
     {
-        foreach (var wheel in wheels) OwnedObjects.TryAdd(wheel.Handle, wheel);
-        OwnedObjects.TryAdd(settings.Handle, settings);
+        FromNative(native.baseSettings);
+
+        Up = native.up;
+        Forward = native.forward;
+        MaxPitchRollAngle = native.maxPitchRollAngle;
+        if (native.wheelsCount > 0)
+        {
+            Wheels = new WheelSettings[native.wheelsCount];
+            for (uint i = 0; i < native.wheelsCount; i++)
+            {
+                Wheels[i] = WheelSettings.GetObject(native.wheels[i])!;
+            }
+        }
+
+        if (native.antiRollBarsCount > 0)
+        {
+            AntiRollBars = new VehicleAntiRollBar[native.antiRollBarsCount];
+            for (uint i = 0; i < native.antiRollBarsCount; i++)
+            {
+                AntiRollBars[i] = new VehicleAntiRollBar();
+                AntiRollBars[i].FromNative(native.antiRollBars[i]);
+            }
+        }
+
+        Controller = VehicleControllerSettings.GetObject(native.controller);
     }
 
-    protected VehicleConstraintSettings(nint handle)
-        : base(handle)
+    internal void ToNative(JPH_VehicleConstraintSettings* native)
     {
+        ToNative(ref native->baseSettings);
+
+        native->up = Up;
+        native->forward = Forward;
+        native->maxPitchRollAngle = MaxPitchRollAngle;
+        native->wheelsCount = Wheels != null ? Wheels.Length : 0;
+        if (native->wheelsCount > 0)
+        {
+            nint* wheels = (nint*)NativeMemory.Alloc((nuint)(sizeof(nint) * native->wheelsCount));
+            native->wheels = wheels;
+            for (uint i = 0; i < native->wheelsCount; i++)
+            {
+                native->wheels[i] = Wheels[i]!.Handle;
+            }
+        }
+        else
+        {
+            native->wheels = null;
+        }
+        native->antiRollBarsCount = AntiRollBars != null ? AntiRollBars.Length : 0;
+        if (native->antiRollBarsCount > 0)
+        {
+            JPH_VehicleAntiRollBar* antiRollBars = (JPH_VehicleAntiRollBar*)NativeMemory.Alloc((nuint)(sizeof(JPH_VehicleAntiRollBar) * native->antiRollBarsCount));
+            native->antiRollBars = antiRollBars;
+            for (uint i = 0; i < native->antiRollBarsCount; i++)
+            {
+                AntiRollBars[i].ToNative(&native->antiRollBars[i]);
+            }
+        }
+        else
+        {
+            native->antiRollBars = null;
+        }
+
+        native->controller = Controller?.Handle ?? nint.Zero;
     }
 
-    protected override void DisposeNative()
+    internal unsafe nint CreateConstraintNative(Body body)
     {
-        JPH_VehicleConstraintSettings_Destroy(Handle);
+        JPH_VehicleConstraintSettings nativeSettings = default;
+        try
+        {
+            ToNative(&nativeSettings);
+            return JPH_VehicleConstraint_Create(body.Handle, &nativeSettings);
+        }
+        finally
+        {
+            if (nativeSettings.wheels != null)
+            {
+                NativeMemory.Free(nativeSettings.wheels);
+            }
+            if (nativeSettings.antiRollBars != null)
+            {
+                NativeMemory.Free(nativeSettings.antiRollBars);
+            }
+        }
     }
 }

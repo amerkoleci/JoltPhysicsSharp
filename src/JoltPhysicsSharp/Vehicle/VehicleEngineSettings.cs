@@ -7,33 +7,38 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class VehicleEngineSettings : NativeObject
+public struct VehicleEngineSettings
 {
-    public VehicleEngineSettings(
-        float maxTorque,
-        float minRPM,
-        float maxRPM,
-        //LinearCurve normalizedTorque, // NOTE: BGE: just using default values for now.
-        float inertia,
-        float angularDamping)
-        : this(
-            JPH_VehicleEngineSettings_Create(
-                maxTorque,
-                minRPM,
-                maxRPM,
-                //normalizedTorque, // NOTE: BGE: just using default values for now.
-                inertia,
-                angularDamping))
+    public float MaxTorque { get; set; }
+    public float MinRPM { get; set; }
+    public float MaxRPM { get; set; }
+    //public LinearCurve			normalizedTorque;
+    public float Inertia { get; set; }
+    public float AngularDamping { get; set; }
+
+    public unsafe VehicleEngineSettings()
     {
+        JPH_VehicleEngineSettings native;
+        JPH_VehicleEngineSettings_Init(&native);
+
+        FromNative(native);
     }
 
-    protected VehicleEngineSettings(nint handle)
-        : base(handle)
+    internal void FromNative(in JPH_VehicleEngineSettings native)
     {
+        MaxTorque = native.maxTorque;
+        MinRPM = native.minRPM;
+        MaxRPM = native.maxRPM;
+        Inertia = native.inertia;
+        AngularDamping = native.angularDamping;
     }
 
-    protected override void DisposeNative()
+    internal unsafe void ToNative(JPH_VehicleEngineSettings* native)
     {
-        JPH_VehicleEngineSettings_Destroy(Handle);
+        native->maxTorque = MaxTorque;
+        native->minRPM = MinRPM;
+        native->maxRPM = MaxRPM;
+        native->inertia = Inertia;
+        native->angularDamping = AngularDamping;
     }
 }

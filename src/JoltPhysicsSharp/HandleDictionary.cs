@@ -14,11 +14,6 @@ internal static class HandleDictionary
 
     internal static readonly Dictionary<IntPtr, WeakReference> s_instances = [];
 
-#if DEBUG
-    internal static readonly ConcurrentBag<Exception> s_exceptions = [];
-    internal static readonly Dictionary<IntPtr, string> s_stackTraces = [];
-#endif
-
     /// <summary>
     /// Retrieve the living instance if there is one, or null if not.
     /// </summary>
@@ -100,9 +95,6 @@ internal static class HandleDictionary
             }
 
             s_instances[handle] = new WeakReference(instance);
-//#if DEBUG // NOTE: BGE: dummied out because it kills performance when debug drawing.
-//            s_stackTraces[handle] = Environment.StackTrace;
-//#endif
         }
         finally
         {
@@ -128,9 +120,6 @@ internal static class HandleDictionary
             if (existed && (!weak!.IsAlive || weak.Target == instance))
             {
                 s_instances.Remove(handle);
-#if DEBUG
-                s_stackTraces.Remove(handle);
-#endif
             }
             else
             {
@@ -164,9 +153,7 @@ internal static class HandleDictionary
                 }
                 if (ex != null)
                 {
-                    if (instance.fromFinalizer)
-                        s_exceptions.Add(ex);
-                    else
+                    if (!instance.fromFinalizer)
                         throw ex;
                 }
 #endif

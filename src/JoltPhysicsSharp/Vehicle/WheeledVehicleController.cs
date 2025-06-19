@@ -3,34 +3,155 @@
 
 using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class WheeledVehicleController : NativeObject
+public class WheelSettingsWV : WheelSettings
 {
-    public WheeledVehicleController(nint handle, bool ownsHandle)
+    public WheelSettingsWV()
+        : base(JPH_WheelSettingsWV_Create(), true)
+    {
+    }
+
+    internal WheelSettingsWV(nint handle, bool ownsHandle)
         : base(handle, ownsHandle)
     {
     }
 
-    public void SetForwardInput(float forward)
+    public float Inertia
     {
-        JPH_WheeledVehicleController_SetForwardInput(Handle, forward);
+        get => JPH_WheelSettingsWV_GetInertia(Handle);
+        set => JPH_WheelSettingsWV_SetInertia(Handle, value);
     }
 
-    public void SetRightInput(float right)
+    public float MaxSteerAngle
     {
-        JPH_WheeledVehicleController_SetRightInput(Handle, right);
+        get => JPH_WheelSettingsWV_GetMaxSteerAngle(Handle);
+        set => JPH_WheelSettingsWV_SetMaxSteerAngle(Handle, value);
     }
 
-    public void SetBrakeInput(float brake)
+    public float MaxBrakeTorque
     {
-        JPH_WheeledVehicleController_SetBrakeInput(Handle, brake);
+        get => JPH_WheelSettingsWV_GetMaxBrakeTorque(Handle);
+        set => JPH_WheelSettingsWV_SetMaxBrakeTorque(Handle, value);
     }
 
-    public void SetHandBrakeInput(float handBrake)
+    public float MaxHandBrakeTorque
     {
-        JPH_WheeledVehicleController_SetHandBrakeInput(Handle, handBrake);
+        get => JPH_WheelSettingsWV_GetMaxHandBrakeTorque(Handle);
+        set => JPH_WheelSettingsWV_SetMaxHandBrakeTorque(Handle, value);
+    }
+
+    internal static new WheelSettingsWV? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new WheelSettingsWV(h, false));
+}
+
+public sealed class WheelWV : Wheel
+{
+    public WheelWV(WheelSettingsWV settings)
+        : base(JPH_WheelWV_Create(settings.Handle), true)
+    {
+    }
+
+    internal WheelWV(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
+    {
+    }
+
+    public WheelSettingsWV Settings => WheelSettingsWV.GetObject(JPH_WheelWV_GetSettings(Handle))!;
+
+    public void ApplyTorque(float torque, float deltaTime)
+    {
+        JPH_WheelWV_ApplyTorque(Handle, torque, deltaTime);
+    }
+}
+
+
+public unsafe class WheeledVehicleControllerSettings : VehicleControllerSettings
+{
+    public WheeledVehicleControllerSettings()
+        : base(JPH_WheeledVehicleControllerSettings_Create(), true)
+    {
+    }
+
+    internal WheeledVehicleControllerSettings(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
+    {
+    }
+
+    public VehicleEngineSettings Engine
+    {
+        get
+        {
+            JPH_WheeledVehicleControllerSettings_GetEngine(Handle, out JPH_VehicleEngineSettings native);
+            VehicleEngineSettings result = new();
+            result.FromNative(native);
+            return result;
+        }
+        set
+        {
+            JPH_VehicleEngineSettings native = new();
+            value.ToNative(&native);
+            JPH_WheeledVehicleControllerSettings_SetEngine(Handle, in native);
+        }
+    }
+
+    public VehicleTransmissionSettings Transmission
+    {
+        get
+        {
+            return VehicleTransmissionSettings.GetObject(JPH_WheeledVehicleControllerSettings_GetTransmission(Handle))!;
+        }
+        set
+        {
+            JPH_WheeledVehicleControllerSettings_SetTransmission(Handle, value.Handle);
+        }
+    }
+
+    public int DifferentialsCount
+    {
+        get => JPH_WheeledVehicleControllerSettings_GetDifferentialsCount(Handle);
+        set => JPH_WheeledVehicleControllerSettings_SetDifferentialsCount(Handle, value);
+    }
+
+    public float DifferentialLimitedSlipRatio
+    {
+        get => JPH_WheeledVehicleControllerSettings_GetDifferentialLimitedSlipRatio(Handle);
+        set => JPH_WheeledVehicleControllerSettings_SetDifferentialLimitedSlipRatio(Handle, value);
+    }
+
+    public VehicleDifferentialSettings GetDifferential(int index)
+    {
+        if (index < 0 || index >= DifferentialsCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+
+        JPH_VehicleDifferentialSettings native;
+        JPH_WheeledVehicleControllerSettings_GetDifferential(Handle, index, &native);
+        VehicleDifferentialSettings result = new();
+        result.FromNative(native);
+        return result;
+    }
+
+    public void SetDifferential(int index, VehicleDifferentialSettings settings)
+    {
+        if (index < 0 || index >= DifferentialsCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+
+        JPH_VehicleDifferentialSettings native = new();
+        settings.ToNative(&native);
+        JPH_WheeledVehicleControllerSettings_SetDifferential(Handle, index, &native);
+    }
+}
+
+public class WheeledVehicleController : VehicleController
+{
+    internal WheeledVehicleController(nint handle, bool ownsHandle)
+        : base(handle, ownsHandle)
+    {
     }
 }
