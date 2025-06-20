@@ -155,6 +155,17 @@ public abstract class NativeObject : IDisposable
         }
     }
 
+    internal static TNativeObject? GetOrAddObject<TNativeObject>(nint handle)
+        where TNativeObject : NativeObject
+    {
+        if (handle == 0)
+        {
+            return null;
+        }
+
+        return HandleDictionary.GetOrAddObject<TNativeObject>(handle);
+    }
+
     internal static TNativeObject? GetOrAddObject<TNativeObject>(nint handle, Func<nint, TNativeObject> objectFactory)
         where TNativeObject : NativeObject
     {

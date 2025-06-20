@@ -154,4 +154,33 @@ public class WheeledVehicleController : VehicleController
         : base(handle, ownsHandle)
     {
     }
+
+    public float ForwardInput
+    {
+        get => JPH_WheeledVehicleController_GetForwardInput(Handle);
+        set => JPH_WheeledVehicleController_SetForwardInput(Handle, value);
+    }
+
+    public float RightInput
+    {
+        get => JPH_WheeledVehicleController_GetRightInput(Handle);
+        set => JPH_WheeledVehicleController_SetRightInput(Handle, value);
+    }
+
+    public float BrakeInput
+    {
+        get => JPH_WheeledVehicleController_GetBrakeInput(Handle);
+        set => JPH_WheeledVehicleController_SetBrakeInput(Handle, value);
+    }
+
+    public float HandBrakeInput
+    {
+        get => JPH_WheeledVehicleController_GetHandBrakeInput(Handle);
+        set => JPH_WheeledVehicleController_SetHandBrakeInput(Handle, value);
+    }
+
+    public float WheelSpeedAtClutch
+    {
+        get => JPH_WheeledVehicleController_GetWheelSpeedAtClutch(Handle);
+    }
 }

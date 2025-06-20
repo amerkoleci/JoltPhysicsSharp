@@ -10,9 +10,15 @@ namespace JoltPhysicsSharp;
 
 internal static class HandleDictionary
 {
-    internal static readonly IPlatformLock s_instancesLock = PlatformLock.Create();
+    private static readonly IPlatformLock s_instancesLock = PlatformLock.Create();
+    private static readonly Dictionary<IntPtr, WeakReference> s_instances = [];
+    private static readonly Dictionary<Type, Func<nint, NativeObject>> s_registeredFactories = [];
 
-    internal static readonly Dictionary<IntPtr, WeakReference> s_instances = [];
+    public static void RegisterFactory<TNativeObject>(Func<nint, TNativeObject> factory)
+        where TNativeObject : NativeObject
+    {
+        s_registeredFactories.Add(typeof(TNativeObject), factory);
+    }
 
     /// <summary>
     /// Retrieve the living instance if there is one, or null if not.
@@ -42,7 +48,39 @@ internal static class HandleDictionary
     /// Retrieve or create an instance for the native handle.
     /// </summary>
     /// <returns>The instance, or null if the handle was null.</returns>
-    public static TNativeObject? GetOrAddObject<TNativeObject>(nint handle, Func<IntPtr, TNativeObject> objectFactory)
+    public static TNativeObject? GetOrAddObject<TNativeObject>(nint handle)
+        where TNativeObject : NativeObject
+    {
+        if (handle == 0)
+            return default;
+
+        if (!s_registeredFactories.TryGetValue(typeof(TNativeObject), out Func<nint, NativeObject>? objectFactory))
+        {
+            throw new InvalidOperationException($"No Factory registered for object type: {typeof(TNativeObject)}");
+        }
+
+        s_instancesLock.EnterUpgradeableReadLock();
+        try
+        {
+            if (GetInstanceNoLocks(handle, out TNativeObject? instance))
+            {
+                return instance;
+            }
+
+            TNativeObject obj = (TNativeObject)objectFactory.Invoke(handle);
+            return obj;
+        }
+        finally
+        {
+            s_instancesLock.ExitUpgradeableReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Retrieve or create an instance for the native handle.
+    /// </summary>
+    /// <returns>The instance, or null if the handle was null.</returns>
+    public static TNativeObject? GetOrAddObject<TNativeObject>(nint handle, Func<nint, TNativeObject> objectFactory)
         where TNativeObject : NativeObject
     {
         if (handle == 0)

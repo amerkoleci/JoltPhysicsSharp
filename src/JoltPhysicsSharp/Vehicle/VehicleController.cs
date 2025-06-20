@@ -16,5 +16,8 @@ public class VehicleController : NativeObject
 
     public VehicleConstraint Constraint => VehicleConstraint.GetObject(JPH_VehicleController_GetConstraint(Handle))!;
 
-    internal static VehicleController? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new VehicleController(h, false));
+    internal static T? GetObject<T>(nint handle) where T : VehicleController
+    {
+        return GetOrAddObject<T>(handle);
+    }
 }

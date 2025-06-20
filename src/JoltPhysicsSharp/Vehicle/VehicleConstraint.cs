@@ -24,9 +24,9 @@ public class VehicleConstraint : Constraint, IPhysicsStepListener
         get => Body.GetObject(JPH_VehicleConstraint_GetVehicleBody(Handle))!;
     }
 
-    public VehicleController? Controller
+    public T GetController<T>() where T : VehicleController
     {
-        get => VehicleController.GetObject(JPH_VehicleConstraint_GetController(Handle));
+        return VehicleController.GetObject<T>(JPH_VehicleConstraint_GetController(Handle))!;
     }
 
     public void SetMaxPitchRollAngle(float maxPitchRollAngle)

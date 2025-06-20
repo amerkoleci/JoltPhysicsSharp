@@ -23,6 +23,8 @@ public static class Program
 
             VehicleSettings settings = new();
             VehicleConstraint constraint = AddVehicle(in settings);
+            Body body = constraint.VehicleBody;
+            WheeledVehicleController controller = constraint.GetController<WheeledVehicleController>();
 
             // add NumberOfBoxes cubes
             for (int i = 0; i < NumberOfBoxes; i++)
