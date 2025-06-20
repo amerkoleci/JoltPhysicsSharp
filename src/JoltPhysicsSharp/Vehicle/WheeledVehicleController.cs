@@ -155,6 +155,11 @@ public class WheeledVehicleController : VehicleController
     {
     }
 
+    public void SetDriverInput(float forward, float right, float brake, float handBrake)
+    {
+        JPH_WheeledVehicleController_SetDriverInput(Handle, forward, right, brake, handBrake);
+    }
+
     public float ForwardInput
     {
         get => JPH_WheeledVehicleController_GetForwardInput(Handle);

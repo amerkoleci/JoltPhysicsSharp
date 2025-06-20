@@ -3465,26 +3465,7 @@ internal static unsafe partial class JoltApi
     public static partial bool JPH_Wheel_HasHitHardPoint(nint wheel);
     #endregion
 
-    #region WheelTV
-    /* WheelTV */
-    [LibraryImport(LibName)]
-    public static partial nint JPH_WheelSettingsTV_Create();
-    [LibraryImport(LibName)]
-    public static partial float JPH_WheelSettingsTV_GetLongitudinalFriction(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_WheelSettingsTV_SetLongitudinalFriction(nint settings, float value);
-    [LibraryImport(LibName)]
-    public static partial float JPH_WheelSettingsTV_GetLateralFriction(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_WheelSettingsTV_SetLateralFriction(nint settings, float value);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_WheelTV_Create(nint settings);
-    [LibraryImport(LibName)]
-    public static partial nint JPH_WheelTV_GetSettings(nint wheel);
-    #endregion
-
-    #region WheelWV
+    #region WheeledVehicleController
     [LibraryImport(LibName)]
     public static partial nint JPH_WheelSettingsWV_Create();
 
@@ -3552,6 +3533,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_WheeledVehicleControllerSettings_SetDifferentialLimitedSlipRatio(nint settings, float value);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleController_SetDriverInput(nint controller, float forward, float right, float brake, float handBrake);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_WheeledVehicleController_SetForwardInput(nint controller, float forward);
     [LibraryImport(LibName)]
     public static partial float JPH_WheeledVehicleController_GetForwardInput(nint controller);
@@ -3569,6 +3553,118 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_WheeledVehicleController_GetHandBrakeInput(nint controller);
     [LibraryImport(LibName)]
     public static partial float JPH_WheeledVehicleController_GetWheelSpeedAtClutch(nint controller);
+    #endregion
+
+    #region MotorcycleController
+    [LibraryImport(LibName)]
+    public static partial nint JPH_MotorcycleControllerSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleControllerSettings_GetMaxLeanAngle(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleControllerSettings_SetMaxLeanAngle(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleControllerSettings_GetLeanSpringConstant(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleControllerSettings_SetLeanSpringConstant(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleControllerSettings_GetLeanSpringDamping(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleControllerSettings_SetLeanSpringDamping(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleControllerSettings_GetLeanSpringIntegrationCoefficient(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleControllerSettings_SetLeanSpringIntegrationCoefficient(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleControllerSettings_GetLeanSpringIntegrationCoefficientDecay(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleControllerSettings_SetLeanSpringIntegrationCoefficientDecay(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleControllerSettings_GetLeanSmoothingFactor(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleControllerSettings_SetLeanSmoothingFactor(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleController_GetWheelBase(nint controller);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_MotorcycleController_IsLeanControllerEnabled(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleController_EnableLeanController(nint controller, [MarshalAs(UnmanagedType.U1)] bool value);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_MotorcycleController_IsLeanSteeringLimitEnabled(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleController_EnableLeanSteeringLimit(nint controller, [MarshalAs(UnmanagedType.U1)] bool value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleController_GetLeanSpringConstant(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleController_SetLeanSpringConstant(nint controller, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleController_GetLeanSpringDamping(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleController_SetLeanSpringDamping(nint controller, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleController_GetLeanSpringIntegrationCoefficient(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleController_SetLeanSpringIntegrationCoefficient(nint controller, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleController_GetLeanSpringIntegrationCoefficientDecay(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleController_SetLeanSpringIntegrationCoefficientDecay(nint controller, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_MotorcycleController_GetLeanSmoothingFactor(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_MotorcycleController_SetLeanSmoothingFactor(nint controller, float value);
+    #endregion
+
+    #region TrackedVehicleController
+    /* WheelTV */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheelSettingsTV_Create();
+    [LibraryImport(LibName)]
+    public static partial float JPH_WheelSettingsTV_GetLongitudinalFriction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheelSettingsTV_SetLongitudinalFriction(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_WheelSettingsTV_GetLateralFriction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheelSettingsTV_SetLateralFriction(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheelTV_Create(nint settings);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheelTV_GetSettings(nint wheel);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TrackedVehicleControllerSettings_Create();
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleControllerSettings_GetEngine(nint settings, out JPH_VehicleEngineSettings result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleControllerSettings_SetEngine(nint settings, in JPH_VehicleEngineSettings value);
+    [LibraryImport(LibName)]
+    public static partial /*JPH_VehicleTransmissionSettings**/nint JPH_TrackedVehicleControllerSettings_GetTransmission(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleControllerSettings_SetTransmission(nint settings, nint value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleController_SetDriverInput(nint controller, float forward, float leftRatio, float rightRatio, float brake);
+    [LibraryImport(LibName)]
+    public static partial float JPH_TrackedVehicleController_GetForwardInput(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleController_SetForwardInput(nint controller, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_TrackedVehicleController_GetLeftRatio(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleController_SetLeftRatio(nint controller, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_TrackedVehicleController_GetRightRatio(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleController_SetRightRatio(nint controller, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_TrackedVehicleController_GetBrakeInput(nint controller);
+    [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleController_SetBrakeInput(nint controller, float value);
     #endregion
 
     sealed class UTF8EncodingRelaxed : UTF8Encoding
