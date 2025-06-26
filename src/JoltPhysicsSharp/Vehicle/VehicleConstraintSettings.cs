@@ -63,8 +63,7 @@ public unsafe class VehicleConstraintSettings : ConstraintSettings
         native->wheelsCount = Wheels != null ? Wheels.Length : 0;
         if (native->wheelsCount > 0)
         {
-            nint* wheels = (nint*)NativeMemory.Alloc((nuint)(sizeof(nint) * native->wheelsCount));
-            native->wheels = wheels;
+            native->wheels = (nint*)NativeMemory.Alloc((nuint)(sizeof(nint) * native->wheelsCount));
             for (uint i = 0; i < native->wheelsCount; i++)
             {
                 native->wheels[i] = Wheels[i]!.Handle;
@@ -74,11 +73,11 @@ public unsafe class VehicleConstraintSettings : ConstraintSettings
         {
             native->wheels = null;
         }
+
         native->antiRollBarsCount = AntiRollBars != null ? AntiRollBars.Length : 0;
         if (native->antiRollBarsCount > 0)
         {
-            JPH_VehicleAntiRollBar* antiRollBars = (JPH_VehicleAntiRollBar*)NativeMemory.Alloc((nuint)(sizeof(JPH_VehicleAntiRollBar) * native->antiRollBarsCount));
-            native->antiRollBars = antiRollBars;
+            native->antiRollBars = (JPH_VehicleAntiRollBar*)NativeMemory.Alloc((nuint)(sizeof(JPH_VehicleAntiRollBar) * native->antiRollBarsCount));
             for (uint i = 0; i < native->antiRollBarsCount; i++)
             {
                 AntiRollBars[i].ToNative(&native->antiRollBars[i]);

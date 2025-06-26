@@ -3322,6 +3322,9 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_VehicleConstraint_Create(nint body, JPH_VehicleConstraintSettings* settings);
 
     [LibraryImport(LibName)]
+    public static partial nint JPH_VehicleConstraint_AsPhysicsStepListener(nint constraint);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_VehicleConstraint_SetMaxPitchRollAngle(nint constraint, float maxPitchRollAngle);
 
     [LibraryImport(LibName)]

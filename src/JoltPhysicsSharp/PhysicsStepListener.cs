@@ -41,6 +41,8 @@ public class PhysicsStepListener : NativeObject, IPhysicsStepListener
         gch.Free();
     }
 
+    nint IPhysicsStepListener.Handle => Handle;
+
     protected virtual void OnStep(in PhysicsStepListenerContext context)
     {
 

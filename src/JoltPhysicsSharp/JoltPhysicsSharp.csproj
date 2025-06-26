@@ -11,7 +11,7 @@
 
   <!-- Version -->
   <PropertyGroup>
-    <VersionPrefix>2.17.2</VersionPrefix>
+    <VersionPrefix>2.17.3</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
   </PropertyGroup>
 

@@ -18,6 +18,7 @@ public class VehicleConstraint : Constraint, IPhysicsStepListener
     {
     }
 
+    nint IPhysicsStepListener.Handle => JPH_VehicleConstraint_AsPhysicsStepListener(Handle);
 
     public Body VehicleBody
     {
