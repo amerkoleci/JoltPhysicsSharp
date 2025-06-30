@@ -30,6 +30,63 @@ public class VehicleConstraint : Constraint, IPhysicsStepListener
         return VehicleController.GetObject<T>(JPH_VehicleConstraint_GetController(Handle))!;
     }
 
+    public int WheelsCount => JPH_VehicleConstraint_GetWheelsCount(Handle);
+
+    public Wheel GetWheel(int index)
+    {
+        if (index < 0 || index >= WheelsCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+
+        return Wheel.GetObject(JPH_VehicleConstraint_GetWheel(Handle, index))!;
+    }
+
+    public TWheel GetWheel<TWheel>(int index)
+        where TWheel : Wheel
+    {
+        if (index < 0 || index >= WheelsCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+
+        return Wheel.GetObject<TWheel>(JPH_VehicleConstraint_GetWheel(Handle, index))!;
+    }
+
+    public IEnumerable<Wheel> GetWheels()
+    {
+        for (int i = 0; i < WheelsCount; i++)
+        {
+            yield return GetWheel(i);
+        }
+    }
+
+    public IEnumerable<TWheel> GetWheels<TWheel>()
+        where TWheel : Wheel
+    {
+        for (int i = 0; i < WheelsCount; i++)
+        {
+            yield return GetWheel<TWheel>(i);
+        }
+    }
+
+    public void GetWheelLocalBasis(Wheel wheel, out Vector3 forward, out Vector3 up, out Vector3 right)
+    {
+        JPH_VehicleConstraint_GetWheelLocalBasis(Handle, wheel.Handle, out forward, out up, out right);
+    }
+
+    public Matrix4x4 GetWheelLocalTransform(int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp)
+    {
+        JPH_VehicleConstraint_GetWheelLocalTransform(Handle, wheelIndex, in wheelRight, in wheelUp, out Matrix4x4 transform);
+        return transform;
+    }
+
+    public Matrix4x4 GetWheelWorldTransform(int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp)
+    {
+        JPH_VehicleConstraint_GetWheelWorldTransform(Handle, wheelIndex, in wheelRight, in wheelUp, out Matrix4x4 transform);
+        return transform;
+    }
+
     public void SetMaxPitchRollAngle(float maxPitchRollAngle)
     {
         JPH_VehicleConstraint_SetMaxPitchRollAngle(Handle, maxPitchRollAngle);

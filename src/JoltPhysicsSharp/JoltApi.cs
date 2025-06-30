@@ -3357,6 +3357,16 @@ internal static unsafe partial class JoltApi
     public static partial int JPH_VehicleConstraint_GetWheelsCount(nint constraint);
     [LibraryImport(LibName)]
     public static partial nint JPH_VehicleConstraint_GetWheel(nint constraint, int index);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraint_GetWheelLocalBasis(nint constraint, nint wheel, out Vector3 forward, out Vector3 up, out Vector3 right);
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraint_GetWheelLocalTransform(nint constraint, int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp, out Matrix4x4 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraint_GetWheelWorldTransform(nint constraint, int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp, out Matrix4x4 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleConstraint_GetWheelWorldTransform(nint constraint, int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp, out RMatrix4x4 result);
+
     #endregion
 
     #region Wheel
@@ -3425,6 +3435,8 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_Wheel_Destroy(nint wheel);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Wheel_GetSettings(nint wheel);
 
     [LibraryImport(LibName)]
     public static partial float JPH_Wheel_GetAngularVelocity(nint wheel);

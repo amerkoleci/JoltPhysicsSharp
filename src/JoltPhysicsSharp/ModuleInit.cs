@@ -12,6 +12,10 @@ public static class ModuleInit
     [ModuleInitializer]
     public static void Register()
     {
+        HandleDictionary.RegisterFactory((handle) => new Wheel(handle, false));
+        HandleDictionary.RegisterFactory((handle) => new WheelTV(handle, false));
+        HandleDictionary.RegisterFactory((handle) => new WheelWV(handle, false));
+
         HandleDictionary.RegisterFactory((handle) => new WheeledVehicleController(handle, false));
         HandleDictionary.RegisterFactory((handle) => new MotorcycleController(handle, false));
         HandleDictionary.RegisterFactory((handle) => new TrackedVehicleController(handle, false));

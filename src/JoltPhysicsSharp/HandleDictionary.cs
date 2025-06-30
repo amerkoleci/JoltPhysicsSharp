@@ -176,7 +176,7 @@ internal static class HandleDictionary
                             $"H: {handle.ToString("x")} Type: {instance.GetType()}");
                     }
                 }
-                else if (weak.Target is NativeObject o && o != instance)
+                else if (weak.Target! is NativeObject o && o != instance)
                 {
                     // there was an object in the dictionary, but it was NOT this object
 
@@ -233,7 +233,7 @@ internal static class HandleDictionary
                 {
                     throw new InvalidOperationException(
                         $"An unknown object exists for the handle when trying to fetch an instance. " +
-                        $"H: {handle.ToString("x")} Type: ({o.GetType()}, {typeof(TNativeObject)})");
+                        $"H: {handle:x} Type: ({o.GetType()}, {typeof(TNativeObject)})");
 #endif
                 }
             }

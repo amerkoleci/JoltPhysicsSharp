@@ -637,7 +637,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         try
         {
             if (@lock.Succeeded)
-                return @lock.Body.GetTransformedShape();
+                return @lock.Body!.GetTransformedShape();
 
             return default;
         }

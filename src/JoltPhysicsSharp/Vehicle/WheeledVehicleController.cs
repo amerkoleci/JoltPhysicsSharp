@@ -59,7 +59,7 @@ public sealed class WheelWV : Wheel
     {
     }
 
-    public WheelSettingsWV Settings => WheelSettingsWV.GetObject(JPH_WheelWV_GetSettings(Handle))!;
+    public new WheelSettingsWV Settings => WheelSettingsWV.GetObject(JPH_WheelWV_GetSettings(Handle))!;
 
     public void ApplyTorque(float torque, float deltaTime)
     {

@@ -47,7 +47,7 @@ public sealed class WheelTV : Wheel
     {
     }
 
-    public WheelSettingsTV Settings => WheelSettingsTV.GetObject(JPH_WheelTV_GetSettings(Handle))!;
+    public new WheelSettingsTV Settings => WheelSettingsTV.GetObject(JPH_WheelTV_GetSettings(Handle))!;
 }
 
 

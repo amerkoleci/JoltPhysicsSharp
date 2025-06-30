@@ -132,7 +132,6 @@ public class WheelSettings : NativeObject
     internal static WheelSettings? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new WheelSettings(h, false));
 }
 
-
 public class Wheel : NativeObject
 {
     public Wheel(WheelSettings settings)
@@ -140,7 +139,7 @@ public class Wheel : NativeObject
     {
     }
 
-    protected Wheel(nint handle, bool ownsHandle)
+    internal Wheel(nint handle, bool ownsHandle)
         : base(handle, ownsHandle)
     {
     }
@@ -149,6 +148,8 @@ public class Wheel : NativeObject
     {
         JPH_Wheel_Destroy(Handle);
     }
+
+    public WheelSettings Settings => WheelSettings.GetObject(JPH_Wheel_GetSettings(Handle))!;
 
     public float AngularVelocity
     {
@@ -222,4 +223,11 @@ public class Wheel : NativeObject
     public float SuspensionLambda => JPH_Wheel_GetSuspensionLambda(Handle);
     public float LongitudinalLambda => JPH_Wheel_GetLongitudinalLambda(Handle);
     public float LateralLambda => JPH_Wheel_GetLateralLambda(Handle);
+
+    internal static Wheel? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new Wheel(h, false));
+
+    internal static T? GetObject<T>(nint handle) where T : Wheel
+    {
+        return GetOrAddObject<T>(handle);
+    }
 }

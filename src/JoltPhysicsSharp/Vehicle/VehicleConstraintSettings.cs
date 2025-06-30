@@ -80,7 +80,7 @@ public unsafe class VehicleConstraintSettings : ConstraintSettings
             native->antiRollBars = (JPH_VehicleAntiRollBar*)NativeMemory.Alloc((nuint)(sizeof(JPH_VehicleAntiRollBar) * native->antiRollBarsCount));
             for (uint i = 0; i < native->antiRollBarsCount; i++)
             {
-                AntiRollBars[i].ToNative(&native->antiRollBars[i]);
+                AntiRollBars[i]!.ToNative(&native->antiRollBars[i]);
             }
         }
         else

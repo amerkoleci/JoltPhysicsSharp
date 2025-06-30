@@ -313,9 +313,11 @@ public abstract class Application : DisposableObject
         BodyInterface.AddBody(car_body, Activation.Activate);
 
         // Create vehicle constraint
-        VehicleConstraintSettings vehicle = new();
-        vehicle.DrawConstraintSize = 0.1f;
-        vehicle.MaxPitchRollAngle = MathUtil.DegreesToRadians(60.0f);
+        VehicleConstraintSettings vehicle = new()
+        {
+            DrawConstraintSize = 0.1f,
+            MaxPitchRollAngle = MathUtil.DegreesToRadians(60.0f)
+        };
 
         // Wheels
         WheelSettingsWV fl = new()
