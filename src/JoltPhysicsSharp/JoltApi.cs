@@ -850,10 +850,10 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyCreationSettings_SetObjectLayer(nint settings, in ObjectLayer value);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_GetCollissionGroup(nint settings, out JPH_CollisionGroup result);
+    public static partial void JPH_BodyCreationSettings_GetCollisionGroup(nint settings, out JPH_CollisionGroup result);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_SetCollissionGroup(nint settings, in JPH_CollisionGroup value);
+    public static partial void JPH_BodyCreationSettings_SetCollisionGroup(nint settings, in JPH_CollisionGroup value);
 
     [LibraryImport(LibName)]
     public static partial MotionType JPH_BodyCreationSettings_GetMotionType(nint settings);
@@ -1748,9 +1748,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_SetPositionRotationAndVelocity(nint handle, uint bodyID, in Double3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_GetCollissionGroup(nint handle, uint bodyId, out JPH_CollisionGroup result);
+    public static partial void JPH_BodyInterface_GetCollisionGroup(nint handle, uint bodyId, out JPH_CollisionGroup result);
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_SetCollissionGroup(nint handle, uint bodyId, in JPH_CollisionGroup* group);
+    public static partial void JPH_BodyInterface_SetCollisionGroup(nint handle, uint bodyId, in JPH_CollisionGroup* group);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_BodyInterface_GetShape(nint handle, uint bodyId);
@@ -2360,9 +2360,9 @@ internal static unsafe partial class JoltApi
     public static partial ObjectLayer JPH_Body_GetObjectLayer(nint handle);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_GetCollissionGroup(nint body, out JPH_CollisionGroup result);
+    public static partial void JPH_Body_GetCollisionGroup(nint body, out JPH_CollisionGroup result);
     [LibraryImport(LibName)]
-    public static partial void JPH_Body_SetCollissionGroup(nint body, in JPH_CollisionGroup value);
+    public static partial void JPH_Body_SetCollisionGroup(nint body, in JPH_CollisionGroup value);
 
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]

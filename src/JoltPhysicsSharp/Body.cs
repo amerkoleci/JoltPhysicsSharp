@@ -97,13 +97,13 @@ public sealed class Body : NativeObject
     {
         get
         {
-            JPH_Body_GetCollissionGroup(Handle, out JPH_CollisionGroup groupNative);
+            JPH_Body_GetCollisionGroup(Handle, out JPH_CollisionGroup groupNative);
             return CollisionGroup.FromNative(groupNative);
         }
         set
         {
             value.ToNative(out JPH_CollisionGroup groupNative);
-            JPH_Body_SetCollissionGroup(Handle, in groupNative);
+            JPH_Body_SetCollisionGroup(Handle, in groupNative);
         }
     }
 

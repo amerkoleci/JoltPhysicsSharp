@@ -122,13 +122,13 @@ public sealed unsafe class BodyCreationSettings : NativeObject
     {
         get
         {
-            JPH_BodyCreationSettings_GetCollissionGroup(Handle, out JPH_CollisionGroup groupNative);
+            JPH_BodyCreationSettings_GetCollisionGroup(Handle, out JPH_CollisionGroup groupNative);
             return CollisionGroup.FromNative(groupNative);
         }
         set
         {
             value.ToNative(out JPH_CollisionGroup groupNative);
-            JPH_BodyCreationSettings_SetCollissionGroup(Handle, in groupNative);
+            JPH_BodyCreationSettings_SetCollisionGroup(Handle, in groupNative);
         }
     }
 

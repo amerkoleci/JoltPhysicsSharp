@@ -217,14 +217,14 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public CollisionGroup GetCollisionGroup(in BodyID bodyID)
     {
-        JPH_BodyInterface_GetCollissionGroup(Handle, bodyID, out JPH_CollisionGroup groupNative);
+        JPH_BodyInterface_GetCollisionGroup(Handle, bodyID, out JPH_CollisionGroup groupNative);
         return CollisionGroup.FromNative(groupNative);
     }
 
-    public void SetCollissionGroup(in BodyID bodyId, in CollisionGroup collisionGroup)
+    public void SetCollisionGroup(in BodyID bodyId, in CollisionGroup collisionGroup)
     {
         collisionGroup.ToNative(out JPH_CollisionGroup groupNative);
-        JPH_BodyInterface_SetCollissionGroup(Handle, bodyId, &groupNative);
+        JPH_BodyInterface_SetCollisionGroup(Handle, bodyId, &groupNative);
     }
 
     public void SetPosition(in BodyID bodyID, in Vector3 position, Activation activationMode)
