@@ -2,6 +2,8 @@
   <!-- https://learn.microsoft.com/nuget/consume-packages/central-package-management -->
   <ItemGroup>
     <!-- Samples-->
+    <PackageVersion Include="JoltPhysics.Native" Version="1.0.0" />
+    <PackageVersion Include="JoltPhysics.Native.Debug" Version="1.0.0" />
     <PackageVersion Include="Raylib-cs" Version="7.0.1" />
 
     <!-- Tests -->

@@ -63,9 +63,23 @@ internal static unsafe partial class JoltApi
             return nativeLibrary;
         }
 
+#if DEBUG
+        string librarySuffix = "d";
+#else
+        string librarySuffix = string.Empty;
+#endif
+
         if (OperatingSystem.IsWindows())
         {
-            string dllName = DoublePrecision ? $"{LibDoubleName}.dll" : $"{LibName}.dll";
+            string dllName = DoublePrecision ? $"{LibDoubleName}{librarySuffix}.dll" : $"{LibName}{librarySuffix}.dll";
+
+            if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
+            {
+                return nativeLibrary;
+            }
+
+            // Try without the debug suffix
+            dllName = DoublePrecision ? $"{LibDoubleName}.dll" : $"{LibName}.dll";
 
             if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
@@ -74,7 +88,15 @@ internal static unsafe partial class JoltApi
         }
         else if (OperatingSystem.IsLinux())
         {
-            string dllName = DoublePrecision ? $"lib{LibDoubleName}.so" : $"lib{LibName}.so";
+            string dllName = DoublePrecision ? $"lib{LibDoubleName}{librarySuffix}.so" : $"lib{LibName}{librarySuffix}.so";
+
+            if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
+            {
+                return nativeLibrary;
+            }
+
+            // Try without the debug suffix
+            dllName = DoublePrecision ? $"lib{LibDoubleName}.so" : $"lib{LibName}.so";
 
             if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
@@ -83,7 +105,15 @@ internal static unsafe partial class JoltApi
         }
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
         {
-            string dllName = DoublePrecision ? $"lib{LibDoubleName}.dylib" : $"lib{LibName}.dylib";
+            string dllName = DoublePrecision ? $"lib{LibDoubleName}{librarySuffix}.dylib" : $"lib{LibName}{librarySuffix}.dylib";
+
+            if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
+            {
+                return nativeLibrary;
+            }
+
+            // Try without the debug suffix
+            dllName = DoublePrecision ? $"lib{LibDoubleName}.dylib" : $"lib{LibName}.dylib";
 
             if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
@@ -91,7 +121,15 @@ internal static unsafe partial class JoltApi
             }
         }
 
-        string libraryLoadName = DoublePrecision ? $"lib{LibDoubleName}" : $"lib{LibName}";
+        string libraryLoadName = DoublePrecision ? $"lib{LibDoubleName}{librarySuffix}" : $"lib{LibName}{librarySuffix}";
+
+        if (NativeLibrary.TryLoad(libraryLoadName, assembly, searchPath, out nativeLibrary))
+        {
+            return nativeLibrary;
+        }
+
+        // Try without the debug suffix
+        libraryLoadName = DoublePrecision ? $"lib{LibDoubleName}" : $"lib{LibName}";
 
         if (NativeLibrary.TryLoad(libraryLoadName, assembly, searchPath, out nativeLibrary))
         {
