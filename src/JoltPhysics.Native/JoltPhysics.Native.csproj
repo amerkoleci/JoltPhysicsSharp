@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net4.6.1;net8.0;net9.0</TargetFrameworks>
+    <Description>joltc native libraries</Description>
+    <PackageVersion>1.0.0</PackageVersion>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE.MIT.txt</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/amerkoleci/joltc</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <Content Include="LICENSE.MIT.txt" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="$(NativeLibDirectory)win-x64\joltc.dll">
+      <PackagePath>runtimes/win-x64/native</PackagePath>
+      <Pack>true</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)win-x64\joltc_double.dll">
+      <PackagePath>runtimes/win-x64/native</PackagePath>
+      <Pack>true</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)win-arm64\joltc.dll">
+      <PackagePath>runtimes/win-arm64/native</PackagePath>
+      <Pack>True</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)win-arm64\joltc_double.dll">
+      <PackagePath>runtimes/win-arm64/native</PackagePath>
+      <Pack>True</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)linux-x64\libjoltc.so">
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+      <Pack>True</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)linux-arm64\libjoltc.so">
+      <PackagePath>runtimes\linux-arm64\native</PackagePath>
+      <Pack>True</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)osx\libjoltc.dylib">
+      <PackagePath>runtimes\osx\native</PackagePath>
+      <Pack>True</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)android-arm\libjoltc.so">
+      <PackagePath>runtimes/android-arm/native</PackagePath>
+      <Pack>True</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)android-arm64\libjoltc.so">
+      <PackagePath>runtimes/android-arm64/native</PackagePath>
+      <Pack>True</Pack>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(NativeLibDirectory)android-x64\libjoltc.so">
+      <PackagePath>runtimes/android-x64/native</PackagePath>
+      <Pack>True</Pack>
+      <Visible>False</Visible>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)_._" PackagePath="lib/net9.0" />
+    <Content Include="$(MSBuildThisFileDirectory)_._" PackagePath="lib/net8.0" />
+    <Content Include="$(MSBuildThisFileDirectory)_._" PackagePath="lib/net461" />
+    <Content Include="$(MSBuildThisFileDirectory)_._" PackagePath="lib/netstandard2.0" />
+  </ItemGroup>
+
+</Project>
