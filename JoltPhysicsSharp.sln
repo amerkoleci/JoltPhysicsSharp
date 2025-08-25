@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "01-HelloWorld", "samples\01
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoltPhysics.Native", "src\JoltPhysics.Native\JoltPhysics.Native.csproj", "{88606BA4-43E9-AA73-ABA0-BF0859540D12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoltPhysics.Native.Debug", "src\JoltPhysics.Native.Debug\JoltPhysics.Native.Debug.csproj", "{5FC67454-7BFA-4B91-F3E2-8E1E4E7FE6F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{88606BA4-43E9-AA73-ABA0-BF0859540D12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88606BA4-43E9-AA73-ABA0-BF0859540D12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88606BA4-43E9-AA73-ABA0-BF0859540D12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FC67454-7BFA-4B91-F3E2-8E1E4E7FE6F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FC67454-7BFA-4B91-F3E2-8E1E4E7FE6F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FC67454-7BFA-4B91-F3E2-8E1E4E7FE6F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FC67454-7BFA-4B91-F3E2-8E1E4E7FE6F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
