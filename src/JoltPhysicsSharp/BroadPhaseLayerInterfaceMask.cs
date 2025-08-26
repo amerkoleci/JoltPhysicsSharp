@@ -9,6 +9,6 @@ public sealed class BroadPhaseLayerInterfaceMask(uint numBroadPhaseLayers) : Bro
 {
     public void ConfigureLayer(in BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude)
     {
-        JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle, in broadPhaseLayer, groupsToInclude, groupsToExclude);
+        JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(Handle, broadPhaseLayer.Value, groupsToInclude, groupsToExclude);
     }
 }

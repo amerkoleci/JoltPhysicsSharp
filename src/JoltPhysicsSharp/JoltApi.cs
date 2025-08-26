@@ -214,14 +214,14 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_BroadPhaseLayerInterfaceMask_Create(uint numBroadPhaseLayers);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(nint bpInterface, in BroadPhaseLayer broadPhaseLayer, uint groupsToInclude, uint groupsToExclude);
+    public static partial void JPH_BroadPhaseLayerInterfaceMask_ConfigureLayer(nint bpInterface, byte broadPhaseLayer, uint groupsToInclude, uint groupsToExclude);
 
 
     [LibraryImport(LibName)]
     public static partial nint JPH_BroadPhaseLayerInterfaceTable_Create(uint numObjectLayers, uint numBroadPhaseLayers);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(nint bpInterface, ObjectLayer objectLayer, BroadPhaseLayer broadPhaseLayer);
+    public static partial void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(nint bpInterface, uint objectLayer, byte broadPhaseLayer);
 
     //  ObjectVsBroadPhaseLayerFilter
     [LibraryImport(LibName)]
@@ -241,10 +241,10 @@ internal static unsafe partial class JoltApi
     public static partial ObjectLayer JPH_ObjectLayerPairFilterMask_GetObjectLayer(uint group, uint mask);
 
     [LibraryImport(LibName)]
-    public static partial uint JPH_ObjectLayerPairFilterMask_GetGroup(in ObjectLayer layer);
+    public static partial uint JPH_ObjectLayerPairFilterMask_GetGroup(uint layer);
 
     [LibraryImport(LibName)]
-    public static partial uint JPH_ObjectLayerPairFilterMask_GetMask(in ObjectLayer layer);
+    public static partial uint JPH_ObjectLayerPairFilterMask_GetMask(uint layer);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_ObjectLayerPairFilterTable_Create(uint numObjectLayers);

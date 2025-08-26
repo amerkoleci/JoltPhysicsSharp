@@ -27,11 +27,11 @@ public sealed class ObjectLayerPairFilterMask : ObjectLayerPairFilter
 
     public static uint GetGroup(in ObjectLayer layer)
     {
-        return JPH_ObjectLayerPairFilterMask_GetGroup(in layer);
+        return JPH_ObjectLayerPairFilterMask_GetGroup(layer.Value);
     }
 
     public static uint GetMask(in ObjectLayer layer)
     {
-        return JPH_ObjectLayerPairFilterMask_GetMask(in layer);
+        return JPH_ObjectLayerPairFilterMask_GetMask(layer.Value);
     }
 }

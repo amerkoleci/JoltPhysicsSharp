@@ -68,8 +68,8 @@ public static class Program
 #endif
 
         {
-            using Sample sample = new HelloWorld();
-            //using Sample sample = new AlternativeCollissionFilteringSample();
+            //using Sample sample = new HelloWorld();
+            using Sample sample = new AlternativeCollissionFilteringSample();
             sample.Initialize();
             sample.Run();
 
