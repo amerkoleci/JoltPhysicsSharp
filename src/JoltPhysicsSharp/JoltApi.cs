@@ -1,6 +1,7 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
+using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -64,14 +65,14 @@ internal static unsafe partial class JoltApi
         }
 
 #if DEBUG
-        string librarySuffix = "d";
+        string debugLibrarySuffix = "d";
 #else
-        string librarySuffix = string.Empty;
+        string debugLibrarySuffix = Debugger.IsAttached ? "d" : string.Empty;
 #endif
 
         if (OperatingSystem.IsWindows())
         {
-            string dllName = DoublePrecision ? $"{LibDoubleName}{librarySuffix}.dll" : $"{LibName}{librarySuffix}.dll";
+            string dllName = DoublePrecision ? $"{LibDoubleName}{debugLibrarySuffix}.dll" : $"{LibName}{debugLibrarySuffix}.dll";
 
             if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
@@ -88,7 +89,7 @@ internal static unsafe partial class JoltApi
         }
         else if (OperatingSystem.IsLinux())
         {
-            string dllName = DoublePrecision ? $"lib{LibDoubleName}{librarySuffix}.so" : $"lib{LibName}{librarySuffix}.so";
+            string dllName = DoublePrecision ? $"lib{LibDoubleName}{debugLibrarySuffix}.so" : $"lib{LibName}{debugLibrarySuffix}.so";
 
             if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
@@ -105,7 +106,7 @@ internal static unsafe partial class JoltApi
         }
         else if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
         {
-            string dllName = DoublePrecision ? $"lib{LibDoubleName}{librarySuffix}.dylib" : $"lib{LibName}{librarySuffix}.dylib";
+            string dllName = DoublePrecision ? $"lib{LibDoubleName}{debugLibrarySuffix}.dylib" : $"lib{LibName}{debugLibrarySuffix}.dylib";
 
             if (NativeLibrary.TryLoad(dllName, assembly, searchPath, out nativeLibrary))
             {
@@ -121,7 +122,7 @@ internal static unsafe partial class JoltApi
             }
         }
 
-        string libraryLoadName = DoublePrecision ? $"lib{LibDoubleName}{librarySuffix}" : $"lib{LibName}{librarySuffix}";
+        string libraryLoadName = DoublePrecision ? $"lib{LibDoubleName}{debugLibrarySuffix}" : $"lib{LibName}{debugLibrarySuffix}";
 
         if (NativeLibrary.TryLoad(libraryLoadName, assembly, searchPath, out nativeLibrary))
         {
