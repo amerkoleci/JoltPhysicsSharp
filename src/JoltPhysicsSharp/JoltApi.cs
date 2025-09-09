@@ -2562,16 +2562,16 @@ internal static unsafe partial class JoltApi
     public struct JPH_ContactListener_Procs
     {
         public delegate* unmanaged<nint, nint, nint, Vector3*, CollideShapeResult*, uint> OnContactValidate;
-        public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactAdded;
-        public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactPersisted;
+        public delegate* unmanaged<nint, nint, nint, nint, ContactSettings*, void> OnContactAdded;
+        public delegate* unmanaged<nint, nint, nint, nint, ContactSettings*, void> OnContactPersisted;
         public delegate* unmanaged<nint, SubShapeIDPair*, void> OnContactRemoved;
     }
 
     public struct JPH_ContactListener_ProcsDouble
     {
         public delegate* unmanaged<nint, nint, nint, Double3*, CollideShapeResult*, uint> OnContactValidate;
-        public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactAdded;
-        public delegate* unmanaged<nint, nint, nint, nint, nint, void> OnContactPersisted;
+        public delegate* unmanaged<nint, nint, nint, nint, ContactSettings*, void> OnContactAdded;
+        public delegate* unmanaged<nint, nint, nint, nint, ContactSettings*, void> OnContactPersisted;
         public delegate* unmanaged<nint, SubShapeIDPair*, void> OnContactRemoved;
     }
 
@@ -2619,45 +2619,6 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_ContactManifold_GetWorldSpaceContactPointOn1(nint manifold, uint index, Vector3* result); // JPH_RVec3
     [LibraryImport(LibName)]
     public static partial void JPH_ContactManifold_GetWorldSpaceContactPointOn2(nint manifold, uint index, Vector3* result); // JPH_RVec3
-
-    /* ContactSettings */
-    [LibraryImport(LibName)]
-    public static partial float JPH_ContactSettings_GetFriction(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetFriction(nint settings, float friction);
-    [LibraryImport(LibName)]
-    public static partial float JPH_ContactSettings_GetRestitution(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetRestitution(nint settings, float restitution);
-    [LibraryImport(LibName)]
-    public static partial float JPH_ContactSettings_GetInvMassScale1(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetInvMassScale1(nint settings, float scale);
-    [LibraryImport(LibName)]
-    public static partial float JPH_ContactSettings_GetInvInertiaScale1(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetInvInertiaScale1(nint settings, float scale);
-    [LibraryImport(LibName)]
-    public static partial float JPH_ContactSettings_GetInvMassScale2(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetInvMassScale2(nint settings, float scale);
-    [LibraryImport(LibName)]
-    public static partial float JPH_ContactSettings_GetInvInertiaScale2(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetInvInertiaScale2(nint settings, float scale);
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_ContactSettings_GetIsSensor(nint settings);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetIsSensor(nint settings, [MarshalAs(UnmanagedType.U1)] bool sensor);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_GetRelativeLinearSurfaceVelocity(nint settings, Vector3* result);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetRelativeLinearSurfaceVelocity(nint settings, Vector3* velocity);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_GetRelativeAngularSurfaceVelocity(nint settings, Vector3* result);
-    [LibraryImport(LibName)]
-    public static partial void JPH_ContactSettings_SetRelativeAngularSurfaceVelocity(nint settings, Vector3* velocity);
 
     #region CharacterBase
     public struct JPH_CharacterBaseSettings

@@ -421,13 +421,15 @@ public abstract class Application : DisposableObject
         return ValidateResult.AcceptAllContactsForThisBodyPair;
     }
 
-    protected virtual void OnContactAdded(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings)
+    protected virtual void OnContactAdded(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, ref ContactSettings settings)
     {
         TraceLog(TraceLogLevel.Debug, "A contact was added");
     }
 
-    protected virtual void OnContactPersisted(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings)
+    protected virtual void OnContactPersisted(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, ref ContactSettings settings)
     {
+        // Override the restitution to 0.5
+        settings.CombinedRestitution = 0.5f;
         TraceLog(TraceLogLevel.Debug, "A contact was persisted");
     }
 

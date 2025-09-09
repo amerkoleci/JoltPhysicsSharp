@@ -15,6 +15,4 @@
     <PackageReference Include="JoltPhysics.Native.Debug" Condition="'$(Configuration)' == 'DEBUG'" />
   </ItemGroup>
 
-  <!--<Import Project="$(RepoRootPath)JoltPhysicsSharp.Native.targets" />-->
-
 </Project>

@@ -651,5 +651,5 @@ public sealed class Body : NativeObject
         JPH_Body_SetUserData(Handle, userData);
     }
 
-    internal static Body? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new Body(h, false));
+    internal static Body? GetObject(nint handle) => GetOrAddObject(handle, h => new Body(h, false));
 }

@@ -9,8 +9,8 @@ using static JoltPhysicsSharp.JoltApi;
 namespace JoltPhysicsSharp;
 
 public delegate ValidateResult ContactValidateHandler(PhysicsSystem system, in Body body1, in Body body2, Double3 baseOffset, in CollideShapeResult collisionResult);
-public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings);
-public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings settings);
+public delegate void ContactAddedHandler(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, ref ContactSettings settings);
+public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1, in Body body2, in ContactManifold manifold, ref ContactSettings settings);
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
 public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData);
 
@@ -330,7 +330,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
     }
 
     [UnmanagedCallersOnly]
-    private static void OnContactAddedCallback(nint context, nint body1, nint body2, nint manifold, nint settings)
+    private static void OnContactAddedCallback(nint context, nint body1, nint body2, nint manifold, ContactSettings* settings)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 
@@ -339,12 +339,12 @@ public sealed unsafe class PhysicsSystem : NativeObject
             Body.GetObject(body1)!,
             Body.GetObject(body2)!,
             new ContactManifold(manifold),
-            new ContactSettings(settings)
+            ref *settings
             );
     }
 
     [UnmanagedCallersOnly]
-    private static void OnContactPersistedCallback(nint context, nint body1, nint body2, nint manifold, nint settings)
+    private static void OnContactPersistedCallback(nint context, nint body1, nint body2, nint manifold, ContactSettings* settings)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 
@@ -353,7 +353,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
             Body.GetObject(body1)!,
             Body.GetObject(body2)!,
             new ContactManifold(manifold),
-            new ContactSettings(settings)
+            ref *settings
             );
     }
 
