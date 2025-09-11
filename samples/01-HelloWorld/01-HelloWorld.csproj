@@ -10,4 +10,6 @@
     <ProjectReference Include="..\Alimer.SampleFramework\Alimer.SampleFramework.csproj" />
   </ItemGroup>
 
+  <Import Project="$(RepoRootPath)JoltPhysicsSharp.Native.targets" />
+
 </Project>

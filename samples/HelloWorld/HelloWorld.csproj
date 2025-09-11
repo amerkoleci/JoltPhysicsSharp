@@ -10,9 +10,6 @@
     <ProjectReference Include="..\..\src\JoltPhysicsSharp\JoltPhysicsSharp.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JoltPhysics.Native" Condition="'$(Configuration)' != 'DEBUG'" />
-    <PackageReference Include="JoltPhysics.Native.Debug" Condition="'$(Configuration)' == 'DEBUG'" />
-  </ItemGroup>
+  <Import Project="$(RepoRootPath)JoltPhysicsSharp.Native.targets" />
 
 </Project>

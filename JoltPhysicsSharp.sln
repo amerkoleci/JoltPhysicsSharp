@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{0FC63B64
 		Directory.Build.targets = Directory.Build.targets
 		Directory.Packages.props = Directory.Packages.props
 		global.json = global.json
+		JoltPhysicsSharp.Native.targets = JoltPhysicsSharp.Native.targets
 		LICENSE = LICENSE
 		NuGet.config = NuGet.config
 		README.md = README.md

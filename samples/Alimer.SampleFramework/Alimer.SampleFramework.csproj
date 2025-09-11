@@ -11,8 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="Raylib-cs" />
-    <PackageReference Include="JoltPhysics.Native" Condition="'$(Configuration)' != 'DEBUG'" />
-    <PackageReference Include="JoltPhysics.Native.Debug" Condition="'$(Configuration)' == 'DEBUG'" />
   </ItemGroup>
 
 </Project>

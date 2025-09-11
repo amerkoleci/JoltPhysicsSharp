@@ -11,12 +11,17 @@
 
   <!-- Version -->
   <PropertyGroup>
-    <VersionPrefix>2.18.3</VersionPrefix>
+    <VersionPrefix>2.18.4</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''"></VersionSuffix>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JoltPhysics.Native\JoltPhysics.Native.csproj" Condition="'$(Configuration)' != 'DEBUG'" />
+    <ProjectReference Include="..\JoltPhysics.Native.Debug\JoltPhysics.Native.Debug.csproj" Condition="'$(Configuration)' == 'DEBUG'" />
   </ItemGroup>
 
 </Project>

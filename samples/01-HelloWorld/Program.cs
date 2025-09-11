@@ -1,12 +1,9 @@
 ﻿// Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using System.Diagnostics;
 using System.Numerics;
-using JoltPhysicsSharp;
 using Alimer.SampleFramework;
-using Raylib_cs;
-using static Raylib_cs.Raylib;
+using JoltPhysicsSharp;
 
 namespace HelloWorld;
 

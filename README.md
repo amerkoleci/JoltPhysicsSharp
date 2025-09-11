@@ -11,11 +11,6 @@ Cross platform modern **.net9.0** and **.net8.0** bindings for [JoltPhysics](htt
 dotnet add package JoltPhysicsSharp --version [VERSION]
 ```
 
-Make sure to add also the native libraries dependency
-```
-dotnet add package JoltPhysics.Native --version 1.0.1
-```
-
 If you want to debug the native libraries add the debug dependency
 ```
 dotnet add package JoltPhysics.Native.Debug --version 1.0.1
