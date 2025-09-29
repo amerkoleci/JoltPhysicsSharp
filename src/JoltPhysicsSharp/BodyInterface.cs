@@ -631,6 +631,16 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         return JPH_BodyInterface_GetUseManifoldReduction(Handle, bodyId);
     }
 
+    public void SetIsSensor(in BodyID bodyId, bool value)
+    {
+        JPH_BodyInterface_SetIsSensor(Handle, bodyId, value);
+    }
+
+    public bool IsSensor(in BodyID bodyId)
+    {
+        return JPH_BodyInterface_IsSensor(Handle, bodyId);
+    }
+
     public TransformedShape GetTransformedShape(in BodyLockInterface bodyLockInterface, in BodyID bodyId)
     {
         bodyLockInterface.LockRead(in bodyId, out BodyLockRead @lock);

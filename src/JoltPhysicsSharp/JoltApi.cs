@@ -1903,6 +1903,13 @@ internal static unsafe partial class JoltApi
     public static partial ulong JPH_BodyInterface_GetUserData(nint handle, uint bodyId);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_SetIsSensor(nint handle, uint bodyId, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyInterface_IsSensor(nint handle, uint bodyId);
+
+    [LibraryImport(LibName)]
     public static partial nint JPH_BodyInterface_GetMaterial(nint handle, uint bodyId, SubShapeID subShapeID);
 
     [LibraryImport(LibName)]
