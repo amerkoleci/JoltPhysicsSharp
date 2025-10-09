@@ -109,7 +109,7 @@ public class Shape : NativeObject
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceBounds)}");
 
-        JPH_Shape_GetWorldSpaceBounds(Handle, in centerOfMassTransform, in scale, out BoundingBox result);
+        JPH_Shape_GetWorldSpaceBounds(Handle, centerOfMassTransform.ToJolt(), in scale, out BoundingBox result);
         return result;
     }
 
@@ -118,7 +118,7 @@ public class Shape : NativeObject
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldSpaceBounds)}");
 
-        JPH_Shape_GetWorldSpaceBounds(Handle, in centerOfMassTransform, in scale, out result);
+        JPH_Shape_GetWorldSpaceBounds(Handle, centerOfMassTransform.ToJolt(), in scale, out result);
     }
 
     public BoundingBox GetRWorldSpaceBounds(in RMatrix4x4 centerOfMassTransform, in Vector3 scale)

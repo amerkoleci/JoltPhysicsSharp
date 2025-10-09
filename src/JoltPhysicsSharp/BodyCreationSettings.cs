@@ -26,12 +26,12 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         }
     }
 
-    public BodyCreationSettings(ShapeSettings shapeSettings, in Double3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+    public BodyCreationSettings(ShapeSettings shapeSettings, in RVector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
 
-        fixed (Double3* positionPtr = &position)
+        fixed (RVector3* positionPtr = &position)
         fixed (Quaternion* rotationPtr = &rotation)
         {
             Handle = JPH_BodyCreationSettings_Create2Double(shapeSettings.Handle, positionPtr, rotationPtr, motionType, objectLayer);
@@ -50,12 +50,12 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         }
     }
 
-    public BodyCreationSettings(Shape shape, in Double3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+    public BodyCreationSettings(Shape shape, in RVector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
 
-        fixed (Double3* positionPtr = &position)
+        fixed (RVector3* positionPtr = &position)
         fixed (Quaternion* rotationPtr = &rotation)
         {
             Handle = JPH_BodyCreationSettings_Create3Double(shape.Handle, positionPtr, rotationPtr, motionType, objectLayer);

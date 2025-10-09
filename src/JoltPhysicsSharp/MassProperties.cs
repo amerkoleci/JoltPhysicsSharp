@@ -90,9 +90,11 @@ public struct MassProperties : IEquatable<MassProperties>
         }
     }
 
-    public void DecomposePrincipalMomentsOfInertia(out Matrix4x4 rotation, out Vector3 diagonal)
+    public unsafe void DecomposePrincipalMomentsOfInertia(out Matrix4x4 rotation, out Vector3 diagonal)
     {
-        JPH_MassProperties_DecomposePrincipalMomentsOfInertia(this, out rotation, out diagonal);
+        Mat4 joltMatrix;
+        JPH_MassProperties_DecomposePrincipalMomentsOfInertia(this, &joltMatrix, out diagonal);
+        rotation = joltMatrix.FromJolt();
     }
 
     public static Vector3 GetEquivalentSolidBoxSize(float mass, in Vector3 inertiaDiagonal)

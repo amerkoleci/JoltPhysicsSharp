@@ -64,7 +64,7 @@ public abstract class CharacterVsCharacterCollisionListener : NativeObject
     #region CharacterContactListener
     [UnmanagedCallersOnly]
     private static unsafe void OnCollideCharacterCallback(nint context,
-        nint character, Matrix4x4* centerOfMassTransform,
+        nint character, Mat4* centerOfMassTransform,
         JPH_CollideShapeSettings* collideShapeSettings,
         Vector3* baseOffset)
     {
@@ -72,7 +72,7 @@ public abstract class CharacterVsCharacterCollisionListener : NativeObject
 
         listener.CollideCharacter(
             CharacterVirtual.GetObject(character)!,
-            *centerOfMassTransform,
+            centerOfMassTransform->FromJolt(),
             CollideShapeSettings.FromNative(*collideShapeSettings),
             *baseOffset
             );
@@ -80,7 +80,7 @@ public abstract class CharacterVsCharacterCollisionListener : NativeObject
 
     [UnmanagedCallersOnly]
     private static unsafe void OnCastCharacterCallback(nint context,
-        nint character, Matrix4x4* centerOfMassTransform,
+        nint character, Mat4* centerOfMassTransform,
         Vector3* direction,
         JPH_ShapeCastSettings* collideShapeSettings,
         Vector3* baseOffset)
@@ -89,7 +89,7 @@ public abstract class CharacterVsCharacterCollisionListener : NativeObject
 
         listener.CastCharacter(
             CharacterVirtual.GetObject(character)!,
-            *centerOfMassTransform,
+            centerOfMassTransform->FromJolt(),
             *direction,
             ShapeCastSettings.FromNative(*collideShapeSettings),
             *baseOffset

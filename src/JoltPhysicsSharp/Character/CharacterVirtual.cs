@@ -26,7 +26,7 @@ public sealed class CharacterVirtual : CharacterBase
     /// <param name="contactPosition">World space contact position</param>
     /// <param name="contactNormal">World space contact normal</param>
     /// <param name="settings">Settings returned by the contact callback to indicate how the character should behave</param>
-    public delegate void ContactAddedPersistedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNormal, ref CharacterContactSettings settings);
+    public delegate void ContactAddedPersistedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2, in RVector3 contactPosition, in Vector3 contactNormal, ref CharacterContactSettings settings);
 
     /// <summary>
     /// Callback called whenever the character loses contact with a body.
@@ -36,7 +36,7 @@ public sealed class CharacterVirtual : CharacterBase
     /// <param name="subShapeID2">Sub shape ID of shape that is being hit</param>
     public delegate void ContactRemovedHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2);
 
-    public delegate void CharacterContactAddedPersistedHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2, in Double3 contactPosition, in Vector3 contactNormal, ref CharacterContactSettings settings);
+    public delegate void CharacterContactAddedPersistedHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2, in RVector3 contactPosition, in Vector3 contactNormal, ref CharacterContactSettings settings);
     public delegate void CharacterContactRemovedHandler(CharacterVirtual character, CharacterID otherCharacterID, SubShapeID subShapeID2);
 
     /// <summary>
@@ -52,7 +52,7 @@ public sealed class CharacterVirtual : CharacterBase
     /// <param name="characterVelocity">World space velocity of the character prior to hitting this contact</param>
     /// <param name="ioNewCharacterVelocity">Contains the calculated world space velocity of the character after hitting this contact, this velocity slides along the surface of the contact. Can be modified by the listener to provide an alternative velocity.</param>
     public delegate void ContactSolveHandler(CharacterVirtual character, in BodyID bodyID2, SubShapeID subShapeID2,
-        in Double3 contactPosition,
+        in RVector3 contactPosition,
         in Vector3 contactNormal,
         in Vector3 contactVelocity,
         PhysicsMaterial? contactMaterial,
@@ -60,7 +60,7 @@ public sealed class CharacterVirtual : CharacterBase
         ref Vector3 ioNewCharacterVelocity);
 
     public delegate void CharacterContactSolveHandler(CharacterVirtual character, CharacterVirtual otherCharacter, SubShapeID subShapeID2,
-        in Double3 contactPosition,
+        in RVector3 contactPosition,
         in Vector3 contactNormal,
         in Vector3 contactVelocity,
         PhysicsMaterial? contactMaterial,
@@ -163,7 +163,7 @@ public sealed class CharacterVirtual : CharacterBase
         JPH_CharacterVirtual_SetListener(Handle, _listenerHandle);
     }
 
-    public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Double3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe CharacterVirtual(CharacterVirtualSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
@@ -244,21 +244,23 @@ public sealed class CharacterVirtual : CharacterBase
         }
     }
 
-    public Matrix4x4 WorldTransform
+    public unsafe Matrix4x4 WorldTransform
     {
         get
         {
-            JPH_CharacterVirtual_GetWorldTransform(Handle, out Matrix4x4 result);
-            return result;
+            Mat4 joltMatrix;
+            JPH_CharacterVirtual_GetWorldTransform(Handle, &joltMatrix);
+            return joltMatrix.FromJolt();
         }
     }
 
-    public Matrix4x4 CenterOfMassTransform
+    public unsafe Matrix4x4 CenterOfMassTransform
     {
         get
         {
-            JPH_CharacterVirtual_GetCenterOfMassTransform(Handle, out Matrix4x4 result);
-            return result;
+            Mat4 joltMatrix;
+            JPH_CharacterVirtual_GetCenterOfMassTransform(Handle, &joltMatrix);
+            return joltMatrix.FromJolt();
         }
     }
 
@@ -627,7 +629,7 @@ public sealed class CharacterVirtual : CharacterBase
         if (listener.OnContactAdded != null)
         {
             CharacterContactSettings settings = *ioSettings;
-            listener.OnContactAdded(listener, bodyID2, subShapeID2, new Double3(*contactPosition), *contactNormal, ref settings);
+            listener.OnContactAdded(listener, bodyID2, subShapeID2, new RVector3(*contactPosition), *contactNormal, ref settings);
             *ioSettings = settings;
         }
     }
@@ -644,7 +646,7 @@ public sealed class CharacterVirtual : CharacterBase
         if (listener.OnContactPersisted != null)
         {
             CharacterContactSettings settings = *ioSettings;
-            listener.OnContactPersisted(listener, bodyID2, subShapeID2, new Double3(*contactPosition), *contactNormal, ref settings);
+            listener.OnContactPersisted(listener, bodyID2, subShapeID2, new RVector3(*contactPosition), *contactNormal, ref settings);
             *ioSettings = settings;
         }
     }
@@ -674,7 +676,7 @@ public sealed class CharacterVirtual : CharacterBase
             listener.OnCharacterContactAdded(listener,
                 GetObject(otherCharacter)!,
                 subShapeID2,
-                new Double3(*contactPosition),
+                new RVector3(*contactPosition),
                 *contactNormal,
                 ref settings);
             *ioSettings = settings;
@@ -697,7 +699,7 @@ public sealed class CharacterVirtual : CharacterBase
             listener.OnCharacterContactPersisted(listener,
                 GetObject(otherCharacter)!,
                 subShapeID2,
-                new Double3(*contactPosition),
+                new RVector3(*contactPosition),
                 *contactNormal,
                 ref settings);
             *ioSettings = settings;
@@ -730,7 +732,7 @@ public sealed class CharacterVirtual : CharacterBase
         {
             Vector3 newCharacterVelocity = *ioNewCharacterVelocity;
             listener.OnContactSolve(listener, bodyID2, subShapeID2,
-                new Double3(*contactPosition),
+                new RVector3(*contactPosition),
                 *contactNormal,
                 *contactVelocity,
                 PhysicsMaterial.GetObject(contactMaterial),
@@ -759,7 +761,7 @@ public sealed class CharacterVirtual : CharacterBase
             Vector3 newCharacterVelocity = *ioNewCharacterVelocity;
             listener.OnCharacterContactSolve(listener, GetObject(otherCharacter)!,
                 subShapeID2,
-                new Double3(*contactPosition),
+                new RVector3(*contactPosition),
                 *contactNormal,
                 *contactVelocity,
                 PhysicsMaterial.GetObject(contactMaterial),

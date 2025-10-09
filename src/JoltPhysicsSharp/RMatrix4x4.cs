@@ -14,53 +14,97 @@ namespace JoltPhysicsSharp;
 /// </summary>
 public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
 {
-    /// <summary>The first element of the first row.</summary>
+    /// <summary>
+    /// The size of the <see cref="Matrix"/> type, in bytes.
+    /// </summary>
+    public static int SizeInBytes => Unsafe.SizeOf<RMatrix4x4>();
+
+    /// <summary>
+    /// Value at row 1 column 1 of the matrix.
+    /// </summary>
     public float M11;
 
-    /// <summary>The second element of the first row.</summary>
-    public float M12;
-
-    /// <summary>The third element of the first row.</summary>
-    public float M13;
-
-    /// <summary>The fourth element of the first row.</summary>
-    public float M14;
-
-    /// <summary>The first element of the second row.</summary>
+    /// <summary>
+    /// Value at row 2 column 1 of the matrix.
+    /// </summary>
     public float M21;
 
-    /// <summary>The second element of the second row.</summary>
-    public float M22;
-
-    /// <summary>The third element of the second row.</summary>
-    public float M23;
-
-    /// <summary>The fourth element of the second row.</summary>
-    public float M24;
-
-    /// <summary>The first element of the third row.</summary>
+    /// <summary>
+    /// Value at row 3 column 1 of the matrix.
+    /// </summary>
     public float M31;
 
-    /// <summary>The second element of the third row.</summary>
+    /// <summary>
+    /// Value at row 4 column 1 of the matrix.
+    /// </summary>
+    public float M41;
+
+    /// <summary>
+    /// Value at row 1 column 2 of the matrix.
+    /// </summary>
+    public float M12;
+
+    /// <summary>
+    /// Value at row 2 column 2 of the matrix.
+    /// </summary>
+    public float M22;
+
+    /// <summary>
+    /// Value at row 3 column 2 of the matrix.
+    /// </summary>
     public float M32;
 
-    /// <summary>The third element of the third row.</summary>
+    /// <summary>
+    /// Value at row 4 column 2 of the matrix.
+    /// </summary>
+    public float M42;
+
+    /// <summary>
+    /// Value at row 1 column 3 of the matrix.
+    /// </summary>
+    public float M13;
+
+    /// <summary>
+    /// Value at row 2 column 3 of the matrix.
+    /// </summary>
+    public float M23;
+
+    /// <summary>
+    /// Value at row 3 column 3 of the matrix.
+    /// </summary>
     public float M33;
 
-    /// <summary>The fourth element of the third row.</summary>
-    public float M34;
+    /// <summary>
+    /// Value at row 4 column 3 of the matrix.
+    /// </summary>
+    public float M43;
 
-    /// <summary>The first element of the fourth row.</summary>
-    public double M41;
+    /// <summary>
+    /// Value at row 1 column 4 of the matrix.
+    /// </summary>
+    public double M14;
 
-    /// <summary>The second element of the fourth row.</summary>
-    public double M42;
+    /// <summary>
+    /// Value at row 2 column 4 of the matrix.
+    /// </summary>
+    public double M24;
 
-    /// <summary>The third element of the fourth row.</summary>
-    public double M43;
+    /// <summary>
+    /// Value at row 3 column 4 of the matrix.
+    /// </summary>
+    public double M34;
 
-    /// <summary>The fourth element of the fourth row.</summary>
-    public double M44;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RMatrix4x4"/> struct.
+    /// </summary>
+    /// <param name="value">The value that will be assigned to all components.</param>
+    public RMatrix4x4(float value)
+    {
+        M11 = M21 = M31 = M41 =
+        M12 = M22 = M32 = M42 =
+        M13 = M23 = M33 = M43 = value;
+        M14 = M24 = M34 = value;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RMatrix4x4"/> struct.
@@ -80,28 +124,29 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
     /// <param name="m41">The value to assign to the first element in the fourth row.</param>
     /// <param name="m42">The value to assign to the second element in the fourth row.</param>
     /// <param name="m43">The value to assign to the third element in the fourth row.</param>
-    /// <param name="m44">The value to assign to the fourth element in the fourth row.</param>
-    public RMatrix4x4(float m11, float m12, float m13, float m14,
-                      float m21, float m22, float m23, float m24,
-                      float m31, float m32, float m33, float m34,
-                      double m41, double m42, double m43, double m44)
+    public RMatrix4x4(float m11, float m12, float m13, double m14,
+                      float m21, float m22, float m23, double m24,
+                      float m31, float m32, float m33, double m34,
+                      float m41, float m42, float m43)
     {
         M11 = m11; M12 = m12; M13 = m13; M14 = m14;
         M21 = m21; M22 = m22; M23 = m23; M24 = m24;
         M31 = m31; M32 = m32; M33 = m33; M34 = m34;
-        M41 = m41; M42 = m42; M43 = m43; M44 = m44;
+        M41 = m41; M42 = m42; M43 = m43;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RMatrix4x4"/> struct.
     /// </summary>
     /// <param name="matrix">The <see cref="Matrix4x4"/> value to assign.</param>
-    public RMatrix4x4(in Matrix4x4 matrix)
+    public RMatrix4x4(Matrix4x4 matrix)
     {
+        matrix = Matrix4x4.Transpose(matrix);
+
         M11 = matrix.M11; M12 = matrix.M12; M13 = matrix.M13; M14 = matrix.M14;
         M21 = matrix.M21; M22 = matrix.M22; M23 = matrix.M23; M24 = matrix.M24;
         M31 = matrix.M31; M32 = matrix.M32; M33 = matrix.M33; M34 = matrix.M34;
-        M41 = matrix.M41; M42 = matrix.M42; M43 = matrix.M43; M44 = matrix.M44;
+        M41 = matrix.M41; M42 = matrix.M42; M43 = matrix.M43;
     }
 
     /// <summary>
@@ -109,7 +154,7 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
     /// </summary>
     public Vector4 Row1
     {
-        readonly get => new(M11, M12, M13, M14);
+        readonly get => new(M11, M12, M13, (float)M14);
         set { M11 = value.X; M12 = value.Y; M13 = value.Z; M14 = value.W; }
     }
 
@@ -118,7 +163,7 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
     /// </summary>
     public Vector4 Row2
     {
-        readonly get => new(M21, M22, M23, M24);
+        readonly get => new(M21, M22, M23, (float)M24);
         set { M21 = value.X; M22 = value.Y; M23 = value.Z; M24 = value.W; }
     }
 
@@ -127,44 +172,83 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
     /// </summary>
     public Vector4 Row3
     {
-        readonly get => new(M31, M32, M33, M34);
+        readonly get => new(M31, M32, M33, (float)M34);
         set { M31 = value.X; M32 = value.Y; M33 = value.Z; M34 = value.W; }
     }
 
     /// <summary>
-    /// Gets or sets the fourth row in the matrix; that is M41, M42, M43,.
+    /// Gets or sets the fourth row in the matrix; that is M41, M42, M43 and 1.0f as M44
     /// </summary>
-    public Double3 Row4
+    public Vector4 Row4
     {
-        readonly get => new(M41, M42, M43);
-        set { M41 = value.X; M42 = value.Y; M43 = value.Z; M44 = 1.0; }
+        readonly get => new(M41, M42, M43, 1.0f);
+        set { M41 = value.X; M42 = value.Y; M43 = value.Z; }
     }
 
     /// <summary>
-    /// Gets or sets the translation of the matrix; that is M41, M42, and M43.
+    /// Gets or sets the first column in the matrix; that is M11, M21, M31, and M41.
     /// </summary>
-    public Double3 Translation
+    public Vector4 Column1
     {
-        readonly get => new(M41, M42, M43);
-        set { M41 = value.X; M42 = value.Y; M43 = value.Z; }
+        readonly get { return new Vector4(M11, M21, M31, M41); }
+        set { M11 = value.X; M21 = value.Y; M31 = value.Z; M41 = value.W; }
+    }
+
+    /// <summary>
+    /// Gets or sets the second column in the matrix; that is M12, M22, M32, and M42.
+    /// </summary>
+    public Vector4 Column2
+    {
+        readonly get { return new Vector4(M12, M22, M32, M42); }
+        set { M12 = value.X; M22 = value.Y; M32 = value.Z; M42 = value.W; }
+    }
+
+    /// <summary>
+    /// Gets or sets the third column in the matrix; that is M13, M23, M33, and M43.
+    /// </summary>
+    public Vector4 Column3
+    {
+        readonly get { return new Vector4(M13, M23, M33, M43); }
+        set { M13 = value.X; M23 = value.Y; M33 = value.Z; M43 = value.W; }
+    }
+
+    /// <summary>
+    /// Gets or sets the fourth column in the matrix; that is M14, M24, M34, and M44.
+    /// </summary>
+    public RVector3 Column4
+    {
+        readonly get { return new RVector3(M14, M24, M34); }
+        set { M14 = value.X; M24 = value.Y; M34 = value.Z; }
+    }
+
+    /// <summary>
+    /// Gets or sets the translation of the matrix; that is M14, M24, and M34.
+    /// </summary>
+    public RVector3 Translation
+    {
+        readonly get => new(M14, M24, M34);
+        set { M14 = value.X; M24 = value.Y; M34 = value.Z; }
     }
 
     /// <summary>
     /// Casts a <see cref="Matrix4x4"/> value to a <see cref="RMatrix4x4"/> one.
     /// </summary>
     /// <param name="xyz">The input <see cref="Matrix4x4"/> value to cast.</param>
-    public static implicit operator RMatrix4x4(in Matrix4x4 matrix) => new(in matrix);
+    public static implicit operator RMatrix4x4(Matrix4x4 matrix) => new(matrix);
 
     /// <summary>
     /// Casts a <see cref="RMatrix4x4"/> value to a <see cref="Matrix4x4"/> one.
     /// </summary>
     /// <param name="xyz">The input <see cref="RMatrix4x4"/> value to cast.</param>
-    public static explicit operator Matrix4x4(in RMatrix4x4 matrix) => new(
-        matrix.M11, matrix.M12, matrix.M13, matrix.M14,
-        matrix.M21, matrix.M22, matrix.M23, matrix.M24,
-        matrix.M31, matrix.M32, matrix.M33, matrix.M34,
-        (float)matrix.M41, (float)matrix.M42, (float)matrix.M43, (float)matrix.M44
-        );
+    public static explicit operator Matrix4x4(in RMatrix4x4 matrix)
+    {
+        // Note the order. Matrices from has to be transposed
+        return new (
+            matrix.M11, matrix.M21, matrix.M31, matrix.M41,
+            matrix.M12, matrix.M22, matrix.M32, matrix.M42,
+            matrix.M13, matrix.M23, matrix.M33, matrix.M43,
+            (float)matrix.M14, (float)matrix.M24, (float)matrix.M34, 1.0f);
+    }
 
     /// <inheritdoc/>
     public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is RMatrix4x4 value && Equals(value);
@@ -179,7 +263,7 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
         return (M11 == other.M11) && (M12 == other.M12) && (M13 == other.M13) && (M14 == other.M14)
             && (M21 == other.M21) && (M22 == other.M22) && (M23 == other.M23) && (M24 == other.M24)
             && (M31 == other.M31) && (M32 == other.M32) && (M33 == other.M33) && (M34 == other.M34)
-            && (M41 == other.M41) && (M42 == other.M42) && (M43 == other.M43) && (M44 == other.M44);
+            && (M41 == other.M41) && (M42 == other.M42) && (M43 == other.M43);
     }
 
     /// <summary>
@@ -224,7 +308,6 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
             hashCode.Add(M41);
             hashCode.Add(M42);
             hashCode.Add(M43);
-            hashCode.Add(M44);
         }
         return hashCode.ToHashCode();
     }
@@ -255,7 +338,6 @@ public struct RMatrix4x4 : IEquatable<RMatrix4x4>, IFormattable
             .Append(M41.ToString(format, formatProvider)).Append(separator).Append(' ')
             .Append(M42.ToString(format, formatProvider)).Append(separator).Append(' ')
             .Append(M43.ToString(format, formatProvider)).Append(separator).Append(' ')
-            .Append(M44.ToString(format, formatProvider)).Append(separator).Append(' ')
             .Append('>')
             .ToString();
     }

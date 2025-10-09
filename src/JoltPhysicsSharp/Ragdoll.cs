@@ -33,7 +33,7 @@ public class RagdollSettings : NativeObject
 
     public unsafe void DisableParentChildCollisions(in Matrix4x4? jointMatrices = default, float minSeparationDistance = 0.0f)
     {
-        Matrix4x4 callJointMatrices = jointMatrices.GetValueOrDefault();
+        Mat4 callJointMatrices = jointMatrices.HasValue ? jointMatrices.Value.ToJolt() : default;
         JPH_RagdollSettings_DisableParentChildCollisions(Handle,
             jointMatrices.HasValue ? &callJointMatrices : default,
             minSeparationDistance);

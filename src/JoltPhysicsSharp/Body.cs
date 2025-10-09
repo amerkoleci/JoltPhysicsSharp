@@ -137,14 +137,14 @@ public sealed class Body : NativeObject
         }
     }
 
-    public Double3 RPosition
+    public RVector3 RPosition
     {
         get
         {
             if (!DoublePrecision)
                 throw new InvalidOperationException($"Double precision is disabled: use {nameof(Position)}");
 
-            JPH_Body_GetPosition(Handle, out Double3 result);
+            JPH_Body_GetPosition(Handle, out RVector3 result);
             return result;
         }
     }
@@ -170,14 +170,14 @@ public sealed class Body : NativeObject
         }
     }
 
-    public Double3 RCenterOfMassPosition
+    public RVector3 RCenterOfMassPosition
     {
         get
         {
             if (!DoublePrecision)
                 throw new InvalidOperationException($"Double precision is disabled: use {nameof(CenterOfMassPosition)}");
 
-            JPH_Body_GetCenterOfMassPosition(Handle, out Double3 value);
+            JPH_Body_GetCenterOfMassPosition(Handle, out RVector3 value);
             return value;
         }
     }
@@ -200,7 +200,7 @@ public sealed class Body : NativeObject
         JPH_Body_GetPosition(Handle, out result);
     }
 
-    public void GetRPosition(out Double3 result)
+    public void GetRPosition(out RVector3 result)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPosition)}");
@@ -221,7 +221,7 @@ public sealed class Body : NativeObject
         JPH_Body_GetCenterOfMassPosition(Handle, out result);
     }
 
-    public void GetRCenterOfMassPosition(out Double3 result)
+    public void GetRCenterOfMassPosition(out RVector3 result)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetCenterOfMassPosition)}");
@@ -230,21 +230,24 @@ public sealed class Body : NativeObject
     }
 
     #region GetWorldTransform
-    public Matrix4x4 GetWorldTransform()
+    public unsafe Matrix4x4 GetWorldTransform()
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldTransform)}");
 
-        JPH_Body_GetWorldTransform(Handle, out Matrix4x4 result);
-        return result;
+        Mat4 joltMatrix;
+        JPH_Body_GetWorldTransform(Handle, &joltMatrix);
+        return joltMatrix.FromJolt();
     }
 
-    public void GetWorldTransform(out Matrix4x4 result)
+    public unsafe void GetWorldTransform(out Matrix4x4 result)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRWorldTransform)}");
 
-        JPH_Body_GetWorldTransform(Handle, out result);
+        Mat4 joltMatrix;
+        JPH_Body_GetWorldTransform(Handle, &joltMatrix);
+        result = joltMatrix.FromJolt();
     }
 
     public RMatrix4x4 GetRWorldTransform()
@@ -266,21 +269,24 @@ public sealed class Body : NativeObject
     #endregion
 
     #region GetCenterOfMassTransform
-    public Matrix4x4 GetCenterOfMassTransform()
+    public unsafe Matrix4x4 GetCenterOfMassTransform()
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassTransform)}");
 
-        JPH_Body_GetCenterOfMassTransform(Handle, out Matrix4x4 result);
-        return result;
+        Mat4 joltMatrix;
+        JPH_Body_GetCenterOfMassTransform(Handle, &joltMatrix);
+        return joltMatrix.FromJolt();
     }
 
-    public void GetCenterOfMassTransform(out Matrix4x4 result)
+    public unsafe void GetCenterOfMassTransform(out Matrix4x4 result)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use {nameof(GetRCenterOfMassTransform)}");
 
-        JPH_Body_GetCenterOfMassTransform(Handle, out result);
+        Mat4 joltMatrix;
+        JPH_Body_GetCenterOfMassTransform(Handle, &joltMatrix);
+        result = joltMatrix.FromJolt();
     }
 
     public RMatrix4x4 GetRCenterOfMassTransform()
@@ -388,7 +394,7 @@ public sealed class Body : NativeObject
         JPH_Body_GetPointVelocity(Handle, in point, out velocity);
     }
 
-    public Vector3 GetPointVelocity(in Double3 point)
+    public Vector3 GetPointVelocity(in RVector3 point)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPointVelocity)}");
@@ -397,7 +403,7 @@ public sealed class Body : NativeObject
         return result;
     }
 
-    public void GetPointVelocity(in Double3 point, out Vector3 velocity)
+    public void GetPointVelocity(in RVector3 point, out Vector3 velocity)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(GetPointVelocity)}");
@@ -431,22 +437,25 @@ public sealed class Body : NativeObject
     public void ResetTorque() => JPH_Body_ResetTorque(Handle);
     public void ResetMotion() => JPH_Body_ResetMotion(Handle);
 
-    public Matrix4x4 GetInverseInertia()
+    public unsafe Matrix4x4 GetInverseInertia()
     {
-        JPH_Body_GetInverseInertia(Handle, out Matrix4x4 result);
-        return result;
+        Mat4 joltMatrix;
+        JPH_Body_GetInverseInertia(Handle, &joltMatrix);
+        return joltMatrix.FromJolt();
     }
 
-    public void GetInverseInertia(out Matrix4x4 result)
+    public unsafe void GetInverseInertia(out Matrix4x4 result)
     {
-        JPH_Body_GetInverseInertia(Handle, out result);
+        Mat4 joltMatrix;
+        JPH_Body_GetInverseInertia(Handle, &joltMatrix);
+        result = joltMatrix.FromJolt();
     }
 
     public void GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Vector3 position, out Vector3 normal)
     {
         if (DoublePrecision)
         {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, new Double3(in position), out normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, new RVector3(in position), out normal);
         }
         else
         {
@@ -458,7 +467,7 @@ public sealed class Body : NativeObject
     {
         if (DoublePrecision)
         {
-            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, new Double3(in position), out Vector3 normal);
+            JPH_Body_GetWorldSpaceSurfaceNormal(Handle, subShapeID.Value, new RVector3(in position), out Vector3 normal);
             return normal;
         }
         else
@@ -468,7 +477,7 @@ public sealed class Body : NativeObject
         }
     }
 
-    public void GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Double3 position, out Vector3 normal)
+    public void GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in RVector3 position, out Vector3 normal)
     {
         if (!DoublePrecision)
         {
@@ -481,7 +490,7 @@ public sealed class Body : NativeObject
         }
     }
 
-    public Vector3 GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in Double3 position)
+    public Vector3 GetWorldSpaceSurfaceNormal(in SubShapeID subShapeID, in RVector3 position)
     {
         if (!DoublePrecision)
         {
@@ -513,7 +522,7 @@ public sealed class Body : NativeObject
     {
         if (DoublePrecision)
         {
-            JPH_Body_AddForceAtPosition(Handle, in force, new Double3(in position));
+            JPH_Body_AddForceAtPosition(Handle, in force, new RVector3(in position));
         }
         else
         {
@@ -521,7 +530,7 @@ public sealed class Body : NativeObject
         }
     }
 
-    public void AddForceAtPosition(in Vector3 force, in Double3 position)
+    public void AddForceAtPosition(in Vector3 force, in RVector3 position)
     {
         if (!DoublePrecision)
         {
@@ -548,7 +557,7 @@ public sealed class Body : NativeObject
     {
         if (DoublePrecision)
         {
-            JPH_Body_AddImpulseAtPosition(Handle, in impulse, new Double3(in position));
+            JPH_Body_AddImpulseAtPosition(Handle, in impulse, new RVector3(in position));
         }
         else
         {
@@ -556,7 +565,7 @@ public sealed class Body : NativeObject
         }
     }
 
-    public void AddImpulseAtPosition(in Vector3 impulse, in Double3 position)
+    public void AddImpulseAtPosition(in Vector3 impulse, in RVector3 position)
     {
         if (!DoublePrecision)
         {
@@ -582,7 +591,7 @@ public sealed class Body : NativeObject
         JPH_Body_MoveKinematic(Handle, in targetPosition, in targetRotation, deltaTime);
     }
 
-    public void MoveKinematic(in Double3 targetPosition, in Quaternion targetRotation, float deltaTime)
+    public void MoveKinematic(in RVector3 targetPosition, in Quaternion targetRotation, float deltaTime)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(MoveKinematic)}");
@@ -609,7 +618,7 @@ public sealed class Body : NativeObject
     }
 
     public bool ApplyBuoyancyImpulse(
-       in Double3 surfacePosition,
+       in RVector3 surfacePosition,
        in Vector3 surfaceNormal,
        float buoyancy, float linearDrag, float angularDrag,
        in Vector3 fluidVelocity,

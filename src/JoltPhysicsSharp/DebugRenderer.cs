@@ -114,7 +114,7 @@ public abstract class DebugRenderer : NativeObject
     /// <param name="size"></param>
 	public void DrawCoordinateSystem(in Matrix4x4 transform, float size = 1.0f)
     {
-        JPH_DebugRenderer_DrawCoordinateSystem(Handle, transform, size);
+        JPH_DebugRenderer_DrawCoordinateSystem(Handle, transform.ToJolt(), size);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public abstract class DebugRenderer : NativeObject
 
     public void DrawWireUnitSphere(in Matrix4x4 matrix, JoltColor color, int level = 3)
     {
-        JPH_DebugRenderer_DrawWireUnitSphere(Handle, matrix, color.PackedValue, level);
+        JPH_DebugRenderer_DrawWireUnitSphere(Handle, matrix.ToJolt(), color.PackedValue, level);
     }
 
     /// Draw a box
@@ -160,7 +160,7 @@ public abstract class DebugRenderer : NativeObject
 
     public void DrawBox(in Matrix4x4 matrix, in BoundingBox box, JoltColor color, CastShadow castShadow = CastShadow.On, DrawMode drawMode = DrawMode.Solid)
     {
-        JPH_DebugRenderer_DrawBox2(Handle, matrix, in box, color.PackedValue, castShadow, drawMode);
+        JPH_DebugRenderer_DrawBox2(Handle, matrix.ToJolt(), in box, color.PackedValue, castShadow, drawMode);
     }
 
     /// Draw a sphere
@@ -171,7 +171,7 @@ public abstract class DebugRenderer : NativeObject
 
     public void DrawUnitSphere(in Matrix4x4 matrix, JoltColor color, CastShadow castShadow = CastShadow.On, DrawMode drawMode = DrawMode.Solid)
     {
-        JPH_DebugRenderer_DrawUnitSphere(Handle, matrix, color.PackedValue, castShadow, drawMode);
+        JPH_DebugRenderer_DrawUnitSphere(Handle, matrix.ToJolt(), color.PackedValue, castShadow, drawMode);
     }
 
     /// <summary>
@@ -186,7 +186,7 @@ public abstract class DebugRenderer : NativeObject
     /// <param name="drawMode"></param>
     public void DrawCapsule(in Matrix4x4 matrix, float halfHeightOfCylinder, float radius, JoltColor color, CastShadow castShadow = CastShadow.On, DrawMode drawMode = DrawMode.Solid)
     {
-        JPH_DebugRenderer_DrawCapsule(Handle, matrix, halfHeightOfCylinder, radius, color.PackedValue, castShadow, drawMode);
+        JPH_DebugRenderer_DrawCapsule(Handle, matrix.ToJolt(), halfHeightOfCylinder, radius, color.PackedValue, castShadow, drawMode);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public abstract class DebugRenderer : NativeObject
     /// <param name="drawMode"></param>
     public void DrawCylinder(in Matrix4x4 matrix, float halfHeight, float radius, JoltColor color, CastShadow castShadow = CastShadow.On, DrawMode drawMode = DrawMode.Solid)
     {
-        JPH_DebugRenderer_DrawCylinder(Handle, matrix, halfHeight, radius, color.PackedValue, castShadow, drawMode);
+        JPH_DebugRenderer_DrawCylinder(Handle, matrix.ToJolt(), halfHeight, radius, color.PackedValue, castShadow, drawMode);
     }
 
     /// <summary>
@@ -232,7 +232,7 @@ public abstract class DebugRenderer : NativeObject
     /// <param name="drawMode">Determines if we draw the geometry solid or in wireframe.</param>
     public void DrawSwingConeLimits(in Matrix4x4 matrix, float swingYHalfAngle, float swingZHalfAngle, float edgeLength, JoltColor color, CastShadow castShadow = CastShadow.On, DrawMode drawMode = DrawMode.Solid)
     {
-        JPH_DebugRenderer_DrawSwingConeLimits(Handle, matrix, swingYHalfAngle, swingZHalfAngle, edgeLength, color.PackedValue, castShadow, drawMode);
+        JPH_DebugRenderer_DrawSwingConeLimits(Handle, matrix.ToJolt(), swingYHalfAngle, swingZHalfAngle, edgeLength, color.PackedValue, castShadow, drawMode);
     }
 
     /// <summary>
@@ -249,7 +249,7 @@ public abstract class DebugRenderer : NativeObject
     /// <param name="drawMode">Determines if we draw the geometry solid or in wireframe.</param>
     public void DrawSwingPyramidLimits(in Matrix4x4 matrix, float minSwingYAngle, float maxSwingYAngle, float minSwingZAngle, float maxSwingZAngle, float edgeLength, JoltColor color, CastShadow castShadow = CastShadow.On, DrawMode drawMode = DrawMode.Solid)
     {
-        JPH_DebugRenderer_DrawSwingPyramidLimits(Handle, matrix, minSwingYAngle, maxSwingYAngle, minSwingZAngle, maxSwingZAngle, edgeLength, color.PackedValue, castShadow, drawMode);
+        JPH_DebugRenderer_DrawSwingPyramidLimits(Handle, matrix.ToJolt(), minSwingYAngle, maxSwingYAngle, minSwingZAngle, maxSwingZAngle, edgeLength, color.PackedValue, castShadow, drawMode);
     }
 
     /// <summary>
@@ -282,7 +282,7 @@ public abstract class DebugRenderer : NativeObject
     /// <param name="drawMode">Determines if we draw the geometry solid or in wireframe.</param>
     public void DrawTaperedCylinder(in Matrix4x4 matrix, float top, float bottom, float topRadius, float bottomRadius, JoltColor color, CastShadow castShadow = CastShadow.On, DrawMode drawMode = DrawMode.Solid)
     {
-        JPH_DebugRenderer_DrawTaperedCylinder(Handle, matrix, top, bottom, topRadius, bottomRadius, color.PackedValue, castShadow, drawMode);
+        JPH_DebugRenderer_DrawTaperedCylinder(Handle, matrix.ToJolt(), top, bottom, topRadius, bottomRadius, color.PackedValue, castShadow, drawMode);
     }
 
 

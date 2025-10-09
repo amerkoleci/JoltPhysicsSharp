@@ -19,7 +19,7 @@ public sealed class Character : CharacterBase
         Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
     }
 
-    public unsafe Character(CharacterSettings settings, in Double3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe Character(CharacterSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
@@ -139,15 +139,18 @@ public sealed class Character : CharacterBase
         JPH_Character_GetCenterOfMassPosition(Handle, out position, lockBodies);
     }
 
-    public Matrix4x4 GetWorldTransform(bool lockBodies = true)
+    public unsafe Matrix4x4 GetWorldTransform(bool lockBodies = true)
     {
-        JPH_Character_GetWorldTransform(Handle, out Matrix4x4 result, lockBodies);
-        return result;
+        Mat4 joltMatrix;
+        JPH_Character_GetWorldTransform(Handle, &joltMatrix, lockBodies);
+        return joltMatrix.FromJolt();
     }
 
-    public void GetWorldTransform(out Matrix4x4 result, bool lockBodies = true)
+    public unsafe void GetWorldTransform(out Matrix4x4 result, bool lockBodies = true)
     {
-        JPH_Character_GetWorldTransform(Handle, out result, lockBodies);
+        Mat4 joltMatrix;
+        JPH_Character_GetWorldTransform(Handle, &joltMatrix, lockBodies);
+        result = joltMatrix.FromJolt();
     }
 
     public BodyID BodyID

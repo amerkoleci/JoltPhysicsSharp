@@ -75,16 +75,18 @@ public class VehicleConstraint : Constraint, IPhysicsStepListener
         JPH_VehicleConstraint_GetWheelLocalBasis(Handle, wheel.Handle, out forward, out up, out right);
     }
 
-    public Matrix4x4 GetWheelLocalTransform(int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp)
+    public unsafe Matrix4x4 GetWheelLocalTransform(int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp)
     {
-        JPH_VehicleConstraint_GetWheelLocalTransform(Handle, wheelIndex, in wheelRight, in wheelUp, out Matrix4x4 transform);
-        return transform;
+        Mat4 joltMatrix;
+        JPH_VehicleConstraint_GetWheelLocalTransform(Handle, wheelIndex, in wheelRight, in wheelUp, &joltMatrix);
+        return joltMatrix.FromJolt();
     }
 
-    public Matrix4x4 GetWheelWorldTransform(int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp)
+    public unsafe Matrix4x4 GetWheelWorldTransform(int wheelIndex, in Vector3 wheelRight, in Vector3 wheelUp)
     {
-        JPH_VehicleConstraint_GetWheelWorldTransform(Handle, wheelIndex, in wheelRight, in wheelUp, out Matrix4x4 transform);
-        return transform;
+        Mat4 joltMatrix;
+        JPH_VehicleConstraint_GetWheelWorldTransform(Handle, wheelIndex, in wheelRight, in wheelUp, &joltMatrix);
+        return joltMatrix.FromJolt();
     }
 
     public void SetMaxPitchRollAngle(float maxPitchRollAngle)

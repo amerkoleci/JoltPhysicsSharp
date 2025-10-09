@@ -33,8 +33,9 @@ public abstract unsafe class TwoBodyConstraint : Constraint
     {
         get
         {
-            JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, out Matrix4x4 result);
-            return result;
+            Mat4 joltMatrix;
+            JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, &joltMatrix);
+            return joltMatrix.FromJolt();
         }
     }
 
@@ -42,18 +43,23 @@ public abstract unsafe class TwoBodyConstraint : Constraint
     {
         get
         {
-            JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, out Matrix4x4 result);
-            return result;
+            Mat4 joltMatrix;
+            JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, &joltMatrix);
+            return joltMatrix.FromJolt();
         }
     }
 
     public void GetConstraintToBody1Matrix(out Matrix4x4 result)
     {
-        JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, out result);
+        Mat4 joltMatrix;
+        JPH_TwoBodyConstraint_GetConstraintToBody1Matrix(Handle, &joltMatrix);
+        result = joltMatrix.FromJolt();
     }
 
     public void GetConstraintToBody2Matrix(out Matrix4x4 result)
     {
-        JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, out result);
+        Mat4 joltMatrix;
+        JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, &joltMatrix);
+        result = joltMatrix.FromJolt();
     }
 }

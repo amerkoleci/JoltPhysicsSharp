@@ -13,7 +13,7 @@ namespace JoltPhysicsSharp;
 /// Vector type containing three 64 bit floating point components.
 /// </summary>
 [DebuggerDisplay("X={X}, Y={Y}, Z={Z}")]
-public struct Double3 : IEquatable<Double3>, IFormattable
+public struct RVector3 : IEquatable<RVector3>, IFormattable
 {
     /// <summary>
     /// The X component of the vector.
@@ -33,10 +33,10 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     internal const int Count = 3;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Double3"/> struct.
+    /// Initializes a new instance of the <see cref="RVector3"/> struct.
     /// </summary>
     /// <param name="value">The value that will be assigned to all components.</param>
-    public Double3(double value) 
+    public RVector3(double value) 
     {
         X = value;
         Y = value;
@@ -44,12 +44,12 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
+    /// Initializes a new instance of the <see cref="RVector3" /> struct.
     /// </summary>
     /// <param name="x">Initial value for the X component of the vector.</param>
     /// <param name="y">Initial value for the Y component of the vector.</param>
     /// <param name="z">Initial value for the Z component of the vector.</param>
-    public Double3(double x, double y, double z)
+    public RVector3(double x, double y, double z)
     {
         X = x;
         Y = y;
@@ -57,12 +57,12 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
+    /// Initializes a new instance of the <see cref="RVector3" /> struct.
     /// </summary>
     /// <param name="x">Initial value for the X component of the vector.</param>
     /// <param name="y">Initial value for the Y component of the vector.</param>
     /// <param name="z">Initial value for the Z component of the vector.</param>
-    public Double3(float x, float y, float z)
+    public RVector3(float x, float y, float z)
     {
         X = x;
         Y = y;
@@ -70,10 +70,10 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
+    /// Initializes a new instance of the <see cref="RVector3" /> struct.
     /// </summary>
     /// <param name="xyz">Initial value for the X, Y and Z component of the vector.</param>
-    public Double3(in Vector3 xyz)
+    public RVector3(in Vector3 xyz)
     {
         X = xyz.X;
         Y = xyz.Y;
@@ -81,11 +81,11 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
+    /// Initializes a new instance of the <see cref="RVector3" /> struct.
     /// </summary>
     /// <param name="xy">Initial value for the X and Y component of the vector.</param>
     /// <param name="z">Initial value for the Z component of the vector.</param>
-    public Double3(in Vector2 xy, double z)
+    public RVector3(in Vector2 xy, double z)
     {
         X = xy.X;
         Y = xy.Y;
@@ -93,23 +93,23 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Double3" /> struct.
+    /// Initializes a new instance of the <see cref="RVector3" /> struct.
     /// </summary>
     /// <param name="values">The span of elements to assign to the vector.</param>
-    public Double3(ReadOnlySpan<double> values)
+    public RVector3(ReadOnlySpan<double> values)
     {
         if (values.Length < 3)
         {
             throw new ArgumentOutOfRangeException(nameof(values), "There must be 3 uint values.");
         }
 
-        this = Unsafe.ReadUnaligned<Double3>(ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(values)));
+        this = Unsafe.ReadUnaligned<RVector3>(ref Unsafe.As<double, byte>(ref MemoryMarshal.GetReference(values)));
     }
 
     /// <summary>
-    /// A <see cref="Double3"/> with all of its components set to zero.
+    /// A <see cref="RVector3"/> with all of its components set to zero.
     /// </summary>
-    public static Double3 Zero
+    public static RVector3 Zero
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => default;
@@ -118,34 +118,34 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <summary>
     /// A <see cref="Int3"/> with all of its components set to one.
     /// </summary>
-    public static Double3 One
+    public static RVector3 One
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => new(1.0, 1.0, 1.0);
     }
 
     /// <summary>
-    /// The X unit <see cref="Double3"/> (1, 0, 0).
+    /// The X unit <see cref="RVector3"/> (1, 0, 0).
     /// </summary>
-    public static Double3 UnitX
+    public static RVector3 UnitX
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => new(1.0, 0.0, 0.0);
     }
 
     /// <summary>
-    /// The Y unit <see cref="Double3"/> (0, 1, 0).
+    /// The Y unit <see cref="RVector3"/> (0, 1, 0).
     /// </summary>
-    public static Double3 UnitY
+    public static RVector3 UnitY
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => new(0.0, 1.0, 0.0);
     }
 
     /// <summary>
-    /// The Y unit <see cref="Double3"/> (0, 0, 1).
+    /// The Y unit <see cref="RVector3"/> (0, 0, 1).
     /// </summary>
-    public static Double3 UnitZ
+    public static RVector3 UnitZ
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => new(0, 0, 1);
@@ -219,11 +219,11 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The first vector to add.</param>
     /// <param name="right">The second vector to add.</param>
     /// <returns>The summed vector.</returns>
-    /// <remarks>The <see cref="op_Addition" /> method defines the addition operation for <see cref="Double3" /> objects.</remarks>
+    /// <remarks>The <see cref="op_Addition" /> method defines the addition operation for <see cref="RVector3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator +(Double3 left, Double3 right)
+    public static RVector3 operator +(RVector3 left, RVector3 right)
     {
-        return new Double3(
+        return new RVector3(
             left.X + right.X,
             left.Y + right.Y,
             left.Z + right.Z
@@ -234,11 +234,11 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The first vector.</param>
     /// <param name="right">The second vector.</param>
     /// <returns>The vector that results from dividing <paramref name="left" /> by <paramref name="right" />.</returns>
-    /// <remarks>The <see cref="Double3.op_Division" /> method defines the division operation for <see cref="Double3" /> objects.</remarks>
+    /// <remarks>The <see cref="RVector3.op_Division" /> method defines the division operation for <see cref="RVector3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator /(Double3 left, Double3 right)
+    public static RVector3 operator /(RVector3 left, RVector3 right)
     {
-        return new Double3(
+        return new RVector3(
             left.X / right.X,
             left.Y / right.Y,
             left.Z / right.Z
@@ -249,22 +249,22 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="value1">The vector.</param>
     /// <param name="value2">The scalar value.</param>
     /// <returns>The result of the division.</returns>
-    /// <remarks>The <see cref="Double3.op_Division" /> method defines the division operation for <see cref="Double3" /> objects.</remarks>
+    /// <remarks>The <see cref="RVector3.op_Division" /> method defines the division operation for <see cref="RVector3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator /(Double3 value1, double value2)
+    public static RVector3 operator /(RVector3 value1, double value2)
     {
-        return value1 / new Double3(value2);
+        return value1 / new RVector3(value2);
     }
 
     /// <summary>Returns a new vector whose values are the product of each pair of elements in two specified vectors.</summary>
     /// <param name="left">The first vector.</param>
     /// <param name="right">The second vector.</param>
     /// <returns>The element-wise product vector.</returns>
-    /// <remarks>The <see cref="Double3.op_Multiply" /> method defines the multiplication operation for <see cref="Double3" /> objects.</remarks>
+    /// <remarks>The <see cref="RVector3.op_Multiply" /> method defines the multiplication operation for <see cref="RVector3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator *(Double3 left, Double3 right)
+    public static RVector3 operator *(RVector3 left, RVector3 right)
     {
-        return new Double3(
+        return new RVector3(
             left.X * right.X,
             left.Y * right.Y,
             left.Z * right.Z
@@ -275,20 +275,20 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The vector.</param>
     /// <param name="right">The scalar value.</param>
     /// <returns>The scaled vector.</returns>
-    /// <remarks>The <see cref="Double3.op_Multiply" /> method defines the multiplication operation for <see cref="Double3" /> objects.</remarks>
+    /// <remarks>The <see cref="RVector3.op_Multiply" /> method defines the multiplication operation for <see cref="RVector3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator *(Double3 left, double right)
+    public static RVector3 operator *(RVector3 left, double right)
     {
-        return left * new Double3(right);
+        return left * new RVector3(right);
     }
 
     /// <summary>Multiplies the scalar value by the specified vector.</summary>
     /// <param name="left">The vector.</param>
     /// <param name="right">The scalar value.</param>
     /// <returns>The scaled vector.</returns>
-    /// <remarks>The <see cref="Double3.op_Multiply" /> method defines the multiplication operation for <see cref="Double3" /> objects.</remarks>
+    /// <remarks>The <see cref="RVector3.op_Multiply" /> method defines the multiplication operation for <see cref="RVector3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator *(double left, Double3 right)
+    public static RVector3 operator *(double left, RVector3 right)
     {
         return right * left;
     }
@@ -297,11 +297,11 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <param name="left">The first vector.</param>
     /// <param name="right">The second vector.</param>
     /// <returns>The vector that results from subtracting <paramref name="right" /> from <paramref name="left" />.</returns>
-    /// <remarks>The <see cref="op_Subtraction" /> method defines the subtraction operation for <see cref="Double3" /> objects.</remarks>
+    /// <remarks>The <see cref="op_Subtraction" /> method defines the subtraction operation for <see cref="RVector3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator -(Double3 left, Double3 right)
+    public static RVector3 operator -(RVector3 left, RVector3 right)
     {
-        return new Double3(
+        return new RVector3(
             left.X - right.X,
             left.Y - right.Y,
             left.Z - right.Z
@@ -311,38 +311,38 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     /// <summary>Negates the specified vector.</summary>
     /// <param name="value">The vector to negate.</param>
     /// <returns>The negated vector.</returns>
-    /// <remarks>The <see cref="op_UnaryNegation" /> method defines the unary negation operation for <see cref="Double3" /> objects.</remarks>
+    /// <remarks>The <see cref="op_UnaryNegation" /> method defines the unary negation operation for <see cref="RVector3" /> objects.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 operator -(Double3 value)
+    public static RVector3 operator -(RVector3 value)
     {
         return Zero - value;
     }
 
     /// <summary>
-    /// Creates a new <see cref="Double3"/> value with the same value for all its components.
+    /// Creates a new <see cref="RVector3"/> value with the same value for all its components.
     /// </summary>
-    /// <param name="x">The value to use for the components of the new <see cref="Double3"/> instance.</param>
-    public static implicit operator Double3(double x) => new(x, x, x);
+    /// <param name="x">The value to use for the components of the new <see cref="RVector3"/> instance.</param>
+    public static implicit operator RVector3(double x) => new(x, x, x);
 
     /// <summary>
-    /// Casts a <see cref="Vector3"/> value to a <see cref="Double3"/> one.
+    /// Casts a <see cref="Vector3"/> value to a <see cref="RVector3"/> one.
     /// </summary>
     /// <param name="xyz">The input <see cref="Vector3"/> value to cast.</param>
-    public static implicit operator Double3(in Vector3 xyz) => new(xyz);
+    public static implicit operator RVector3(in Vector3 xyz) => new(xyz);
 
     /// <summary>
-    /// Casts a <see cref="Double3"/> value to a <see cref="Vector3"/> one.
+    /// Casts a <see cref="RVector3"/> value to a <see cref="Vector3"/> one.
     /// </summary>
-    /// <param name="xyz">The input <see cref="Double3"/> value to cast.</param>
-    public static explicit operator Vector3(in Double3 xyz) => new((float)xyz.X, (float)xyz.Y, (float)xyz.Z);
+    /// <param name="xyz">The input <see cref="RVector3"/> value to cast.</param>
+    public static explicit operator Vector3(in RVector3 xyz) => new((float)xyz.X, (float)xyz.Y, (float)xyz.Z);
 
     /// <summary>Returns a vector whose elements are the absolute values of each of the specified vector's elements.</summary>
     /// <param name="value">A vector.</param>
     /// <returns>The absolute value vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Double3 Abs(Double3 value)
+    public static RVector3 Abs(RVector3 value)
     {
-        return new Double3(
+        return new RVector3(
             Math.Abs(value.X),
             Math.Abs(value.Y),
             Math.Abs(value.Z)
@@ -350,14 +350,14 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     }
 
     /// <inheritdoc/>
-    public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is Double3 value && Equals(value);
+    public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is RVector3 value && Equals(value);
 
     /// <summary>
-    /// Determines whether the specified <see cref="Double3"/> is equal to this instance.
+    /// Determines whether the specified <see cref="RVector3"/> is equal to this instance.
     /// </summary>
-    /// <param name="other">The <see cref="Double3"/> to compare with this instance.</param>
+    /// <param name="other">The <see cref="RVector3"/> to compare with this instance.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool Equals(Double3 other)
+    public readonly bool Equals(RVector3 other)
     {
         return X == other.X
             && Y == other.Y
@@ -365,26 +365,26 @@ public struct Double3 : IEquatable<Double3>, IFormattable
     }
 
     /// <summary>
-    /// Compares two <see cref="Double3"/> objects for equality.
+    /// Compares two <see cref="RVector3"/> objects for equality.
     /// </summary>
-    /// <param name="left">The <see cref="Double3"/> on the left hand of the operand.</param>
-    /// <param name="right">The <see cref="Double3"/> on the right hand of the operand.</param>
+    /// <param name="left">The <see cref="RVector3"/> on the left hand of the operand.</param>
+    /// <param name="right">The <see cref="RVector3"/> on the right hand of the operand.</param>
     /// <returns>
     /// True if the current left is equal to the <paramref name="right"/> parameter; otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Double3 left, Double3 right) => left.Equals(right);
+    public static bool operator ==(RVector3 left, RVector3 right) => left.Equals(right);
 
     /// <summary>
-    /// Compares two <see cref="Double3"/> objects for inequality.
+    /// Compares two <see cref="RVector3"/> objects for inequality.
     /// </summary>
-    /// <param name="left">The <see cref="Double3"/> on the left hand of the operand.</param>
-    /// <param name="right">The <see cref="Double3"/> on the right hand of the operand.</param>
+    /// <param name="left">The <see cref="RVector3"/> on the left hand of the operand.</param>
+    /// <param name="right">The <see cref="RVector3"/> on the right hand of the operand.</param>
     /// <returns>
     /// True if the current left is unequal to the <paramref name="right"/> parameter; otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Double3 left, Double3 right) => !left.Equals(right);
+    public static bool operator !=(RVector3 left, RVector3 right) => !left.Equals(right);
 
     /// <inheritdoc/>
     public override readonly int GetHashCode() => HashCode.Combine(X, Y, Z);
@@ -394,18 +394,18 @@ public struct Double3 : IEquatable<Double3>, IFormattable
 
     /// <inheritdoc />
     public readonly string ToString(string? format, IFormatProvider? formatProvider)
-        => $"{nameof(Double3)} {{ {nameof(X)} = {X.ToString(format, formatProvider)}, {nameof(Y)} = {Y.ToString(format, formatProvider)}, {nameof(Z)} = {Z.ToString(format, formatProvider)} }}";
+        => $"{nameof(RVector3)} {{ {nameof(X)} = {X.ToString(format, formatProvider)}, {nameof(Y)} = {Y.ToString(format, formatProvider)}, {nameof(Z)} = {Z.ToString(format, formatProvider)} }}";
 
-    internal static double GetElement(Double3 vector, int index)
+    internal static double GetElement(RVector3 vector, int index)
     {
         return index >= Count ? throw new ArgumentOutOfRangeException(nameof(index)) : GetElementUnsafe(ref vector, index);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static double GetElementUnsafe(ref Double3 vector, int index)
+    private static double GetElementUnsafe(ref RVector3 vector, int index)
     {
         Debug.Assert(index is >= 0 and < Count);
 
-        return Unsafe.Add(ref Unsafe.As<Double3, double>(ref vector), index);
+        return Unsafe.Add(ref Unsafe.As<RVector3, double>(ref vector), index);
     }
 }
