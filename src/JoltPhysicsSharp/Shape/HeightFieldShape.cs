@@ -17,7 +17,7 @@ public sealed class HeightFieldShapeSettings : ConvexShapeSettings
     /// <param name="offset">The shape offset.</param>
     /// <param name="scale">Shape scale.</param>
     /// <param name="sampleCount">sampleCount / blockSize must be minimally 2 and a power of 2 is the most efficient in terms of performance and storage.</param>
-    public unsafe HeightFieldShapeSettings(float* samples, in Vector3 offset, in Vector3 scale, int sampleCount)
+    public unsafe HeightFieldShapeSettings(float* samples, in Vector3 offset, in Vector3 scale, uint sampleCount)
         : base(JPH_HeightFieldShapeSettings_Create(samples, offset, scale, sampleCount))
     {
     }
@@ -31,12 +31,68 @@ public sealed class HeightFieldShapeSettings : ConvexShapeSettings
     /// <param name="offset">The shape offset.</param>
     /// <param name="scale">Shape scale.</param>
     /// <param name="sampleCount">sampleCount / blockSize must be minimally 2 and a power of 2 is the most efficient in terms of performance and storage.</param>
-    public unsafe HeightFieldShapeSettings(Span<float> samples, in Vector3 offset, in Vector3 scale, int sampleCount)
+    public unsafe HeightFieldShapeSettings(Span<float> samples, in Vector3 offset, in Vector3 scale, uint sampleCount)
     {
         fixed (float* samplesPtr = samples)
         {
             Handle = JPH_HeightFieldShapeSettings_Create(samplesPtr, offset, scale, sampleCount);
         }
+    }
+
+    public Vector3 Offset
+    {
+        get
+        {
+            JPH_HeightFieldShapeSettings_GetOffset(Handle, out Vector3 result);
+            return result;
+        }
+        set => JPH_HeightFieldShapeSettings_SetOffset(Handle, in value);
+    }
+
+    public Vector3 Scale
+    {
+        get
+        {
+            JPH_HeightFieldShapeSettings_GetScale(Handle, out Vector3 result);
+            return result;
+        }
+        set => JPH_HeightFieldShapeSettings_SetScale(Handle, in value);
+    }
+
+    public uint SampleCount
+    {
+        get => JPH_HeightFieldShapeSettings_GetSampleCount(Handle);
+        set => JPH_HeightFieldShapeSettings_SetSampleCount(Handle, value);
+    }
+
+    public float MinHeightValue
+    {
+        get => JPH_HeightFieldShapeSettings_GetMinHeightValue(Handle);
+        set => JPH_HeightFieldShapeSettings_SetMinHeightValue(Handle, value);
+    }
+
+    public float MaxHeightValue
+    {
+        get => JPH_HeightFieldShapeSettings_GetMaxHeightValue(Handle);
+        set => JPH_HeightFieldShapeSettings_SetMaxHeightValue(Handle, value);
+    }
+
+    public uint BlockSize
+    {
+        get => JPH_HeightFieldShapeSettings_GetBlockSize(Handle);
+        set => JPH_HeightFieldShapeSettings_SetBlockSize(Handle, value);
+    }
+
+    public uint BitsPerSample
+            {
+        get => JPH_HeightFieldShapeSettings_GetBitsPerSample(Handle);
+        set => JPH_HeightFieldShapeSettings_SetBitsPerSample(Handle, value);
+    }
+
+    public float ActiveEdgeCosThresholdAngle
+    {
+        get => JPH_HeightFieldShapeSettings_GetActiveEdgeCosThresholdAngle(Handle);
+        set => JPH_HeightFieldShapeSettings_SetActiveEdgeCosThresholdAngle(Handle, value);
     }
 
     public override Shape Create() => new HeightFieldShape(this);

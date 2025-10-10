@@ -705,16 +705,47 @@ internal static unsafe partial class JoltApi
 
     #region HeightFieldShape/HeightFieldShapeSettings
     [LibraryImport(LibName)]
-    public static partial nint JPH_HeightFieldShapeSettings_Create(float* samples, in Vector3 offset, in Vector3 scale, int sampleCount);
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_HeightFieldShapeSettings_CreateShape(nint settings);
+    public static partial nint JPH_HeightFieldShapeSettings_Create(float* samples, in Vector3 offset, in Vector3 scale, uint sampleCount, byte* materialIndices = default);
 
     [LibraryImport(LibName)]
     public static partial void JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(nint settings, out float outMinValue, out float outMaxValue, out float outQuantizationScale);
-
     [LibraryImport(LibName)]
     public static partial uint JPH_HeightFieldShapeSettings_CalculateBitsPerSampleForError(nint settings, float maxError);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_GetOffset(nint shape, out Vector3 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_SetOffset(nint settings, in Vector3 value);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_GetScale(nint shape, out Vector3 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_SetScale(nint settings, in Vector3 value);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_HeightFieldShapeSettings_GetSampleCount(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_SetSampleCount(nint settings, uint value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_HeightFieldShapeSettings_GetMinHeightValue(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_SetMinHeightValue(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_HeightFieldShapeSettings_GetMaxHeightValue(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_SetMaxHeightValue(nint settings, float value);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_HeightFieldShapeSettings_GetBlockSize(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_SetBlockSize(nint settings, uint value);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_HeightFieldShapeSettings_GetBitsPerSample(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_SetBitsPerSample(nint settings, uint value);
+    [LibraryImport(LibName)]
+    public static partial float JPH_HeightFieldShapeSettings_GetActiveEdgeCosThresholdAngle(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_HeightFieldShapeSettings_SetActiveEdgeCosThresholdAngle(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_HeightFieldShapeSettings_CreateShape(nint settings);
 
     [LibraryImport(LibName)]
     public static partial uint JPH_HeightFieldShape_GetSampleCount(nint shape);
