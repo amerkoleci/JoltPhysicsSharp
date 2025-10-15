@@ -220,6 +220,11 @@ public sealed unsafe class PhysicsSystem : NativeObject
         return JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, jobSystem.Handle);
     }
 
+    public void ActivateBodiesInAABox(in BoundingBox box, ObjectLayer layer)
+    {
+        JPH_PhysicsSystem_ActivateBodiesInAABox(Handle, in box, layer.Value);
+    }
+
     public Vector3 Gravity
     {
         get

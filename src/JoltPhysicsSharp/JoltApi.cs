@@ -1673,6 +1673,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PhysicsSystem_GetConstraints(nint handle, nint* constraints, uint count);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_ActivateBodiesInAABox(nint system, in BoundingBox box, JPH_ObjectLayer layer);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_DrawBodies(nint system, DrawSettings* settings, nint renderer, nint bodyFilter);
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_DrawConstraints(nint system, nint renderer);
@@ -1754,10 +1757,6 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName, EntryPoint = nameof(JPH_BodyInterface_GetCenterOfMassPosition))]
     public static partial void JPH_BodyInterface_GetCenterOfMassPositionDouble(nint handle, uint bodyID, RVector3* position);
 
-    [LibraryImport(LibName)]
-
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_BodyInterface_IsActive(nint handle, uint bodyID);
 
     [LibraryImport(LibName)]
 
@@ -1845,7 +1844,23 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_ActivateBody(nint handle, uint bodyId);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_ActivateBodies(nint handle, uint* bodyIDs, uint count);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_BodyInterface_ActivateBodiesInAABox(nint handle, in BoundingBox box, nint broadPhaseLayerFilter, nint objectLayerFilter);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_DeactivateBody(nint handle, uint bodyId);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_DeactivateBodies(nint handle, uint* bodyIDs, uint count);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_BodyInterface_IsActive(nint handle, uint bodyID);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_BodyInterface_ResetSleepTimer(nint bodyInterface, uint bodyID);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_SetObjectLayer(nint handle, uint bodyId, JPH_ObjectLayer layer);

@@ -191,7 +191,6 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         JPH_BodyInterface_SetMotionQuality(Handle, bodyID, quality);
     }
 
-    public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID);
     public bool IsAdded(in BodyID bodyID) => JPH_BodyInterface_IsAdded(Handle, bodyID);
     public BodyType GetBodyType(in BodyID bodyID) => JPH_BodyInterface_GetBodyType(Handle, bodyID);
 
@@ -357,10 +356,46 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
         JPH_BodyInterface_ActivateBody(Handle, bodyId);
     }
 
+    public void ActivateBodiesInAABox(in BoundingBox box,
+        BroadPhaseLayerFilter broadPhaseLayerFilter,
+        ObjectLayerFilter objectLayerFilter)
+    {
+        JPH_BodyInterface_ActivateBodiesInAABox(Handle,
+            in box,
+            broadPhaseLayerFilter.Handle,
+            objectLayerFilter.Handle
+            );
+    }
+
+    public void ActivateBodies(Span<BodyID> bodyIDs)
+    {
+        uint* bodyIDsPtr = stackalloc uint[bodyIDs.Length];
+        for (int i = 0; i < bodyIDs.Length; i++)
+        {
+            bodyIDsPtr[i] = bodyIDs[i];
+        }
+
+        JPH_BodyInterface_ActivateBodies(Handle, bodyIDsPtr, (uint)bodyIDs.Length);
+    }
+
     public void DeactivateBody(in BodyID bodyId)
     {
         JPH_BodyInterface_DeactivateBody(Handle, bodyId);
     }
+
+    public void DeactivateBodies(Span<BodyID> bodyIDs)
+    {
+        uint* bodyIDsPtr = stackalloc uint[bodyIDs.Length];
+        for (int i = 0; i < bodyIDs.Length; i++)
+        {
+            bodyIDsPtr[i] = bodyIDs[i];
+        }
+
+        JPH_BodyInterface_DeactivateBodies(Handle, bodyIDsPtr, (uint)bodyIDs.Length);
+    }
+
+    public bool IsActive(in BodyID bodyID) => JPH_BodyInterface_IsActive(Handle, bodyID);
+    public void ResetSleepTimer(in BodyID bodyID) => JPH_BodyInterface_ResetSleepTimer(Handle, bodyID);
 
     public void SetObjectLayer(in BodyID bodyId, in ObjectLayer layer)
     {

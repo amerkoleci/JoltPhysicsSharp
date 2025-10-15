@@ -4,7 +4,7 @@
 [![Build status](https://github.com/amerkoleci/JoltPhysicsSharp/workflows/Build/badge.svg)](https://github.com/amerkoleci/JoltPhysicsSharp/actions)
 [![NuGet](https://img.shields.io/nuget/v/JoltPhysicsSharp.svg)](https://www.nuget.org/packages/JoltPhysicsSharp)
 
-Cross platform modern **.net9.0** and **.net8.0** bindings for [JoltPhysics](https://github.com/jrouwe/JoltPhysics) using [joltc](https://github.com/amerkoleci/joltc).
+Cross platform modern **.net9.0** and **.net10.0** bindings for [JoltPhysics](https://github.com/jrouwe/JoltPhysics) using [joltc](https://github.com/amerkoleci/joltc).
 
 # Installation - [Nuget](https://www.nuget.org/packages/JoltPhysicsSharp)
 ```
