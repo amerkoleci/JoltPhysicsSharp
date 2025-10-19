@@ -225,6 +225,10 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_ActivateBodiesInAABox(Handle, in box, layer.Value);
     }
 
+    public bool WereBodiesInContact(in BodyID inBody1ID, in BodyID inBody2ID) {
+        return JPH_PhysicsSystem_WereBodiesInContact(Handle, inBody1ID, inBody2ID);
+    }
+
     public Vector3 Gravity
     {
         get

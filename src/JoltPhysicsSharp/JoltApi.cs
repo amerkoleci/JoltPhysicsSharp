@@ -1676,6 +1676,10 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_PhysicsSystem_ActivateBodiesInAABox(nint system, in BoundingBox box, JPH_ObjectLayer layer);
 
     [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_PhysicsSystem_WereBodiesInContact(nint system, uint inBody1ID, uint inBody2ID);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_DrawBodies(nint system, DrawSettings* settings, nint renderer, nint bodyFilter);
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_DrawConstraints(nint system, nint renderer);
