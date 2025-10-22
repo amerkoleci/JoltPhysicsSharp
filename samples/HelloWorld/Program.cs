@@ -44,11 +44,6 @@ public static class Program
 
     public static unsafe void Main()
     {
-        if (!Foundation.Init(false))
-        {
-            return;
-        }
-
         Foundation.SetTraceHandler((message) =>
         {
             Console.WriteLine(message);
@@ -66,6 +61,11 @@ public static class Program
             throw new Exception(outMessage);
         });
 #endif
+
+        if (!Foundation.Init(false))
+        {
+            return;
+        }
 
         {
             //using Sample sample = new HelloWorld();

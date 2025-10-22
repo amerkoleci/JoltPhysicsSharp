@@ -35,11 +35,6 @@ public abstract class Application : DisposableObject
 
     protected Application(string title, int width = 1200, int height = 800)
     {
-        if (!Foundation.Init(false))
-        {
-            return;
-        }
-
         Foundation.SetTraceHandler((message) =>
         {
             Console.WriteLine(message);
@@ -57,6 +52,12 @@ public abstract class Application : DisposableObject
             throw new Exception(outMessage);
         });
 #endif
+
+        if (!Foundation.Init(false))
+        {
+            return;
+        }
+
         _settings = new PhysicsSystemSettings()
         {
             MaxBodies = MaxBodies,
