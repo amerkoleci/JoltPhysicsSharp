@@ -25,7 +25,7 @@ jobs:
         global-json-file: ./global.json
 
     - name: Pack
-      run: dotnet pack JoltPhysicsSharp.sln --configuration Release
+      run: dotnet pack JoltPhysicsSharp.slnx --configuration Release
 
     - name: Publish to NuGet
       if: github.event_name == 'push'

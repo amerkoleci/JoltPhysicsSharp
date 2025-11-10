@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/build/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="JoltPhysicsSharp.Native.targets" />
+    <File Path="LICENSE" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/01-HelloWorld/01-HelloWorld.csproj" />
+    <Project Path="samples/Alimer.SampleFramework/Alimer.SampleFramework.csproj" />
+    <Project Path="samples/HelloWorld/HelloWorld.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JoltPhysicsSharp.Tests.csproj" />
+  </Folder>
+  <Project Path="src/JoltPhysics.Native.Debug/JoltPhysics.Native.Debug.csproj" />
+  <Project Path="src/JoltPhysics.Native/JoltPhysics.Native.csproj" />
+  <Project Path="src/JoltPhysicsSharp/JoltPhysicsSharp.csproj" />
+</Solution>
