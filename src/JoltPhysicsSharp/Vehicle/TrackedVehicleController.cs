@@ -130,4 +130,14 @@ public class TrackedVehicleController : VehicleController
         get => JPH_TrackedVehicleController_GetBrakeInput(Handle);
         set => JPH_TrackedVehicleController_SetBrakeInput(Handle, value);
     }
+
+    public VehicleEngine Engine
+    {
+        get => VehicleEngine.GetObject(JPH_TrackedVehicleController_GetEngine(Handle))!;
+    }
+
+    public VehicleTransmission Transmission
+    {
+        get => VehicleTransmission.GetObject(JPH_TrackedVehicleController_GetTransmission(Handle))!;
+    }
 }

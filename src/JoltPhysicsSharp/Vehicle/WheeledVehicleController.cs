@@ -32,6 +32,18 @@ public class WheelSettingsWV : WheelSettings
         set => JPH_WheelSettingsWV_SetMaxSteerAngle(Handle, value);
     }
 
+    public LinearCurve LongitudinalFriction
+    {
+        get => LinearCurve.GetObject(JPH_WheelSettingsWV_GetLongitudinalFriction(Handle))!;
+        set => JPH_WheelSettingsWV_SetLongitudinalFriction(Handle, value.Handle);
+    }
+
+    public LinearCurve LateralFriction
+    {
+        get => LinearCurve.GetObject(JPH_WheelSettingsWV_GetLateralFriction(Handle))!;
+        set => JPH_WheelSettingsWV_SetLateralFriction(Handle, value.Handle);
+    }
+
     public float MaxBrakeTorque
     {
         get => JPH_WheelSettingsWV_GetMaxBrakeTorque(Handle);
@@ -150,9 +162,33 @@ public unsafe class WheeledVehicleControllerSettings : VehicleControllerSettings
 
 public class WheeledVehicleController : VehicleController
 {
+    public delegate void TireMaxImpulseCallback(uint wheelIndex,
+        out float longitudinalImpulse,
+        out float lateralImpulse,
+        float suspensionImpulse,
+        float longitudinalFriction,
+        float lateralFriction,
+        float longitudinalSlip,
+        float lateralSlip,
+        float deltaTime);
+
+    private TireMaxImpulseCallback? _tireMaxCallback;
+    private nint _listenerUserData;
+
     internal WheeledVehicleController(nint handle, bool ownsHandle)
         : base(handle, ownsHandle)
     {
+    }
+
+    protected override void DisposeNative()
+    {
+        if (_listenerUserData != 0)
+        {
+            DelegateProxies.GetUserData<WheeledVehicleController>(_listenerUserData, out GCHandle gch);
+            gch.Free();
+
+            _listenerUserData = 0;
+        }
     }
 
     public void SetDriverInput(float forward, float right, float brake, float handBrake)
@@ -187,5 +223,57 @@ public class WheeledVehicleController : VehicleController
     public float WheelSpeedAtClutch
     {
         get => JPH_WheeledVehicleController_GetWheelSpeedAtClutch(Handle);
+    }
+
+    public VehicleEngine Engine
+    {
+        get => VehicleEngine.GetObject(JPH_WheeledVehicleController_GetEngine(Handle))!;
+    }
+
+    public VehicleTransmission Transmission
+    {
+        get => VehicleTransmission.GetObject(JPH_WheeledVehicleController_GetTransmission(Handle))!;
+    }
+
+    public unsafe void SetTireMaxImpulseCallback(TireMaxImpulseCallback callback)
+    {
+        if (_listenerUserData == 0)
+        {
+            _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        }
+
+        _tireMaxCallback = callback;
+        JPH_WheeledVehicleController_SetTireMaxImpulseCallback(Handle,
+            callback != null ? &OnNativeTireMaxImpulseCallback : null,
+            _listenerUserData);
+    }
+
+    [UnmanagedCallersOnly]
+    private static unsafe void OnNativeTireMaxImpulseCallback(nint context,
+        uint wheelIndex,
+        float* outLongitudinalImpulse,
+        float* outLateralImpulse,
+        float suspensionImpulse,
+        float longitudinalFriction,
+        float lateralFriction,
+        float longitudinalSlip,
+        float lateralSlip,
+        float deltaTime)
+    {
+        WheeledVehicleController listener = DelegateProxies.GetUserData<WheeledVehicleController>(context, out _);
+        float longitudinalImpulse = 0;
+        float lateralImpulse = 0;
+        listener._tireMaxCallback?.Invoke(wheelIndex,
+            out longitudinalImpulse,
+            out lateralImpulse,
+            suspensionImpulse,
+            longitudinalFriction,
+            lateralFriction,
+            longitudinalSlip,
+            lateralSlip,
+            deltaTime
+            );
+        *outLongitudinalImpulse = longitudinalImpulse;
+        *outLateralImpulse = lateralImpulse;
     }
 }

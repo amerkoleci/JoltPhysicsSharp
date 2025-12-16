@@ -24,6 +24,7 @@ using unsafe JPH_CollideShapeResultCallback = delegate* unmanaged<nint, CollideS
 using unsafe JPH_QueueJobCallback = delegate* unmanaged<nint, /*JPH_JobFunction*/delegate* unmanaged<nint, void>, nint, void>;
 using unsafe JPH_QueueJobsCallback = delegate* unmanaged<nint, /*JPH_JobFunction**/delegate* unmanaged<nint, void>, void**, uint, void>;
 using unsafe JPH_RayCastBodyCollectorCallback = delegate* unmanaged<nint, BroadPhaseCastResult*, float>;
+using unsafe JPH_TireMaxImpulseCallback = delegate* unmanaged<nint, uint, float*, float*, float, float, float, float, float, float, void>;
 
 internal static unsafe partial class JoltApi
 {
@@ -497,6 +498,15 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     [return: MarshalAs(UnmanagedType.U1)]
     public static partial bool JPH_Shape_CollidePoint2(nint shape, in Vector3 point, CollisionCollectorType collectorType, JPH_CollidePointResultCallback callback, nint userData, nint shapeFilter);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_Shape_Draw(nint shape,
+        nint renderer,
+        /*JPH_RMat4**/in Matrix4x4 centerOfMassTransform,
+        in Vector3 scale,
+        uint color,
+        [MarshalAs(UnmanagedType.U1)] bool useMaterialColors,
+        [MarshalAs(UnmanagedType.U1)] bool drawWireframe);
     #endregion
 
     #region ConvexShape
@@ -3260,7 +3270,7 @@ internal static unsafe partial class JoltApi
         public float maxTorque;
         public float minRPM;
         public float maxRPM;
-        //public LinearCurve			normalizedTorque;
+        public nint normalizedTorque;
         public float inertia;
         public float angularDamping;
     }
@@ -3280,6 +3290,26 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_VehicleEngineSettings_Init(JPH_VehicleEngineSettings* settings);
+
+    #region VehicleEngine
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleEngine_ClampRPM(nint engine);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleEngine_GetCurrentRPM(nint engine);
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleEngine_SetCurrentRPM(nint engine, float rpm);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleEngine_GetAngularVelocity(nint engine);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleEngine_GetTorque(nint engine, float acceleration);
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleEngine_ApplyTorque(nint engine, float torque, float deltaTime);
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleEngine_ApplyDamping(nint engine, float deltaTime);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_VehicleEngine_AllowSleep(nint engine);
+    #endregion
 
     [LibraryImport(LibName)]
     public static partial void JPH_VehicleDifferentialSettings_Init(JPH_VehicleDifferentialSettings* settings);
@@ -3345,6 +3375,25 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_VehicleTransmissionSettings_GetClutchStrength(nint settings);
     [LibraryImport(LibName)]
     public static partial void JPH_VehicleTransmissionSettings_SetClutchStrength(nint settings, float value);
+    #endregion
+
+    #region VehicleTransmission
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleTransmission_Set(nint transmission, int currentGear, float clutchFriction);
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleTransmission_Update(nint transmission, float deltaTime, float currentRPM, float forwardInput, [MarshalAs(UnmanagedType.U1)] bool canShiftUp);
+    [LibraryImport(LibName)]
+    public static partial int JPH_VehicleTransmission_GetCurrentGear(nint transmission);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleTransmission_GetClutchFriction(nint transmission);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_VehicleTransmission_IsSwitchingGear(nint transmission);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleTransmission_GetCurrentRatio(nint transmission);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_VehicleTransmission_AllowSleep(nint transmission);
     #endregion
 
     [LibraryImport(LibName)]
@@ -3562,10 +3611,14 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_WheelSettingsWV_GetMaxSteerAngle(nint settings);
     [LibraryImport(LibName)]
     public static partial void JPH_WheelSettingsWV_SetMaxSteerAngle(nint settings, float value);
-    //JPH_CAPI JPH_LinearCurve* JPH_WheelSettingsWV_GetLongitudinalFriction(const JPH_WheelSettingsWV* settings);
-    //JPH_CAPI void JPH_WheelSettingsWV_SetLongitudinalFriction(JPH_WheelSettingsWV* settings, const JPH_LinearCurve* value);
-    //JPH_CAPI JPH_LinearCurve* JPH_WheelSettingsWV_GetLateralFriction(const JPH_WheelSettingsWV* settings);
-    //JPH_CAPI void JPH_WheelSettingsWV_SetLateralFriction(JPH_WheelSettingsWV* settings, const JPH_LinearCurve* value);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheelSettingsWV_GetLongitudinalFriction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheelSettingsWV_SetLongitudinalFriction(nint settings, nint value);
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheelSettingsWV_GetLateralFriction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheelSettingsWV_SetLateralFriction(nint settings, nint value);
     [LibraryImport(LibName)]
     public static partial float JPH_WheelSettingsWV_GetMaxBrakeTorque(nint settings);
     [LibraryImport(LibName)]
@@ -3634,6 +3687,15 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_WheeledVehicleController_GetHandBrakeInput(nint controller);
     [LibraryImport(LibName)]
     public static partial float JPH_WheeledVehicleController_GetWheelSpeedAtClutch(nint controller);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleController_SetTireMaxImpulseCallback(nint controller, JPH_TireMaxImpulseCallback tireMaxImpulseCallback, nint userData);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheeledVehicleController_GetEngine(nint controller);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_WheeledVehicleController_GetTransmission(nint controller);
     #endregion
 
     #region MotorcycleController
@@ -3698,6 +3760,33 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_MotorcycleController_SetLeanSmoothingFactor(nint controller, float value);
     #endregion
 
+    #region LinearCurve
+    [LibraryImport(LibName)]
+    public static partial nint JPH_LinearCurve_Create();
+    [LibraryImport(LibName)]
+    public static partial void JPH_LinearCurve_Destroy(nint curve);
+    [LibraryImport(LibName)]
+    public static partial void JPH_LinearCurve_Clear(nint curve);
+    [LibraryImport(LibName)]
+    public static partial void JPH_LinearCurve_Reserve(nint curve, int numPoints);
+    [LibraryImport(LibName)]
+    public static partial void JPH_LinearCurve_AddPoint(nint curve, float x, float y);
+    [LibraryImport(LibName)]
+    public static partial void JPH_LinearCurve_Sort(nint curve);
+    [LibraryImport(LibName)]
+    public static partial float JPH_LinearCurve_GetMinX(nint curve);
+    [LibraryImport(LibName)]
+    public static partial float JPH_LinearCurve_GetMaxX(nint curve);
+    [LibraryImport(LibName)]
+    public static partial float JPH_LinearCurve_GetValue(nint curve, float x);
+    [LibraryImport(LibName)]
+    public static partial int JPH_LinearCurve_GetPointCount(nint curve);
+    [LibraryImport(LibName)]
+    public static partial void JPH_LinearCurve_GetPoint(nint curve, int index, out Vector2 result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_LinearCurve_GetPoints(nint curve, Vector2* points, out int count);
+    #endregion
+
     #region TrackedVehicleController
     /* WheelTV */
     [LibraryImport(LibName)]
@@ -3746,6 +3835,12 @@ internal static unsafe partial class JoltApi
     public static partial float JPH_TrackedVehicleController_GetBrakeInput(nint controller);
     [LibraryImport(LibName)]
     public static partial void JPH_TrackedVehicleController_SetBrakeInput(nint controller, float value);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TrackedVehicleController_GetEngine(nint controller);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TrackedVehicleController_GetTransmission(nint controller);
     #endregion
 
     sealed class UTF8EncodingRelaxed : UTF8Encoding

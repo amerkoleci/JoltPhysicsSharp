@@ -210,6 +210,16 @@ public class Shape : NativeObject
         return callbackResult;
     }
 
+    public void Draw(DebugRenderer debugRenderer,
+        in Matrix4x4 centerOfMassTransform,
+        in Vector3 scale,
+        in JoltColor color,
+        bool useMaterialColors,
+        bool drawWireframe)
+    {
+        JPH_Shape_Draw(Handle, debugRenderer.Handle, in centerOfMassTransform, in scale, color.PackedValue, useMaterialColors, drawWireframe);
+    }
+
     [UnmanagedCallersOnly]
     private static unsafe void OnCastRayResultCallback(nint userData, RayCastResult* result)
     {

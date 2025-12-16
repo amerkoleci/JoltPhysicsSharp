@@ -12,7 +12,7 @@ public struct VehicleEngineSettings
     public float MaxTorque { get; set; }
     public float MinRPM { get; set; }
     public float MaxRPM { get; set; }
-    //public LinearCurve			normalizedTorque;
+    public LinearCurve? NormalizedTorque { get; set; }
     public float Inertia { get; set; }
     public float AngularDamping { get; set; }
 
@@ -29,15 +29,17 @@ public struct VehicleEngineSettings
         MaxTorque = native.maxTorque;
         MinRPM = native.minRPM;
         MaxRPM = native.maxRPM;
+        NormalizedTorque = LinearCurve.GetObject(native.normalizedTorque);
         Inertia = native.inertia;
         AngularDamping = native.angularDamping;
     }
 
-    internal unsafe void ToNative(JPH_VehicleEngineSettings* native)
+    internal unsafe readonly void ToNative(JPH_VehicleEngineSettings* native)
     {
         native->maxTorque = MaxTorque;
         native->minRPM = MinRPM;
         native->maxRPM = MaxRPM;
+        native->normalizedTorque = NormalizedTorque?.Handle ?? nint.Zero;
         native->inertia = Inertia;
         native->angularDamping = AngularDamping;
     }
