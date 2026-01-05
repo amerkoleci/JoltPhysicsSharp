@@ -3183,40 +3183,6 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_DebugRenderer_DrawTaperedCylinder(nint renderer, /*RMatrix4x4*/ in Mat4 matrix, float top, float bottom, float topRadius, float bottomRadius, uint color, DebugRenderer.CastShadow castShadow, DebugRenderer.DrawMode drawMode);
     #endregion
 
-    #region Skeleton
-    public readonly struct SkeletonJoint
-    {
-        public readonly byte* name;
-        public readonly byte* parentName;
-        public readonly int parentJointIndex;
-    }
-
-    [LibraryImport(LibName)]
-    public static partial nint JPH_Skeleton_Create();
-    [LibraryImport(LibName)]
-    public static partial void JPH_Skeleton_Destroy(nint skeleton);
-
-    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
-    public static partial uint JPH_Skeleton_AddJoint(nint skeleton, string name);
-    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
-    public static partial uint JPH_Skeleton_AddJoint2(nint skeleton, string name, int parentIndex);
-    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
-    public static partial uint JPH_Skeleton_AddJoint3(nint skeleton, string name, string parentName);
-    [LibraryImport(LibName)]
-    public static partial int JPH_Skeleton_GetJointCount(nint skeleton);
-    [LibraryImport(LibName)]
-    public static partial void JPH_Skeleton_GetJoint(nint skeleton, int index, out SkeletonJoint joint);
-    [LibraryImport(LibName, StringMarshalling = StringMarshalling.Utf8)]
-    public static partial int JPH_Skeleton_GetJointIndex(nint skeleton, string name);
-    [LibraryImport(LibName)]
-    public static partial void JPH_Skeleton_CalculateParentJointIndices(nint skeleton);
-    [LibraryImport(LibName)]
-    [return: MarshalAs(UnmanagedType.U1)]
-    public static partial bool JPH_Skeleton_AreJointsCorrectlyOrdered(nint skeleton);
-    #endregion
-
-    [LibraryImport(LibName)]
-    public static partial void JPH_EstimateCollisionResponse(nint body1, nint body2, nint manifold, float combinedFriction, float combinedRestitution, float minVelocityForRestitution, int numIterations, CollisionEstimationResult* result);
 
     #region Ragdoll
     /* Ragdoll */
@@ -3242,6 +3208,25 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_RagdollSettings_CalculateConstraintIndexToBodyIdxPair(nint settings);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_ResizeParts(nint settings, int count);
+    [LibraryImport(LibName)]
+    public static partial int JPH_RagdollSettings_GetPartCount(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_SetPartShape(nint settings, int partIndex, /*const JPH_Shape**/nint shape);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_SetPartPosition(nint settings, int partIndex, in Vector3 position); // JPH_RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_SetPartRotation(nint settings, int partIndex, in Quaternion rotation);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_SetPartMotionType(nint settings, int partIndex, MotionType motionType);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_SetPartObjectLayer(nint settings, int partIndex, JPH_ObjectLayer layer);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_SetPartMassProperties(nint settings, int partIndex, float mass);
+    [LibraryImport(LibName)]
+    public static partial void JPH_RagdollSettings_SetPartToParent(nint settings, int partIndex, JPH_SwingTwistConstraintSettings* constraintSettings);
+
+    [LibraryImport(LibName)]
     public static partial nint JPH_RagdollSettings_CreateRagdoll(nint settings, nint system, uint collisionGroup, ulong userData);
     [LibraryImport(LibName)]
     public static partial void JPH_Ragdoll_Destroy(nint ragdoll);
@@ -3256,7 +3241,35 @@ internal static unsafe partial class JoltApi
     public static partial bool JPH_Ragdoll_IsActive(nint ragdoll, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
     [LibraryImport(LibName)]
     public static partial void JPH_Ragdoll_ResetWarmStart(nint ragdoll);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_SetPose(nint ragdoll, /*const JPH_SkeletonPose**/nint pose, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_SetPose2(nint ragdoll, /*JPH_RVec3*/ in Vector3 rootOffset, in Matrix4x4 jointMatrices, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_GetPose(nint ragdoll, out nint outPose, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_GetPose2(nint ragdoll, /*JPH_RVec3*/ out Vector3 outRootOffset, out Matrix4x4 outJointMatrices, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_DriveToPoseUsingMotors(nint ragdoll, /*const JPH_SkeletonPose**/nint pose);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_DriveToPoseUsingKinematics(nint ragdoll, /*const JPH_SkeletonPose**/nint pose, float deltaTime, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial int JPH_Ragdoll_GetBodyCount(nint ragdoll);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_Ragdoll_GetBodyID(nint ragdoll, int bodyIndex);
+    [LibraryImport(LibName)]
+    public static partial int JPH_Ragdoll_GetConstraintCount(nint ragdoll);
+    [LibraryImport(LibName)]
+    public static partial /*JPH_TwoBodyConstraint*/nint JPH_Ragdoll_GetConstraint(nint ragdoll, int constraintIndex);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Ragdoll_GetRootTransform(nint ragdoll, /*JPH_RVec3*/out Vector3 outPosition, out Quaternion outRotation, [MarshalAs(UnmanagedType.U1)] bool lockBodies /* = true */);
+    [LibraryImport(LibName)]
+    public static partial /*const JPH_RagdollSettings**/nint JPH_Ragdoll_GetRagdollSettings(nint ragdoll);
     #endregion
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_EstimateCollisionResponse(nint body1, nint body2, nint manifold, float combinedFriction, float combinedRestitution, float minVelocityForRestitution, int numIterations, CollisionEstimationResult* result);
+
 
     public struct JPH_VehicleAntiRollBar
     {

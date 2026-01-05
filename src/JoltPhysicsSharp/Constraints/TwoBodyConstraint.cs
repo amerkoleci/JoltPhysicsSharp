@@ -12,10 +12,10 @@ public abstract class TwoBodyConstraintSettings : ConstraintSettings
     public abstract TwoBodyConstraint CreateConstraint(in Body body1, in Body body2);
 }
 
-public abstract unsafe class TwoBodyConstraint : Constraint
+public unsafe class TwoBodyConstraint : Constraint
 {
-    protected TwoBodyConstraint(nint handle)
-        : base(handle)
+    internal TwoBodyConstraint(nint handle, bool owns = true)
+       : base(handle, owns)
     {
     }
 
@@ -62,4 +62,7 @@ public abstract unsafe class TwoBodyConstraint : Constraint
         JPH_TwoBodyConstraint_GetConstraintToBody2Matrix(Handle, &joltMatrix);
         result = joltMatrix.FromJolt();
     }
+
+
+    internal static TwoBodyConstraint? GetObject(nint handle) => GetOrAddObject(handle, h => new TwoBodyConstraint(h, false));
 }
