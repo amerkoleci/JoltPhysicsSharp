@@ -3298,6 +3298,18 @@ internal static unsafe partial class JoltApi
         public float engineTorqueRatio;
     }
 
+
+    public struct JPH_VehicleTrackSettings
+    {
+        public uint drivenWheel;
+        public unsafe uint* wheels;
+        public uint wheelsCount;
+        public float inertia;
+        public float angularDamping;
+        public float maxBrakeTorque;
+        public float differentialRatio;
+    }
+
     [LibraryImport(LibName)]
     public static partial void JPH_VehicleAntiRollBar_Init(JPH_VehicleAntiRollBar* settings);
 
@@ -3854,6 +3866,29 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial nint JPH_TrackedVehicleController_GetTransmission(nint controller);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_TrackedVehicleController_GetTrack(nint controller, TrackSide side);
+    #endregion
+
+    #region VehicleTrack
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleTrackSettings_Init(JPH_VehicleTrackSettings* settings);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleTrack_GetAngularVelocity(nint track);
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleTrack_SetAngularVelocity(nint track, float velocity);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_VehicleTrack_GetDrivenWheel(nint track);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleTrack_GetInertia(nint track);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleTrack_GetAngularDamping(nint track);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleTrack_GetMaxBrakeTorque(nint track);
+    [LibraryImport(LibName)]
+    public static partial float JPH_VehicleTrack_GetDifferentialRatio(nint track);
     #endregion
 
     sealed class UTF8EncodingRelaxed : UTF8Encoding

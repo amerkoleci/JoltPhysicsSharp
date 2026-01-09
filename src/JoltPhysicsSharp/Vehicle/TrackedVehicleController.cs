@@ -92,7 +92,6 @@ public unsafe class TrackedVehicleControllerSettings : VehicleControllerSettings
         }
     }
 
-    // TODO: VehicleTrackSettings
 }
 
 public class TrackedVehicleController : VehicleController
@@ -140,4 +139,12 @@ public class TrackedVehicleController : VehicleController
     {
         get => VehicleTransmission.GetObject(JPH_TrackedVehicleController_GetTransmission(Handle))!;
     }
+
+    public VehicleTrack GetTrack(TrackSide side)
+    {
+        return VehicleTrack.GetObject(JPH_TrackedVehicleController_GetTrack(Handle, side))!;
+    }
+
+    public VehicleTrack LeftTrack => GetTrack(TrackSide.Left);
+    public VehicleTrack RightTrack => GetTrack(TrackSide.Right);
 }

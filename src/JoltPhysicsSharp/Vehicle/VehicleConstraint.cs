@@ -25,6 +25,33 @@ public class VehicleConstraint : Constraint, IPhysicsStepListener
         get => Body.GetObject(JPH_VehicleConstraint_GetVehicleBody(Handle))!;
     }
 
+    public Vector3 LocalForward
+    {
+        get
+        {
+            JPH_VehicleConstraint_GetLocalForward(Handle, out Vector3 result);
+            return result;
+        }
+    }
+
+    public Vector3 LocalUp
+    {
+        get
+        {
+            JPH_VehicleConstraint_GetLocalUp(Handle, out Vector3 result);
+            return result;
+        }
+    }
+
+    public Vector3 WorldUp
+    {
+        get
+        {
+            JPH_VehicleConstraint_GetWorldUp(Handle, out Vector3 result);
+            return result;
+        }
+    }
+
     public T GetController<T>() where T : VehicleController
     {
         return VehicleController.GetObject<T>(JPH_VehicleConstraint_GetController(Handle))!;
