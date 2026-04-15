@@ -63,7 +63,7 @@ public unsafe class VehicleConstraintSettings : ConstraintSettings
         native->wheelsCount = Wheels != null ? Wheels.Length : 0;
         if (native->wheelsCount > 0)
         {
-            native->wheels = (nint*)NativeMemory.Alloc((nuint)(sizeof(nint) * native->wheelsCount));
+            native->wheels = AllocArray<nint>((uint)native->wheelsCount);
             for (uint i = 0; i < native->wheelsCount; i++)
             {
                 native->wheels[i] = Wheels[i]!.Handle;
@@ -91,7 +91,7 @@ public unsafe class VehicleConstraintSettings : ConstraintSettings
         native->controller = Controller?.Handle ?? nint.Zero;
     }
 
-    internal unsafe nint CreateConstraintNative(Body body)
+    internal nint CreateConstraintNative(Body body)
     {
         JPH_VehicleConstraintSettings nativeSettings = default;
         try

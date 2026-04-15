@@ -15,10 +15,16 @@ public sealed class VehicleTransmission : NativeObject
 
     internal static VehicleTransmission? GetObject(nint handle) => GetOrAddObject(handle, h => new VehicleTransmission(h, false));
 
+    public void SetMode(TransmissionMode mode)
+    {
+        JPH_VehicleTransmission_SetMode(Handle, mode);
+    }
+
     public void Set(int currentGear, float clutchFriction)
     {
         JPH_VehicleTransmission_Set(Handle, currentGear, clutchFriction);
     }
+
     public void Update(float deltaTime, float currentRPM, float forwardInput, bool canShiftUp)
     {
         JPH_VehicleTransmission_Update(Handle, deltaTime, currentRPM, forwardInput, canShiftUp);

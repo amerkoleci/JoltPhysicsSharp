@@ -285,6 +285,21 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_RemoveStepListener(Handle, listener.Handle);
     }
 
+    public void GetBodies(BodyID* ids, uint count)
+    {
+        JPH_PhysicsSystem_GetBodies(Handle, ids, count);
+    }
+
+    public void GetActiveBodies(BodyType type, BodyID* ids, uint count)
+    {
+        JPH_PhysicsSystem_GetActiveBodies(Handle, type, ids, count);
+    }
+
+    public BodyID* GetActiveBodiesUnsafe(BodyType type)
+    {
+        return JPH_PhysicsSystem_GetActiveBodiesUnsafe(Handle, type);
+    }
+
     public void DrawBodies(in DrawSettings settings, DebugRenderer renderer, BodyDrawFilter? bodyDrawFilter = default)
     {
         fixed (DrawSettings* settingsPtr = &settings)

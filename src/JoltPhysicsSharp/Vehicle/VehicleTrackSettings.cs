@@ -40,7 +40,7 @@ public struct VehicleTrackSettings
         }
     }
 
-    internal unsafe void ToNative(JPH_VehicleTrackSettings* native, uint* wheelsBuffer)
+    internal readonly unsafe void ToNative(JPH_VehicleTrackSettings* native)
     {
         native->drivenWheel = DrivenWheel;
         native->inertia = Inertia;
@@ -50,11 +50,11 @@ public struct VehicleTrackSettings
 
         if (Wheels is { Length: > 0 })
         {
+            native->wheels = AllocArray<uint>((uint)Wheels.Length);
             for (int i = 0; i < Wheels.Length; i++)
             {
-                wheelsBuffer[i] = Wheels[i];
+                native->wheels[i] = Wheels[i];
             }
-            native->wheels = wheelsBuffer;
             native->wheelsCount = (uint)Wheels.Length;
         }
         else

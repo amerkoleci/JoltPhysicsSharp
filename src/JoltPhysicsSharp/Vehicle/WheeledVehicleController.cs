@@ -158,6 +158,11 @@ public unsafe class WheeledVehicleControllerSettings : VehicleControllerSettings
         settings.ToNative(&native);
         JPH_WheeledVehicleControllerSettings_SetDifferential(Handle, index, &native);
     }
+
+    public void AddDifferential(int leftWheel, int rightWheel)
+    {
+        JPH_WheeledVehicleControllerSettings_AddDifferential(Handle, leftWheel, rightWheel);
+    }
 }
 
 public class WheeledVehicleController : VehicleController

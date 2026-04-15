@@ -216,7 +216,8 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public CollisionGroup GetCollisionGroup(in BodyID bodyID)
     {
-        JPH_BodyInterface_GetCollisionGroup(Handle, bodyID, out JPH_CollisionGroup groupNative);
+        JPH_CollisionGroup groupNative = default;
+        JPH_BodyInterface_GetCollisionGroup(Handle, bodyID, &groupNative);
         return CollisionGroup.FromNative(groupNative);
     }
 

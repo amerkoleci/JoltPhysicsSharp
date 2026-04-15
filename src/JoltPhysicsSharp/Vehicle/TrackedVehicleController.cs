@@ -92,6 +92,16 @@ public unsafe class TrackedVehicleControllerSettings : VehicleControllerSettings
         }
     }
 
+    public void SetTrack(uint index, VehicleTrackSettings track)
+    {
+        JPH_VehicleTrackSettings nativeTrack = default;
+        track.ToNative(&nativeTrack);
+        JPH_TrackedVehicleControllerSettings_SetTrack(Handle, index, &nativeTrack);
+        if (nativeTrack.wheelsCount > 0)
+        {
+            NativeMemory.Free(nativeTrack.wheels);
+        }
+    }
 }
 
 public class TrackedVehicleController : VehicleController

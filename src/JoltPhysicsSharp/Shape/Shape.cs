@@ -236,6 +236,6 @@ public class Shape : NativeObject
 
     internal static Shape? GetObject(nint handle)
     {
-        return GetOrAddObject(handle, (nint h) => new Shape(h, false));
+        return GetOrAddObject(handle, h => new Shape(h, false));
     }
 }

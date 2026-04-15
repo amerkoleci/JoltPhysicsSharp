@@ -222,6 +222,9 @@ internal static unsafe partial class JoltApi
 
     // BroadPhaseLayerInterface
     [LibraryImport(LibName)]
+    public static partial void JPH_BroadPhaseLayerInterface_Destroy(nint handle);
+
+    [LibraryImport(LibName)]
     public static partial nint JPH_BroadPhaseLayerInterfaceMask_Create(uint numBroadPhaseLayers);
 
     [LibraryImport(LibName)]
@@ -235,6 +238,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(nint bpInterface, uint objectLayer, byte broadPhaseLayer);
 
     //  ObjectVsBroadPhaseLayerFilter
+
     [LibraryImport(LibName)]
     public static partial nint JPH_ObjectVsBroadPhaseLayerFilterMask_Create(nint broadPhaseLayerInterface);
 
@@ -245,6 +249,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(nint handle);
 
     #region JPH_ObjectLayerPairFilter
+    [LibraryImport(LibName)]
+    public static partial void JPH_ObjectLayerPairFilter_Destroy(nint handle);
+
     [LibraryImport(LibName)]
     public static partial nint JPH_ObjectLayerPairFilterMask_Create();
 
@@ -1072,12 +1079,146 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_BodyCreationSettings_SetMassPropertiesOverride(nint settings, MassProperties* massProperties);
 
+    /* JPH_SoftBodySharedSettings  */
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SoftBodySharedSettings_Create();
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodySharedSettings_Destroy(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodySharedSettings_AddVertex(nint settings, in SoftBodySharedSettings.Vertex vertex);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodySharedSettings_AddVertices(nint settings, SoftBodySharedSettings.Vertex* vertices, uint count);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SoftBodySharedSettings_RemoveVertex(nint settings, uint index);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_SoftBodySharedSettings_GetVertexCount(nint settings);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SoftBodySharedSettings_GetVertex(nint settings, uint index, out SoftBodySharedSettings.Vertex vertex);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodySharedSettings_AddFace(nint settings, in SoftBodySharedSettings.Face face);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodySharedSettings_AddFaces(nint settings, SoftBodySharedSettings.Face* faces, uint count);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SoftBodySharedSettings_RemoveFace(nint settings, uint index);
+    [LibraryImport(LibName)]
+    public static partial uint JPH_SoftBodySharedSettings_GetFaceCount(nint settings);
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SoftBodySharedSettings_GetFace(nint settings, uint index, out SoftBodySharedSettings.Face face);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodySharedSettings_CreateConstraints(nint settings, float compliance, SoftBodyBendType bendType);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodySharedSettings_Optimize(nint settings);
+
+
     /* SoftBodyCreationSettings */
     [LibraryImport(LibName)]
     public static partial nint JPH_SoftBodyCreationSettings_Create();
 
     [LibraryImport(LibName)]
+    public static partial nint JPH_SoftBodyCreationSettings_Create2(/* JPH_SoftBodySharedSettings**/nint settings,  /*JPH_RVec3*/in Vector3 position, in Quaternion rotation, JPH_ObjectLayer objectLayer);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_SoftBodyCreationSettings_Destroy(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_SoftBodyCreationSettings_GetSettings(nint settings);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetSettings(nint settings, /* JPH_SoftBodySharedSettings*/nint sharedSettings);
+
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_GetPosition(nint settings, out Vector3 result); // JPH_RVec3
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetPosition(nint settings, in Vector3 value); // JPH_RVec3
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_GetRotation(nint settings, out Quaternion result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetRotation(nint settings, in Quaternion value);
+
+    [LibraryImport(LibName)]
+    public static partial ulong JPH_SoftBodyCreationSettings_GetUserData(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetUserData(nint settings, ulong userData);
+
+    [LibraryImport(LibName)]
+    public static partial JPH_ObjectLayer JPH_SoftBodyCreationSettings_GetObjectLayer(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetObjectLayer(nint settings, JPH_ObjectLayer value);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_GetCollisionGroup(nint settings, JPH_CollisionGroup* result);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetCollisionGroup(nint settings, JPH_CollisionGroup* group);
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_SoftBodyCreationSettings_GetNumIterations(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetNumIterations(nint settings, uint iterations);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SoftBodyCreationSettings_GetLinearDamping(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetLinearDamping(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SoftBodyCreationSettings_GetMaxLinearVelocity(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetMaxLinearVelocity(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SoftBodyCreationSettings_GetRestitution(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetRestitution(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SoftBodyCreationSettings_GetFriction(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetFriction(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SoftBodyCreationSettings_GetPressure(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetPressure(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SoftBodyCreationSettings_GetGravityFactor(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetGravityFactor(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    public static partial float JPH_SoftBodyCreationSettings_GetVertexRadius(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetVertexRadius(nint settings, float value);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SoftBodyCreationSettings_GetUpdatePosition(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetUpdatePosition(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SoftBodyCreationSettings_GetMakeRotationIdentity(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetMakeRotationIdentity(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SoftBodyCreationSettings_GetAllowSleeping(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetAllowSleeping(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
+
+    [LibraryImport(LibName)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    public static partial bool JPH_SoftBodyCreationSettings_GetFacesDoubleSided(nint settings);
+    [LibraryImport(LibName)]
+    public static partial void JPH_SoftBodyCreationSettings_SetFacesDoubleSided(nint settings, [MarshalAs(UnmanagedType.U1)] bool value);
 
     #region JPH_Constraint
     public struct JPH_ConstraintSettings
@@ -1652,6 +1793,7 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial uint JPH_PhysicsSystem_GetNumConstraints(nint system);
 
+
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_GetGravity(nint handle, out Vector3 velocity);
 
@@ -1678,6 +1820,11 @@ internal static unsafe partial class JoltApi
 
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_GetBodies(nint handle, BodyID* ids, uint count);
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_PhysicsSystem_GetActiveBodies(nint system, BodyType type, BodyID* ids, uint count);
+    [LibraryImport(LibName)]
+    public static partial BodyID* JPH_PhysicsSystem_GetActiveBodiesUnsafe(nint system, BodyType type);
 
     [LibraryImport(LibName)]
     public static partial void JPH_PhysicsSystem_GetConstraints(nint handle, nint* constraints, uint count);
@@ -1781,6 +1928,9 @@ internal static unsafe partial class JoltApi
     public static partial BodyType JPH_BodyInterface_GetBodyType(nint handle, uint bodyID);
 
     [LibraryImport(LibName)]
+    public static partial nint JPH_PhysicsSystem_GetBodyPtr(nint handle, uint bodyID);
+
+    [LibraryImport(LibName)]
     public static partial MotionType JPH_BodyInterface_GetMotionType(nint handle, uint bodyID);
 
     [LibraryImport(LibName)]
@@ -1841,9 +1991,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BodyInterface_SetPositionRotationAndVelocity(nint handle, uint bodyID, in RVector3 position, in Quaternion rotation, in Vector3 linearVelocity, in Vector3 angularVelocity);
 
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_GetCollisionGroup(nint handle, uint bodyId, out JPH_CollisionGroup result);
+    public static partial void JPH_BodyInterface_GetCollisionGroup(nint handle, uint bodyId, JPH_CollisionGroup* result);
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyInterface_SetCollisionGroup(nint handle, uint bodyId, in JPH_CollisionGroup* group);
+    public static partial void JPH_BodyInterface_SetCollisionGroup(nint handle, uint bodyId, JPH_CollisionGroup* group);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_BodyInterface_GetShape(nint handle, uint bodyId);
@@ -2635,6 +2785,17 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial ulong JPH_Body_GetUserData(nint handle);
 
+
+    [LibraryImport(LibName)]
+    public static partial nint JPH_Body_GetFixedToWorldBody();
+
+    [LibraryImport(LibName)]
+    public static partial uint JPH_Body_GetSoftBodyVertexCount(nint body);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_GetSoftBodyVertexPosition(nint body, uint index, out Vector3 outPos);
+    [LibraryImport(LibName)]
+    public static partial void JPH_Body_GetSoftBodyVertexPositions(nint body, Vector3* outPositions, uint capacity, out uint outCount);
+
     // ContactListener
     public struct JPH_ContactListener_Procs
     {
@@ -3403,6 +3564,10 @@ internal static unsafe partial class JoltApi
     #endregion
 
     #region VehicleTransmission
+
+    [LibraryImport(LibName)]
+    public static partial void JPH_VehicleTransmission_SetMode(nint transmission, TransmissionMode mode);
+
     [LibraryImport(LibName)]
     public static partial void JPH_VehicleTransmission_Set(nint transmission, int currentGear, float clutchFriction);
     [LibraryImport(LibName)]
@@ -3687,6 +3852,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_WheeledVehicleControllerSettings_SetDifferentials(nint settings, JPH_VehicleDifferentialSettings* values, int count);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_WheeledVehicleControllerSettings_AddDifferential(nint settings, int leftWheel, int rightWheel);
+
+    [LibraryImport(LibName)]
     public static partial float JPH_WheeledVehicleControllerSettings_GetDifferentialLimitedSlipRatio(nint settings);
     [LibraryImport(LibName)]
     public static partial void JPH_WheeledVehicleControllerSettings_SetDifferentialLimitedSlipRatio(nint settings, float value);
@@ -3843,6 +4011,9 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_TrackedVehicleControllerSettings_SetTransmission(nint settings, nint value);
 
     [LibraryImport(LibName)]
+    public static partial void JPH_TrackedVehicleControllerSettings_SetTrack(nint settings, uint index, JPH_VehicleTrackSettings* track);
+
+    [LibraryImport(LibName)]
     public static partial void JPH_TrackedVehicleController_SetDriverInput(nint controller, float forward, float leftRatio, float rightRatio, float brake);
     [LibraryImport(LibName)]
     public static partial float JPH_TrackedVehicleController_GetForwardInput(nint controller);
@@ -3890,6 +4061,12 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial float JPH_VehicleTrack_GetDifferentialRatio(nint track);
     #endregion
+
+    public static T* AllocArray<T>(uint count)
+        where T : unmanaged
+    {
+        return (T*)NativeMemory.Alloc((nuint)(sizeof(T) * count));
+    }
 
     sealed class UTF8EncodingRelaxed : UTF8Encoding
     {
