@@ -97,8 +97,6 @@ public sealed class HeightFieldShapeSettings : ConvexShapeSettings
 
     public override Shape Create() => new HeightFieldShape(this);
 
-    public void Sanitize() => JPH_MeshShapeSettings_Sanitize(Handle);
-
     public void DetermineMinAndMaxSample(out float minValue, out float maxValue, out float quantizationScale)
     {
         JPH_HeightFieldShapeSettings_DetermineMinAndMaxSample(Handle, out minValue, out maxValue, out quantizationScale);
