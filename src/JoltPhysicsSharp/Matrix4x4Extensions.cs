@@ -11,14 +11,16 @@ public static class Matrix4x4Extensions
 {
     internal static Matrix4x4 FromJolt(this Mat4 matrix)
     {
-        // Transpose the matrix due to the different row/column major layout
-        return Matrix4x4.Transpose(Unsafe.As<Mat4, Matrix4x4>(ref matrix));
+        // No transpose needed: Jolt's Mat44 is column-major with a column-vector
+        // convention (M * v), while System.Numerics.Matrix4x4 is row-major with a
+        // row-vector convention (v * M). The two differences cancel out, so the
+        // memory layouts are identical (translation at offsets 48/52/56 in both).
+        return Unsafe.As<Mat4, Matrix4x4>(ref matrix);
     }
 
     internal static Mat4 ToJolt(this Matrix4x4 matrix)
     {
-        // Transpose the matrix due to the different row/column major layout
-        matrix = Matrix4x4.Transpose(matrix);
+        // See FromJolt: the memory layouts are identical, reinterpret directly.
         return Unsafe.As<Matrix4x4, Mat4>(ref matrix);
     }
 
