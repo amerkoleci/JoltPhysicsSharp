@@ -949,7 +949,7 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial ObjectLayer JPH_BodyCreationSettings_GetObjectLayer(nint settings);
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_SetObjectLayer(nint settings, in ObjectLayer value);
+    public static partial void JPH_BodyCreationSettings_SetObjectLayer(nint settings, ObjectLayer value);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyCreationSettings_GetCollisionGroup(nint settings, out JPH_CollisionGroup result);
@@ -1007,7 +1007,7 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial MotionQuality JPH_BodyCreationSettings_GetMotionQuality(nint settings);
     [LibraryImport(LibName)]
-    public static partial void JPH_BodyCreationSettings_SetMotionQuality(nint settings, in MotionQuality value);
+    public static partial void JPH_BodyCreationSettings_SetMotionQuality(nint settings, MotionQuality value);
 
     [LibraryImport(LibName)]
 
