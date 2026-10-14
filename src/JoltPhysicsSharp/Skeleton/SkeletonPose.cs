@@ -26,7 +26,11 @@ public class SkeletonPose : NativeObject
     public Skeleton Skeleton
     {
         get => Skeleton.GetObject(JPH_SkeletonPose_GetSkeleton(Handle));
-        set => JPH_SkeletonPose_SetSkeleton(Handle, value.Handle);
+        set
+        {
+            JPH_SkeletonPose_SetSkeleton(Handle, value.Handle);
+            GC.KeepAlive(value);
+        }
     }
 
     public Vector3 RootOffset

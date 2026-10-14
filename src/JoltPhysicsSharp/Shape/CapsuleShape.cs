@@ -26,6 +26,7 @@ public sealed class CapsuleShape : ConvexShape
     public CapsuleShape(CapsuleShapeSettings settings)
         : base(JPH_CapsuleShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public float Radius => JPH_CapsuleShape_GetRadius(Handle);

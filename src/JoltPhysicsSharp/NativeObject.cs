@@ -36,6 +36,9 @@ public abstract class NativeObject : IDisposable
         OwnsHandle = ownsHandle;
     }
 
+    // The finalizer can run as soon as nothing uses the object, which may be during a native call that was only given its
+    // Handle: a method that passes an object's Handle for native code to build from, copy or keep calls GC.KeepAlive on it
+    // after the call.
     ~NativeObject()
     {
         fromFinalizer = true;

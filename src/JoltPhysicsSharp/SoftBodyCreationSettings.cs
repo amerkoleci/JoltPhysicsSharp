@@ -16,6 +16,7 @@ public sealed class SoftBodyCreationSettings : NativeObject
     public SoftBodyCreationSettings(SoftBodySharedSettings settings, in Vector3 position, in Quaternion rotation, ObjectLayer objectLayer)
         : base(JPH_SoftBodyCreationSettings_Create2(settings.Handle, position, rotation, objectLayer))
     {
+        GC.KeepAlive(settings);
     }
 
     protected override void DisposeNative()
@@ -26,7 +27,11 @@ public sealed class SoftBodyCreationSettings : NativeObject
     public SoftBodySharedSettings? Settings
     {
         get => SoftBodySharedSettings.GetObject(JPH_SoftBodyCreationSettings_GetSettings(Handle));
-        set => JPH_SoftBodyCreationSettings_SetSettings(Handle, value is not null ? value.Handle : 0);  
+        set
+        {
+            JPH_SoftBodyCreationSettings_SetSettings(Handle, value is not null ? value.Handle : 0);
+            GC.KeepAlive(value);
+        }
     }
 
     public Vector3 Position

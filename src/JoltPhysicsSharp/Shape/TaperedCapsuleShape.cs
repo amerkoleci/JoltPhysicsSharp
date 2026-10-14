@@ -20,6 +20,7 @@ public sealed class TaperedCapsuleShape : ConvexShape
     public TaperedCapsuleShape(TaperedCapsuleShapeSettings settings)
         : base(JPH_TaperedCapsuleShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public float TopRadius => JPH_TaperedCapsuleShape_GetTopRadius(Handle);

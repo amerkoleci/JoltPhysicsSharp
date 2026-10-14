@@ -26,6 +26,7 @@ public sealed class CylinderShape : ConvexShape
     public CylinderShape(CylinderShapeSettings settings)
         : base(JPH_CylinderShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public float Radius => JPH_CylinderShape_GetRadius(Handle);

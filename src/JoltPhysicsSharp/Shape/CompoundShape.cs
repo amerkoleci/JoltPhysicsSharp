@@ -21,6 +21,7 @@ public abstract unsafe class CompoundShapeShapeSettings : ShapeSettings
         fixed (Quaternion* rotationPtr = &rotation)
         {
             JPH_CompoundShapeSettings_AddShape(Handle, positionPtr, rotationPtr, shapeSettings.Handle, userData);
+            GC.KeepAlive(shapeSettings);
         }
     }
 
@@ -30,6 +31,7 @@ public abstract unsafe class CompoundShapeShapeSettings : ShapeSettings
         fixed (Quaternion* rotationPtr = &rotation)
         {
             JPH_CompoundShapeSettings_AddShape2(Handle, positionPtr, rotationPtr, shape.Handle, userData);
+            GC.KeepAlive(shape);
         }
     }
 }

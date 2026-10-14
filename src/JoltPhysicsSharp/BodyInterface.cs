@@ -27,27 +27,37 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public Body CreateBody(BodyCreationSettings settings)
     {
-        return new(JPH_BodyInterface_CreateBody(Handle, settings.Handle));
+        Body body = new(JPH_BodyInterface_CreateBody(Handle, settings.Handle));
+        GC.KeepAlive(settings);
+        return body;
     }
 
     public Body CreateSoftBody(SoftBodyCreationSettings settings)
     {
-        return new(JPH_BodyInterface_CreateSoftBody(Handle, settings.Handle));
+        Body body = new(JPH_BodyInterface_CreateSoftBody(Handle, settings.Handle));
+        GC.KeepAlive(settings);
+        return body;
     }
 
     public BodyID CreateAndAddBody(BodyCreationSettings settings, Activation activationMode)
     {
-        return new(JPH_BodyInterface_CreateAndAddBody(Handle, settings.Handle, activationMode));
+        BodyID bodyID = new(JPH_BodyInterface_CreateAndAddBody(Handle, settings.Handle, activationMode));
+        GC.KeepAlive(settings);
+        return bodyID;
     }
 
     public Body CreateBodyWithID(in BodyID bodyID, BodyCreationSettings settings)
     {
-        return new(JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle));
+        Body body = new(JPH_BodyInterface_CreateBodyWithID(Handle, bodyID, settings.Handle));
+        GC.KeepAlive(settings);
+        return body;
     }
 
     public Body CreateBodyWithoutID(BodyCreationSettings settings)
     {
-        return new(JPH_BodyInterface_CreateBodyWithoutID(Handle, settings.Handle));
+        Body body = new(JPH_BodyInterface_CreateBodyWithoutID(Handle, settings.Handle));
+        GC.KeepAlive(settings);
+        return body;
     }
 
     public void DestroyBody(in BodyID bodyID)
@@ -343,6 +353,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
     public void SetShape(in BodyID bodyId, in Shape shape, bool updateMassProperties, Activation activationMode)
     {
         JPH_BodyInterface_SetShape(Handle, bodyId, shape.Handle, updateMassProperties, activationMode);
+        GC.KeepAlive(shape);
     }
 
     public Shape? GetShape(in BodyID bodyId) => Shape.GetObject(JPH_BodyInterface_GetShape(Handle, bodyId));

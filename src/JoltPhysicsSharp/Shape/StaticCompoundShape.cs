@@ -25,5 +25,6 @@ public sealed class StaticCompoundShape : CompoundShape
     public StaticCompoundShape(StaticCompoundShapeSettings settings)
         : base(JPH_StaticCompoundShape_Create(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 }

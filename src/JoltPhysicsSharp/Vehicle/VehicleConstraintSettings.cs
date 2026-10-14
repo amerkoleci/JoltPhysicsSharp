@@ -97,7 +97,9 @@ public unsafe class VehicleConstraintSettings : ConstraintSettings
         try
         {
             ToNative(&nativeSettings);
-            return JPH_VehicleConstraint_Create(body.Handle, &nativeSettings);
+            nint handle = JPH_VehicleConstraint_Create(body.Handle, &nativeSettings);
+            GC.KeepAlive(this);
+            return handle;
         }
         finally
         {

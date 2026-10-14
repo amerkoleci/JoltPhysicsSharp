@@ -38,6 +38,7 @@ public unsafe class ConvexHullShape : ConvexShape
     public ConvexHullShape(ConvexHullShapeSettings settings)
         : base(JPH_ConvexHullShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public uint GetNumPoints()

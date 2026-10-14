@@ -26,6 +26,7 @@ public sealed class BoxShape : ConvexShape
     public BoxShape(BoxShapeSettings settings)
         : base(JPH_BoxShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public Vector3 HalfExtent

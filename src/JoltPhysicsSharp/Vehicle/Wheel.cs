@@ -137,6 +137,7 @@ public class Wheel : NativeObject
     public Wheel(WheelSettings settings)
         : base(JPH_Wheel_Create(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     internal Wheel(nint handle, bool ownsHandle)

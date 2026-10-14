@@ -44,5 +44,6 @@ public class EmptyShape : Shape
     public EmptyShape(in EmptyShapeSettings settings)
         : base(JPH_EmptyShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 }

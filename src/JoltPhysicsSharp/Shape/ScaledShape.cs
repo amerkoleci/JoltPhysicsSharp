@@ -11,11 +11,13 @@ public class ScaledShapeSettings : DecoratedShapeSettings
     public ScaledShapeSettings(ShapeSettings shapeSettings, in Vector3 scale)
     {
         Handle = JPH_ScaledShapeSettings_Create(shapeSettings.Handle, in scale);
+        GC.KeepAlive(shapeSettings);
     }
 
     public ScaledShapeSettings(Shape shape, in Vector3 scale)
     {
         Handle = JPH_ScaledShapeSettings_Create2(shape.Handle, in scale);
+        GC.KeepAlive(shape);
     }
 
     public Vector3 Scale
@@ -35,10 +37,12 @@ public  class ScaledShape : DecoratedShape
     public ScaledShape(Shape shape, in Vector3 scale)
         : base(JPH_ScaledShape_Create(shape.Handle, in scale))
     {
+        GC.KeepAlive(shape);
     }
 
     public ScaledShape(ScaledShapeSettings settings)
         : base(JPH_ScaledShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 }

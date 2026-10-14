@@ -35,13 +35,21 @@ public class WheelSettingsWV : WheelSettings
     public LinearCurve LongitudinalFriction
     {
         get => LinearCurve.GetObject(JPH_WheelSettingsWV_GetLongitudinalFriction(Handle))!;
-        set => JPH_WheelSettingsWV_SetLongitudinalFriction(Handle, value.Handle);
+        set
+        {
+            JPH_WheelSettingsWV_SetLongitudinalFriction(Handle, value.Handle);
+            GC.KeepAlive(value);
+        }
     }
 
     public LinearCurve LateralFriction
     {
         get => LinearCurve.GetObject(JPH_WheelSettingsWV_GetLateralFriction(Handle))!;
-        set => JPH_WheelSettingsWV_SetLateralFriction(Handle, value.Handle);
+        set
+        {
+            JPH_WheelSettingsWV_SetLateralFriction(Handle, value.Handle);
+            GC.KeepAlive(value);
+        }
     }
 
     public float MaxBrakeTorque
@@ -64,6 +72,7 @@ public sealed class WheelWV : Wheel
     public WheelWV(WheelSettingsWV settings)
         : base(JPH_WheelWV_Create(settings.Handle), true)
     {
+        GC.KeepAlive(settings);
     }
 
     internal WheelWV(nint handle, bool ownsHandle)
@@ -118,6 +127,7 @@ public unsafe class WheeledVehicleControllerSettings : VehicleControllerSettings
         set
         {
             JPH_WheeledVehicleControllerSettings_SetTransmission(Handle, value.Handle);
+            GC.KeepAlive(value);
         }
     }
 
