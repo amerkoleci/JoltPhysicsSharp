@@ -246,6 +246,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
     public void AddConstraint(Constraint constraint)
     {
         JPH_PhysicsSystem_AddConstraint(Handle, constraint.Handle);
+        GC.KeepAlive(constraint);
     }
 
     public void RemoveConstraint(Constraint constraint)
@@ -262,6 +263,10 @@ public sealed unsafe class PhysicsSystem : NativeObject
             constraintsPtr[i] = constraints[i].Handle;
         }
         JPH_PhysicsSystem_AddConstraints(Handle, constraintsPtr, (uint)count);
+        foreach (Constraint constraint in constraints)
+        {
+            GC.KeepAlive(constraint);
+        }
     }
 
     public void RemoveConstraints(params Span<Constraint> constraints)

@@ -11,11 +11,13 @@ public class RotatedTranslatedShapeSettings : DecoratedShapeSettings
     public RotatedTranslatedShapeSettings(in Vector3 position, in Quaternion rotation, ShapeSettings shapeSettings)
     {
         Handle = JPH_RotatedTranslatedShapeSettings_Create(in position, in rotation, shapeSettings.Handle);
+        GC.KeepAlive(shapeSettings);
     }
 
     public RotatedTranslatedShapeSettings(in Vector3 position, in Quaternion rotation, Shape shape)
     {
         Handle = JPH_RotatedTranslatedShapeSettings_Create2(in position, in rotation, shape.Handle);
+        GC.KeepAlive(shape);
     }
 
     public Vector3 Position
@@ -44,10 +46,12 @@ public class RotatedTranslatedShape : DecoratedShape
     public RotatedTranslatedShape(in Vector3 position, in Quaternion rotation, Shape shape)
     {
         Handle = JPH_RotatedTranslatedShape_Create(in position, in rotation, shape.Handle);
+        GC.KeepAlive(shape);
     }
 
     public RotatedTranslatedShape(RotatedTranslatedShapeSettings settings)
         : base(JPH_RotatedTranslatedShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 }

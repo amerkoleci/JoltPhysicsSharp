@@ -110,6 +110,7 @@ public sealed class HeightFieldShape : Shape
     public HeightFieldShape(in HeightFieldShapeSettings settings)
         : base(JPH_HeightFieldShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public uint SampleCount => JPH_HeightFieldShape_GetSampleCount(Handle);

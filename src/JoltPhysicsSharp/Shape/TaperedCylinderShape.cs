@@ -10,6 +10,7 @@ public sealed class TaperedCylinderShapeSettings : ConvexShapeSettings
     public unsafe TaperedCylinderShapeSettings(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius, float convexRadius = Foundation.DefaultConvexRadius, PhysicsMaterial? material = default)
         : base(JPH_TaperedCylinderShapeSettings_Create(halfHeightOfTaperedCylinder, topRadius, bottomRadius, convexRadius, material != null ? material.Handle : IntPtr.Zero))
     {
+        GC.KeepAlive(material);
     }
 
     public override Shape Create() => new TaperedCylinderShape(this);
@@ -21,6 +22,7 @@ public sealed class TaperedCylinderShape : ConvexShape
     public TaperedCylinderShape(TaperedCylinderShapeSettings settings)
         : base(JPH_TaperedCylinderShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public float TopRadius => JPH_TaperedCylinderShape_GetTopRadius(Handle);

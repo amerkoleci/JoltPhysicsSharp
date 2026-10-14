@@ -11,11 +11,13 @@ public sealed class OffsetCenterOfMassShapeSettings : DecoratedShapeSettings
     public OffsetCenterOfMassShapeSettings(in Vector3 offset, ShapeSettings shapeSettings)
         : base(JPH_OffsetCenterOfMassShapeSettings_Create(in offset, shapeSettings.Handle))
     {
+        GC.KeepAlive(shapeSettings);
     }
 
     public OffsetCenterOfMassShapeSettings(in Vector3 offset, Shape shape)
         : base(JPH_OffsetCenterOfMassShapeSettings_Create2(in offset, shape.Handle))
     {
+        GC.KeepAlive(shape);
     }
 
     public override Shape Create() => new OffsetCenterOfMassShape(this);
@@ -26,11 +28,13 @@ public sealed class OffsetCenterOfMassShape : ConvexShape
     public OffsetCenterOfMassShape(in Vector3 offset, Shape shape)
         : base(JPH_OffsetCenterOfMassShape_Create(offset, shape.Handle))
     {
+        GC.KeepAlive(shape);
     }
 
     public OffsetCenterOfMassShape(OffsetCenterOfMassShapeSettings settings)
         : base(JPH_OffsetCenterOfMassShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public Vector3 Offset

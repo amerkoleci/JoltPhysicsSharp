@@ -64,6 +64,7 @@ public class RagdollSettings : NativeObject
     public void SetPartShape(int partIndex, Shape shape)
     {
         JPH_RagdollSettings_SetPartShape(Handle, partIndex, shape.Handle);
+        GC.KeepAlive(shape);
     }
     public void SetPartPosition(int partIndex, in Vector3 position)
     {
@@ -108,16 +109,22 @@ public class Ragdoll : NativeObject
     public Ragdoll(RagdollSettings settings, PhysicsSystem system)
         : base(JPH_RagdollSettings_CreateRagdoll(settings.Handle, system.Handle, 0u, 0u))
     {
+        GC.KeepAlive(settings);
+        GC.KeepAlive(system);
     }
 
     public Ragdoll(RagdollSettings settings, PhysicsSystem system, CollisionGroupID collisionGroup)
         : base(JPH_RagdollSettings_CreateRagdoll(settings.Handle, system.Handle, collisionGroup.Value, 0u))
     {
+        GC.KeepAlive(settings);
+        GC.KeepAlive(system);
     }
 
     public Ragdoll(RagdollSettings settings, PhysicsSystem system, CollisionGroupID collisionGroup, ulong userData)
         : base(JPH_RagdollSettings_CreateRagdoll(settings.Handle, system.Handle, collisionGroup.Value, userData))
     {
+        GC.KeepAlive(settings);
+        GC.KeepAlive(system);
     }
 
     protected override void DisposeNative()

@@ -21,11 +21,14 @@ public sealed class MutableCompoundShape : CompoundShape
     public MutableCompoundShape(MutableCompoundShapeSettings settings)
         : base(JPH_MutableCompoundShape_Create(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public uint AddShape(in Vector3 position, in Quaternion rotation, Shape child, uint userData = 0, uint index = uint.MaxValue)
     {
-        return JPH_MutableCompoundShape_AddShape(Handle, in position, in rotation, child.Handle, userData, index);
+        uint result = JPH_MutableCompoundShape_AddShape(Handle, in position, in rotation, child.Handle, userData, index);
+        GC.KeepAlive(child);
+        return result;
     }
 
     public void RemoveShape(uint index)
@@ -41,6 +44,7 @@ public sealed class MutableCompoundShape : CompoundShape
     public void ModifyShape(uint index, in Vector3 position, in Quaternion rotation, Shape newShape)
     {
         JPH_MutableCompoundShape_ModifyShape2(Handle, index, in position, in rotation, newShape.Handle);
+        GC.KeepAlive(newShape);
     }
 
     public void AdjustCenterOfMass()

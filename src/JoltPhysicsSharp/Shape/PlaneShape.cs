@@ -13,6 +13,7 @@ public sealed class PlaneShapeSettings : ShapeSettings
     public PlaneShapeSettings(in Plane plane, PhysicsMaterial? material = default, float halfExtent = DefaultHalfExtent)
         : base(JPH_PlaneShapeSettings_Create(in plane, material != null ? material.Handle : IntPtr.Zero, halfExtent))
     {
+        GC.KeepAlive(material);
     }
 
     internal PlaneShapeSettings(nint handle)
@@ -33,11 +34,13 @@ public sealed class PlaneShape : Shape
     public PlaneShape(in Plane plane, PhysicsMaterial? material = default, float halfExtent = PlaneShapeSettings.DefaultHalfExtent)
         : base(JPH_PlaneShape_Create(in plane, material != null ? material.Handle : IntPtr.Zero, halfExtent))
     {
+        GC.KeepAlive(material);
     }
 
     public PlaneShape(PlaneShapeSettings settings)
         : base(JPH_PlaneShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public Plane Plane

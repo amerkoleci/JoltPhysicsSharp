@@ -23,6 +23,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         fixed (Quaternion* rotationPtr = &rotation)
         {
             Handle = JPH_BodyCreationSettings_Create2(shapeSettings.Handle, positionPtr, rotationPtr, motionType, objectLayer);
+            GC.KeepAlive(shapeSettings);
         }
     }
 
@@ -35,6 +36,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         fixed (Quaternion* rotationPtr = &rotation)
         {
             Handle = JPH_BodyCreationSettings_Create2Double(shapeSettings.Handle, positionPtr, rotationPtr, motionType, objectLayer);
+            GC.KeepAlive(shapeSettings);
         }
     }
 
@@ -47,6 +49,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         fixed (Quaternion* rotationPtr = &rotation)
         {
             Handle = JPH_BodyCreationSettings_Create3(shape.Handle, positionPtr, rotationPtr, motionType, objectLayer);
+            GC.KeepAlive(shape);
         }
     }
 
@@ -59,6 +62,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         fixed (Quaternion* rotationPtr = &rotation)
         {
             Handle = JPH_BodyCreationSettings_Create3Double(shape.Handle, positionPtr, rotationPtr, motionType, objectLayer);
+            GC.KeepAlive(shape);
         }
     }
 
@@ -129,6 +133,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
         {
             value.ToNative(out JPH_CollisionGroup groupNative);
             JPH_BodyCreationSettings_SetCollisionGroup(Handle, in groupNative);
+            GC.KeepAlive(value.GroupFilter);
         }
     }
 

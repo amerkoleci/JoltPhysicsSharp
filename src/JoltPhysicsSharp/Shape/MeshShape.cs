@@ -81,6 +81,7 @@ public sealed class MeshShape : Shape
     public MeshShape(in MeshShapeSettings settings)
         : base(JPH_MeshShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public uint GetTriangleUserData(uint triangleIndex) => JPH_MeshShape_GetTriangleUserData(Handle, triangleIndex);

@@ -26,6 +26,7 @@ public sealed unsafe class TriangleShape : ConvexShape
     public TriangleShape(TriangleShapeSettings settings)
         : base(JPH_TriangleShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public float ConvexRadius => JPH_TriangleShape_GetConvexRadius(Handle);

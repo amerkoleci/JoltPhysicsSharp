@@ -40,6 +40,7 @@ public sealed class WheelTV : Wheel
     public WheelTV(WheelSettingsTV settings)
         : base(JPH_WheelTV_Create(settings.Handle), true)
     {
+        GC.KeepAlive(settings);
     }
 
     internal WheelTV(nint handle, bool ownsHandle)
@@ -89,6 +90,7 @@ public unsafe class TrackedVehicleControllerSettings : VehicleControllerSettings
         set
         {
             JPH_TrackedVehicleControllerSettings_SetTransmission(Handle, value.Handle);
+            GC.KeepAlive(value);
         }
     }
 

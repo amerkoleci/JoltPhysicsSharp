@@ -104,6 +104,7 @@ public sealed class Body : NativeObject
         {
             value.ToNative(out JPH_CollisionGroup groupNative);
             JPH_Body_SetCollisionGroup(Handle, in groupNative);
+            GC.KeepAlive(value.GroupFilter);
         }
     }
 

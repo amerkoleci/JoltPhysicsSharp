@@ -31,6 +31,7 @@ public sealed class SphereShape : ConvexShape
     public SphereShape(SphereShapeSettings settings)
         : base(JPH_SphereShapeSettings_CreateShape(settings.Handle))
     {
+        GC.KeepAlive(settings);
     }
 
     public float Radius => JPH_SphereShape_GetRadius(Handle);

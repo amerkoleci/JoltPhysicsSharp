@@ -154,6 +154,8 @@ public sealed partial class CharacterVirtual : CharacterBase
         JPH_CharacterVirtualSettings nativeSettings;
         settings.ToNative(&nativeSettings);
         Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+        GC.KeepAlive(settings);
+        GC.KeepAlive(physicsSystem);
 
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listenerUserData);
@@ -168,6 +170,8 @@ public sealed partial class CharacterVirtual : CharacterBase
         JPH_CharacterVirtualSettings nativeSettings;
         settings.ToNative(&nativeSettings);
         Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+        GC.KeepAlive(settings);
+        GC.KeepAlive(physicsSystem);
 
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listenerUserData);
@@ -491,7 +495,7 @@ public sealed partial class CharacterVirtual : CharacterBase
         BodyFilter? bodyFilter = default,
         ShapeFilter? shapeFilter = default)
     {
-        return JPH_CharacterVirtual_SetShape(Handle,
+        bool result = JPH_CharacterVirtual_SetShape(Handle,
             shape.Handle,
             maxPenetrationDepth,
             layer.Value,
@@ -499,11 +503,14 @@ public sealed partial class CharacterVirtual : CharacterBase
             bodyFilter?.Handle ?? 0,
             shapeFilter?.Handle ?? 0
             );
+        GC.KeepAlive(shape);
+        return result;
     }
 
     public void SetInnerBodyShape(Shape shape)
     {
         JPH_CharacterVirtual_SetInnerBodyShape(Handle, shape.Handle);
+        GC.KeepAlive(shape);
     }
 
     public int GetNumActiveContacts()

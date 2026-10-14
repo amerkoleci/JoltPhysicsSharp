@@ -17,6 +17,8 @@ public sealed class Character : CharacterBase
         JPH_CharacterSettings nativeSettings;
         settings.ToNative(&nativeSettings);
         Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+        GC.KeepAlive(settings);
+        GC.KeepAlive(physicsSystem);
     }
 
     public unsafe Character(CharacterSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
@@ -27,6 +29,8 @@ public sealed class Character : CharacterBase
         JPH_CharacterSettings nativeSettings;
         settings.ToNative(&nativeSettings);
         Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+        GC.KeepAlive(settings);
+        GC.KeepAlive(physicsSystem);
     }
 
     public void AddToPhysicsSystem(Activation activationMode = Activation.Activate, bool lockBodies = true)
@@ -286,5 +290,6 @@ public sealed class Character : CharacterBase
     public void SetShape(Shape shape, float maxPenetrationDepth, bool lockBodies = true)
     {
         JPH_Character_SetShape(Handle, shape.Handle, maxPenetrationDepth, lockBodies);
+        GC.KeepAlive(shape);
     }
 }
