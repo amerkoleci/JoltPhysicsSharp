@@ -15,16 +15,13 @@ public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDP
 public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData);
 
 /// <summary>
-/// Settings for creating a physics system. On successful native creation, ownership of all
-/// three collision filters transfers to the system. They cannot be shared with another system.
-/// Disposing a transferred filter has no effect; the system invalidates it during destruction.
-/// Configure filters before creating the object-versus-broad-phase filter, which may cache
-/// their settings. Configuration is rejected after ownership transfers to the system.
+/// Settings for creating a <see cref="PhysicsSystem"/>.
 /// </summary>
 /// <remarks>
-/// Construction, filter configuration, and disposal require external synchronization.
-/// Do not dispose or modify any supplied filter while constructing a physics system.
-/// If setup fails after native system creation, the filters are consumed and invalidated.
+/// Configure filters before creating the object-versus-broad-phase filter, which may cache their settings.
+/// Successful native creation transfers all three filters to the system, even if later setup fails.
+/// Transferred filters cannot be shared or reconfigured; disposing them has no effect.
+/// System teardown invalidates their wrappers. Externally synchronize construction, configuration, and disposal.
 /// </remarks>
 public struct PhysicsSystemSettings
 {
