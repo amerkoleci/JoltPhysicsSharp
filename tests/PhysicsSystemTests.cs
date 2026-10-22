@@ -71,7 +71,13 @@ public class PhysicsSystemTests : BaseTest
         Assert.That(pairFilter.IsDisposed, Is.False);
         Assert.That(broadPhase.IsDisposed, Is.False);
         Assert.That(broadPhaseFilter.IsDisposed, Is.False);
-        ConfigureFilters(settings);
+        Assert.Throws<InvalidOperationException>(() => ConfigureFilters(settings));
+        Assert.Throws<InvalidOperationException>(() => new ObjectVsBroadPhaseLayerFilterMask(broadPhase));
+        if (pairFilter is ObjectLayerPairFilterTable transferredTable)
+        {
+            Assert.Throws<InvalidOperationException>(() => transferredTable.EnableCollision(new ObjectLayer(0), new ObjectLayer(0)));
+            Assert.Throws<InvalidOperationException>(() => transferredTable.DisableCollision(new ObjectLayer(0), new ObjectLayer(0)));
+        }
         system.OptimizeBroadPhase();
 
         system.Dispose();
@@ -174,6 +180,130 @@ public class PhysicsSystemTests : BaseTest
         }
     }
 
+    [TestCase(0)]
+    [TestCase(1)]
+    [TestCase(2)]
+    public void Constructor_TransferThrows_InvalidatesAllConsumedFilters(int filterIndex)
+    {
+        using ObjectLayerPairFilter pair = filterIndex == 0 ? new ThrowingPairFilter() : new ObjectLayerPairFilterTable(1);
+        using BroadPhaseLayerInterface broad = filterIndex == 1 ? new ThrowingBroadPhase() : new BroadPhaseLayerInterfaceTable(1, 1);
+        using ObjectVsBroadPhaseLayerFilter vs = filterIndex == 2
+            ? new ThrowingBroadPhaseFilter(broad, pair)
+            : new ObjectVsBroadPhaseLayerFilterTable(broad, 1, pair, 1);
+        PhysicsSystemSettings settings = new()
+        {
+            MaxBodies = 16,
+            MaxBodyPairs = 128,
+            MaxContactConstraints = 128,
+            ObjectLayerPairFilter = pair,
+            BroadPhaseLayerInterface = broad,
+            ObjectVsBroadPhaseLayerFilter = vs
+        };
+
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => new PhysicsSystem(settings));
+        Assert.That(exception!.Message, Is.EqualTo("Ownership transfer failed."));
+        // Filters later in the sequence still had OwnsHandle == true when setup
+        // failed. They must be invalidated without calling their native destructors.
+        AssertDisposed(pair);
+        AssertDisposed(broad);
+        AssertDisposed(vs);
+    }
+
+    [Test]
+    public void Dispose_FilterManagedCleanupThrows_CompletesRemainingCleanup()
+    {
+        using ThrowingPairFilter pair = new(false) { ThrowDuringManagedCleanup = true };
+        using BroadPhaseLayerInterfaceTable broad = new(1, 1);
+        using ObjectVsBroadPhaseLayerFilterTable vs = new(broad, 1, pair, 1);
+        using PhysicsSystem system = new(new PhysicsSystemSettings
+        {
+            MaxBodies = 16,
+            MaxBodyPairs = 128,
+            MaxContactConstraints = 128,
+            ObjectLayerPairFilter = pair,
+            BroadPhaseLayerInterface = broad,
+            ObjectVsBroadPhaseLayerFilter = vs
+        });
+
+        InvalidOperationException? exception = Assert.Throws<InvalidOperationException>(() => system.Dispose());
+        Assert.That(exception!.Message, Is.EqualTo("Managed cleanup failed."));
+        AssertDisposed(system);
+        AssertDisposed(pair);
+        AssertDisposed(broad);
+        AssertDisposed(vs);
+        system.Dispose();
+        Assert.That(pair.ManagedCleanupCount, Is.EqualTo(1));
+    }
+
+    private sealed class ThrowingPairFilter : ObjectLayerPairFilter
+    {
+        private readonly bool _throwOnTransfer;
+
+        public ThrowingPairFilter(bool throwOnTransfer = true)
+            : base(JoltApi.JPH_ObjectLayerPairFilterTable_Create(1), true)
+        {
+            _throwOnTransfer = throwOnTransfer;
+        }
+
+        public bool ThrowDuringManagedCleanup { get; set; }
+        public int ManagedCleanupCount { get; private set; }
+
+        protected internal override bool OwnsHandle
+        {
+            get => base.OwnsHandle;
+            protected set
+            {
+                if (!value && _throwOnTransfer)
+                    throw new InvalidOperationException("Ownership transfer failed.");
+                base.OwnsHandle = value;
+            }
+        }
+
+        protected override void DisposeManaged()
+        {
+            ManagedCleanupCount++;
+            if (ThrowDuringManagedCleanup)
+                throw new InvalidOperationException("Managed cleanup failed.");
+        }
+    }
+
+    private sealed class ThrowingBroadPhase : BroadPhaseLayerInterface
+    {
+        public ThrowingBroadPhase() : base(JoltApi.JPH_BroadPhaseLayerInterfaceTable_Create(1, 1))
+        {
+        }
+
+        protected internal override bool OwnsHandle
+        {
+            get => base.OwnsHandle;
+            protected set
+            {
+                if (!value)
+                    throw new InvalidOperationException("Ownership transfer failed.");
+                base.OwnsHandle = value;
+            }
+        }
+    }
+
+    private sealed class ThrowingBroadPhaseFilter : ObjectVsBroadPhaseLayerFilter
+    {
+        public ThrowingBroadPhaseFilter(BroadPhaseLayerInterface broad, ObjectLayerPairFilter pair)
+            : base(JoltApi.JPH_ObjectVsBroadPhaseLayerFilterTable_Create(broad.Handle, 1, pair.Handle, 1))
+        {
+        }
+
+        protected internal override bool OwnsHandle
+        {
+            get => base.OwnsHandle;
+            protected set
+            {
+                if (!value)
+                    throw new InvalidOperationException("Ownership transfer failed.");
+                base.OwnsHandle = value;
+            }
+        }
+    }
+
     private static void AssertDisposed(NativeObject value)
     {
         Assert.That(value.IsDisposed, Is.True);
@@ -195,19 +325,18 @@ public class PhysicsSystemTests : BaseTest
     {
         ObjectLayerPairFilter pairFilter = useMask ? new ObjectLayerPairFilterMask() : new ObjectLayerPairFilterTable(1);
         BroadPhaseLayerInterface broadPhase = useMask ? new BroadPhaseLayerInterfaceMask(1) : new BroadPhaseLayerInterfaceTable(1, 1);
-        ObjectVsBroadPhaseLayerFilter broadPhaseFilter = useMask
-            ? new ObjectVsBroadPhaseLayerFilterMask(broadPhase)
-            : new ObjectVsBroadPhaseLayerFilterTable(broadPhase, 1, pairFilter, 1);
         PhysicsSystemSettings settings = new()
         {
             MaxBodies = 16,
             MaxBodyPairs = 128,
             MaxContactConstraints = 128,
             ObjectLayerPairFilter = pairFilter,
-            BroadPhaseLayerInterface = broadPhase,
-            ObjectVsBroadPhaseLayerFilter = broadPhaseFilter
+            BroadPhaseLayerInterface = broadPhase
         };
         ConfigureFilters(settings);
+        settings.ObjectVsBroadPhaseLayerFilter = useMask
+            ? new ObjectVsBroadPhaseLayerFilterMask(broadPhase)
+            : new ObjectVsBroadPhaseLayerFilterTable(broadPhase, 1, pairFilter, 1);
         return settings;
     }
 }

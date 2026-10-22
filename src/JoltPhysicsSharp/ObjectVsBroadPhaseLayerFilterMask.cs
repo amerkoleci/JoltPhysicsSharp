@@ -8,7 +8,7 @@ namespace JoltPhysicsSharp;
 public sealed class ObjectVsBroadPhaseLayerFilterMask : ObjectVsBroadPhaseLayerFilter
 {
     public ObjectVsBroadPhaseLayerFilterMask(BroadPhaseLayerInterface broadPhaseLayerInterface)
-        : base(JPH_ObjectVsBroadPhaseLayerFilterMask_Create(broadPhaseLayerInterface.GetHandleChecked()))
+        : base(JPH_ObjectVsBroadPhaseLayerFilterMask_Create(broadPhaseLayerInterface.GetHandleForConfiguration()))
     {
     }
 }

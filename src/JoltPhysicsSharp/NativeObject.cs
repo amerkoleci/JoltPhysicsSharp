@@ -8,6 +8,10 @@ namespace JoltPhysicsSharp;
 /// <summary>
 /// A native object which is disposable.
 /// </summary>
+/// <remarks>
+/// Disposal must be externally synchronized with native operations. In particular, do not
+/// dispose or configure collision filters concurrently with physics system construction.
+/// </remarks>
 public abstract class NativeObject : IDisposable
 {
     private volatile uint _isDisposed;
@@ -82,6 +86,7 @@ public abstract class NativeObject : IDisposable
     }
 
     protected internal virtual bool OwnsHandle { get; protected set; }
+    internal bool IsOwnershipTransferred { get; private set; }
 
     internal nint GetHandleChecked()
     {
@@ -92,12 +97,44 @@ public abstract class NativeObject : IDisposable
         return Handle;
     }
 
+    internal nint GetHandleForConfiguration()
+    {
+        nint handle = GetHandleChecked();
+        if (IsOwnershipTransferred)
+            throw new InvalidOperationException("The filter belongs to a physics system and can no longer be configured.");
+
+        return handle;
+    }
+
     // The native owner must invalidate this wrapper when it destroys the handle.
     internal void TransferOwnership()
     {
-        OwnsHandle = false;
+        IsOwnershipTransferred = true;
         IgnorePublicDispose = true;
         GC.SuppressFinalize(this);
+        OwnsHandle = false;
+    }
+
+    // joltc owns the allocation, even if construction failed partway through transfer.
+    // Clear the handle before managed cleanup, without calling a native destructor.
+    internal void InvalidateHandle(bool disposing)
+    {
+        if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) != 0)
+            return;
+
+        Handle = 0;
+        GC.SuppressFinalize(this);
+        if (disposing)
+        {
+            try
+            {
+                DisposeUnownedManaged();
+            }
+            finally
+            {
+                DisposeManaged();
+            }
+        }
     }
 
     public void Dispose()
@@ -124,7 +161,7 @@ public abstract class NativeObject : IDisposable
             DisposeUnownedManaged();
 
         // destroy the native object
-        if (Handle != IntPtr.Zero && OwnsHandle)
+        if (Handle != IntPtr.Zero && !IsOwnershipTransferred && OwnsHandle)
             DisposeNative();
 
         // dispose any remaining managed-created objects
