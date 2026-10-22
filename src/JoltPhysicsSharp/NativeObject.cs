@@ -83,6 +83,23 @@ public abstract class NativeObject : IDisposable
 
     protected internal virtual bool OwnsHandle { get; protected set; }
 
+    internal nint GetHandleChecked()
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+        if (Handle == 0)
+            throw new InvalidOperationException("The native handle is invalid.");
+
+        return Handle;
+    }
+
+    // The native owner must invalidate this wrapper when it destroys the handle.
+    internal void TransferOwnership()
+    {
+        OwnsHandle = false;
+        IgnorePublicDispose = true;
+        GC.SuppressFinalize(this);
+    }
+
     public void Dispose()
     {
         if (IgnorePublicDispose)

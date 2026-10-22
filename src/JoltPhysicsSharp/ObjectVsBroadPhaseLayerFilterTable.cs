@@ -10,7 +10,7 @@ public sealed class ObjectVsBroadPhaseLayerFilterTable : ObjectVsBroadPhaseLayer
     public ObjectVsBroadPhaseLayerFilterTable(
         BroadPhaseLayerInterface broadPhaseLayerInterface, uint numBroadPhaseLayers,
         ObjectLayerPairFilter objectLayerPairFilter, uint numObjectLayers)
-        : base(JPH_ObjectVsBroadPhaseLayerFilterTable_Create(broadPhaseLayerInterface.Handle, numBroadPhaseLayers, objectLayerPairFilter.Handle, numObjectLayers))
+        : base(JPH_ObjectVsBroadPhaseLayerFilterTable_Create(broadPhaseLayerInterface.GetHandleChecked(), numBroadPhaseLayers, objectLayerPairFilter.GetHandleChecked(), numObjectLayers))
     {
     }
 }

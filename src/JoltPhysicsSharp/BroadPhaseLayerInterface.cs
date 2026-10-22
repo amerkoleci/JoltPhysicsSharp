@@ -7,8 +7,8 @@ namespace JoltPhysicsSharp;
 public abstract class BroadPhaseLayerInterface : NativeObject
 {
     protected BroadPhaseLayerInterface(nint handle)
+        : base(handle)
     {
-        Handle = handle;
     }
 
     protected override void DisposeNative()

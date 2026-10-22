@@ -14,6 +14,6 @@ public sealed class BroadPhaseLayerInterfaceTable : BroadPhaseLayerInterface
 
     public void MapObjectToBroadPhaseLayer(ObjectLayer objectLayer, BroadPhaseLayer broadPhaseLayer)
     {
-        JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(Handle, objectLayer, broadPhaseLayer);
+        JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(GetHandleChecked(), objectLayer, broadPhaseLayer);
     }
 }
