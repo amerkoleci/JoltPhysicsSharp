@@ -17,6 +17,7 @@ public abstract class NativeObject : IDisposable
     private volatile uint _isDisposed;
     internal bool fromFinalizer = false;
     private nint _handle;
+    private bool _ownsHandle;
     private readonly object _locker = new();
     private ConcurrentDictionary<nint, NativeObject>? _ownedObjects;
 
@@ -85,7 +86,11 @@ public abstract class NativeObject : IDisposable
         }
     }
 
-    protected internal virtual bool OwnsHandle { get; protected set; }
+    protected internal virtual bool OwnsHandle
+    {
+        get => _ownsHandle;
+        protected set => _ownsHandle = value;
+    }
     internal bool IsOwnershipTransferred { get; private set; }
 
     internal nint GetHandleChecked()
@@ -112,10 +117,10 @@ public abstract class NativeObject : IDisposable
         IsOwnershipTransferred = true;
         IgnorePublicDispose = true;
         GC.SuppressFinalize(this);
-        OwnsHandle = false;
+        _ownsHandle = false;
     }
 
-    // joltc owns the allocation, even if construction failed partway through transfer.
+    // joltc owns the allocation once native system creation succeeds.
     // Clear the handle before managed cleanup, without calling a native destructor.
     internal void InvalidateHandle(bool disposing)
     {

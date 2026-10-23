@@ -18,7 +18,8 @@ public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyI
 /// Settings for creating a <see cref="PhysicsSystem"/>.
 /// </summary>
 /// <remarks>
-/// Configure filters before creating the object-versus-broad-phase filter, which may cache their settings.
+/// Configure filters before creating the object-versus-broad-phase filter. The Table filter copies
+/// the configuration at creation; the Mask filter retains a reference to the broad-phase interface.
 /// Successful native creation transfers all three filters to the system, even if later setup fails.
 /// Transferred filters cannot be shared or reconfigured; disposing them has no effect.
 /// System teardown invalidates their wrappers. Externally synchronize construction, configuration, and disposal.
@@ -47,8 +48,6 @@ public sealed unsafe class PhysicsSystem : NativeObject
     private nint _listenerUserData;
     private nint _contactListenerHandle;
     private nint _bodyActivationListenerHandle;
-    private bool _contactListenerAttached;
-    private bool _bodyActivationListenerAttached;
     private readonly ObjectLayerPairFilter? _objectLayerPairFilter;
     private readonly BroadPhaseLayerInterface? _broadPhaseLayerInterface;
     private readonly ObjectVsBroadPhaseLayerFilter? _objectVsBroadPhaseLayerFilter;
@@ -126,8 +125,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
             if (handle == 0)
                 throw new InvalidOperationException("Failed to create the physics system.");
 
-            // Record ownership before any operation that can throw, including transfer
-            // through an overridden OwnsHandle setter or handle registration.
+            // Record ownership before handle registration, which can throw.
             OwnsHandle = true;
             Handle = handle;
 
@@ -137,16 +135,17 @@ public sealed unsafe class PhysicsSystem : NativeObject
             _objectVsBroadPhaseLayerFilter.TransferOwnership();
 
             JPH_PhysicsSystem_SetContactListener(Handle, _contactListenerHandle);
-            _contactListenerAttached = true;
             JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
-            _bodyActivationListenerAttached = true;
         }
         catch
         {
             if (Handle != 0)
                 DisposeInternal();
             else
+            {
                 DisposeListeners();
+                GC.SuppressFinalize(this);
+            }
 
             throw;
         }
@@ -166,40 +165,25 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
     protected override void DisposeNative()
     {
-        bool systemDestroyed = false;
+        JPH_PhysicsSystem_SetContactListener(Handle, 0);
+        JPH_PhysicsSystem_SetBodyActivationListener(Handle, 0);
+        JPH_PhysicsSystem_Destroy(Handle);
+        Handle = 0;
+
         try
         {
-            try
-            {
-                DetachListeners();
-            }
-            finally
-            {
-                // Attempt destruction even if detaching a listener fails.
-                JPH_PhysicsSystem_Destroy(Handle);
-                systemDestroyed = true;
-                _contactListenerAttached = false;
-                _bodyActivationListenerAttached = false;
-                Handle = 0;
-            }
+            InvalidateFilters(!fromFinalizer);
         }
         finally
         {
-            try
-            {
-                // Retain managed resources if the native filters could still use them.
-                InvalidateFilters(systemDestroyed && !fromFinalizer);
-            }
-            finally
-            {
-                DisposeListeners();
-            }
+            // Managed filter cleanup can throw; listeners must still be released.
+            DisposeListeners();
         }
     }
 
     private void InvalidateFilters(bool disposing)
     {
-        // Also invalidate on finalization and after partial ownership transfer.
+        // Invalidate every wrapper even if a filter's managed cleanup throws.
         try
         {
             _objectLayerPairFilter?.InvalidateHandle(disposing);
@@ -217,56 +201,22 @@ public sealed unsafe class PhysicsSystem : NativeObject
         }
     }
 
-    private void DetachListeners()
-    {
-        try
-        {
-            if (_contactListenerAttached)
-            {
-                JPH_PhysicsSystem_SetContactListener(Handle, 0);
-                _contactListenerAttached = false;
-            }
-        }
-        finally
-        {
-            if (_bodyActivationListenerAttached)
-            {
-                JPH_PhysicsSystem_SetBodyActivationListener(Handle, 0);
-                _bodyActivationListenerAttached = false;
-            }
-        }
-    }
-
     private void DisposeListeners()
     {
-        // If both detachment and system destruction fail, retain listeners still
-        // referenced by the native system rather than leave dangling callbacks.
-        try
+        if (_contactListenerHandle != 0)
         {
-            if (!_contactListenerAttached && _contactListenerHandle != 0)
-            {
-                JPH_ContactListener_Destroy(_contactListenerHandle);
-                _contactListenerHandle = 0;
-            }
+            JPH_ContactListener_Destroy(_contactListenerHandle);
+            _contactListenerHandle = 0;
         }
-        finally
+        if (_bodyActivationListenerHandle != 0)
         {
-            try
-            {
-                if (!_bodyActivationListenerAttached && _bodyActivationListenerHandle != 0)
-                {
-                    JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
-                    _bodyActivationListenerHandle = 0;
-                }
-            }
-            finally
-            {
-                if (!_contactListenerAttached && !_bodyActivationListenerAttached && _listenerUserData != 0)
-                {
-                    GCHandle.FromIntPtr(_listenerUserData).Free();
-                    _listenerUserData = 0;
-                }
-            }
+            JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
+            _bodyActivationListenerHandle = 0;
+        }
+        if (_listenerUserData != 0)
+        {
+            GCHandle.FromIntPtr(_listenerUserData).Free();
+            _listenerUserData = 0;
         }
     }
 
