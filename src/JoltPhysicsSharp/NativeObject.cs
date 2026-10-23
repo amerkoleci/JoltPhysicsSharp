@@ -8,11 +8,16 @@ namespace JoltPhysicsSharp;
 /// <summary>
 /// A native object which is disposable.
 /// </summary>
+/// <remarks>
+/// Disposal must be externally synchronized with native operations. In particular, do not
+/// dispose or configure collision filters concurrently with physics system construction.
+/// </remarks>
 public abstract class NativeObject : IDisposable
 {
     private volatile uint _isDisposed;
     internal bool fromFinalizer = false;
     private nint _handle;
+    private bool _ownsHandle;
     private readonly object _locker = new();
     private ConcurrentDictionary<nint, NativeObject>? _ownedObjects;
 
@@ -81,7 +86,61 @@ public abstract class NativeObject : IDisposable
         }
     }
 
-    protected internal virtual bool OwnsHandle { get; protected set; }
+    protected internal virtual bool OwnsHandle
+    {
+        get => _ownsHandle;
+        protected set => _ownsHandle = value;
+    }
+    internal bool IsOwnershipTransferred { get; private set; }
+
+    internal nint GetHandleChecked()
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+        if (Handle == 0)
+            throw new InvalidOperationException("The native handle is invalid.");
+
+        return Handle;
+    }
+
+    internal nint GetHandleForConfiguration()
+    {
+        nint handle = GetHandleChecked();
+        if (IsOwnershipTransferred)
+            throw new InvalidOperationException("The filter belongs to a physics system and can no longer be configured.");
+
+        return handle;
+    }
+
+    // The native owner must invalidate this wrapper when it destroys the handle.
+    internal void TransferOwnership()
+    {
+        IsOwnershipTransferred = true;
+        IgnorePublicDispose = true;
+        GC.SuppressFinalize(this);
+        _ownsHandle = false;
+    }
+
+    // joltc owns the allocation once native system creation succeeds.
+    // Clear the handle before managed cleanup, without calling a native destructor.
+    internal void InvalidateHandle(bool disposing)
+    {
+        if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) != 0)
+            return;
+
+        Handle = 0;
+        GC.SuppressFinalize(this);
+        if (disposing)
+        {
+            try
+            {
+                DisposeUnownedManaged();
+            }
+            finally
+            {
+                DisposeManaged();
+            }
+        }
+    }
 
     public void Dispose()
     {
@@ -107,7 +166,7 @@ public abstract class NativeObject : IDisposable
             DisposeUnownedManaged();
 
         // destroy the native object
-        if (Handle != IntPtr.Zero && OwnsHandle)
+        if (Handle != IntPtr.Zero && !IsOwnershipTransferred && OwnsHandle)
             DisposeNative();
 
         // dispose any remaining managed-created objects

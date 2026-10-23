@@ -19,11 +19,11 @@ public sealed class ObjectLayerPairFilterTable : ObjectLayerPairFilter
 
     public void DisableCollision(ObjectLayer layer1, ObjectLayer layer2)
     {
-        JPH_ObjectLayerPairFilterTable_DisableCollision(Handle, layer1, layer2);
+        JPH_ObjectLayerPairFilterTable_DisableCollision(GetHandleForConfiguration(), layer1, layer2);
     }
 
     public void EnableCollision(ObjectLayer layer1, ObjectLayer layer2)
     {
-        JPH_ObjectLayerPairFilterTable_EnableCollision(Handle, layer1, layer2);
+        JPH_ObjectLayerPairFilterTable_EnableCollision(GetHandleForConfiguration(), layer1, layer2);
     }
 }

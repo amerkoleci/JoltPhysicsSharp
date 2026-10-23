@@ -14,6 +14,16 @@ public delegate void ContactPersistedHandler(PhysicsSystem system, in Body body1
 public delegate void ContactRemovedHandler(PhysicsSystem system, ref SubShapeIDPair subShapePair);
 public delegate void BodyActivationHandler(PhysicsSystem system, in BodyID bodyID, ulong bodyUserData);
 
+/// <summary>
+/// Settings for creating a <see cref="PhysicsSystem"/>.
+/// </summary>
+/// <remarks>
+/// Configure filters before creating the object-versus-broad-phase filter. The Table filter copies
+/// the configuration at creation; the Mask filter retains a reference to the broad-phase interface.
+/// Successful native creation transfers all three filters to the system, even if later setup fails.
+/// Transferred filters cannot be shared or reconfigured; disposing them has no effect.
+/// System teardown invalidates their wrappers. Externally synchronize construction, configuration, and disposal.
+/// </remarks>
 public struct PhysicsSystemSettings
 {
     public int MaxBodies { get; set; } = 10240;
@@ -35,9 +45,12 @@ public sealed unsafe class PhysicsSystem : NativeObject
     private static readonly JPH_ContactListener_ProcsDouble _contactListener_ProcsDouble;
     private static readonly JPH_BodyActivationListener_Procs _bodyActivationListener_Procs;
 
-    private readonly nint _listenerUserData;
-    private readonly nint _contactListenerHandle;
-    private readonly nint _bodyActivationListenerHandle;
+    private nint _listenerUserData;
+    private nint _contactListenerHandle;
+    private nint _bodyActivationListenerHandle;
+    private readonly ObjectLayerPairFilter? _objectLayerPairFilter;
+    private readonly BroadPhaseLayerInterface? _broadPhaseLayerInterface;
+    private readonly ObjectVsBroadPhaseLayerFilter? _objectVsBroadPhaseLayerFilter;
 
     static PhysicsSystem()
     {
@@ -78,6 +91,14 @@ public sealed unsafe class PhysicsSystem : NativeObject
         ArgumentNullException.ThrowIfNull(settings.BroadPhaseLayerInterface, nameof(settings.BroadPhaseLayerInterface));
         ArgumentNullException.ThrowIfNull(settings.ObjectVsBroadPhaseLayerFilter, nameof(settings.ObjectVsBroadPhaseLayerFilter));
 
+        ValidateFilter(settings.ObjectLayerPairFilter, nameof(settings.ObjectLayerPairFilter));
+        ValidateFilter(settings.BroadPhaseLayerInterface, nameof(settings.BroadPhaseLayerInterface));
+        ValidateFilter(settings.ObjectVsBroadPhaseLayerFilter, nameof(settings.ObjectVsBroadPhaseLayerFilter));
+
+        _objectLayerPairFilter = settings.ObjectLayerPairFilter;
+        _broadPhaseLayerInterface = settings.BroadPhaseLayerInterface;
+        _objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter;
+
         NativePhysicsSystemSettings nativeSettings = new()
         {
             maxBodies = settings.MaxBodies,
@@ -88,22 +109,53 @@ public sealed unsafe class PhysicsSystem : NativeObject
             objectLayerPairFilter = settings.ObjectLayerPairFilter.Handle,
             objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter.Handle
         };
-        Handle = JPH_PhysicsSystem_Create(&nativeSettings);
-
-        _listenerUserData = DelegateProxies.CreateUserData(this, true);
-        if (!DoublePrecision)
+        try
         {
+            // Allocate listeners first so failures do not consume the caller's filters.
+            _listenerUserData = DelegateProxies.CreateUserData(this, true);
             _contactListenerHandle = JPH_ContactListener_Create(_listenerUserData);
+            if (_contactListenerHandle == 0)
+                throw new InvalidOperationException("Failed to create the contact listener.");
+
+            _bodyActivationListenerHandle = JPH_BodyActivationListener_Create(_listenerUserData);
+            if (_bodyActivationListenerHandle == 0)
+                throw new InvalidOperationException("Failed to create the body activation listener.");
+
+            nint handle = JPH_PhysicsSystem_Create(&nativeSettings);
+            if (handle == 0)
+                throw new InvalidOperationException("Failed to create the physics system.");
+
+            // Record ownership before handle registration, which can throw.
+            OwnsHandle = true;
+            Handle = handle;
+
+            // joltc destroys these filters with the system, unlike the Jolt C++ API.
+            _objectLayerPairFilter.TransferOwnership();
+            _broadPhaseLayerInterface.TransferOwnership();
+            _objectVsBroadPhaseLayerFilter.TransferOwnership();
+
+            JPH_PhysicsSystem_SetContactListener(Handle, _contactListenerHandle);
+            JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
         }
-        else
+        catch
         {
-            _contactListenerHandle = JPH_ContactListener_Create(_listenerUserData);
+            if (Handle != 0)
+                DisposeInternal();
+            else
+            {
+                DisposeListeners();
+                GC.SuppressFinalize(this);
+            }
+
+            throw;
         }
+    }
 
-        _bodyActivationListenerHandle = JPH_BodyActivationListener_Create(_listenerUserData);
-
-        JPH_PhysicsSystem_SetContactListener(Handle, _contactListenerHandle);
-        JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
+    private static void ValidateFilter(NativeObject filter, string paramName)
+    {
+        filter.GetHandleChecked();
+        if (filter.IsOwnershipTransferred || !filter.OwnsHandle)
+            throw new ArgumentException("The filter must own its native handle and cannot already belong to a physics system.", paramName);
     }
 
     internal PhysicsSystem(nint handle, bool ownsHandle)
@@ -113,13 +165,59 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
     protected override void DisposeNative()
     {
-        DelegateProxies.GetUserData<PhysicsSystem>(_listenerUserData, out GCHandle gch);
-
-        JPH_ContactListener_Destroy(_contactListenerHandle);
-        JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
-
+        JPH_PhysicsSystem_SetContactListener(Handle, 0);
+        JPH_PhysicsSystem_SetBodyActivationListener(Handle, 0);
         JPH_PhysicsSystem_Destroy(Handle);
-        gch.Free();
+        Handle = 0;
+
+        try
+        {
+            InvalidateFilters(!fromFinalizer);
+        }
+        finally
+        {
+            // Managed filter cleanup can throw; listeners must still be released.
+            DisposeListeners();
+        }
+    }
+
+    private void InvalidateFilters(bool disposing)
+    {
+        // Invalidate every wrapper even if a filter's managed cleanup throws.
+        try
+        {
+            _objectLayerPairFilter?.InvalidateHandle(disposing);
+        }
+        finally
+        {
+            try
+            {
+                _broadPhaseLayerInterface?.InvalidateHandle(disposing);
+            }
+            finally
+            {
+                _objectVsBroadPhaseLayerFilter?.InvalidateHandle(disposing);
+            }
+        }
+    }
+
+    private void DisposeListeners()
+    {
+        if (_contactListenerHandle != 0)
+        {
+            JPH_ContactListener_Destroy(_contactListenerHandle);
+            _contactListenerHandle = 0;
+        }
+        if (_bodyActivationListenerHandle != 0)
+        {
+            JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
+            _bodyActivationListenerHandle = 0;
+        }
+        if (_listenerUserData != 0)
+        {
+            GCHandle.FromIntPtr(_listenerUserData).Free();
+            _listenerUserData = 0;
+        }
     }
 
     public PhysicsSettings Settings
@@ -127,19 +225,19 @@ public sealed unsafe class PhysicsSystem : NativeObject
         get
         {
             PhysicsSettings result;
-            JPH_PhysicsSystem_GetPhysicsSettings(Handle, &result);
+            JPH_PhysicsSystem_GetPhysicsSettings(GetHandleChecked(), &result);
             return result;
         }
         set
         {
-            JPH_PhysicsSystem_SetPhysicsSettings(Handle, &value);
+            JPH_PhysicsSystem_SetPhysicsSettings(GetHandleChecked(), &value);
         }
     }
 
-    public uint BodiesCount => JPH_PhysicsSystem_GetNumBodies(Handle);
-    public uint GetNumActiveBodies(BodyType type) => JPH_PhysicsSystem_GetNumActiveBodies(Handle, type);
-    public uint MaxBodies => JPH_PhysicsSystem_GetMaxBodies(Handle);
-    public uint NumConstraints => JPH_PhysicsSystem_GetNumConstraints(Handle);
+    public uint BodiesCount => JPH_PhysicsSystem_GetNumBodies(GetHandleChecked());
+    public uint GetNumActiveBodies(BodyType type) => JPH_PhysicsSystem_GetNumActiveBodies(GetHandleChecked(), type);
+    public uint MaxBodies => JPH_PhysicsSystem_GetMaxBodies(GetHandleChecked());
+    public uint NumConstraints => JPH_PhysicsSystem_GetNumConstraints(GetHandleChecked());
 
     #region Events
     /// <summary>
@@ -196,61 +294,61 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
     public void SetSimShapeFilter(SimShapeFilter? filter)
     {
-        JPH_PhysicsSystem_SetSimShapeFilter(Handle, filter != null ? filter.Handle : 0);
+        JPH_PhysicsSystem_SetSimShapeFilter(GetHandleChecked(), filter != null ? filter.Handle : 0);
     }
 
-    public BodyInterface BodyInterface => new(JPH_PhysicsSystem_GetBodyInterface(Handle));
-    public BodyInterface BodyInterfaceNoLock => new(JPH_PhysicsSystem_GetBodyInterfaceNoLock(Handle));
+    public BodyInterface BodyInterface => new(JPH_PhysicsSystem_GetBodyInterface(GetHandleChecked()));
+    public BodyInterface BodyInterfaceNoLock => new(JPH_PhysicsSystem_GetBodyInterfaceNoLock(GetHandleChecked()));
 
-    public BodyLockInterface BodyLockInterface => new(JPH_PhysicsSystem_GetBodyLockInterface(Handle));
-    public BodyLockInterface BodyLockInterfaceNoLock => new(JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(Handle));
+    public BodyLockInterface BodyLockInterface => new(JPH_PhysicsSystem_GetBodyLockInterface(GetHandleChecked()));
+    public BodyLockInterface BodyLockInterfaceNoLock => new(JPH_PhysicsSystem_GetBodyLockInterfaceNoLock(GetHandleChecked()));
 
-    public BroadPhaseQuery BroadPhaseQuery => new(JPH_PhysicsSystem_GetBroadPhaseQuery(Handle));
+    public BroadPhaseQuery BroadPhaseQuery => new(JPH_PhysicsSystem_GetBroadPhaseQuery(GetHandleChecked()));
 
-    public NarrowPhaseQuery NarrowPhaseQuery => new(JPH_PhysicsSystem_GetNarrowPhaseQuery(Handle));
-    public NarrowPhaseQuery NarrowPhaseQueryNoLock => new(JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(Handle));
+    public NarrowPhaseQuery NarrowPhaseQuery => new(JPH_PhysicsSystem_GetNarrowPhaseQuery(GetHandleChecked()));
+    public NarrowPhaseQuery NarrowPhaseQueryNoLock => new(JPH_PhysicsSystem_GetNarrowPhaseQueryNoLock(GetHandleChecked()));
 
     public void OptimizeBroadPhase()
     {
-        JPH_PhysicsSystem_OptimizeBroadPhase(Handle);
+        JPH_PhysicsSystem_OptimizeBroadPhase(GetHandleChecked());
     }
 
     public PhysicsUpdateError Update(float deltaTime, int collisionSteps, JobSystem jobSystem)
     {
-        return JPH_PhysicsSystem_Update(Handle, deltaTime, collisionSteps, jobSystem.Handle);
+        return JPH_PhysicsSystem_Update(GetHandleChecked(), deltaTime, collisionSteps, jobSystem.Handle);
     }
 
     public void ActivateBodiesInAABox(in BoundingBox box, ObjectLayer layer)
     {
-        JPH_PhysicsSystem_ActivateBodiesInAABox(Handle, in box, layer.Value);
+        JPH_PhysicsSystem_ActivateBodiesInAABox(GetHandleChecked(), in box, layer.Value);
     }
 
     public bool WereBodiesInContact(in BodyID inBody1ID, in BodyID inBody2ID)
-        => JPH_PhysicsSystem_WereBodiesInContact(Handle, inBody1ID, inBody2ID);
+        => JPH_PhysicsSystem_WereBodiesInContact(GetHandleChecked(), inBody1ID, inBody2ID);
 
     public Vector3 Gravity
     {
         get
         {
-            JPH_PhysicsSystem_GetGravity(Handle, out Vector3 value);
+            JPH_PhysicsSystem_GetGravity(GetHandleChecked(), out Vector3 value);
             return value;
         }
-        set => JPH_PhysicsSystem_SetGravity(Handle, value);
+        set => JPH_PhysicsSystem_SetGravity(GetHandleChecked(), value);
     }
 
     public void GetGravity(out Vector3 gravity)
     {
-        JPH_PhysicsSystem_GetGravity(Handle, out gravity);
+        JPH_PhysicsSystem_GetGravity(GetHandleChecked(), out gravity);
     }
 
     public void AddConstraint(Constraint constraint)
     {
-        JPH_PhysicsSystem_AddConstraint(Handle, constraint.Handle);
+        JPH_PhysicsSystem_AddConstraint(GetHandleChecked(), constraint.Handle);
     }
 
     public void RemoveConstraint(Constraint constraint)
     {
-        JPH_PhysicsSystem_RemoveConstraint(Handle, constraint.Handle);
+        JPH_PhysicsSystem_RemoveConstraint(GetHandleChecked(), constraint.Handle);
     }
 
     public void AddConstraints(params Span<Constraint> constraints)
@@ -261,7 +359,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
         {
             constraintsPtr[i] = constraints[i].Handle;
         }
-        JPH_PhysicsSystem_AddConstraints(Handle, constraintsPtr, (uint)count);
+        JPH_PhysicsSystem_AddConstraints(GetHandleChecked(), constraintsPtr, (uint)count);
     }
 
     public void RemoveConstraints(params Span<Constraint> constraints)
@@ -272,55 +370,55 @@ public sealed unsafe class PhysicsSystem : NativeObject
         {
             constraintsPtr[i] = constraints[i].Handle;
         }
-        JPH_PhysicsSystem_RemoveConstraints(Handle, constraintsPtr, (uint)count);
+        JPH_PhysicsSystem_RemoveConstraints(GetHandleChecked(), constraintsPtr, (uint)count);
     }
 
     public void AddStepListener(IPhysicsStepListener listener)
     {
-        JPH_PhysicsSystem_AddStepListener(Handle, listener.Handle);
+        JPH_PhysicsSystem_AddStepListener(GetHandleChecked(), listener.Handle);
     }
 
     public void RemoveStepListener(IPhysicsStepListener listener)
     {
-        JPH_PhysicsSystem_RemoveStepListener(Handle, listener.Handle);
+        JPH_PhysicsSystem_RemoveStepListener(GetHandleChecked(), listener.Handle);
     }
 
     public void GetBodies(BodyID* ids, uint count)
     {
-        JPH_PhysicsSystem_GetBodies(Handle, ids, count);
+        JPH_PhysicsSystem_GetBodies(GetHandleChecked(), ids, count);
     }
 
     public void GetActiveBodies(BodyType type, BodyID* ids, uint count)
     {
-        JPH_PhysicsSystem_GetActiveBodies(Handle, type, ids, count);
+        JPH_PhysicsSystem_GetActiveBodies(GetHandleChecked(), type, ids, count);
     }
 
     public BodyID* GetActiveBodiesUnsafe(BodyType type)
     {
-        return JPH_PhysicsSystem_GetActiveBodiesUnsafe(Handle, type);
+        return JPH_PhysicsSystem_GetActiveBodiesUnsafe(GetHandleChecked(), type);
     }
 
     public void DrawBodies(in DrawSettings settings, DebugRenderer renderer, BodyDrawFilter? bodyDrawFilter = default)
     {
         fixed (DrawSettings* settingsPtr = &settings)
         {
-            JPH_PhysicsSystem_DrawBodies(Handle, settingsPtr, renderer.Handle, bodyDrawFilter != null ? bodyDrawFilter.Handle : 0);
+            JPH_PhysicsSystem_DrawBodies(GetHandleChecked(), settingsPtr, renderer.Handle, bodyDrawFilter != null ? bodyDrawFilter.Handle : 0);
         }
     }
 
     public void DrawConstraints(DebugRenderer renderer)
     {
-        JPH_PhysicsSystem_DrawConstraints(Handle, renderer.Handle);
+        JPH_PhysicsSystem_DrawConstraints(GetHandleChecked(), renderer.Handle);
     }
 
     public void DrawConstraintLimits(DebugRenderer renderer)
     {
-        JPH_PhysicsSystem_DrawConstraintLimits(Handle, renderer.Handle);
+        JPH_PhysicsSystem_DrawConstraintLimits(GetHandleChecked(), renderer.Handle);
     }
 
     public void DrawConstraintReferenceFrame(DebugRenderer renderer)
     {
-        JPH_PhysicsSystem_DrawConstraintReferenceFrame(Handle, renderer.Handle);
+        JPH_PhysicsSystem_DrawConstraintReferenceFrame(GetHandleChecked(), renderer.Handle);
     }
 
     internal static PhysicsSystem? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new PhysicsSystem(h, false));
