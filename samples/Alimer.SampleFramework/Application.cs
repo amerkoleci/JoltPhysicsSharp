@@ -189,7 +189,8 @@ public abstract class Application : DisposableObject
 
                 // Raylib uses column major matrix
                 Matrix4x4 worldTransform = BodyInterface.GetWorldTransform(bodyID);
-                DrawMesh(BoxMesh, BoxMaterial, worldTransform);
+                Matrix4x4 drawTransform = Matrix4x4.Transpose(worldTransform);
+                DrawMesh(BoxMesh, BoxMaterial, drawTransform);
             }
 
             EndMode3D();

@@ -44,4 +44,24 @@ public class ShapeTests : BaseTest
         // Mass is easy to calculate, double check if SetMassAndInertiaOfSolidBox calculated it correctly
         //CHECK_APPROX_EQUAL(5.0f * 6.0f * 7.0f * cDensity, reference.mMass, 1.0e-6f);
     }
+
+    [Test]
+    public static void TestGetWorldSpaceBoundsWithTranslation()
+    {
+        // Regression test for the Matrix4x4 <-> Mat44 conversion: the translation
+        // stored in M41..M43 of a System.Numerics matrix must reach Jolt as the
+        // translation column. If the conversion is wrong the translation is lost
+        // and the bounds come back centered at the origin.
+        using BoxShape shape = new(new Vector3(1.0f, 2.0f, 3.0f));
+
+        Matrix4x4 transform = Matrix4x4.CreateTranslation(10.0f, 20.0f, 30.0f);
+        BoundingBox bounds = shape.GetWorldSpaceBounds(transform, Vector3.One);
+
+        CHECK_APPROX_EQUAL(9.0f, bounds.Min.X);
+        CHECK_APPROX_EQUAL(18.0f, bounds.Min.Y);
+        CHECK_APPROX_EQUAL(27.0f, bounds.Min.Z);
+        CHECK_APPROX_EQUAL(11.0f, bounds.Max.X);
+        CHECK_APPROX_EQUAL(22.0f, bounds.Max.Y);
+        CHECK_APPROX_EQUAL(33.0f, bounds.Max.Z);
+    }
 }
