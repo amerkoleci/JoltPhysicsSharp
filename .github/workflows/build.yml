@@ -14,7 +14,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write  # enable GitHub OIDC token issuance for this job
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v7
@@ -29,4 +31,4 @@ jobs:
 
     - name: Publish to NuGet
       if: github.event_name == 'push'
-      run: dotnet nuget push artifacts/package/release/*.nupkg -k ${{secrets.NUGET_TOKEN}} --skip-duplicate --source https://api.nuget.org/v3/index.json          
+      run: dotnet nuget push artifacts/package/release/*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --skip-duplicate --source https://api.nuget.org/v3/index.json          
