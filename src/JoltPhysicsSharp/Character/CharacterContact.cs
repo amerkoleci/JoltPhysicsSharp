@@ -51,7 +51,7 @@ public struct CharacterContact
         IsSensorB = native->isSensorB;
         CharacterB = CharacterVirtual.GetObject(native->characterB);
         UserData = native->userData;
-        Material = PhysicsMaterial.GetObject(native->material);
+        Material = native->material;
         HadCollision = native->hadCollision;
         WasDiscarded = native->wasDiscarded;
         CanPushCharacter = native->canPushCharacter;
@@ -75,7 +75,7 @@ public struct CharacterContact
         IsSensorB = native->isSensorB;
         CharacterB = CharacterVirtual.GetObject(native->characterB);
         UserData = native->userData;
-        Material = PhysicsMaterial.GetObject(native->material);
+        Material = native->material;
         HadCollision = native->hadCollision;
         WasDiscarded = native->wasDiscarded;
         CanPushCharacter = native->canPushCharacter;

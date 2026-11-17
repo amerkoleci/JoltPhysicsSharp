@@ -48,14 +48,10 @@ public abstract class DebugRenderer : NativeObject
     }
 
     protected DebugRenderer()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         Handle = JPH_DebugRenderer_Create(_listenerUserData);
-    }
-
-    protected DebugRenderer(nint handle)
-        : base(handle)
-    {
     }
 
     protected override void DisposeNative()

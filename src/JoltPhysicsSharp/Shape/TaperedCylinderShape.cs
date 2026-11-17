@@ -8,7 +8,7 @@ namespace JoltPhysicsSharp;
 public sealed class TaperedCylinderShapeSettings : ConvexShapeSettings
 {
     public unsafe TaperedCylinderShapeSettings(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius, float convexRadius = Foundation.DefaultConvexRadius, PhysicsMaterial? material = default)
-        : base(JPH_TaperedCylinderShapeSettings_Create(halfHeightOfTaperedCylinder, topRadius, bottomRadius, convexRadius, material != null ? material.Handle : IntPtr.Zero))
+        : base(JPH_TaperedCylinderShapeSettings_Create(halfHeightOfTaperedCylinder, topRadius, bottomRadius, convexRadius, material ?? PhysicsMaterial.Null))
     {
     }
 

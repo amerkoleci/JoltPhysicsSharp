@@ -1,8 +1,6 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using System.Collections.Concurrent;
-
 namespace JoltPhysicsSharp;
 
 /// <summary>
@@ -15,27 +13,9 @@ namespace JoltPhysicsSharp;
 public abstract class NativeObject : IDisposable
 {
     private volatile uint _isDisposed;
-    internal bool fromFinalizer = false;
-    private nint _handle;
-    private bool _ownsHandle;
-    private readonly object _locker = new();
-    private ConcurrentDictionary<nint, NativeObject>? _ownedObjects;
+    internal bool _fromFinalizer = false;
 
-    protected NativeObject()
-    {
-
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NativeObject" /> class.
-    /// <param name="handle">The handle to initialize width.</param>
-    /// </summary>
-    internal NativeObject(nint handle)
-        : this(handle, true)
-    {
-    }
-
-    internal NativeObject(nint handle, bool ownsHandle)
+    protected NativeObject(nint handle, bool ownsHandle = true)
     {
         Handle = handle;
         OwnsHandle = ownsHandle;
@@ -43,7 +23,7 @@ public abstract class NativeObject : IDisposable
 
     ~NativeObject()
     {
-        fromFinalizer = true;
+        _fromFinalizer = true;
 
         Dispose(false);
     }
@@ -51,95 +31,47 @@ public abstract class NativeObject : IDisposable
 
     /// <summary>Gets <c>true</c> if the object has been disposed; otherwise, <c>false</c>.</summary>
     public bool IsDisposed => _isDisposed != 0;
-    protected internal bool IgnorePublicDispose { get; set; }
-
-    internal ConcurrentDictionary<nint, NativeObject> OwnedObjects
-    {
-        get
-        {
-            if (_ownedObjects == null)
-            {
-                lock (_locker)
-                {
-                    _ownedObjects ??= new();
-                }
-            }
-            return _ownedObjects;
-        }
-    }
 
     public nint Handle
     {
-        get => _handle;
+        get;
         protected set
         {
             if (value == 0)
             {
                 UnregisterHandle(Handle, this);
-                _handle = value;
+                field = value;
             }
             else
             {
-                _handle = value;
+                field = value;
                 RegisterHandle(Handle, this);
             }
         }
     }
 
-    protected internal virtual bool OwnsHandle
+    public bool OwnsHandle { get; protected set; }
+    protected internal bool IgnorePublicDispose { get; private set; }
+
+    internal void PreventPublicDisposal()
     {
-        get => _ownsHandle;
-        protected set => _ownsHandle = value;
-    }
-    internal bool IsOwnershipTransferred { get; private set; }
-
-    internal nint GetHandleChecked()
-    {
-        ObjectDisposedException.ThrowIf(IsDisposed, this);
-        if (Handle == 0)
-            throw new InvalidOperationException("The native handle is invalid.");
-
-        return Handle;
-    }
-
-    internal nint GetHandleForConfiguration()
-    {
-        nint handle = GetHandleChecked();
-        if (IsOwnershipTransferred)
-            throw new InvalidOperationException("The filter belongs to a physics system and can no longer be configured.");
-
-        return handle;
-    }
-
-    // The native owner must invalidate this wrapper when it destroys the handle.
-    internal void TransferOwnership()
-    {
-        IsOwnershipTransferred = true;
-        IgnorePublicDispose = true;
-        GC.SuppressFinalize(this);
-        _ownsHandle = false;
-    }
-
-    // joltc owns the allocation once native system creation succeeds.
-    // Clear the handle before managed cleanup, without calling a native destructor.
-    internal void InvalidateHandle(bool disposing)
-    {
-        if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) != 0)
-            return;
-
-        Handle = 0;
-        GC.SuppressFinalize(this);
-        if (disposing)
+#if DEBUG
+        // All callers (GetOrAddObject) hold the HandleDictionary upgradeable-read lock and target either a
+        // freshly-created wrapper or one that GetInstanceNoLocks just confirmed !IsDisposed.
+        // A live target can only become disposed via: public Dispose() (blocked here by the
+        // mutually-exclusive write lock), an owned-child / ownership-handoff / replacement
+        // DisposeInternal, or the finalizer. No dispose-protected call site registers its
+        // singleton as an owned child, hands off its ownership, or lets it be replaced, and
+        // the promoting thread holds a strong reference (so no finalizer race). Observing a
+        // disposed wrapper here therefore means one of those invariants was broken — a real
+        // bug worth surfacing.
+        if (IsDisposed)
         {
-            try
-            {
-                DisposeUnownedManaged();
-            }
-            finally
-            {
-                DisposeManaged();
-            }
+            throw new InvalidOperationException($"Attempted to dispose-protect an already-disposed wrapper. " + $"H: {Handle.ToString("x")} Type: {GetType()}");
         }
+#endif
+
+        IgnorePublicDispose = true;
     }
 
     public void Dispose()
@@ -161,31 +93,15 @@ public abstract class NativeObject : IDisposable
         if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) != 0)
             return;
 
-        // dispose any objects that are owned/created by native code
-        if (disposing)
-            DisposeUnownedManaged();
-
         // destroy the native object
-        if (Handle != IntPtr.Zero && !IsOwnershipTransferred && OwnsHandle)
+        if (Handle != 0 && OwnsHandle)
             DisposeNative();
 
         // dispose any remaining managed-created objects
         if (disposing)
             DisposeManaged();
 
-        Handle = IntPtr.Zero;
-    }
-
-    private void DisposeUnownedManaged()
-    {
-        if (_ownedObjects != null)
-        {
-            foreach (var child in _ownedObjects)
-            {
-                if (child.Value is NativeObject c && !c.OwnsHandle)
-                    c.DisposeInternal();
-            }
-        }
+        Handle = 0;
     }
 
     protected virtual void DisposeManaged()
@@ -196,6 +112,20 @@ public abstract class NativeObject : IDisposable
     protected virtual void DisposeNative()
     {
         // dispose of any unmanaged resources
+    }
+
+    protected nint GetHandleChecked()
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
+        if (Handle == 0)
+            throw new InvalidOperationException("The native handle is invalid.");
+
+        return Handle;
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, this);
     }
 
     internal static void RegisterHandle(nint handle, NativeObject? instance)

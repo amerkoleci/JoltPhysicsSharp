@@ -5,15 +5,12 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public abstract class ObjectLayerPairFilter : NativeObject
+public abstract class ObjectLayerPairFilter
 {
-    protected ObjectLayerPairFilter(nint handle, bool owns)
-        : base(handle, owns)
+    protected ObjectLayerPairFilter(nint handle)
     {
+        Handle = handle;
     }
 
-    protected override void DisposeNative()
-    {
-        JPH_ObjectLayerPairFilter_Destroy(Handle);
-    }
+    public nint Handle { get; }
 }

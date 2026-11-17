@@ -9,11 +9,7 @@ namespace JoltPhysicsSharp;
 
 public class VehicleControllerSettings : NativeObject
 {
-    protected VehicleControllerSettings()
-    {
-    }
-
-    internal VehicleControllerSettings(nint handle, bool ownsHandle)
+    internal VehicleControllerSettings(nint handle, bool ownsHandle = true)
         : base(handle, ownsHandle)
     {
     }
@@ -23,5 +19,5 @@ public class VehicleControllerSettings : NativeObject
         JPH_VehicleControllerSettings_Destroy(Handle);
     }
 
-    internal static VehicleControllerSettings? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new VehicleControllerSettings(h, false));
+    internal static VehicleControllerSettings? GetObject(nint handle) => GetOrAddObject(handle, h => new VehicleControllerSettings(h, false));
 }

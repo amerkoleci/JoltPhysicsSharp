@@ -5,19 +5,25 @@ using static JoltPhysicsSharp.JoltApi;
 
 namespace JoltPhysicsSharp;
 
-public class PhysicsMaterial : NativeObject
+public readonly partial struct PhysicsMaterial : IDisposable
 {
+    public readonly nint Handle;
+
+    public bool IsNull => Handle is 0;
+
+    public static PhysicsMaterial Null => new(0);
+
     public PhysicsMaterial(string name, in JoltColor color)
-        : base(JPH_PhysicsMaterial_Create(name, color.PackedValue), true)
+        : this(JPH_PhysicsMaterial_Create(name, color.PackedValue))
     {
     }
 
-    internal PhysicsMaterial(nint handle, bool owns)
-        : base(handle, owns)
+    private PhysicsMaterial(nint handle)
     {
+        Handle = handle;
     }
 
-    protected override void DisposeNative()
+    public void Dispose()
     {
         JPH_PhysicsMaterial_Destroy(Handle);
     }
@@ -25,8 +31,5 @@ public class PhysicsMaterial : NativeObject
     public string? DebugName => JPH_PhysicsMaterial_GetDebugName(Handle);
     public uint DebugColor => JPH_PhysicsMaterial_GetDebugColor(Handle);
 
-    internal static PhysicsMaterial? GetObject(nint handle)
-    {
-        return GetOrAddObject(handle, (nint h) => new PhysicsMaterial(h, false));
-    }
+    public static implicit operator PhysicsMaterial(nint handle) => new(handle);
 }

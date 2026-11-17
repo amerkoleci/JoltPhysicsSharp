@@ -10,6 +10,7 @@ namespace JoltPhysicsSharp;
 public sealed class Character : CharacterBase
 {
     public unsafe Character(CharacterSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+        : base(0, true)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use constructor with Double3");
@@ -20,6 +21,7 @@ public sealed class Character : CharacterBase
     }
 
     public unsafe Character(CharacterSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+        : base(0, true)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");

@@ -21,6 +21,7 @@ public abstract class BroadPhaseLayerFilter : NativeObject
     }
 
     public BroadPhaseLayerFilter()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         Handle = JPH_BroadPhaseLayerFilter_Create(_listenerUserData);

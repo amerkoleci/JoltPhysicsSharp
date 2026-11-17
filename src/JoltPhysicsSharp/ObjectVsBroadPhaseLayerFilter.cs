@@ -1,19 +1,14 @@
 // Copyright (c) Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
-using static JoltPhysicsSharp.JoltApi;
-
 namespace JoltPhysicsSharp;
 
-public abstract class ObjectVsBroadPhaseLayerFilter : NativeObject
+public abstract class ObjectVsBroadPhaseLayerFilter
 {
     protected ObjectVsBroadPhaseLayerFilter(nint handle)
-        : base(handle)
     {
+        Handle = handle;
     }
 
-    protected override void DisposeNative()
-    {
-        JPH_ObjectVsBroadPhaseLayerFilter_Destroy(Handle);
-    }
+    public nint Handle { get; }
 }

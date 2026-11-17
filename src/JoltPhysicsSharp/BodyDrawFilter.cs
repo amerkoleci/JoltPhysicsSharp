@@ -21,9 +21,9 @@ public abstract class BodyDrawFilter : NativeObject
     }
 
     public BodyDrawFilter()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
-        
         Handle = JPH_BodyDrawFilter_Create(_listenerUserData);
     }
 

@@ -58,7 +58,7 @@ public unsafe class TrackedVehicleControllerSettings : VehicleControllerSettings
     {
     }
 
-    internal TrackedVehicleControllerSettings(nint handle, bool ownsHandle)
+    internal TrackedVehicleControllerSettings(nint handle, bool ownsHandle = true)
         : base(handle, ownsHandle)
     {
     }

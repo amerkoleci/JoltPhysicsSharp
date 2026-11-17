@@ -31,6 +31,7 @@ public sealed unsafe class MeshShapeSettings : ConvexShapeSettings
     }
 
     public MeshShapeSettings(Span<Triangle> triangles)
+        : base(0, true)
     {
         fixed (Triangle* trianglePtr = triangles)
         {
@@ -39,6 +40,7 @@ public sealed unsafe class MeshShapeSettings : ConvexShapeSettings
     }
 
     public MeshShapeSettings(Span<Vector3> vertices, Span<IndexedTriangle> triangles)
+        : base(0, true)
     {
         fixed (Vector3* verticesPtr = vertices)
         fixed (IndexedTriangle* trianglePtr = triangles)

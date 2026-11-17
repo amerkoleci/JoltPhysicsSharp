@@ -22,6 +22,7 @@ public abstract class BodyFilter : NativeObject
     }
 
     public BodyFilter()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         Handle = JPH_BodyFilter_Create(_listenerUserData);

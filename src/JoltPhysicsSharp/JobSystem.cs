@@ -7,9 +7,9 @@ namespace JoltPhysicsSharp;
 
 public abstract class JobSystem : NativeObject
 {
-    protected JobSystem(nint handle)
+    protected JobSystem(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
-        Handle = handle;
     }
 
 

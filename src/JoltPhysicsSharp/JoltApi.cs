@@ -227,9 +227,6 @@ internal static unsafe partial class JoltApi
 
     // BroadPhaseLayerInterface
     [LibraryImport(LibName)]
-    public static partial void JPH_BroadPhaseLayerInterface_Destroy(nint handle);
-
-    [LibraryImport(LibName)]
     public static partial nint JPH_BroadPhaseLayerInterfaceMask_Create(uint numBroadPhaseLayers);
 
     [LibraryImport(LibName)]
@@ -250,13 +247,7 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial nint JPH_ObjectVsBroadPhaseLayerFilterTable_Create(nint broadPhaseLayerInterface, uint numBroadPhaseLayers, nint objectLayerPairFilter, uint numObjectLayers);
 
-    [LibraryImport(LibName)]
-    public static partial void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(nint handle);
-
     #region JPH_ObjectLayerPairFilter
-    [LibraryImport(LibName)]
-    public static partial void JPH_ObjectLayerPairFilter_Destroy(nint handle);
-
     [LibraryImport(LibName)]
     public static partial nint JPH_ObjectLayerPairFilterMask_Create();
 
@@ -490,7 +481,7 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_Shape_GetWorldSpaceBounds(nint shape, in RMatrix4x4 centerOfMassTransform, in Vector3 scale, out BoundingBox result);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_Shape_GetMaterial(nint shape, SubShapeID subShapeID);
+    public static partial PhysicsMaterial JPH_Shape_GetMaterial(nint shape, SubShapeID subShapeID);
 
     [LibraryImport(LibName)]
     public static partial void JPH_Shape_GetSurfaceNormal(nint shape, SubShapeID subShapeID, in Vector3 localPosition, out Vector3 normal);
@@ -568,13 +559,13 @@ internal static unsafe partial class JoltApi
 
     #region PlaneShape/PlaneShapeSettings
     [LibraryImport(LibName)]
-    public static partial nint JPH_PlaneShapeSettings_Create(in Plane plane, nint material, float halfExtent);
+    public static partial nint JPH_PlaneShapeSettings_Create(in Plane plane, PhysicsMaterial material, float halfExtent);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_PlaneShapeSettings_CreateShape(nint settings);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_PlaneShape_Create(in Plane plane, nint material, float halfExtent);
+    public static partial nint JPH_PlaneShape_Create(in Plane plane, PhysicsMaterial material, float halfExtent);
 
     [LibraryImport(LibName)]
     public static partial void JPH_PlaneShape_GetPlane(nint handle, out Plane result);
@@ -642,7 +633,7 @@ internal static unsafe partial class JoltApi
 
     #region TaperedCylinderShape/TaperedCylinderShapeSettings
     [LibraryImport(LibName)]
-    public static partial nint JPH_TaperedCylinderShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius, float convexRadius, nint material);
+    public static partial nint JPH_TaperedCylinderShapeSettings_Create(float halfHeightOfTaperedCylinder, float topRadius, float bottomRadius, float convexRadius, PhysicsMaterial material);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_TaperedCylinderShapeSettings_CreateShape(nint settings);
@@ -774,7 +765,7 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial uint JPH_HeightFieldShape_GetBlockSize(nint shape);
     [LibraryImport(LibName)]
-    public static partial nint JPH_HeightFieldShape_GetMaterial(nint shape, uint x, uint y);
+    public static partial PhysicsMaterial JPH_HeightFieldShape_GetMaterial(nint shape, uint x, uint y);
     [LibraryImport(LibName)]
     public static partial void JPH_HeightFieldShape_GetPosition(nint shape, uint x, uint y, out Vector3 result);
     [LibraryImport(LibName)]
@@ -2135,7 +2126,7 @@ internal static unsafe partial class JoltApi
     public static partial bool JPH_BodyInterface_IsSensor(nint handle, uint bodyId);
 
     [LibraryImport(LibName)]
-    public static partial nint JPH_BodyInterface_GetMaterial(nint handle, uint bodyId, SubShapeID subShapeID);
+    public static partial PhysicsMaterial JPH_BodyInterface_GetMaterial(nint handle, uint bodyId, SubShapeID subShapeID);
 
     [LibraryImport(LibName)]
     public static partial void JPH_BodyInterface_InvalidateContactCache(nint handle, uint bodyId);
@@ -3207,7 +3198,7 @@ internal static unsafe partial class JoltApi
         public Bool8 isSensorB;
         public /*const JPH_CharacterVirtual**/nint characterB;
         public ulong userData;
-        public /*const JPH_PhysicsMaterial**/nint material;
+        public PhysicsMaterial material;
         public Bool8 hadCollision;
         public Bool8 wasDiscarded;
         public Bool8 canPushCharacter;
@@ -3230,7 +3221,7 @@ internal static unsafe partial class JoltApi
         public Bool8 isSensorB;
         public /*const JPH_CharacterVirtual**/nint characterB;
         public ulong userData;
-        public /*const JPH_PhysicsMaterial**/nint material;
+        public PhysicsMaterial material;
         public Bool8 hadCollision;
         public Bool8 wasDiscarded;
         public Bool8 canPushCharacter;
@@ -3269,8 +3260,8 @@ internal static unsafe partial class JoltApi
         public delegate* unmanaged<nint, nint, JPH_CharacterContact*, CharacterContactSettings*, void> OnCharacterContactAdded;
         public delegate* unmanaged<nint, nint, JPH_CharacterContact*, CharacterContactSettings*, void> OnCharacterContactPersisted;
         public delegate* unmanaged<nint, nint, CharacterID, SubShapeID, void> OnCharacterContactRemoved;
-        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, void* /* JPH_RVec3 */, Vector3*, Vector3*, nint, Vector3*, Vector3*, void> OnContactSolve;
-        public delegate* unmanaged<nint, nint, nint, SubShapeID, void* /* JPH_RVec3 */, Vector3*, Vector3*, nint, Vector3*, Vector3*, void> OnCharacterContactSolve;
+        public delegate* unmanaged<nint, nint, BodyID, SubShapeID, void* /* JPH_RVec3 */, Vector3*, Vector3*, PhysicsMaterial, Vector3*, Vector3*, void> OnContactSolve;
+        public delegate* unmanaged<nint, nint, nint, SubShapeID, void* /* JPH_RVec3 */, Vector3*, Vector3*, PhysicsMaterial, Vector3*, Vector3*, void> OnCharacterContactSolve;
     }
 
     [LibraryImport(LibName)]
@@ -3476,8 +3467,7 @@ internal static unsafe partial class JoltApi
     #endregion
 
     [LibraryImport(LibName)]
-    public static partial void JPH_EstimateCollisionResponse(nint body1, nint body2, nint manifold, float combinedFriction, float combinedRestitution, float minVelocityForRestitution, int numIterations, CollisionEstimationResult* result);
-
+    public static partial void JPH_EstimateCollisionResponse(nint body1, nint body2, nint manifold, in ContactSettings contactSettings, float minVelocityForRestitution, int numIterations, CollisionEstimationResult* result);
 
     public struct JPH_VehicleAntiRollBar
     {

@@ -8,17 +8,8 @@ namespace JoltPhysicsSharp;
 
 public abstract class CharacterBase : NativeObject
 {
-    protected CharacterBase()
-    {
-    }
-
-    protected CharacterBase(nint handle)
-        : base(handle)
-    {
-    }
-
-    protected CharacterBase(nint handle, bool owns)
-        : base(handle, owns)
+    protected CharacterBase(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 

@@ -15,6 +15,7 @@ public sealed unsafe class ConvexHullShapeSettings : ConvexShapeSettings
     }
 
     public ConvexHullShapeSettings(Vector3[] points, float maxConvexRadius = Foundation.DefaultConvexRadius)
+        : base(0, true)
     {
         fixed (Vector3* pointsPtr = points)
         {
@@ -23,6 +24,7 @@ public sealed unsafe class ConvexHullShapeSettings : ConvexShapeSettings
     }
 
     public ConvexHullShapeSettings(ReadOnlySpan<Vector3> points, float maxConvexRadius = Foundation.DefaultConvexRadius)
+        : base(0, true)
     {
         fixed (Vector3* pointsPtr = points)
         {

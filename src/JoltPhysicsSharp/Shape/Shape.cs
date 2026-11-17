@@ -9,12 +9,8 @@ namespace JoltPhysicsSharp;
 
 public abstract class ShapeSettings : NativeObject
 {
-    protected ShapeSettings()
-    {
-    }
-
-    protected ShapeSettings(nint handle)
-        : base(handle)
+    protected ShapeSettings(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 
@@ -35,12 +31,8 @@ public abstract class ShapeSettings : NativeObject
 
 public class Shape : NativeObject
 {
-    protected Shape()
-    {
-    }
-
-    internal Shape(nint handle, bool owns = true)
-        : base(handle, owns)
+    internal Shape(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 
@@ -138,7 +130,7 @@ public class Shape : NativeObject
         JPH_Shape_GetWorldSpaceBounds(Handle, in centerOfMassTransform, in scale, out result);
     }
 
-    public PhysicsMaterial? GetMaterial(SubShapeID subShapeID) => PhysicsMaterial.GetObject(JPH_Shape_GetMaterial(Handle, subShapeID));
+    public PhysicsMaterial? GetMaterial(SubShapeID subShapeID) => JPH_Shape_GetMaterial(Handle, subShapeID);
 
     public Vector3 GetSurfaceNormal(SubShapeID subShapeID, in Vector3 localPosition)
     {

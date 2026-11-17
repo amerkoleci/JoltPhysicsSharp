@@ -23,6 +23,7 @@ public class PhysicsStepListener : NativeObject, IPhysicsStepListener
     }
 
     public PhysicsStepListener()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         Handle = JPH_PhysicsStepListener_Create(_listenerUserData);

@@ -32,6 +32,7 @@ public sealed class HeightFieldShapeSettings : ConvexShapeSettings
     /// <param name="scale">Shape scale.</param>
     /// <param name="sampleCount">sampleCount / blockSize must be minimally 2 and a power of 2 is the most efficient in terms of performance and storage.</param>
     public unsafe HeightFieldShapeSettings(Span<float> samples, in Vector3 offset, in Vector3 scale, uint sampleCount)
+        : base(0, true)
     {
         fixed (float* samplesPtr = samples)
         {
@@ -118,9 +119,9 @@ public sealed class HeightFieldShape : Shape
     public float MinHeightValue => JPH_HeightFieldShape_GetMinHeightValue(Handle);
     public float MaxHeightValue => JPH_HeightFieldShape_GetMaxHeightValue(Handle);
 
-    public PhysicsMaterial? GetMaterial(uint x, uint y)
+    public PhysicsMaterial GetMaterial(uint x, uint y)
     {
-        return PhysicsMaterial.GetObject(JPH_HeightFieldShape_GetMaterial(Handle, x, y));
+        return JPH_HeightFieldShape_GetMaterial(Handle, x, y);
     }
 
     public Vector3 GetPosition(uint x, uint y)

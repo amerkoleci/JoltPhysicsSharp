@@ -9,13 +9,13 @@ namespace JoltPhysicsSharp;
 public class ScaledShapeSettings : DecoratedShapeSettings
 {
     public ScaledShapeSettings(ShapeSettings shapeSettings, in Vector3 scale)
+        : base(JPH_ScaledShapeSettings_Create(shapeSettings.Handle, in scale))
     {
-        Handle = JPH_ScaledShapeSettings_Create(shapeSettings.Handle, in scale);
     }
 
     public ScaledShapeSettings(Shape shape, in Vector3 scale)
+        : base(JPH_ScaledShapeSettings_Create2(shape.Handle, in scale))
     {
-        Handle = JPH_ScaledShapeSettings_Create2(shape.Handle, in scale);
     }
 
     public Vector3 Scale

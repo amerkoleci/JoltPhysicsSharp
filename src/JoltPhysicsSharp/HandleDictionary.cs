@@ -191,7 +191,7 @@ internal static class HandleDictionary
                 }
                 if (ex != null)
                 {
-                    if (!instance.fromFinalizer)
+                    if (!instance._fromFinalizer)
                         throw ex;
                 }
 #endif

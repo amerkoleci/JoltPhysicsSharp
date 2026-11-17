@@ -36,6 +36,7 @@ public abstract class CharacterVsCharacterCollisionListener : NativeObject
     }
 
     public CharacterVsCharacterCollisionListener()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         Handle = JPH_CharacterVsCharacterCollision_Create(_listenerUserData);

@@ -14,11 +14,7 @@ public readonly unsafe struct CollisionEstimationResult
     public readonly Vector3 AngularVelocity2;
 
     public readonly Vector3 FrictionPoint;
-    public readonly Vector3 Tangent1;
-    public readonly Vector3 Tangent2;
-
-    public readonly float FrictionImpulse1;
-    public readonly float FrictionImpulse2;
+    public readonly Vector3 FrictionImpulse;
     public readonly float AngularFrictionImpulse;
 
     public readonly int ContactImpulseCount;

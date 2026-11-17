@@ -702,7 +702,7 @@ public readonly unsafe struct BodyInterface(nint handle) : IEquatable<BodyInterf
 
     public PhysicsMaterial? GetMaterial(in BodyID bodyId, SubShapeID subShapeID)
     {
-        return PhysicsMaterial.GetObject(JPH_BodyInterface_GetMaterial(Handle, bodyId, subShapeID));
+        return JPH_BodyInterface_GetMaterial(Handle, bodyId, subShapeID);
     }
 
     public void InvalidateContactCache(in BodyID bodyId)

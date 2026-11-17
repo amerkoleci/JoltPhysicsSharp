@@ -21,6 +21,7 @@ public abstract class ObjectLayerFilter : NativeObject
     }
 
     public ObjectLayerFilter()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         Handle = JPH_ObjectLayerFilter_Create(_listenerUserData);

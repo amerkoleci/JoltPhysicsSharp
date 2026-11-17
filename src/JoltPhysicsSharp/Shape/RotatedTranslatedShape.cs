@@ -9,13 +9,13 @@ namespace JoltPhysicsSharp;
 public class RotatedTranslatedShapeSettings : DecoratedShapeSettings
 {
     public RotatedTranslatedShapeSettings(in Vector3 position, in Quaternion rotation, ShapeSettings shapeSettings)
+        : base(JPH_RotatedTranslatedShapeSettings_Create(in position, in rotation, shapeSettings.Handle))
     {
-        Handle = JPH_RotatedTranslatedShapeSettings_Create(in position, in rotation, shapeSettings.Handle);
     }
 
     public RotatedTranslatedShapeSettings(in Vector3 position, in Quaternion rotation, Shape shape)
+        : base(JPH_RotatedTranslatedShapeSettings_Create2(in position, in rotation, shape.Handle))
     {
-        Handle = JPH_RotatedTranslatedShapeSettings_Create2(in position, in rotation, shape.Handle);
     }
 
     public Vector3 Position
@@ -42,8 +42,8 @@ public class RotatedTranslatedShapeSettings : DecoratedShapeSettings
 public class RotatedTranslatedShape : DecoratedShape
 {
     public RotatedTranslatedShape(in Vector3 position, in Quaternion rotation, Shape shape)
+        : base(JPH_RotatedTranslatedShape_Create(in position, in rotation, shape.Handle))
     {
-        Handle = JPH_RotatedTranslatedShape_Create(in position, in rotation, shape.Handle);
     }
 
     public RotatedTranslatedShape(RotatedTranslatedShapeSettings settings)

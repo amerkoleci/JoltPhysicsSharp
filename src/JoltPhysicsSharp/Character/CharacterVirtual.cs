@@ -147,6 +147,7 @@ public sealed partial class CharacterVirtual : CharacterBase
     }
 
     public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+        : base(0, true)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use constructor with Double3");
@@ -161,6 +162,7 @@ public sealed partial class CharacterVirtual : CharacterBase
     }
 
     public unsafe CharacterVirtual(CharacterVirtualSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+        : base(0, true)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
@@ -727,7 +729,7 @@ public sealed partial class CharacterVirtual : CharacterBase
         void* contactPosition, // JPH_RVec3
         Vector3* contactNormal,
         Vector3* contactVelocity,
-        nint contactMaterial, // JPH_PhysicsMaterial
+        PhysicsMaterial contactMaterial,
         Vector3* characterVelocity,
         Vector3* ioNewCharacterVelocity)
     {
@@ -740,7 +742,7 @@ public sealed partial class CharacterVirtual : CharacterBase
                 ReadRVec3(contactPosition),
                 *contactNormal,
                 *contactVelocity,
-                PhysicsMaterial.GetObject(contactMaterial),
+                contactMaterial,
                 *characterVelocity,
                 ref newCharacterVelocity);
 
@@ -755,7 +757,7 @@ public sealed partial class CharacterVirtual : CharacterBase
         void* contactPosition, // JPH_RVec3
         Vector3* contactNormal,
         Vector3* contactVelocity,
-        nint contactMaterial, // JPH_PhysicsMaterial
+        PhysicsMaterial contactMaterial,
         Vector3* characterVelocity,
         Vector3* ioNewCharacterVelocity)
     {
@@ -769,7 +771,7 @@ public sealed partial class CharacterVirtual : CharacterBase
                 ReadRVec3(contactPosition),
                 *contactNormal,
                 *contactVelocity,
-                PhysicsMaterial.GetObject(contactMaterial),
+                contactMaterial,
                 *characterVelocity,
                 ref newCharacterVelocity);
 

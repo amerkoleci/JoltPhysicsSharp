@@ -45,12 +45,9 @@ public sealed unsafe class PhysicsSystem : NativeObject
     private static readonly JPH_ContactListener_ProcsDouble _contactListener_ProcsDouble;
     private static readonly JPH_BodyActivationListener_Procs _bodyActivationListener_Procs;
 
-    private nint _listenerUserData;
-    private nint _contactListenerHandle;
-    private nint _bodyActivationListenerHandle;
-    private readonly ObjectLayerPairFilter? _objectLayerPairFilter;
-    private readonly BroadPhaseLayerInterface? _broadPhaseLayerInterface;
-    private readonly ObjectVsBroadPhaseLayerFilter? _objectVsBroadPhaseLayerFilter;
+    private readonly nint _listenerUserData;
+    private readonly nint _contactListenerHandle;
+    private readonly nint _bodyActivationListenerHandle;
 
     static PhysicsSystem()
     {
@@ -86,18 +83,11 @@ public sealed unsafe class PhysicsSystem : NativeObject
     }
 
     public PhysicsSystem(PhysicsSystemSettings settings)
+        : base(0, true)
     {
         ArgumentNullException.ThrowIfNull(settings.ObjectLayerPairFilter, nameof(settings.ObjectLayerPairFilter));
         ArgumentNullException.ThrowIfNull(settings.BroadPhaseLayerInterface, nameof(settings.BroadPhaseLayerInterface));
         ArgumentNullException.ThrowIfNull(settings.ObjectVsBroadPhaseLayerFilter, nameof(settings.ObjectVsBroadPhaseLayerFilter));
-
-        ValidateFilter(settings.ObjectLayerPairFilter, nameof(settings.ObjectLayerPairFilter));
-        ValidateFilter(settings.BroadPhaseLayerInterface, nameof(settings.BroadPhaseLayerInterface));
-        ValidateFilter(settings.ObjectVsBroadPhaseLayerFilter, nameof(settings.ObjectVsBroadPhaseLayerFilter));
-
-        _objectLayerPairFilter = settings.ObjectLayerPairFilter;
-        _broadPhaseLayerInterface = settings.BroadPhaseLayerInterface;
-        _objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter;
 
         NativePhysicsSystemSettings nativeSettings = new()
         {
@@ -109,53 +99,24 @@ public sealed unsafe class PhysicsSystem : NativeObject
             objectLayerPairFilter = settings.ObjectLayerPairFilter.Handle,
             objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter.Handle
         };
-        try
-        {
-            // Allocate listeners first so failures do not consume the caller's filters.
-            _listenerUserData = DelegateProxies.CreateUserData(this, true);
-            _contactListenerHandle = JPH_ContactListener_Create(_listenerUserData);
-            if (_contactListenerHandle == 0)
-                throw new InvalidOperationException("Failed to create the contact listener.");
 
-            _bodyActivationListenerHandle = JPH_BodyActivationListener_Create(_listenerUserData);
-            if (_bodyActivationListenerHandle == 0)
-                throw new InvalidOperationException("Failed to create the body activation listener.");
+        // Allocate listeners first so failures do not consume the caller's filters.
+        _listenerUserData = DelegateProxies.CreateUserData(this, true);
+        _contactListenerHandle = JPH_ContactListener_Create(_listenerUserData);
+        if (_contactListenerHandle == 0)
+            throw new InvalidOperationException("Failed to create the contact listener.");
 
-            nint handle = JPH_PhysicsSystem_Create(&nativeSettings);
-            if (handle == 0)
-                throw new InvalidOperationException("Failed to create the physics system.");
+        _bodyActivationListenerHandle = JPH_BodyActivationListener_Create(_listenerUserData);
+        if (_bodyActivationListenerHandle == 0)
+            throw new InvalidOperationException("Failed to create the body activation listener.");
 
-            // Record ownership before handle registration, which can throw.
-            OwnsHandle = true;
-            Handle = handle;
+        nint handle = JPH_PhysicsSystem_Create(&nativeSettings);
+        if (handle == 0)
+            throw new InvalidOperationException("Failed to create the physics system.");
 
-            // joltc destroys these filters with the system, unlike the Jolt C++ API.
-            _objectLayerPairFilter.TransferOwnership();
-            _broadPhaseLayerInterface.TransferOwnership();
-            _objectVsBroadPhaseLayerFilter.TransferOwnership();
-
-            JPH_PhysicsSystem_SetContactListener(Handle, _contactListenerHandle);
-            JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
-        }
-        catch
-        {
-            if (Handle != 0)
-                DisposeInternal();
-            else
-            {
-                DisposeListeners();
-                GC.SuppressFinalize(this);
-            }
-
-            throw;
-        }
-    }
-
-    private static void ValidateFilter(NativeObject filter, string paramName)
-    {
-        filter.GetHandleChecked();
-        if (filter.IsOwnershipTransferred || !filter.OwnsHandle)
-            throw new ArgumentException("The filter must own its native handle and cannot already belong to a physics system.", paramName);
+        Handle = handle;
+        JPH_PhysicsSystem_SetContactListener(Handle, _contactListenerHandle);
+        JPH_PhysicsSystem_SetBodyActivationListener(Handle, _bodyActivationListenerHandle);
     }
 
     internal PhysicsSystem(nint handle, bool ownsHandle)
@@ -165,59 +126,12 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
     protected override void DisposeNative()
     {
-        JPH_PhysicsSystem_SetContactListener(Handle, 0);
-        JPH_PhysicsSystem_SetBodyActivationListener(Handle, 0);
+        DelegateProxies.GetUserData<PhysicsSystem>(_listenerUserData, out GCHandle gch);
+
+        JPH_ContactListener_Destroy(_contactListenerHandle);
+        JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
         JPH_PhysicsSystem_Destroy(Handle);
-        Handle = 0;
-
-        try
-        {
-            InvalidateFilters(!fromFinalizer);
-        }
-        finally
-        {
-            // Managed filter cleanup can throw; listeners must still be released.
-            DisposeListeners();
-        }
-    }
-
-    private void InvalidateFilters(bool disposing)
-    {
-        // Invalidate every wrapper even if a filter's managed cleanup throws.
-        try
-        {
-            _objectLayerPairFilter?.InvalidateHandle(disposing);
-        }
-        finally
-        {
-            try
-            {
-                _broadPhaseLayerInterface?.InvalidateHandle(disposing);
-            }
-            finally
-            {
-                _objectVsBroadPhaseLayerFilter?.InvalidateHandle(disposing);
-            }
-        }
-    }
-
-    private void DisposeListeners()
-    {
-        if (_contactListenerHandle != 0)
-        {
-            JPH_ContactListener_Destroy(_contactListenerHandle);
-            _contactListenerHandle = 0;
-        }
-        if (_bodyActivationListenerHandle != 0)
-        {
-            JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
-            _bodyActivationListenerHandle = 0;
-        }
-        if (_listenerUserData != 0)
-        {
-            GCHandle.FromIntPtr(_listenerUserData).Free();
-            _listenerUserData = 0;
-        }
+        gch.Free();
     }
 
     public PhysicsSettings Settings
@@ -225,19 +139,19 @@ public sealed unsafe class PhysicsSystem : NativeObject
         get
         {
             PhysicsSettings result;
-            JPH_PhysicsSystem_GetPhysicsSettings(GetHandleChecked(), &result);
+            JPH_PhysicsSystem_GetPhysicsSettings(Handle, &result);
             return result;
         }
         set
         {
-            JPH_PhysicsSystem_SetPhysicsSettings(GetHandleChecked(), &value);
+            JPH_PhysicsSystem_SetPhysicsSettings(Handle, &value);
         }
     }
 
-    public uint BodiesCount => JPH_PhysicsSystem_GetNumBodies(GetHandleChecked());
-    public uint GetNumActiveBodies(BodyType type) => JPH_PhysicsSystem_GetNumActiveBodies(GetHandleChecked(), type);
-    public uint MaxBodies => JPH_PhysicsSystem_GetMaxBodies(GetHandleChecked());
-    public uint NumConstraints => JPH_PhysicsSystem_GetNumConstraints(GetHandleChecked());
+    public uint BodiesCount => JPH_PhysicsSystem_GetNumBodies(Handle);
+    public uint GetNumActiveBodies(BodyType type) => JPH_PhysicsSystem_GetNumActiveBodies(Handle, type);
+    public uint MaxBodies => JPH_PhysicsSystem_GetMaxBodies(Handle);
+    public uint NumConstraints => JPH_PhysicsSystem_GetNumConstraints(Handle);
 
     #region Events
     /// <summary>
@@ -294,7 +208,8 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
     public void SetSimShapeFilter(SimShapeFilter? filter)
     {
-        JPH_PhysicsSystem_SetSimShapeFilter(GetHandleChecked(), filter != null ? filter.Handle : 0);
+        ThrowIfDisposed();
+        JPH_PhysicsSystem_SetSimShapeFilter(Handle, filter != null ? filter.Handle : 0);
     }
 
     public BodyInterface BodyInterface => new(JPH_PhysicsSystem_GetBodyInterface(GetHandleChecked()));
@@ -421,7 +336,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_PhysicsSystem_DrawConstraintReferenceFrame(GetHandleChecked(), renderer.Handle);
     }
 
-    internal static PhysicsSystem? GetObject(nint handle) => GetOrAddObject(handle, (nint h) => new PhysicsSystem(h, false));
+    internal static PhysicsSystem? GetObject(nint handle) => GetOrAddObject(handle, h => new PhysicsSystem(h, false));
 
     #region ContactListener
     [UnmanagedCallersOnly]

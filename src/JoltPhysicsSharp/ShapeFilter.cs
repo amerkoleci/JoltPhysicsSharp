@@ -22,6 +22,7 @@ public abstract class ShapeFilter : NativeObject
     }
 
     public unsafe ShapeFilter()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         Handle = JPH_ShapeFilter_Create(_listenerUserData);

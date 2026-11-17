@@ -9,7 +9,7 @@ namespace JoltPhysicsSharp;
 
 public static class Jolt
 {
-    public static unsafe CollisionEstimationResult EstimateCollisionResponse(in Body body1, in Body body2, in ContactManifold manifold, float combinedFriction, float combinedRestitution, float minVelocityForRestitution = 1.0f, int numIterations = 10)
+    public static unsafe CollisionEstimationResult EstimateCollisionResponse(in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings contactSettings, float minVelocityForRestitution = 1.0f, int numIterations = 10)
     {
         Debug.Assert(numIterations > 0);
 
@@ -18,8 +18,7 @@ public static class Jolt
             body1.Handle,
             body2.Handle,
             manifold.Handle,
-            combinedFriction,
-            combinedRestitution,
+            in contactSettings,
             minVelocityForRestitution,
             numIterations,
             &result);
@@ -27,7 +26,7 @@ public static class Jolt
     }
 
     [SkipLocalsInit]
-    public static unsafe void EstimateCollisionResponse(in Body body1, in Body body2, in ContactManifold manifold, out CollisionEstimationResult result, float combinedFriction, float combinedRestitution, float minVelocityForRestitution = 1.0f, int numIterations = 10)
+    public static unsafe void EstimateCollisionResponse(in Body body1, in Body body2, in ContactManifold manifold, in ContactSettings contactSettings, out CollisionEstimationResult result, float minVelocityForRestitution = 1.0f, int numIterations = 10)
     {
         Debug.Assert(numIterations > 0);
         Unsafe.SkipInit(out result);
@@ -39,8 +38,7 @@ public static class Jolt
                 body1.Handle,
                 body2.Handle,
                 manifold.Handle,
-                combinedFriction,
-                combinedRestitution,
+                in contactSettings,
                 minVelocityForRestitution,
                 numIterations,
                 __result_native);

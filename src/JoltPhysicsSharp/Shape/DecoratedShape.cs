@@ -6,24 +6,16 @@ namespace JoltPhysicsSharp;
 
 public abstract class DecoratedShapeSettings : ShapeSettings
 {
-    protected DecoratedShapeSettings()
-    {
-    }
-
-    internal DecoratedShapeSettings(nint handle)
-        : base(handle)
+    internal DecoratedShapeSettings(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 }
 
 public abstract class DecoratedShape : Shape
 {
-    protected DecoratedShape()
-    {
-    }
-
-    internal DecoratedShape(nint handle)
-        : base(handle)
+    internal DecoratedShape(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 

@@ -11,12 +11,12 @@ public sealed class PlaneShapeSettings : ShapeSettings
     public const float DefaultHalfExtent = 1000.0f;
 
     public PlaneShapeSettings(in Plane plane, PhysicsMaterial? material = default, float halfExtent = DefaultHalfExtent)
-        : base(JPH_PlaneShapeSettings_Create(in plane, material != null ? material.Handle : IntPtr.Zero, halfExtent))
+        : base(JPH_PlaneShapeSettings_Create(in plane, material ?? PhysicsMaterial.Null, halfExtent))
     {
     }
 
-    internal PlaneShapeSettings(nint handle)
-        : base(handle)
+    internal PlaneShapeSettings(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 
@@ -25,13 +25,13 @@ public sealed class PlaneShapeSettings : ShapeSettings
 
 public sealed class PlaneShape : Shape
 {
-    internal PlaneShape(nint handle)
-        : base(handle)
+    internal PlaneShape(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 
     public PlaneShape(in Plane plane, PhysicsMaterial? material = default, float halfExtent = PlaneShapeSettings.DefaultHalfExtent)
-        : base(JPH_PlaneShape_Create(in plane, material != null ? material.Handle : IntPtr.Zero, halfExtent))
+        : base(JPH_PlaneShape_Create(in plane, material ?? PhysicsMaterial.Null, halfExtent))
     {
     }
 

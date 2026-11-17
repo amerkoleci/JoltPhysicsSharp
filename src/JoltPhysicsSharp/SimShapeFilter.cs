@@ -21,6 +21,7 @@ public abstract class SimShapeFilter : NativeObject
     }
 
     public SimShapeFilter()
+        : base(0, true)
     {
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         Handle = JPH_SimShapeFilter_Create(_listenerUserData);

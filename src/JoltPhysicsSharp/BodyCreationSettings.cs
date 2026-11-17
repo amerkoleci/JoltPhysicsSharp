@@ -15,6 +15,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
     }
 
     public BodyCreationSettings(ShapeSettings shapeSettings, in Vector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+        : base(0, true)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use constructor with Double3");
@@ -27,6 +28,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
     }
 
     public BodyCreationSettings(ShapeSettings shapeSettings, in RVector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+        : base(0, true)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
@@ -39,6 +41,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
     }
 
     public BodyCreationSettings(Shape shape, in Vector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+        : base(0, true)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use constructor with Double3");
@@ -51,6 +54,7 @@ public sealed unsafe class BodyCreationSettings : NativeObject
     }
 
     public BodyCreationSettings(Shape shape, in RVector3 position, in Quaternion rotation, MotionType motionType, ObjectLayer objectLayer)
+        : base(0, true)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");

@@ -7,12 +7,8 @@ namespace JoltPhysicsSharp;
 
 public abstract class ConvexShapeSettings : ShapeSettings
 {
-    protected ConvexShapeSettings()
-    {
-    }
-
-    internal ConvexShapeSettings(nint handle)
-        : base(handle)
+    internal ConvexShapeSettings(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 
@@ -25,8 +21,8 @@ public abstract class ConvexShapeSettings : ShapeSettings
 
 public abstract class ConvexShape : Shape
 {
-    internal ConvexShape(nint handle, bool owns = true)
-        : base(handle, owns)
+    internal ConvexShape(nint handle, bool ownsHandle = true)
+        : base(handle, ownsHandle)
     {
     }
 

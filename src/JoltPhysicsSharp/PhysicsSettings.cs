@@ -24,7 +24,6 @@ public record struct PhysicsSettings
     public float MinVelocityForRestitution;
     public float TimeBeforeSleep;
     public float PointVelocitySleepThreshold;
-    public Bool8 DeterministicSimulation;
     public Bool8 ConstraintWarmStart;
     public Bool8 UseBodyPairContactCache;
     public Bool8 UseManifoldReduction;
