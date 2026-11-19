@@ -227,6 +227,9 @@ internal static unsafe partial class JoltApi
 
     // BroadPhaseLayerInterface
     [LibraryImport(LibName)]
+    public static partial void JPH_BroadPhaseLayerInterface_Destroy(nint filter);
+
+    [LibraryImport(LibName)]
     public static partial nint JPH_BroadPhaseLayerInterfaceMask_Create(uint numBroadPhaseLayers);
 
     [LibraryImport(LibName)]
@@ -240,6 +243,8 @@ internal static unsafe partial class JoltApi
     public static partial void JPH_BroadPhaseLayerInterfaceTable_MapObjectToBroadPhaseLayer(nint bpInterface, uint objectLayer, byte broadPhaseLayer);
 
     //  ObjectVsBroadPhaseLayerFilter
+    [LibraryImport(LibName)]
+    public static partial void JPH_ObjectVsBroadPhaseLayerFilter_Destroy(nint filter);
 
     [LibraryImport(LibName)]
     public static partial nint JPH_ObjectVsBroadPhaseLayerFilterMask_Create(nint broadPhaseLayerInterface);
@@ -248,6 +253,9 @@ internal static unsafe partial class JoltApi
     public static partial nint JPH_ObjectVsBroadPhaseLayerFilterTable_Create(nint broadPhaseLayerInterface, uint numBroadPhaseLayers, nint objectLayerPairFilter, uint numObjectLayers);
 
     #region JPH_ObjectLayerPairFilter
+    [LibraryImport(LibName)]
+    public static partial void JPH_ObjectLayerPairFilter_Destroy(nint filter);
+
     [LibraryImport(LibName)]
     public static partial nint JPH_ObjectLayerPairFilterMask_Create();
 
@@ -2207,6 +2215,14 @@ internal static unsafe partial class JoltApi
     [LibraryImport(LibName)]
     public static partial void JPH_MassProperties_GetEquivalentSolidBoxSize(float mass, in Vector3 inertiaDiagonal, out Vector3 result);
 
+
+
+    [LibraryImport(LibName)]
+    public static partial /*const JPH_BroadPhaseLayerInterface**/nint JPH_PhysicsSystem_GetBroadPhaseLayerInterface(nint system);
+    [LibraryImport(LibName)]
+    public static partial /*const JPH_ObjectVsBroadPhaseLayerFilter**/nint JPH_PhysicsSystem_GetObjectVsBroadPhaseLayerFilter(nint system);
+    [LibraryImport(LibName)]
+    public static partial /*const JPH_ObjectLayerPairFilter**/nint JPH_PhysicsSystem_GetObjectLayerPairFilter(nint system);
 
     /* BodyLockInterface */
     [LibraryImport(LibName)]

@@ -146,30 +146,36 @@ public sealed partial class CharacterVirtual : CharacterBase
         JPH_CharacterContactListener_SetProcs(in _procs);
     }
 
-    public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe CharacterVirtual(CharacterVirtualSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem system)
         : base(0, true)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use constructor with Double3");
 
+        ArgumentNullException.ThrowIfNull(system, nameof(system));
+        ObjectDisposedException.ThrowIf(system.IsDisposed, nameof(system));
+
         JPH_CharacterVirtualSettings nativeSettings;
         settings.ToNative(&nativeSettings);
-        Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+        Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, system.Handle);
 
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listenerUserData);
         JPH_CharacterVirtual_SetListener(Handle, _listenerHandle);
     }
 
-    public unsafe CharacterVirtual(CharacterVirtualSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe CharacterVirtual(CharacterVirtualSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem system)
         : base(0, true)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
 
+        ArgumentNullException.ThrowIfNull(system, nameof(system));
+        ObjectDisposedException.ThrowIf(system.IsDisposed, nameof(system));
+
         JPH_CharacterVirtualSettings nativeSettings;
         settings.ToNative(&nativeSettings);
-        Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+        Handle = JPH_CharacterVirtual_Create(&nativeSettings, position, rotation, userData, system.Handle);
 
         _listenerUserData = DelegateProxies.CreateUserData(this, true);
         _listenerHandle = JPH_CharacterContactListener_Create(_listenerUserData);

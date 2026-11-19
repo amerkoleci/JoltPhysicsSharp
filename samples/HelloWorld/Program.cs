@@ -79,11 +79,13 @@ public static class Program
 
             CapsuleShape capsule = new(0.5f * mHeightStanding, mRadiusStanding);
 
-            CharacterVirtualSettings characterSettings = new();
-            characterSettings.Shape = new RotatedTranslatedShapeSettings(new Vector3(0, 0.5f * mHeightStanding + mRadiusStanding, 0), Quaternion.Identity, capsule).Create();
+            CharacterVirtualSettings characterSettings = new()
+            {
+                Shape = new RotatedTranslatedShapeSettings(new Vector3(0, 0.5f * mHeightStanding + mRadiusStanding, 0), Quaternion.Identity, capsule).Create(),
 
-            // Configure supporting volume
-            characterSettings.SupportingVolume = new Plane(Vector3.UnitY, -mHeightStanding); // Accept contacts that touch the lower sphere of the capsule
+                // Configure supporting volume
+                SupportingVolume = new Plane(Vector3.UnitY, -mHeightStanding) // Accept contacts that touch the lower sphere of the capsule
+            };
 
             //CharacterVirtual character = new(characterSettings, new Vector3(0, 0, 0), Quaternion.Identity, 0, physicsSystem);
         }

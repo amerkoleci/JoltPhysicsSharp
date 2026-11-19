@@ -49,6 +49,10 @@ public sealed unsafe class PhysicsSystem : NativeObject
     private readonly nint _contactListenerHandle;
     private readonly nint _bodyActivationListenerHandle;
 
+    private readonly ObjectLayerPairFilter? _objectLayerPairFilter;
+    private readonly BroadPhaseLayerInterface? _broadPhaseLayerInterface;
+    private readonly ObjectVsBroadPhaseLayerFilter? _objectVsBroadPhaseLayerFilter;
+
     static PhysicsSystem()
     {
         if (!DoublePrecision)
@@ -86,8 +90,18 @@ public sealed unsafe class PhysicsSystem : NativeObject
         : base(0, true)
     {
         ArgumentNullException.ThrowIfNull(settings.ObjectLayerPairFilter, nameof(settings.ObjectLayerPairFilter));
+        ObjectDisposedException.ThrowIf(settings.ObjectLayerPairFilter.IsDisposed, nameof(settings.ObjectLayerPairFilter));
         ArgumentNullException.ThrowIfNull(settings.BroadPhaseLayerInterface, nameof(settings.BroadPhaseLayerInterface));
+        ObjectDisposedException.ThrowIf(settings.BroadPhaseLayerInterface.IsDisposed, nameof(settings.BroadPhaseLayerInterface));
         ArgumentNullException.ThrowIfNull(settings.ObjectVsBroadPhaseLayerFilter, nameof(settings.ObjectVsBroadPhaseLayerFilter));
+        ObjectDisposedException.ThrowIf(settings.ObjectVsBroadPhaseLayerFilter.IsDisposed, nameof(settings.ObjectVsBroadPhaseLayerFilter));
+
+        _objectLayerPairFilter = settings.ObjectLayerPairFilter;
+        _broadPhaseLayerInterface = settings.BroadPhaseLayerInterface;
+        _objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter;
+        _objectLayerPairFilter.AddReference();
+        _broadPhaseLayerInterface.AddReference();
+        _objectVsBroadPhaseLayerFilter.AddReference();
 
         NativePhysicsSystemSettings nativeSettings = new()
         {
@@ -95,9 +109,9 @@ public sealed unsafe class PhysicsSystem : NativeObject
             numBodyMutexes = settings.NumBodyMutexes,
             maxBodyPairs = settings.MaxBodyPairs,
             maxContactConstraints = settings.MaxContactConstraints,
-            broadPhaseLayerInterface = settings.BroadPhaseLayerInterface.Handle,
-            objectLayerPairFilter = settings.ObjectLayerPairFilter.Handle,
-            objectVsBroadPhaseLayerFilter = settings.ObjectVsBroadPhaseLayerFilter.Handle
+            broadPhaseLayerInterface = _broadPhaseLayerInterface.Handle,
+            objectLayerPairFilter = _objectLayerPairFilter.Handle,
+            objectVsBroadPhaseLayerFilter = _objectVsBroadPhaseLayerFilter.Handle
         };
 
         // Allocate listeners first so failures do not consume the caller's filters.
@@ -132,6 +146,13 @@ public sealed unsafe class PhysicsSystem : NativeObject
         JPH_BodyActivationListener_Destroy(_bodyActivationListenerHandle);
         JPH_PhysicsSystem_Destroy(Handle);
         gch.Free();
+    }
+
+    protected override void DisposeManaged()
+    {
+        _objectLayerPairFilter?.Dispose();
+        _broadPhaseLayerInterface?.Dispose();
+        _objectVsBroadPhaseLayerFilter?.Dispose();
     }
 
     public PhysicsSettings Settings
@@ -340,7 +361,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
 
     #region ContactListener
     [UnmanagedCallersOnly]
-    private static unsafe uint OnContactValidateCallback(nint context, nint body1, nint body2, Vector3* baseOffset, CollideShapeResult* collisionResult)
+    private static uint OnContactValidateCallback(nint context, nint body1, nint body2, Vector3* baseOffset, CollideShapeResult* collisionResult)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 
@@ -353,7 +374,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
     }
 
     [UnmanagedCallersOnly]
-    private static unsafe uint OnContactValidateCallbackDouble(nint context, nint body1, nint body2, RVector3* baseOffset, CollideShapeResult* collisionResult)
+    private static uint OnContactValidateCallbackDouble(nint context, nint body1, nint body2, RVector3* baseOffset, CollideShapeResult* collisionResult)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 
@@ -394,7 +415,7 @@ public sealed unsafe class PhysicsSystem : NativeObject
     }
 
     [UnmanagedCallersOnly]
-    private unsafe static void OnContactRemovedCallback(nint context, SubShapeIDPair* subShapePair)
+    private static void OnContactRemovedCallback(nint context, SubShapeIDPair* subShapePair)
     {
         PhysicsSystem listener = DelegateProxies.GetUserData<PhysicsSystem>(context, out _);
 

@@ -9,26 +9,32 @@ namespace JoltPhysicsSharp;
 
 public sealed class Character : CharacterBase
 {
-    public unsafe Character(CharacterSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe Character(CharacterSettings settings, in Vector3 position, in Quaternion rotation, ulong userData, PhysicsSystem system)
         : base(0, true)
     {
         if (DoublePrecision)
             throw new InvalidOperationException($"Double precision is enabled: use constructor with Double3");
 
+        ArgumentNullException.ThrowIfNull(system, nameof(system));
+        ObjectDisposedException.ThrowIf(system.IsDisposed, nameof(system));
+
         JPH_CharacterSettings nativeSettings;
         settings.ToNative(&nativeSettings);
-        Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+        Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, system.Handle);
     }
 
-    public unsafe Character(CharacterSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem physicsSystem)
+    public unsafe Character(CharacterSettings settings, in RVector3 position, in Quaternion rotation, ulong userData, PhysicsSystem system)
         : base(0, true)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use constructor with Vector3");
 
+        ArgumentNullException.ThrowIfNull(system, nameof(system));
+        ObjectDisposedException.ThrowIf(system.IsDisposed, nameof(system));
+
         JPH_CharacterSettings nativeSettings;
         settings.ToNative(&nativeSettings);
-        Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, physicsSystem.Handle);
+        Handle = JPH_Character_Create(&nativeSettings, position, rotation, userData, system.Handle);
     }
 
     public void AddToPhysicsSystem(Activation activationMode = Activation.Activate, bool lockBodies = true)

@@ -10,7 +10,7 @@ namespace JoltPhysicsSharp;
 /// Disposal must be externally synchronized with native operations. In particular, do not
 /// dispose or configure collision filters concurrently with physics system construction.
 /// </remarks>
-public abstract class NativeObject : IDisposable
+public abstract class NativeObject : IDisposableObject
 {
     private volatile uint _isDisposed;
     internal bool _fromFinalizer = false;
