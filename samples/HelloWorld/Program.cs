@@ -42,7 +42,7 @@ public static class Program
         return new MeshShapeSettings(triangleVertices, indexedTriangles);
     }
 
-    public static unsafe void Main()
+    public static void Main()
     {
         Foundation.SetTraceHandler((message) =>
         {

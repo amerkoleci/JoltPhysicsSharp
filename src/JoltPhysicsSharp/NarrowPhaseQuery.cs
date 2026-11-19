@@ -121,14 +121,18 @@ public readonly unsafe struct NarrowPhaseQuery : IEquatable<NarrowPhaseQuery>
         in RVector3 origin,
         in Vector3 direction,
         out RayCastResult hit,
-        BroadPhaseLayerFilter broadPhaseFilter,
-        ObjectLayerFilter objectLayerFilter,
-        BodyFilter bodyFilter)
+        BroadPhaseLayerFilter? broadPhaseFilter = default,
+        ObjectLayerFilter? objectLayerFilter = default,
+        BodyFilter? bodyFilter = default)
     {
         if (!DoublePrecision)
             throw new InvalidOperationException($"Double precision is disabled: use {nameof(CastRay)}");
 
-        return JPH_NarrowPhaseQuery_CastRay(Handle, in origin, in direction, out hit, broadPhaseFilter.Handle, objectLayerFilter.Handle, bodyFilter.Handle);
+        return JPH_NarrowPhaseQuery_CastRay(Handle, in origin, in direction, out hit,
+            broadPhaseFilter?.Handle ?? 0,
+            objectLayerFilter?.Handle ?? 0,
+            bodyFilter?.Handle ?? 0
+            );
     }
 
     public bool CastRay(
