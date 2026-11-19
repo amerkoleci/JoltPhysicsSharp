@@ -178,18 +178,10 @@ public abstract class Application : DisposableObject
                 if (_ignoreDrawBodies.Contains(bodyID))
                     continue;
 
-                //Vector3 pos = BodyInterface.GetPosition(bodyID);
-                //Quaternion rot = BodyInterface.GetRotation(bodyID);
-                //Matrix4x4 ori = Matrix4x4.CreateFromQuaternion(rot);
-                //Matrix4x4 matrix = new(
-                //    ori.M11, ori.M12, ori.M13, pos.X,
-                //    ori.M21, ori.M22, ori.M23, pos.Y,
-                //    ori.M31, ori.M32, ori.M33, pos.Z,
-                //    0, 0, 0, 1.0f);
-
-                // Raylib uses column major matrix
                 Matrix4x4 worldTransform = BodyInterface.GetWorldTransform(bodyID);
-                DrawMesh(BoxMesh, BoxMaterial, worldTransform);
+                // Raylib uses column major matrix
+                Matrix4x4 drawTransform = Matrix4x4.Transpose(worldTransform);
+                DrawMesh(BoxMesh, BoxMaterial, drawTransform);
             }
 
             EndMode3D();
